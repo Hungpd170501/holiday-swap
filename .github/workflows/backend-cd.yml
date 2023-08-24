@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "HolidaySwap/**"
+      - ".github/workflows/backend-cd.yml"
 
 jobs:
   deploy:

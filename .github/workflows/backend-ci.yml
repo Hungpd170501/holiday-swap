@@ -3,6 +3,9 @@ name: CI - Build Backend
 on:
   pull_request:
     branches: [ master ]
+    paths:
+      - "HolidaySwap/**"
+      - ".github/workflows/backend-ci.yml"
 
 env:
   POSTGRESQL_VERSION: 13.1
