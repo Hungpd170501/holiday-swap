@@ -18,6 +18,20 @@
           "value": "dev"
         }
       ]
+    },
+    {
+      "name": "rabbitmq",
+      "image": "rabbitmq:3-management-alpine",
+      "portMappings": [
+        {
+          "hostPort": 5672,
+          "containerPort": 5672
+        },
+        {
+          "hostPort": 15672,
+          "containerPort": 15672
+        }
+      ]
     }
   ]
 }

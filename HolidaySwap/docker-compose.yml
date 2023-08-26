@@ -2,6 +2,7 @@ services:
 
   postgres:
     image: postgres
+    container_name: postgres
     environment:
       POSTGRES_USER: holiday-swap
       POSTGRES_PASSWORD: password
@@ -16,6 +17,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
+    container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@gmail.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
@@ -41,6 +43,24 @@ services:
       - cluster-network
     volumes:
       - rabbitmq:/var/lib/rabbitmq
+
+  holiday-swap-be:
+    image: hungpd170501/holiday-swap:latest
+    container_name: holiday-swap-be
+    environment:
+#      CONFIG_SERVER_HOST:
+      DATASOURCE_HOST: postgres
+      RABBITMQ_HOST: rabbitmq
+      EMAIL_USERNAME: hunga1705@gmail.com
+      EMAIL_PASSWORD: sawqoatroowhbdhf
+    ports:
+      - "8080:8080"
+    networks:
+      - postgres
+      - cluster-network
+    depends_on:
+      - postgres
+      - rabbitmq
 
 networks:
   postgres:

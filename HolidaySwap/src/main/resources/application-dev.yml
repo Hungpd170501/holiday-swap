@@ -12,15 +12,15 @@ spring:
         format_sql: true
         use_nationalized_character_data: true
     rabbitmq:
-      addresses: localhost:5672
+      addresses: ${RABBITMQ_HOST:localhost}:5672:5672
     profiles:
       active: default
     mail:
       host: smtp.gmail.com
       port: 587
       protocol: smtp
-      username: ${EMAIL_USERNAME}
-      password: ${EMAIL_PASSWORD}
+      username: ${EMAIL_USERNAME:hunga1705@gmail.com}
+      password: ${EMAIL_PASSWORD:sawqoatroowhbdhf}
       properties:
         mail:
           smtp:

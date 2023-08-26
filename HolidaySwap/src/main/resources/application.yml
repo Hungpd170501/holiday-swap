@@ -6,7 +6,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/holiday-swap
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/holiday-swap
     username: holiday-swap
     password: password
   jpa:
@@ -19,15 +19,15 @@ spring:
         use_nationalized_character_data: true
     show-sql: true
   rabbitmq:
-    addresses: localhost:5672
+    addresses: ${RABBITMQ_HOST:localhost}:5672
   profiles:
     active: default
   mail:
     host: smtp.gmail.com
     port: 587
     protocol: smtp
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PASSWORD}
+    username: ${EMAIL_USERNAME:hunga1705@gmail.com}
+    password: ${EMAIL_PASSWORD:sawqoatroowhbdhf}
     properties:
       mail:
         smtp:
