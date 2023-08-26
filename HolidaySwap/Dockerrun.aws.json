@@ -40,10 +40,7 @@
           "hostPort": 15672,
           "containerPort": 15672
         }
-      ],
-      "links": [
-          "holiday-swap"
-        ]
+      ]
     }
   ]
 }
