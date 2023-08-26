@@ -21,7 +21,10 @@
           "name": "RABBITMQ_HOST",
           "value": "rabbitmq"
         }
-      ]
+      ],
+      "links": [
+          "rabbitmq"
+        ]
     },
     {
       "name": "rabbitmq",
@@ -37,7 +40,10 @@
           "hostPort": 15672,
           "containerPort": 15672
         }
-      ]
+      ],
+      "links": [
+          "holiday-swap"
+        ]
     }
   ]
 }
