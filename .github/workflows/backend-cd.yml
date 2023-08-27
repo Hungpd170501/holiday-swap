@@ -9,6 +9,10 @@ on:
       - "HolidaySwap/**"
       - ".github/workflows/backend-cd.yml"
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,6 +30,11 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+          - 5672:5672
+          - 15672:15672
 
     steps:
       - uses: actions/checkout@v3
@@ -47,10 +56,10 @@ jobs:
       - name: Update Dockerrun.aws.json api image tag with new build number
         run: |
           echo "Dockerrun.aws.json before updating tag"
-          cat ./HolidaySwap/Dockerrun.aws.json
-          sed -i -E 's_(hungpd170501/holiday-swap:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' ./HolidaySwap/Dockerrun.aws.json
+          cat ./Dockerrun.aws.json
+          sed -i -E 's_(hungpd170501/holiday-swap:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' ./Dockerrun.aws.json
           echo "Dockerrun.aws.json after updating tag"
-          cat ./HolidaySwap/Dockerrun.aws.json
+          cat ./Dockerrun.aws.json
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -61,11 +70,11 @@ jobs:
           version_label: ${{ steps.build-number.outputs.BUILD_NUMBER }}
           version_description: ${{ github.SHA }}
           region: ${{ secrets.EB_REGION }}
-          deployment_package: ./HolidaySwap/Dockerrun.aws.json
+          deployment_package: ./Dockerrun.aws.json
       - name: Commit and push Dockerrun.aws.json
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add ./HolidaySwap/Dockerrun.aws.json
+          git add ./Dockerrun.aws.json
           git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
           git push
