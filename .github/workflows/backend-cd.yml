@@ -8,11 +8,7 @@ on:
     paths:
       - "HolidaySwap/**"
       - ".github/workflows/backend-cd.yml"
-
-permissions:
-  contents: read
-  packages: write
-
+      
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -38,6 +34,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT }}
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
