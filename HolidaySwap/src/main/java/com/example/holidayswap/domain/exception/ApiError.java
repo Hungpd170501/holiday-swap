@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ApiError {
+public class ApiError extends RuntimeException{
     private HttpStatus status;
     private String message;
     private List<String> errors;
