@@ -1,9 +1,17 @@
 {
   "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "rabbitmq",
+      "host": {
+        "sourcePath": "/var/lib/rabbitmq"
+      }
+    }
+  ],
   "containerDefinitions": [
     {
       "name": "holiday-swap",
-      "image": "hungpd170501/latest",
+      "image": "hungpd170501/holiday-swap:latest",
       "essential": true,
       "memory": 512,
       "portMappings": [
@@ -22,6 +30,8 @@
     {
       "name": "rabbitmq",
       "image": "rabbitmq:3-management-alpine",
+      "essential": true,
+      "memory": 128,
       "portMappings": [
         {
           "hostPort": 5672,

@@ -12,7 +12,7 @@ spring:
         format_sql: true
         use_nationalized_character_data: true
     rabbitmq:
-      addresses: ${RABBITMQ_HOST:localhost}:5672:5672
+      addresses: ${RABBITMQ_HOST:localhost}:5672
     profiles:
       active: default
     mail:
