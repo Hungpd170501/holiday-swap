@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -23,6 +26,33 @@ public class EmailService {
 
     @Value("${spring.mail.username}")
     private String username;
+
+    @Value("${application.base-url}")
+    private String baseUrl;
+
+
+    public void sendRegistrationReceipt(String email, String name){
+        sendMessage(EmailRequest
+                .builder()
+                .to(email)
+                .subject("HolidaySwap – Receipt of your membership")
+                .template("registration-receipt-template")
+                .attributes((Map<String, Object>) new HashMap<>().put("name", name)).build());
+    }
+
+    public void sendVerificationEmail(String email, String token){
+        Map<String, Object> attribute= new HashMap<>();
+        attribute.put("baseUrl", baseUrl);
+        attribute.put("verificationToken", token);
+
+        sendMessage(EmailRequest
+                .builder()
+                .to(email)
+                .subject("HolidaySwap - Please verify your email address")
+                .template("registration-template")
+                .attributes(attribute).build());
+    }
+
 
     public void sendMessage(EmailRequest emailRequest) {
         rabbitMQMessageProducer.publish(

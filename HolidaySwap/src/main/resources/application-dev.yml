@@ -19,8 +19,8 @@ spring:
       host: smtp.gmail.com
       port: 587
       protocol: smtp
-      username: ${EMAIL_USERNAME:hunga1705@gmail.com}
-      password: ${EMAIL_PASSWORD:sawqoatroowhbdhf}
+      username: ${EMAIL_USERNAME:holidayswap.noreply@gmail.com}
+      password: ${EMAIL_PASSWORD:wnummecwjczsyxpx}
       properties:
         mail:
           smtp:
@@ -43,3 +43,6 @@ spring:
 
   mail:
     debug: true
+
+application:
+  base-url: https://api.holiday-swap.click/api/v1/auth/verify-email
