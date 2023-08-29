@@ -1,0 +1,90 @@
+services:
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: holiday-swap
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@gmail.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - cluster-network
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    command: [ "redis-server", "--appendonly", "yes", "--requirepass", "password"]
+    ports:
+      - "6379:6379"
+    networks:
+      - cluster-network
+    volumes:
+      - redis:/data
+    restart: always
+
+  holiday-swap-be:
+    image: hungpd170501/holiday-swap:latest
+    container_name: holiday-swap-be
+    environment:
+#      CONFIG_SERVER_HOST:
+      DATASOURCE_HOST: postgres
+      RABBITMQ_HOST: rabbitmq
+      EMAIL_USERNAME: hunga1705@gmail.com
+      EMAIL_PASSWORD: sawqoatroowhbdhf
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password
+    ports:
+      - "8080:8080"
+    networks:
+      - postgres
+      - cluster-network
+    depends_on:
+      - postgres
+      - rabbitmq
+
+networks:
+  postgres:
+    driver: bridge
+  cluster-network:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+  rabbitmq:
+  redis:
