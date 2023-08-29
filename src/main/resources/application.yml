@@ -1,0 +1,63 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5432/holiday-swap
+    username: holiday-swap
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_nationalized_character_data: true
+    show-sql: true
+  rabbitmq:
+    addresses: ${RABBITMQ_HOST:localhost}:5672
+  profiles:
+    active: default
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    protocol: smtp
+    username: ${EMAIL_USERNAME:holidayswap.noreply@gmail.com}
+    password: ${EMAIL_PASSWORD:wnummecwjczsyxpx}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+logging:
+  level:
+    org:
+      hibernate: error
+
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queues:
+    email: email.queue
+  routing-keys:
+    internal-email: internal.email.routing-key
+
+mail:
+  debug: true
+
+application:
+  base-url: ${BASE_URL:http://localhost:8080}
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET:secretsecretsecretsecretsecret}
+      expiration: ${JWT_EXPIRATION:2592000000} #30 days
+      access-token:
+        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000} #30 minutes
+      refresh-token:
+        expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:1296000000} #15 days

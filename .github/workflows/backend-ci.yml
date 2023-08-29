@@ -3,9 +3,6 @@ name: CI - Build Backend
 on:
   pull_request:
     branches: [ master ]
-    paths:
-      - "HolidaySwap/**"
-      - ".github/workflows/backend-ci.yml"
 
 env:
   POSTGRESQL_VERSION: 13.1
@@ -40,4 +37,4 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           cache: 'maven'
       - name: Build and run Unit/Integration Tests with Maven
-        run: mvn -ntp -B verify -f HolidaySwap/pom.xml
+        run: mvn -ntp -B verify

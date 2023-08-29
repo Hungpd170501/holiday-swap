@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    url: jdbc-secretsmanager:postgresql://awseb-e-ykimbrpgq3-stack-awsebrdsdatabase-pushioghcpm6.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/ebdb
+    username: dev/cosmetic/postgres
+    driver-class-name: com.amazonaws.secretsmanager.sql.AWSSecretsManagerPostgreSQLDriver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_nationalized_character_data: true
+  rabbitmq:
+    addresses: ${RABBITMQ_HOST:localhost}:5672
+  profiles:
+    active: default
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    protocol: smtp
+    username: ${EMAIL_USERNAME:holidayswap.noreply@gmail.com}
+    password: ${EMAIL_PASSWORD:wnummecwjczsyxpx}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+logging:
+  level:
+    org:
+      hibernate: error
+
+rabbitmq:
+  exchanges:
+    internal: internal.exchange
+  queues:
+    email: email.queue
+  routing-keys:
+    internal-email: internal.email.routing-key
+
+mail:
+  debug: true
+
+application:
+  base-url: https://api.holiday-swap.click/api/v1/auth/verify-email
