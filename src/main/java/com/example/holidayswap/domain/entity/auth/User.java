@@ -1,26 +1,33 @@
 package com.example.holidayswap.domain.entity.auth;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.hibernate.annotations.Nationalized;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name = "users")
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
@@ -37,7 +44,7 @@ public class User implements UserDetails {
     private String email;
 
     @NotBlank(message = "Password must be specified.")
-    @Column(nullable = false)
+    @Column(nullable = false, name = "password_hash")
     private String passwordHash;
 
     @NotEmpty(message = "Username must be specified.")
@@ -46,6 +53,10 @@ public class User implements UserDetails {
             unique = true
     )
     private String username;
+
+    @Nationalized
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column
     private String avatar;
@@ -100,12 +111,12 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return status.equals(UserStatus.ACTIVE);
+        return status.equals(UserStatus.ACTIVE)||status.equals(UserStatus.PENDING);
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return status.equals(UserStatus.ACTIVE);
+        return status.equals(UserStatus.ACTIVE)||status.equals(UserStatus.PENDING);
     }
 
     @Override

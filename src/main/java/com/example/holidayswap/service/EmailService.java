@@ -38,7 +38,7 @@ public class EmailService {
 
     public void sendForgotPasswordEmail(String email, String token) {
         Map<String, Object> attribute = new HashMap<>();
-        attribute.put("baseUrl", baseUrl+"/api/v1/auth/forgot-password");
+        attribute.put("baseUrl", baseUrl + "/api/v1/auth/forgot-password");
         attribute.put("verificationToken", token);
         sendMessage(EmailRequest
                 .builder()
@@ -51,7 +51,7 @@ public class EmailService {
 
     public void sendVerificationEmail(String email, String token) {
         Map<String, Object> attribute = new HashMap<>();
-        attribute.put("baseUrl", baseUrl+"/api/v1/auth/verify-email");
+        attribute.put("baseUrl", baseUrl + "/api/v1/auth/verify-email");
         attribute.put("verificationToken", token);
         sendMessage(EmailRequest
                 .builder()

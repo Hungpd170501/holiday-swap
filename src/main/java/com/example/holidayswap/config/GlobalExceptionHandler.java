@@ -1,44 +1,31 @@
 package com.example.holidayswap.config;
 
 import com.example.holidayswap.domain.exception.*;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.TypeMismatchException;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-
-//import org.springframework.security.access.AccessDeniedException;
-//import org.springframework.security.core.AuthenticationException;
-import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+
+import static com.example.holidayswap.constants.ErrorMessage.INCORRECT_EMAIL_OR_PASSWORD;
+import static com.example.holidayswap.constants.ErrorMessage.JWT_TOKEN_INVALID;
 
 @Slf4j
 @ControllerAdvice
-public class GlobalExceptionHandler{
+public class GlobalExceptionHandler {
+    public static final String TRACE = "trace";
+
+    @Value("${reflectoring.trace:false}")
+    private boolean printStackTrace;
+
     //400
     @ExceptionHandler({ResourceNotFoundException.class, EntityNotFoundException.class})
     public <T extends RuntimeException> ResponseEntity<ApiError> resourceNotFoundExceptionHandler(T ex, WebRequest request) {
@@ -49,11 +36,11 @@ public class GlobalExceptionHandler{
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 
     //401
-    @ExceptionHandler({VerificationException.class, BadCredentialsException.class})
+    @ExceptionHandler({VerificationException.class, AuthenticationException.class})
     public <T extends RuntimeException> ResponseEntity<ApiError> verificationExceptionHandler(T ex, WebRequest request) {
         ApiError message = ApiError.builder()
                 .status(HttpStatus.UNAUTHORIZED)
@@ -61,8 +48,30 @@ public class GlobalExceptionHandler{
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
-        return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
     }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    public <T extends RuntimeException> ResponseEntity<ApiError> badCredentialsExceptionHandler(T ex, WebRequest request) {
+        ApiError message = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(INCORRECT_EMAIL_OR_PASSWORD)
+                .description(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+    }
+    @ExceptionHandler({JwtException.class})
+    public <T extends RuntimeException> ResponseEntity<ApiError> jwtExceptionHandler(T ex, WebRequest request) {
+        ApiError message = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(JWT_TOKEN_INVALID)
+                .description(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+    }
+
 
     //403
     @ExceptionHandler({AccessDeniedException.class})
@@ -73,8 +82,7 @@ public class GlobalExceptionHandler{
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
     }
 
     //409
@@ -86,8 +94,7 @@ public class GlobalExceptionHandler{
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
-
-        return new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
 
     //500
@@ -99,6 +106,6 @@ public class GlobalExceptionHandler{
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
-        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
     }
 }
