@@ -44,8 +44,8 @@ public class SecurityConfig {
                 )
                 .permitAll()
 
-//                .requestMatchers(SecurityConstants.ADMIN_API_PATHS)
-//                .hasAnyAuthority("Staff", "Admin")
+                .requestMatchers("api/v1/user/**")
+                .hasAnyAuthority("Staff", "Admin")
 
 
                 .anyRequest()

@@ -6,7 +6,10 @@ import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.ResetPasswordRequest;
 import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
 import com.example.holidayswap.domain.entity.auth.*;
-import com.example.holidayswap.domain.exception.*;
+import com.example.holidayswap.domain.exception.AccessDeniedException;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
+import com.example.holidayswap.domain.exception.EntityNotFoundException;
+import com.example.holidayswap.domain.exception.VerificationException;
 import com.example.holidayswap.domain.mapper.auth.UserMapper;
 import com.example.holidayswap.repository.auth.TokenRepository;
 import com.example.holidayswap.repository.auth.UserRepository;
@@ -14,7 +17,6 @@ import com.example.holidayswap.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -76,7 +78,7 @@ public class AuthenticationService {
                 )
         );
         var user = userRepository.getUserByEmailEquals(loginRequest.getEmail())
-                .orElseThrow(()->new EntityNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
         if (user.getStatus().equals(UserStatus.PENDING)) {
             throw new AccessDeniedException("User not verified.");
         }
@@ -98,15 +100,18 @@ public class AuthenticationService {
     }
 
     public void confirmRegistration(Long userId) {
-        var user = userRepository.findById(userId)
-                .orElseThrow(()->new EntityNotFoundException(USER_NOT_FOUND));
-        user.setStatus(UserStatus.ACTIVE);
-        userRepository.save(user);
+        userRepository.findById(userId)
+                .ifPresentOrElse(u -> {
+                    u.setStatus(UserStatus.ACTIVE);
+                    userRepository.save(u);
+                }, () -> {
+                    throw new EntityNotFoundException(USER_NOT_FOUND);
+                });
     }
 
     public void forgetPassword(String email) {
         var user = userRepository.getUserByEmailEquals(email)
-                .orElseThrow(()->new EntityNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
         var token = tokenRepository.save(Token
                 .builder()
                 .user(user)
@@ -122,8 +127,7 @@ public class AuthenticationService {
         String userEmail = jwtService.extractUsername(resetPasswordRequest.getToken());
         if (userEmail != null) {
             var user = this.userRepository.getUserByEmailEquals(userEmail)
-                    .orElseThrow(()->new EntityNotFoundException(USER_NOT_FOUND));
-
+                    .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
             if (jwtService.isTokenValid(resetPasswordRequest.getToken(), user)) {
                 tokenRepository.findByValueEquals(resetPasswordRequest.getToken())
                         .ifPresent(token -> {
@@ -147,7 +151,7 @@ public class AuthenticationService {
         String userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
             var user = this.userRepository.getUserByEmailEquals(userEmail)
-                    .orElseThrow(()->new EntityNotFoundException(USER_NOT_FOUND));
+                    .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
             if (jwtService.isTokenValid(refreshToken, user)) {
                 return getAuthenticationResponse(user);
             }
@@ -172,12 +176,10 @@ public class AuthenticationService {
                 .stream()
                 .filter(t -> t.getTokenType().equals(TokenType.ACCESS) || t.getTokenType().equals(TokenType.REFRESH))
                 .toList();
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setStatus(TokenStatus.REVOKED);
-        });
-        tokenRepository.saveAll(validUserTokens);
+        if (!validUserTokens.isEmpty()) {
+            validUserTokens.forEach(token -> token.setStatus(TokenStatus.REVOKED));
+            tokenRepository.saveAll(validUserTokens);
+        }
     }
 
 
@@ -185,15 +187,13 @@ public class AuthenticationService {
         String userEmail = jwtService.extractUsername(token);
         if (userEmail != null) {
             var user = this.userRepository.getUserByEmailEquals(userEmail)
-                    .orElseThrow(()->new EntityNotFoundException(USER_NOT_FOUND));
+                    .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
             if (jwtService.isTokenValid(token, user)) {
                 var validUserPasswordResetTokens = tokenRepository.findAllValidTokenByUser(user.getUserId())
                         .stream()
                         .filter(t -> t.getTokenType().equals(TokenType.PASSWORD_RESET))
                         .toList();
-                validUserPasswordResetTokens.forEach(t -> {
-                    t.setStatus(TokenStatus.REVOKED);
-                });
+                validUserPasswordResetTokens.forEach(t -> t.setStatus(TokenStatus.REVOKED));
                 tokenRepository.saveAll(validUserPasswordResetTokens);
                 return;
             }
@@ -205,16 +205,16 @@ public class AuthenticationService {
         String userEmail = jwtService.extractUsername(token);
         if (userEmail != null) {
             var user = this.userRepository.getUserByEmailEquals(userEmail)
-                    .orElseThrow(()->new EntityNotFoundException(USER_NOT_FOUND));
+                    .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
             if (jwtService.isTokenValid(token, user)) {
                 var validUserEmailVerificationTokens = tokenRepository.findAllValidTokenByUser(user.getUserId())
                         .stream()
                         .filter(t -> t.getTokenType().equals(TokenType.EMAIL_VERIFICATION))
                         .toList();
-                validUserEmailVerificationTokens.forEach(t -> {
-                    t.setStatus(TokenStatus.REVOKED);
-                });
+                validUserEmailVerificationTokens.forEach(t -> t.setStatus(TokenStatus.REVOKED));
                 tokenRepository.saveAll(validUserEmailVerificationTokens);
+                user.setEmailVerified(true);
+                userRepository.save(user);
                 return;
             }
         }

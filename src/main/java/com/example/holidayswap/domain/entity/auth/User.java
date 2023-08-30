@@ -1,7 +1,10 @@
 package com.example.holidayswap.domain.entity.auth;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +15,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -100,12 +105,12 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return status.equals(UserStatus.ACTIVE);
+        return status.equals(UserStatus.ACTIVE)||status.equals(UserStatus.PENDING);
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return status.equals(UserStatus.ACTIVE);
+        return status.equals(UserStatus.ACTIVE)||status.equals(UserStatus.PENDING);
     }
 
     @Override

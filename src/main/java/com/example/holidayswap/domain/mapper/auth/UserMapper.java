@@ -12,6 +12,7 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     UserProfileResponse toUserProfileResponse(User user);
-    @Mapping(source = "password",target = "passwordHash", ignore = true)
+
+    @Mapping(source = "password", target = "passwordHash", ignore = true)
     User toUserEntity(RegisterRequest registerRequest);
 }
