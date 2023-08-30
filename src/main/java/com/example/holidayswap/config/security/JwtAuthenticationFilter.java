@@ -1,6 +1,7 @@
 package com.example.holidayswap.config.security;
 
 import com.example.holidayswap.domain.entity.auth.TokenStatus;
+import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.repository.auth.TokenRepository;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
@@ -50,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var isTokenValid = tokenRepository.findByValueEquals(jwt)
                     .map(t -> t.getStatus().equals(TokenStatus.VALID) && t.getExpirationTime().isAfter(java.time.LocalDateTime.now()))
                     .orElse(false);
-            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+            if (jwtService.isTokenValid(jwt, (User) userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

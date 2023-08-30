@@ -39,14 +39,13 @@ public class SecurityConfig {
                         "/configuration/security",
                         "/swagger-ui/**",
                         "/webjars/**",
-                        "/swagger-ui.html"
+                        "/swagger-ui.html",
+                        "/api/v1/user/**"
                 )
                 .permitAll()
 
 //                .requestMatchers(SecurityConstants.ADMIN_API_PATHS)
 //                .hasAnyAuthority("Staff", "Admin")
-
-
 
 
                 .anyRequest()

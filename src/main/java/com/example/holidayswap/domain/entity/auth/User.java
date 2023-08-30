@@ -28,18 +28,19 @@ public class User implements UserDetails {
     )
     private Long userId;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email must be specified.")
+    @Email(message = "Email must be valid.")
     @Column(
             nullable = false,
             unique = true
     )
     private String email;
 
-    @Column
+    @NotBlank(message = "Password must be specified.")
+    @Column(nullable = false)
     private String passwordHash;
 
-    @NotEmpty
+    @NotEmpty(message = "Username must be specified.")
     @Nationalized
     @Column(nullable = false,
             unique = true
