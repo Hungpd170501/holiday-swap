@@ -9,11 +9,13 @@ import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.service.auth.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/auth")
+@Validated
 public class AuthController {
     private final AuthenticationService authenticationService;
 
@@ -64,11 +66,13 @@ public class AuthController {
 
     @GetMapping("/verify-email")
     public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
+        authenticationService.verifyEmailToken(token);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/forgot-password")
     public ResponseEntity<Void> verifyForgotPasswordToken(@RequestParam String token) {
+        authenticationService.verifyForgotPasswordToken(token);
         return ResponseEntity.ok().build();
     }
 }

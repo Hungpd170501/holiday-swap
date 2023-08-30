@@ -3,10 +3,10 @@ package com.example.holidayswap.domain.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class VerificationException extends RuntimeException {
+@ResponseStatus(HttpStatus.FORBIDDEN)
+public class AccessDeniedException extends RuntimeException {
 
-    public VerificationException(String message) {
+    public AccessDeniedException(String message) {
         super(message);
     }
 

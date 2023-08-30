@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.dto.response.auth;
 
 import com.example.holidayswap.domain.entity.auth.Gender;
 import com.example.holidayswap.domain.entity.auth.UserStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,7 +23,9 @@ public class UserProfileResponse {
     private Gender gender;
     private LocalDate dob;
     private String phone;
+    @JsonProperty("email_verified")
     private boolean emailVerified;
+    @JsonProperty("phone_verified")
     private boolean phoneVerified;
     private UserStatus status;
 }

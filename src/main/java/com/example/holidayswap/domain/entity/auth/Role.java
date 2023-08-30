@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.auth;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,12 +26,13 @@ public class Role {
     )
     private Long roleId;
 
-    @NotEmpty
+    @NotEmpty(message = "Name must be specified.")
     @Column(nullable = false)
     private String name;
 
+    @NotNull(message = "Status must be specified.")
     @Column(nullable = false)
-    private Integer status;
+    private boolean status;
 
     @OneToMany(mappedBy = "role",
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},

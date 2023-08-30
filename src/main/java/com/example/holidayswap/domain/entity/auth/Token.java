@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.auth;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class Token {
     @Column(nullable = false, name = "token_type")
     private TokenType tokenType;
 
+    @NotBlank(message = "Token value must be specified.")
     @Column(nullable = false)
     private String value;
 

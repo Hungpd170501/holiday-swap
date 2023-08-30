@@ -17,20 +17,7 @@ import java.util.List;
 public class ApiError extends RuntimeException{
     private HttpStatus status;
     private String message;
-    private List<String> errors;
+    private String description;
     @Builder.Default
     private LocalDateTime timestamp = LocalDateTime.now();
-
-    public ApiError(HttpStatus status, String message, List<String> errors) {
-        this.status = status;
-        this.message = message;
-        this.errors = errors;
-    }
-
-    public ApiError(final HttpStatus status, final String message, final String error) {
-        super();
-        this.status = status;
-        this.message = message;
-        errors = Collections.singletonList(error);
-    }
 }
