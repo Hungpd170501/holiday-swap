@@ -1,4 +1,4 @@
-package com.example.holidayswap.service.auth;
+package com.example.holidayswap.config.security;
 
 import com.example.holidayswap.domain.entity.auth.TokenStatus;
 import com.example.holidayswap.repository.auth.TokenRepository;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler {
-
     private final TokenRepository tokenRepository;
 
     @Override

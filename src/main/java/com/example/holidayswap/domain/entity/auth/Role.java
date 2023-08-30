@@ -27,7 +27,7 @@ public class Role {
     private Long roleId;
 
     @NotEmpty(message = "Name must be specified.")
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @NotNull(message = "Status must be specified.")

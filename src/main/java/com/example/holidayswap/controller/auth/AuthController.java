@@ -8,6 +8,7 @@ import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.service.auth.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(authenticationService.login(loginRequest));
+        AuthenticationResponse response = authenticationService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
@@ -56,11 +58,6 @@ public class AuthController {
     @PutMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         authenticationService.resetPassword(resetPasswordRequest);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/profile")
-    public ResponseEntity<UserProfileResponse> getUserInfo() {
         return ResponseEntity.noContent().build();
     }
 
