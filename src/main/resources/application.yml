@@ -19,8 +19,6 @@ spring:
     show-sql: true
   rabbitmq:
     addresses: ${RABBITMQ_HOST:localhost}:5672
-  profiles:
-    active: default
   mail:
     host: smtp.gmail.com
     port: 587
