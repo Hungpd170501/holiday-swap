@@ -9,7 +9,6 @@ services:
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
-    command: ["postgres", "-c", "shared_preload_libraries=unaccent"]
     ports:
       - "5432:5432"
     networks:
@@ -38,9 +37,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672" # AMQP
-      - "15672:15672" # Management UI
-      - "61613:61613" # STOMP port
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - cluster-network
     volumes:
@@ -58,37 +56,26 @@ services:
       - redis:/data
     restart: always
 
-  redisinsight:
-    container_name: redisinsight
-    image: redislabs/redisinsight:latest
+  holiday-swap-be:
+    image: hungpd170501/holiday-swap:latest
+    container_name: holiday-swap-be
+    environment:
+#      CONFIG_SERVER_HOST:
+      DATASOURCE_HOST: postgres
+      RABBITMQ_HOST: rabbitmq
+      EMAIL_USERNAME: hunga1705@gmail.com
+      EMAIL_PASSWORD: sawqoatroowhbdhf
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password
     ports:
-      - '8001:8001'
-    volumes:
-      - redisinsight:/db
+      - "8080:8080"
     networks:
+      - postgres
       - cluster-network
-
-#  holiday-swap-be:
-#    image: hungpd170501/holiday-swap:latest
-#    container_name: holiday-swap-be
-#    environment:
-##      CONFIG_SERVER_HOST:
-#      DATASOURCE_HOST: postgres
-#      RABBITMQ_HOST: rabbitmq
-#      EMAIL_USERNAME: hunga1705@gmail.com
-#      EMAIL_PASSWORD: sawqoatroowhbdhf
-#      REDIS_HOST: redis
-#      REDIS_PORT: 6379
-#      REDIS_PASSWORD: password
-#    ports:
-#      - "8080:8080"
-#    networks:
-#      - postgres
-#      - cluster-network
-#    depends_on:
-#      - postgres
-#      - rabbitmq
-#      - redis
+    depends_on:
+      - postgres
+      - rabbitmq
 
 networks:
   postgres:
@@ -101,4 +88,3 @@ volumes:
   pgadmin:
   rabbitmq:
   redis:
-  redisinsight:

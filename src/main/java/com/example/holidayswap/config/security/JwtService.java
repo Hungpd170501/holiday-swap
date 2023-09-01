@@ -33,9 +33,6 @@ public class JwtService {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getId);
-    }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -70,7 +67,6 @@ public class JwtService {
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getEmail())
-                .setId(userDetails.getUserId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -78,8 +74,8 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, User userDetails) {
-        final String userId = extractUserId(token);
-        return (userId.equals(userDetails.getUserId().toString())) && !isTokenExpired(token);
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getEmail())) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
