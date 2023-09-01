@@ -11,6 +11,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         use_nationalized_character_data: true
+    show-sql: true
   rabbitmq:
     addresses: ${RABBITMQ_HOST:localhost}:5672
     stomp:
@@ -19,14 +20,19 @@ spring:
     host: smtp.gmail.com
     port: 587
     protocol: smtp
-    username: ${EMAIL_USERNAME:holidayswap.noreply@gmail.com}
-    password: ${EMAIL_PASSWORD:wnummecwjczsyxpx}
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 30MB
+      max-request-size: 30MB
 
 logging:
   level:
@@ -44,13 +50,26 @@ rabbitmq:
 mail:
   debug: true
 
+redis:
+  host: ${HOST:localhost}
+  port: 6379
+
+amazon:
+  s3:
+    bucket:
+      name: holiday-swap-file-resouces
+  aws:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+
 application:
-  base-url: ${BASE_URL:https://api.holiday-swap.click}
+  host: ${HOST:localhost}
+  base-url: ${BASE_URL:http://localhost:8080}
   security:
     jwt:
-      secret-key: ${JWT_SECRET:8A2F7B9E1D3C5F6A0B2D4F6A8C0E2F4A1B3D5F7A9C0E3F5A2B4D6F8A1B2}
-      expiration: ${JWT_EXPIRATION:2592000000} #30 days
+      secret-key: ${JWT_SECRET}
+      expiration: ${JWT_EXPIRATION:2592000000}
       access-token:
-        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000} #30 minutes
+        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000}
       refresh-token:
-        expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:1296000000} #15 days
+        expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:1296000000}
