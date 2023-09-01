@@ -16,6 +16,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         use_nationalized_character_data: true
+    show-sql: true
   rabbitmq:
     addresses: ${RABBITMQ_HOST:localhost}:5672
     stomp:
@@ -32,6 +33,11 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 30MB
+      max-request-size: 30MB
 
 logging:
   level:
@@ -67,7 +73,8 @@ twilio:
   trial_number: ${TWILIO_TRIAL_NUMBER}
 
 application:
-  base-url: ${BASE_URL:https://api.holiday-swap.click}
+  host: ${HOST:localhost}
+  base-url: ${BASE_URL:http://localhost:8080}
   security:
     jwt:
       secret-key: ${JWT_SECRET}

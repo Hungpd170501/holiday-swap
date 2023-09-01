@@ -46,7 +46,11 @@ jobs:
         ports:
           - 6379:6379
         credentials:
+<<<<<<< HEAD
           password: password
+=======
+            password: password
+>>>>>>> b284581 (chore: upload file with s3 (#5))
 
 
     steps:
