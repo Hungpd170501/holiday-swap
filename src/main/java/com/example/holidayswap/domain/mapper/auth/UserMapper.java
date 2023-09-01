@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.mapper.auth;
 
 import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
+import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 import org.mapstruct.Mapper;
@@ -15,4 +16,7 @@ public interface UserMapper {
 
     @Mapping(source = "password", target = "passwordHash", ignore = true)
     User toUserEntity(RegisterRequest registerRequest);
+
+    @Mapping(source = "password", target = "passwordHash", ignore = true)
+    User toUserEntity(UserRequest userRequest);
 }

@@ -1,5 +1,8 @@
 package com.example.holidayswap.config.security;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,10 +11,15 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -40,12 +48,12 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/webjars/**",
                         "/swagger-ui.html",
-                        "/api/v1/user/**"
+                        "/**"
                 )
                 .permitAll()
 
-                .requestMatchers("api/v1/user/**")
-                .hasAnyAuthority("Staff", "Admin")
+//                .requestMatchers("/api/v1/user/**")
+//                .hasAnyAuthority("Staff", "Admin")
 
 
                 .anyRequest()
