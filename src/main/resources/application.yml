@@ -1,7 +1,7 @@
 server:
   port: 8080
   error:
-    include-stacktrace: on-param
+    include-stacktrace: never
 
 spring:
   datasource:
@@ -33,6 +33,11 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 30MB
+      max-request-size: 30MB
 
 logging:
   level:
@@ -53,6 +58,14 @@ mail:
 redis:
   host: ${HOST:localhost}
   port: 6379
+
+amazon:
+  s3:
+    bucket:
+      name: holiday-swap-file-resouces
+  aws:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
 
 application:
   host: ${HOST:localhost}

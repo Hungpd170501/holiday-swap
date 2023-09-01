@@ -10,10 +10,13 @@ env:
   POSTGRESQL_USER: holiday-swap
   POSTGRESQL_PASSWORD: password
   JAVA_VERSION: 17
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Env
     services:
       postgres:
         image: postgres:14.1
@@ -28,6 +31,19 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+          - 5672:5672
+          - 15672:15672
+          - 61613:61613
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        credentials:
+            password: password
+
 
     steps:
       - uses: actions/checkout@v3
