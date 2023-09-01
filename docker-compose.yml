@@ -45,6 +45,7 @@ services:
       - cluster-network
     volumes:
       - rabbitmq:/var/lib/rabbitmq
+    restart: unless-stopped
 
   redis:
     container_name: redis
