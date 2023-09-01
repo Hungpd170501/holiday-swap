@@ -1,4 +1,4 @@
-package com.example.holidayswap.service.auth;
+package com.example.holidayswap.config.security;
 
 import com.example.holidayswap.domain.entity.auth.TokenStatus;
 import com.example.holidayswap.repository.auth.TokenRepository;

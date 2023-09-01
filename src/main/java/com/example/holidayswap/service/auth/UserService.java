@@ -1,21 +1,19 @@
 package com.example.holidayswap.service.auth;
 
+import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
+import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
-import com.example.holidayswap.domain.exception.ApiError;
-import com.example.holidayswap.domain.exception.EntityNotFoundException;
-import com.example.holidayswap.domain.mapper.auth.UserMapper;
-import com.example.holidayswap.repository.auth.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
-    private final UserRepository userRepository;
+import java.util.List;
 
-    public UserProfileResponse getUserById(Long userId) {
-        return userRepository.getUserByUserIdEquals(userId).map(UserMapper.INSTANCE::toUserProfileResponse)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-    }
+public interface UserService {
+    UserProfileResponse getUserById(Long userId);
+
+    UserProfileResponse getUserInfo();
+
+    void deleteUser(Long userId);
+
+    List<UserProfileResponse> findAllByEmailNamePhoneWithPagination(String email, String name, String phone, Integer limit, Integer offset);
+
+    void createUser(UserRequest userRequest);
 }
