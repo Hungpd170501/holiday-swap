@@ -41,7 +41,7 @@ public class PaymentController {
 //        }
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
-//        vnp_Params.put("vnp_OrderType", orderType);
+        vnp_Params.put("vnp_OrderType", "120000");
 
 //        String locate = req.getParameter("language");
 //        if (locate != null && !locate.isEmpty()) {
@@ -49,8 +49,8 @@ public class PaymentController {
 //        } else {
 //            vnp_Params.put("vnp_Locale", "vn");
 //        }
-//        vnp_Params.put("vnp_ReturnUrl", BankingConfig.vnp_ReturnUrl);
-//        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+        vnp_Params.put("vnp_ReturnUrl", "http://localhost:8080/swagger-ui/index.html");
+        vnp_Params.put("vnp_IpAddr", "vnp_IpAddr");
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
