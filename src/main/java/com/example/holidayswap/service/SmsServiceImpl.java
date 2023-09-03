@@ -6,15 +6,15 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 @Service("smsService")
 @RequiredArgsConstructor
 public class SmsServiceImpl implements SmsService {
     private static final String SENDER_ID = "HolidaySwap";
-    private static final Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
     private final AmazonSNSClient amazonSNSClient;
 
     public static String getRandomNumberString() {
