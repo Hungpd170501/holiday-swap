@@ -14,7 +14,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> getUserByUserIdEquals(Long userId);
+
     Optional<User> getUserByEmailEquals(String email);
+
     @Query("""
             SELECT u FROM User u WHERE 
             (:email = '' OR u.email LIKE %:email%)
@@ -24,8 +26,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
         //    CREATE EXTENSION unaccent; in postgresql
     Page<User> findAllByEmailNamePhoneWithPagination(
             String email, String name, String phone, Pageable pageable);
+
     Optional<User> getUserByEmailEqualsAndStatusEquals(String email, UserStatus status);
+
     boolean existsByUsername(String username);
+
     boolean existsByEmail(String email);
 }
 

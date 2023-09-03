@@ -17,7 +17,7 @@ import java.io.IOException;
 public class FileController {
     private final FileService fileService;
 
-    @PostMapping(value = "/upload", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String uploadImage(@RequestPart("file") MultipartFile multipartFile) throws IOException {
         return fileService.uploadFile(multipartFile);
     }

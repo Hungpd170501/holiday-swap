@@ -38,15 +38,6 @@ public class EmailConfig {
     @Value("${mail.debug}")
     private String debug;
 
-    @Value("${rabbitmq.exchanges.internal}")
-    private String internalExchange;
-
-    @Value("${rabbitmq.queues.email}")
-    private String notificationQueue;
-
-    @Value("${rabbitmq.routing-keys.internal-email}")
-    private String internalNotificationRoutingKey;
-
     @Bean
     public JavaMailSender getMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

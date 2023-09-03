@@ -15,4 +15,5 @@ public class ErrorMessage {
     public static final String ROLE_ALREADY_EXISTS = "Role already exists.";
     public static final String PROFILE_NOT_FOUND = "Profile not found.";
     public static final String INCORRECT_EMAIL_OR_PASSWORD = "Incorrect email or password.";
+    public static final String SERVICE_UNAVAILABLE = "Oops! Something went wrong. Please try again later or contact our support team for assistance.";
 }
