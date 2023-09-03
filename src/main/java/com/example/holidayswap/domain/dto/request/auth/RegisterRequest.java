@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.entity.auth.Role;
 import lombok.Data;
 
 import java.time.LocalDate;
+
 @Data
 public class RegisterRequest {
     private String email;

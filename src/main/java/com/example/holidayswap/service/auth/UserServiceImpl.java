@@ -1,6 +1,5 @@
 package com.example.holidayswap.service.auth;
 
-import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.entity.auth.User;
@@ -18,7 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.example.holidayswap.constants.ErrorMessage.*;
+import static com.example.holidayswap.constants.ErrorMessage.PROFILE_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -56,14 +56,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserProfileResponse> findAllByEmailNamePhoneWithPagination(String email, String name, String phone, Integer limit, Integer offset){
+    public List<UserProfileResponse> findAllByEmailNamePhoneWithPagination(String email, String name, String phone, Integer limit, Integer offset) {
         Page<User> userPage = userRepository.findAllByEmailNamePhoneWithPagination(email, StringUtils.stripAccents(name), phone, PageRequest.of(offset, limit));
         return userPage.stream().map(userMapper::toUserProfileResponse).toList();
     }
 
     @Override
     public void createUser(UserRequest userRequest) {
-        var user= userMapper.toUserEntity(userRequest);
+        var user = userMapper.toUserEntity(userRequest);
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
         userRepository.save(user);
     }
