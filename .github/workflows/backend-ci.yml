@@ -21,7 +21,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: Env
     services:
       postgres:
         image: postgres:14.1
