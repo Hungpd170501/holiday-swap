@@ -1,10 +1,7 @@
 package com.example.holidayswap.domain.entity.auth;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 import org.springframework.security.core.GrantedAuthority;
@@ -71,6 +68,7 @@ public class User implements UserDetails, Serializable {
     private LocalDate dob;
 
     @Column
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     private String phone;
 
     @Column(name = "email_verified")
@@ -111,12 +109,12 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isAccountNonExpired() {
-        return status.equals(UserStatus.ACTIVE)||status.equals(UserStatus.PENDING);
+        return status.equals(UserStatus.ACTIVE) || status.equals(UserStatus.PENDING);
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return status.equals(UserStatus.ACTIVE)||status.equals(UserStatus.PENDING);
+        return status.equals(UserStatus.ACTIVE) || status.equals(UserStatus.PENDING);
     }
 
     @Override

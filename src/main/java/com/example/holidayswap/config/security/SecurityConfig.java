@@ -27,23 +27,23 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorizeHttpRequests->authorizeHttpRequests
-                        .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/v2/api-docs",
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/swagger-resources",
-                                "/swagger-resources/**",
-                                "/configuration/ui",
-                                "/configuration/security",
-                                "/swagger-ui/**",
-                                "/webjars/**",
-                                "/swagger-ui.html",
-                                "/**"
-                        )
-                        .permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                                .requestMatchers(
+                                        "/api/v1/auth/**",
+                                        "/v2/api-docs",
+                                        "/v3/api-docs",
+                                        "/v3/api-docs/**",
+                                        "/swagger-resources",
+                                        "/swagger-resources/**",
+                                        "/configuration/ui",
+                                        "/configuration/security",
+                                        "/swagger-ui/**",
+                                        "/webjars/**",
+                                        "/swagger-ui.html",
+                                        "/**"
+                                )
+                                .permitAll()
+                                .anyRequest().authenticated()
                         //                .requestMatchers("/api/v1/user/**")
                         //                .hasAnyAuthority("Staff", "Admin")
                 )

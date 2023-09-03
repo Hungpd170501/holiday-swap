@@ -26,7 +26,7 @@ spring:
     port: 587
     protocol: smtp
     username: ${EMAIL_USERNAME:holidayswap.noreply@gmail.com}
-    password: ${EMAIL_PASSWORD:wnummecwjczsyxpx}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -67,12 +67,17 @@ amazon:
     access-key: ${AWS_ACCESS_KEY}
     secret-key: ${AWS_SECRET_KEY}
 
+twilio:
+  account_sid: ${TWILIO_ACCOUNT_SID}
+  auth_token: ${TWILIO_AUTH_TOKEN}
+  trial_number: ${TWILIO_TRIAL_NUMBER}
+
 application:
   host: ${HOST:localhost}
   base-url: ${BASE_URL:http://localhost:8080}
   security:
     jwt:
-      secret-key: ${JWT_SECRET:8A2F7B9E1D3C5F6A0B2D4F6A8C0E2F4A1B3D5F7A9C0E3F5A2B4D6F8A1B2}
+      secret-key: ${JWT_SECRET}
       expiration: ${JWT_EXPIRATION:2592000000} #30 days
       access-token:
         expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000} #30 minutes

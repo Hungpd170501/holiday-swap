@@ -25,6 +25,13 @@ jobs:
         ports:
           - 5672:5672
           - 15672:15672
+          - 61613:61613
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        credentials:
+          password: password
 
     steps:
       - uses: actions/checkout@v3
