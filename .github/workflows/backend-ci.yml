@@ -10,13 +10,17 @@ env:
   POSTGRESQL_USER: holiday-swap
   POSTGRESQL_PASSWORD: password
   JAVA_VERSION: 17
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+  TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+  TWILIO_TRIAL_NUMBER: ${{ secrets.TWILIO_TRIAL_NUMBER }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: Env
     services:
       postgres:
         image: postgres:14.1
@@ -42,8 +46,7 @@ jobs:
         ports:
           - 6379:6379
         credentials:
-            password: password
-
+          password: password
 
     steps:
       - uses: actions/checkout@v3

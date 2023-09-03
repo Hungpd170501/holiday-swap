@@ -1,6 +1,5 @@
 package com.example.holidayswap.controller.auth;
 
-import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.service.auth.UserService;

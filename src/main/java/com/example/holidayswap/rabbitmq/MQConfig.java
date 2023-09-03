@@ -12,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MQConfig {
+    private final ConnectionFactory connectionFactory;
     @Value("${rabbitmq.exchanges.internal}")
     private String internalExchange;
     @Value("${rabbitmq.queues.email}")
     private String notificationQueue;
     @Value("${rabbitmq.routing-keys.internal-email}")
     private String internalNotificationRoutingKey;
-    private final ConnectionFactory connectionFactory;
 
     public MQConfig(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;

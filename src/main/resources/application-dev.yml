@@ -1,3 +1,8 @@
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
 spring:
   datasource:
     url: jdbc-secretsmanager:postgresql://awseb-e-ykimbrpgq3-stack-awsebrdsdatabase-pushioghcpm6.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/ebdb
@@ -20,7 +25,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     protocol: smtp
-    username: ${EMAIL_USERNAME}
+    username: ${EMAIL_USERNAME:holidayswap.noreply@gmail.com}
     password: ${EMAIL_PASSWORD}
     properties:
       mail:
@@ -62,14 +67,19 @@ amazon:
     access-key: ${AWS_ACCESS_KEY}
     secret-key: ${AWS_SECRET_KEY}
 
+twilio:
+  account_sid: ${TWILIO_ACCOUNT_SID}
+  auth_token: ${TWILIO_AUTH_TOKEN}
+  trial_number: ${TWILIO_TRIAL_NUMBER}
+
 application:
   host: ${HOST:localhost}
   base-url: ${BASE_URL:http://localhost:8080}
   security:
     jwt:
       secret-key: ${JWT_SECRET}
-      expiration: ${JWT_EXPIRATION:2592000000}
+      expiration: ${JWT_EXPIRATION:2592000000} #30 days
       access-token:
-        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000}
+        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000} #30 minutes
       refresh-token:
-        expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:1296000000}
+        expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:1296000000} #15 days
