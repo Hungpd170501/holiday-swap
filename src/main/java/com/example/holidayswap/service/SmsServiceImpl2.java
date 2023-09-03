@@ -6,11 +6,11 @@ import com.twilio.type.PhoneNumber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 @Service("smsService2")
 public class SmsServiceImpl2 implements SmsService {
-    private static final Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
     @Value("${twilio.account_sid}")
     private String accountSid;
     @Value("${twilio.auth_token}")
