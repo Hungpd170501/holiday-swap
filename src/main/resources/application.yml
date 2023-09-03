@@ -26,7 +26,7 @@ spring:
     port: 587
     protocol: smtp
     username: ${EMAIL_USERNAME:holidayswap.noreply@gmail.com}
-    password: ${EMAIL_PASSWORD:wnummecwjczsyxpx}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
