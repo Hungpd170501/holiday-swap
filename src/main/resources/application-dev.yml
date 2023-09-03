@@ -1,3 +1,8 @@
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
 spring:
   datasource:
     url: jdbc-secretsmanager:postgresql://awseb-e-ykimbrpgq3-stack-awsebrdsdatabase-pushioghcpm6.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/ebdb
@@ -61,6 +66,11 @@ amazon:
   aws:
     access-key: ${AWS_ACCESS_KEY}
     secret-key: ${AWS_SECRET_KEY}
+
+twilio:
+  account_sid: ${TWILIO_ACCOUNT_SID}
+  auth_token: ${TWILIO_AUTH_TOKEN}
+  trial_number: ${TWILIO_TRIAL_NUMBER}
 
 application:
   host: ${HOST:localhost}
