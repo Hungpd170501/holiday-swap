@@ -1,0 +1,64 @@
+package com.example.holidayswap.domain.entity.property;
+
+import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.resort.Resort;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "property", schema = "public")
+public class Property {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "property_id", nullable = false)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resort_id")
+    private Resort resort;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_type_id")
+    private PropertyType propertyType;
+
+    @Column(name = "status", length = Integer.MAX_VALUE)
+    private String status;
+
+    @Column(name = "isdeleted")
+    private Boolean isdeleted;
+
+    @OneToMany(mappedBy = "property")
+    private Set<PropertyAvailableTime> propertyAvailableTimes = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "property")
+    private Set<PropertyContract> propertyContracts = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "property_facility",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "facility_id"))
+    private Set<Facility> facilities = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "property_images",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "property_image_id"))
+    private Set<ImageProperty> imageProperties = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "property_service",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id"))
+    private Set<Service> services = new LinkedHashSet<>();
+
+}

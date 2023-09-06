@@ -20,8 +20,8 @@ public class Resort {
     private Long id;
 
     @Size(max = 255)
-    @Column(name = "name")
-    private String name;
+    @Column(name = "resort_name")
+    private String resortName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
