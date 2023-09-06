@@ -16,9 +16,7 @@ import org.springframework.data.geo.Point;
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(
-            name = "address_id"
-    )
+    @Column(name = "address_id")
     private Long addressId;
 
     @Column(nullable = false)
@@ -30,10 +28,7 @@ public class Address {
     @Column
     private String description;
 
-    @Column(
-            nullable = false,
-            length = 35
-    )
+    @Column(nullable = false, length = 35)
     private String code;
 
     @Column(name = "coordinates", columnDefinition = "Point")
