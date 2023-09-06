@@ -18,12 +18,10 @@ public class RedisConfig {
     private String redisHost;
 
     @Value("${redis.port}")
-    private int redisPort;
-
+    private String redisPort; // bug in server retrieving int/Integer from .properties
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
-        configuration.setPassword("password");
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, Integer.parseInt("6379"));
         return new LettuceConnectionFactory(configuration);
     }
 
@@ -34,7 +32,6 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
-                .withCacheConfiguration("roles", myDefaultCacheConfig(Duration.ofMinutes(5)))
                 .withCacheConfiguration("role", myDefaultCacheConfig(Duration.ofMinutes(1)))
                 .build();
     }

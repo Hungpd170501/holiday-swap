@@ -11,9 +11,9 @@
   "containerDefinitions": [
     {
       "name": "holiday-swap",
-      "image": "hungpd170501/holiday-swap:03.09.2023.10.17.52",
+      "image": "hungpd170501/holiday-swap:arm64v8-v1.1",
       "essential": true,
-      "memory": 512,
+      "memory": 1024,
       "portMappings": [
         {
           "hostPort": 8080,
@@ -22,23 +22,20 @@
       ],
       "environment": [
         {
-          "name": "SPRING_PROFILES_ACTIVE",
-          "value": "dev"
-        },
-        {
           "name": "RABBITMQ_HOST",
           "value": "rabbitmq"
         }
       ],
       "links": [
-          "rabbitmq"
-        ]
+        "rabbitmq",
+        "redis"
+      ]
     },
     {
       "name": "rabbitmq",
       "image": "rabbitmq:3-management-alpine",
       "essential": true,
-      "memory": 128,
+      "memory": 512,
       "portMappings": [
         {
           "hostPort": 5672,
@@ -57,19 +54,12 @@
     {
       "name": "redis",
       "image": "redis:alpine",
-      "essential": true,
-      "command": ["redis-server", "--appendonly", "yes", "--requirepass", "password"],
-      "memory": 128,
+      "essential": false,
+      "memory": 512,
       "portMappings": [
         {
           "hostPort": 6379,
           "containerPort": 6379
-        }
-      ],
-      "environment": [
-        {
-          "name": "REDIS_PASSWORD",
-          "value": "password"
         }
       ]
     }
