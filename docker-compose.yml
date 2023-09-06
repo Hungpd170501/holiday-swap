@@ -5,7 +5,7 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: holiday-swap
-        POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
@@ -37,6 +37,7 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
+    command: ["rabbitmq-plugins", "enable", "rabbitmq_stomp"]
     ports:
       - "5672:5672" # AMQP
       - "15672:15672" # Management UI
@@ -50,7 +51,6 @@ services:
   redis:
     container_name: redis
     image: redis:alpine
-    command: [ "redis-server", "--appendonly", "yes", "--requirepass", "password"]
     ports:
       - "6379:6379"
     networks:
@@ -69,27 +69,6 @@ services:
     networks:
       - cluster-network
 
-#  holiday-swap-be:
-#    image: hungpd170501/holiday-swap:latest
-#    container_name: holiday-swap-be
-#    environment:
-##      CONFIG_SERVER_HOST:
-#      DATASOURCE_HOST: postgres
-#      RABBITMQ_HOST: rabbitmq
-#      EMAIL_USERNAME: hunga1705@gmail.com
-#      EMAIL_PASSWORD: sawqoatroowhbdhf
-#      REDIS_HOST: redis
-#      REDIS_PORT: 6379
-#      REDIS_PASSWORD: password
-#    ports:
-#      - "8080:8080"
-#    networks:
-#      - postgres
-#      - cluster-network
-#    depends_on:
-#      - postgres
-#      - rabbitmq
-#      - redis
 
 networks:
   postgres:

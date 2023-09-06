@@ -14,9 +14,9 @@ import com.example.holidayswap.domain.mapper.auth.UserMapper;
 import com.example.holidayswap.repository.auth.TokenRepository;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.service.EmailService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +31,6 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
@@ -45,6 +44,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private long accessTokenExpiration;
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
+
+    public AuthenticationServiceImpl(UserRepository userRepository,
+                                     TokenRepository tokenRepository,
+                                     EmailService emailService,
+                                     JwtService jwtService,
+                                     PasswordEncoder passwordEncoder,
+                                     @Lazy
+                                     AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.emailService = emailService;
+        this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+    }
 
     @Override
     @Transactional
@@ -187,7 +201,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         throw new VerificationException(JWT_TOKEN_INVALID);
     }
 
-    private AuthenticationResponse getAuthenticationResponse(User user) {
+    public AuthenticationResponse getAuthenticationResponse(User user) {
         var accessToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         CompletableFuture.runAsync(() -> revokeAllUserAuthTokens(user));

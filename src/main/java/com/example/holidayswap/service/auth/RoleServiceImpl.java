@@ -7,6 +7,9 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.auth.RoleMapper;
 import com.example.holidayswap.repository.auth.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +28,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Cacheable(value = "role")
     public RoleResponse getRoleById(Long roleId) {
         return roleRepository.findById(roleId).map(RoleMapper.INSTANCE::toRoleResponse).orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
     }
@@ -38,6 +42,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CachePut(value = "role", key = "#roleId")
     public RoleResponse updateRole(Long roleId, RoleRequest roleRequest) {
         return roleRepository.findById(roleId).map(role -> {
             role.setName(roleRequest.getName());
@@ -49,6 +54,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(value = "role", key = "#roleId")
     public void deleteRole(Long roleId) {
         roleRepository.findById(roleId)
                 .ifPresentOrElse(

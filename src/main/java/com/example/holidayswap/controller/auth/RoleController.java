@@ -18,7 +18,6 @@ public class RoleController {
     private final RoleService roleService;
 
     @GetMapping
-    @Cacheable(value = "roles")
     public ResponseEntity<List<RoleResponse>> getRoles() {
         var roles = roleService.getRoles();
         return ResponseEntity.ok(roles);
@@ -26,7 +25,6 @@ public class RoleController {
 
 
     @GetMapping("/{roleId}")
-    @Cacheable(value = "role")
     public ResponseEntity<RoleResponse> getUserById(@PathVariable("roleId") Long roleId) {
         var role = roleService.getRoleById(roleId);
         return ResponseEntity.ok(role);
@@ -39,14 +37,12 @@ public class RoleController {
     }
 
     @PutMapping("/{roleId}")
-    @CacheEvict(value = "role", key = "#roleId")
     public ResponseEntity<RoleResponse> updateRole(@PathVariable("roleId") Long roleId, @RequestBody RoleRequest roleRequest) {
         var role = roleService.updateRole(roleId, roleRequest);
         return ResponseEntity.ok(role);
     }
 
     @DeleteMapping("/{roleId}")
-    @CacheEvict(value = "role", key = "#roleId")
     public ResponseEntity<Void> deleteRole(@PathVariable("roleId") Long roleId) {
         roleService.deleteRole(roleId);
         return ResponseEntity.noContent().build();

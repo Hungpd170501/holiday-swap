@@ -141,6 +141,10 @@
             <artifactId>twilio</artifactId>
             <version>9.11.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -163,7 +167,7 @@
                 <version>3.3.1</version>
                 <configuration>
                     <from>
-                        <image>openjdk:17-alpine</image>
+                        <image>arm64v8/openjdk:17-slim</image>
                     </from>
                     <to>
                         <image>docker.io/${docker.username}/${docker.image.name}:${docker.image.tag}</image>
