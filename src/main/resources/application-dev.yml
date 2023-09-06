@@ -1,13 +1,8 @@
-server:
-  port: 8080
-  error:
-    include-stacktrace: never
-
 spring:
   datasource:
-    url: jdbc-secretsmanager:postgresql://awseb-e-ykimbrpgq3-stack-awsebrdsdatabase-pushioghcpm6.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/ebdb
-    username: dev/cosmetic/postgres
-    driver-class-name: com.amazonaws.secretsmanager.sql.AWSSecretsManagerPostgreSQLDriver
+    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/ebdb
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -38,6 +33,26 @@ spring:
       enabled: true
       max-file-size: 30MB
       max-request-size: 30MB
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_ID}
+            scope:
+              - email
+              - profile
+          facebook:
+            client-id: ${OAUTH2_FB_CLIENT_ID}
+            client-secret: ${OAUTH2_FB_CLIENT_SECRET}
+            scope:
+              - email
+              - public_profile
+          github:
+            client-id: ${OAUTH2_GITHUB_CLIENT_ID}
+            client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
+
 
 logging:
   level:
@@ -56,7 +71,7 @@ mail:
   debug: true
 
 redis:
-  host: ${HOST:localhost}
+  host: ${REDIS_HOST:localhost}
   port: 6379
 
 amazon:

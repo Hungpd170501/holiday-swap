@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -114,6 +115,7 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         log.error("Exception: %s".formatted(message));
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
     }
 
@@ -131,6 +133,7 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         log.error("AWS Exception: %s".formatted(message));
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(message);
     }
 }
