@@ -26,4 +26,5 @@ public interface AuthenticationService {
     void verifyEmailToken(String token);
 
     User getUserFromToken(String token);
+    AuthenticationResponse getAuthenticationResponse(User user);
 }
