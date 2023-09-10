@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.entity.property;
+package com.example.holidayswap.domain.entity.property.service;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,5 +1,6 @@
-package com.example.holidayswap.domain.entity.property;
+package com.example.holidayswap.domain.entity.property.facility;
 
+import com.example.holidayswap.domain.entity.property.Property;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

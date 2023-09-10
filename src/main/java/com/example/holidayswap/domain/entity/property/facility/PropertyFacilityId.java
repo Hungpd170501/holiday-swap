@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.entity.property;
+package com.example.holidayswap.domain.entity.property.facility;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

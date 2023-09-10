@@ -1,16 +1,21 @@
 package com.example.holidayswap.domain.entity.property;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.property.facility.Facility;
+import com.example.holidayswap.domain.entity.property.service.Service;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
 @Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "property", schema = "public")
 public class Property {
@@ -32,10 +37,11 @@ public class Property {
     private PropertyType propertyType;
 
     @Column(name = "status", length = Integer.MAX_VALUE)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PropertyStatus status;
 
-    @Column(name = "isdeleted")
-    private Boolean isdeleted;
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @OneToMany(mappedBy = "property")
     private Set<PropertyAvailableTime> propertyAvailableTimes = new LinkedHashSet<>();
