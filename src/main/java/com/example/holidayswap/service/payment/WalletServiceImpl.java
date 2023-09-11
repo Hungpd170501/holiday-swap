@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.payment.Wallet;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.payment.WalletRepository;
+import com.example.holidayswap.service.BankException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class WalletServiceImpl implements IWalletService{
     public boolean TopUpWallet(Long userId, int amount) {
         Wallet userWallet = walletRepository.findByUser(userRepository.findById(userId).get());
         if(userWallet == null) userWallet = CreateWallet(userId);
+        if(userWallet == null) throw new BankException("Wallet not found");
 
         userWallet.setTotalPoint(userWallet.getTotalPoint() + amount);
         walletRepository.save(userWallet);
@@ -29,6 +31,7 @@ public class WalletServiceImpl implements IWalletService{
     @Override
     public Wallet CreateWallet(Long userId) {
         User user = userRepository.findById(userId).get();
+        if(user == null) throw new BankException("User not found");
         Wallet userWallet = walletRepository.findByUser(user);
 
         if(userWallet == null){
@@ -37,6 +40,9 @@ public class WalletServiceImpl implements IWalletService{
             wallet.setTotalPoint(0);
             wallet.setStatus(true);
             walletRepository.save(wallet);
+            user.setWallet(wallet);
+            userRepository.save(user);
+            return wallet;
         }
         return userWallet;
     }

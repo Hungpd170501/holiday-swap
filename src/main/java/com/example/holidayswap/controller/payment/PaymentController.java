@@ -26,6 +26,8 @@ import java.util.*;
 public class PaymentController {
     @Autowired
     private ITransactionService transactionService;
+    @Autowired
+    private IMoneyTranferService moneyTranferService;
     @GetMapping("/Create_payment")
     public ResponseEntity<?> createPayment(@RequestParam String amount ) throws UnsupportedEncodingException {
 
@@ -107,10 +109,12 @@ public class PaymentController {
         topUpWalletDTO.setOrderInfor(orderInfo);
         topUpWalletDTO.setPaymentDate(payDate);
         topUpWalletDTO.setUserId(userid);
-
+        boolean check = false;
         if(responseCode.equals("00")) {
-            transactionService.TransactionTopUpWallet(topUpWalletDTO,true);
+           check = transactionService.TransactionTopUpWallet(topUpWalletDTO,true);
+        }else {
+            moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO,false);
         }
-        return ResponseEntity.ok(topUpWalletDTO);
+        return check ? ResponseEntity.ok(topUpWalletDTO) : ResponseEntity.badRequest().body("Transfer fail");
     }
 }

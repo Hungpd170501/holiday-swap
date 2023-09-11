@@ -1,8 +1,10 @@
 package com.example.holidayswap.service.payment;
 
 import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
+import com.example.holidayswap.service.BankException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -14,16 +16,15 @@ public class TransactionServiceImpl implements ITransactionService {
     private  IWalletService walletService;
 
     @Override
-    @Transactional
-    public void TransactionTopUpWallet(TopUpWalletDTO topUpWalletDTO, boolean status) {
+    public boolean TransactionTopUpWallet(TopUpWalletDTO topUpWalletDTO, boolean status) {
         try {
-            if(status != true) throw new Exception();
+            walletService.TopUpWallet(Long.parseLong(topUpWalletDTO.getUserId()) ,10);
             moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO,status);
-            walletService.TopUpWallet(Long.parseLong(topUpWalletDTO.getUserId()) ,topUpWalletDTO.getAmount());
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
+            return true;
+        }catch (BankException e){
             moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO,false);
+            e.printStackTrace();
+            return false;
         }
 
     }
