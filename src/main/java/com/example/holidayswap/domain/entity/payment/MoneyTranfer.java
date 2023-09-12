@@ -45,6 +45,6 @@ public class MoneyTranfer {
     private String paymentDate;
 
     @Column(name = "status",nullable = false)
-    private boolean status;
+    private StatusPayment status;
 
 }

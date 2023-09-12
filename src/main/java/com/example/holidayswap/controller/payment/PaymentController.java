@@ -5,8 +5,10 @@ import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.dto.response.payment.PaymentResDTO;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
+import com.example.holidayswap.domain.entity.payment.StatusPayment;
 import com.example.holidayswap.service.payment.IMoneyTranferService;
 import com.example.holidayswap.service.payment.ITransactionService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,7 +31,7 @@ public class PaymentController {
     @Autowired
     private IMoneyTranferService moneyTranferService;
     @GetMapping("/Create_payment")
-    public ResponseEntity<?> createPayment(@RequestParam String amount ) throws UnsupportedEncodingException {
+    public ResponseEntity<?> createPayment(@RequestParam String amount, @RequestParam String orderInfor ) throws UnsupportedEncodingException {
 
         Long total = Long.parseLong(amount)*100;
         String vnp_TxnRef = BankingConfig.getRandomNumber(8);
@@ -37,7 +39,18 @@ public class PaymentController {
         Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
 
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String vnp_CreateDate = formatter.format(cld.getTime());
+
         User user = (User) principal;
+        //create history money transfer
+        TopUpWalletDTO topUpWalletDTO = new TopUpWalletDTO();
+        topUpWalletDTO.setAmount(Integer.parseInt(amount));
+        topUpWalletDTO.setOrderInfor(orderInfor);
+        topUpWalletDTO.setUserId(user.getUserId().toString());
+        topUpWalletDTO.setPaymentDate(vnp_CreateDate);
+        MoneyTranfer moneyTranfer = moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO, StatusPayment.WAITING);
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", BankingConfig.vnp_Version);
@@ -48,14 +61,10 @@ public class PaymentController {
         vnp_Params.put("vnp_BankCode", "NCB");
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        vnp_Params.put("vnp_OrderInfo", orderInfor);
         vnp_Params.put("vnp_OrderType", "120000");
-        vnp_Params.put("vnp_ReturnUrl", "http://localhost:8080/api/v1/payment/payment_infor/"+ user.getUserId());
+        vnp_Params.put("vnp_ReturnUrl", "http://localhost:8080/api/v1/payment/payment_infor/" + moneyTranfer.getId());
         vnp_Params.put("vnp_IpAddr", "vnp_IpAddr");
-
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
         cld.add(Calendar.MINUTE, 15);
@@ -93,27 +102,29 @@ public class PaymentController {
         paymentResDTO.setURL(paymentUrl);
         paymentResDTO.setMessage("success");
         paymentResDTO.setStatus("Ok");
+
         return ResponseEntity.ok(paymentResDTO);
     }
 
-    @GetMapping("/payment_infor/{userid}")
-    public ResponseEntity<?> transaction(@RequestParam(value = "vnp_Amount") String amount,
-                                         @RequestParam(value = "vnp_BankCode") String bankCode,
-                                         @RequestParam(value = "vnp_OrderInfo") String orderInfo,
-                                         @RequestParam(value = "vnp_PayDate") String payDate,
-                                         @PathVariable String userid,
-                                         @RequestParam(value = "vnp_ResponseCode") String responseCode) throws ParseException {
+    @GetMapping("/payment_infor/{moneyTransferId}")
+    public ResponseEntity<?> transaction(@PathVariable String moneyTransferId ,  @RequestParam(value = "vnp_ResponseCode") String responseCode){
+
+        MoneyTranfer moneyTranfer = moneyTranferService.GetMoneyTranferTransaction(Long.parseLong(moneyTransferId));
+        if(moneyTranfer == null) return ResponseEntity.badRequest().body("Transaction not found");
+
         TopUpWalletDTO topUpWalletDTO = new TopUpWalletDTO();
-        topUpWalletDTO.setAmount(Integer.parseInt(amount));
-        topUpWalletDTO.setBankCode(bankCode);
-        topUpWalletDTO.setOrderInfor(orderInfo);
-        topUpWalletDTO.setPaymentDate(payDate);
-        topUpWalletDTO.setUserId(userid);
-        boolean check = false;
+        topUpWalletDTO.setAmount((int) moneyTranfer.getAmount());
+        topUpWalletDTO.setBankCode(moneyTranfer.getBankCode());
+        topUpWalletDTO.setOrderInfor(moneyTranfer.getOrderInfor());
+        topUpWalletDTO.setPaymentDate(moneyTranfer.getPaymentDate());
+        topUpWalletDTO.setUserId(moneyTranfer.getUser().getUserId().toString());
+
+        var check = false;
+
         if(responseCode.equals("00")) {
-           check = transactionService.TransactionTopUpWallet(topUpWalletDTO,true);
+           check = transactionService.TransactionTopUpWallet(topUpWalletDTO,StatusPayment.SUCCESS,moneyTranfer.getId());
         }else {
-            moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO,false);
+            moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranfer.getId(), StatusPayment.FAILED);
         }
         return check ? ResponseEntity.ok(topUpWalletDTO) : ResponseEntity.badRequest().body("Transfer fail");
     }
