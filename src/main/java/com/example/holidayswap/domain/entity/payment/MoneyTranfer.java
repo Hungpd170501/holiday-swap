@@ -18,7 +18,7 @@ public class MoneyTranfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
-            name = "money_tranfer_id"
+            name = "money_transfer_id"
     )
     private Long id;
     @JsonIgnore
