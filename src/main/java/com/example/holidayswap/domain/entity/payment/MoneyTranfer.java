@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,6 +43,6 @@ public class MoneyTranfer {
     private String paymentDate;
 
     @Column(name = "status",nullable = false)
-    private StatusPayment status;
+    private EnumPaymentStatus.StatusMoneyTranfer status;
 
 }

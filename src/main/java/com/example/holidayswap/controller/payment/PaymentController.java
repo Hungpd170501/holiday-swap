@@ -5,22 +5,18 @@ import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.dto.response.payment.PaymentResDTO;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
-import com.example.holidayswap.domain.entity.payment.StatusPayment;
+import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.service.payment.IMoneyTranferService;
 import com.example.holidayswap.service.payment.ITransactionService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -50,7 +46,7 @@ public class PaymentController {
         topUpWalletDTO.setOrderInfor(orderInfor);
         topUpWalletDTO.setUserId(user.getUserId().toString());
         topUpWalletDTO.setPaymentDate(vnp_CreateDate);
-        MoneyTranfer moneyTranfer = moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO, StatusPayment.WAITING);
+        MoneyTranfer moneyTranfer = moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer.WAITING);
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", BankingConfig.vnp_Version);
@@ -111,9 +107,9 @@ public class PaymentController {
 
         MoneyTranfer moneyTranfer = moneyTranferService.GetMoneyTranferTransaction(Long.parseLong(moneyTransferId));
         if(moneyTranfer == null) return ResponseEntity.badRequest().body("Transaction not found");
-
+        if(moneyTranfer.getStatus().name() != EnumPaymentStatus.StatusMoneyTranfer.WAITING.name()) return ResponseEntity.badRequest().body("Transaction has been completed");
         TopUpWalletDTO topUpWalletDTO = new TopUpWalletDTO();
-        topUpWalletDTO.setAmount((int) moneyTranfer.getAmount());
+        topUpWalletDTO.setAmount((int) moneyTranfer.getAmount() /100);
         topUpWalletDTO.setBankCode(moneyTranfer.getBankCode());
         topUpWalletDTO.setOrderInfor(moneyTranfer.getOrderInfor());
         topUpWalletDTO.setPaymentDate(moneyTranfer.getPaymentDate());
@@ -122,9 +118,9 @@ public class PaymentController {
         var check = false;
 
         if(responseCode.equals("00")) {
-           check = transactionService.TransactionTopUpWallet(topUpWalletDTO,StatusPayment.SUCCESS,moneyTranfer.getId());
+           check = transactionService.TransactionTopUpWallet(topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer.SUCCESS,moneyTranfer.getId());
         }else {
-            moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranfer.getId(), StatusPayment.FAILED);
+            moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranfer.getId(), EnumPaymentStatus.StatusMoneyTranfer.FAILED);
         }
         return check ? ResponseEntity.ok(topUpWalletDTO) : ResponseEntity.badRequest().body("Transfer fail");
     }

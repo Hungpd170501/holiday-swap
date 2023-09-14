@@ -8,6 +8,7 @@ import com.example.holidayswap.service.BankException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class WalletServiceImpl implements IWalletService{
 
@@ -17,6 +18,7 @@ public class WalletServiceImpl implements IWalletService{
     private UserRepository userRepository;
 
     @Override
+    @Transactional
     public boolean TopUpWallet(Long userId, int amount) {
         Wallet userWallet = walletRepository.findByUser(userRepository.findById(userId).get());
         if(userWallet == null) userWallet = CreateWallet(userId);
@@ -40,7 +42,6 @@ public class WalletServiceImpl implements IWalletService{
             wallet.setStatus(true);
             walletRepository.save(wallet);
             user.setWallet(wallet);
-            userRepository.save(user);
             return wallet;
         }
         return userWallet;

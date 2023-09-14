@@ -3,12 +3,11 @@ package com.example.holidayswap.service.payment;
 import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
-import com.example.holidayswap.domain.entity.payment.StatusPayment;
+import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.payment.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,9 +21,9 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
     @Autowired
     private UserRepository userRepository;
     @Override
-    public MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, StatusPayment status) {
+    public MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status) {
 
-        if(status.name() != StatusPayment.WAITING.name()) return null;
+        if(status.name() != EnumPaymentStatus.StatusMoneyTranfer.WAITING.name()) return null;
 
         MoneyTranfer moneyTranfer = new MoneyTranfer();
         User user = userRepository.findById(Long.parseLong(topUpWalletDTO.getUserId())).get();
@@ -54,9 +53,9 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
     }
 
     @Override
-    public boolean UpdateStatusMoneyTranferTransaction(Long id, StatusPayment status) {
+    public boolean UpdateStatusMoneyTranferTransaction(Long id, EnumPaymentStatus.StatusMoneyTranfer status) {
         Optional<MoneyTranfer> moneyTranfer = transactionRepository.findById(id);
-        if(!moneyTranfer.isPresent() || moneyTranfer.get().getStatus().name() != StatusPayment.WAITING.name()){
+        if(!moneyTranfer.isPresent() || moneyTranfer.get().getStatus().name() != EnumPaymentStatus.StatusMoneyTranfer.WAITING.name()){
             return false;
         }
         MoneyTranfer moneyTranfer1 = moneyTranfer.get();

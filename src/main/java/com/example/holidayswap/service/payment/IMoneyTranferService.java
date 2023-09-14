@@ -2,15 +2,13 @@ package com.example.holidayswap.service.payment;
 
 import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
-import com.example.holidayswap.domain.entity.payment.StatusPayment;
-
-import java.time.LocalDateTime;
+import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 
 
 public interface IMoneyTranferService {
-    MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, StatusPayment status);
+    MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status);
 
     MoneyTranfer GetMoneyTranferTransaction(Long id);
 
-    boolean UpdateStatusMoneyTranferTransaction(Long id, StatusPayment status);
+    boolean UpdateStatusMoneyTranferTransaction(Long id, EnumPaymentStatus.StatusMoneyTranfer status);
 }
