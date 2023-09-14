@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.payment.TransactionRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class MoneyTranferServiceImpl implements IMoneyTranferService {
     @Autowired
     private TransactionRepository transactionRepository;
@@ -23,10 +25,10 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
     @Override
     public MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status) {
 
-        if(status.name() != EnumPaymentStatus.StatusMoneyTranfer.WAITING.name()) return null;
+        if(!status.name().equals(EnumPaymentStatus.StatusMoneyTranfer.WAITING.name())) return null;
 
         MoneyTranfer moneyTranfer = new MoneyTranfer();
-        User user = userRepository.findById(Long.parseLong(topUpWalletDTO.getUserId())).get();
+        User user = userRepository.findById(Long.parseLong(topUpWalletDTO.getUserId())).orElse(null);
         moneyTranfer.setAmount(topUpWalletDTO.getAmount());
         moneyTranfer.setBankCode(topUpWalletDTO.getBankCode());
         moneyTranfer.setStatus(status);
@@ -40,7 +42,7 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
         String formattedString = targetFormat.format(date);
         moneyTranfer.setPaymentDate(formattedString);
     }catch (Exception e){
-        e.printStackTrace();
+        log.error("Error parsing payment date: {}", e.getMessage(), e);
     }
         transactionRepository.save(moneyTranfer);
 
@@ -49,13 +51,13 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
 
     @Override
     public MoneyTranfer GetMoneyTranferTransaction(Long id) {
-        return transactionRepository.findById(id).get();
+        return transactionRepository.findById(id).orElse(null);
     }
 
     @Override
     public boolean UpdateStatusMoneyTranferTransaction(Long id, EnumPaymentStatus.StatusMoneyTranfer status) {
         Optional<MoneyTranfer> moneyTranfer = transactionRepository.findById(id);
-        if(!moneyTranfer.isPresent() || moneyTranfer.get().getStatus().name() != EnumPaymentStatus.StatusMoneyTranfer.WAITING.name()){
+        if(moneyTranfer.isEmpty() || !moneyTranfer.get().getStatus().name().equals(EnumPaymentStatus.StatusMoneyTranfer.WAITING.name())){
             return false;
         }
         MoneyTranfer moneyTranfer1 = moneyTranfer.get();

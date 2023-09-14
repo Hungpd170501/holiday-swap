@@ -4,11 +4,13 @@ import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.domain.entity.payment.Point;
 import com.example.holidayswap.service.BankException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class TransactionServiceImpl implements ITransactionService {
 
     @Autowired
@@ -28,8 +30,8 @@ public class TransactionServiceImpl implements ITransactionService {
             moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranferId,status);
             return true;
         }catch (BankException e){
+            log.error("BankException occurred during top-up wallet: {}", e.getMessage(), e);
             moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranferId, EnumPaymentStatus.StatusMoneyTranfer.FAILED);
-            e.printStackTrace();
             return false;
         }
 

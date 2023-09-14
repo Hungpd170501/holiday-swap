@@ -20,7 +20,7 @@ public class WalletServiceImpl implements IWalletService{
     @Override
     @Transactional
     public boolean TopUpWallet(Long userId, int amount) {
-        Wallet userWallet = walletRepository.findByUser(userRepository.findById(userId).get());
+        Wallet userWallet = walletRepository.findByUser(userRepository.findById(userId).orElse(null));
         if(userWallet == null) userWallet = CreateWallet(userId);
         if(userWallet == null) throw new BankException("Wallet not found");
 
@@ -31,7 +31,7 @@ public class WalletServiceImpl implements IWalletService{
 
     @Override
     public Wallet CreateWallet(Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId).orElse(null);
         if(user == null) throw new BankException("User not found");
         Wallet userWallet = user.getWallet();
 

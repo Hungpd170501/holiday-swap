@@ -107,9 +107,9 @@ public class PaymentController {
 
         MoneyTranfer moneyTranfer = moneyTranferService.GetMoneyTranferTransaction(Long.parseLong(moneyTransferId));
         if(moneyTranfer == null) return ResponseEntity.badRequest().body("Transaction not found");
-        if(moneyTranfer.getStatus().name() != EnumPaymentStatus.StatusMoneyTranfer.WAITING.name()) return ResponseEntity.badRequest().body("Transaction has been completed");
+        if(!moneyTranfer.getStatus().name().equals(EnumPaymentStatus.StatusMoneyTranfer.WAITING.name())) return ResponseEntity.badRequest().body("Transaction has been completed");
         TopUpWalletDTO topUpWalletDTO = new TopUpWalletDTO();
-        topUpWalletDTO.setAmount((int) moneyTranfer.getAmount() /100);
+        topUpWalletDTO.setAmount((int) moneyTranfer.getAmount());
         topUpWalletDTO.setBankCode(moneyTranfer.getBankCode());
         topUpWalletDTO.setOrderInfor(moneyTranfer.getOrderInfor());
         topUpWalletDTO.setPaymentDate(moneyTranfer.getPaymentDate());
