@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
+import com.example.holidayswap.domain.entity.payment.Point;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.payment.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,16 +24,35 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
     private TransactionRepository transactionRepository;
 
     @Autowired
+    private IPointService pointService;
+
+    @Autowired
     private UserRepository userRepository;
     @Override
     public MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status) {
 
         if(!status.name().equals(EnumPaymentStatus.StatusMoneyTranfer.WAITING.name())) return null;
+        Point point = pointService.GetActivePoint();
+
+        if(point == null) return null;
+
+        // check user has any transaction waiting
+
+        List<MoneyTranfer> moneyTranfers = transactionRepository.findByUserOrderByIdAsc(userRepository.findById(Long.parseLong(topUpWalletDTO.getUserId())).orElse(null));
+        moneyTranfers.stream().filter(moneyTranfer -> moneyTranfer.getStatus().name().equals(EnumPaymentStatus.StatusMoneyTranfer.WAITING.name())).forEach(moneyTranfer -> {
+            moneyTranfer.setStatus(EnumPaymentStatus.StatusMoneyTranfer.FAILED);
+            transactionRepository.save(moneyTranfer);
+        });
+
+        // end check
+
+
 
         MoneyTranfer moneyTranfer = new MoneyTranfer();
         User user = userRepository.findById(Long.parseLong(topUpWalletDTO.getUserId())).orElse(null);
         moneyTranfer.setAmount(topUpWalletDTO.getAmount());
         moneyTranfer.setBankCode(topUpWalletDTO.getBankCode());
+        moneyTranfer.setAmountCoinDeposit((int) (topUpWalletDTO.getAmount() / point.getPointPrice()));
         moneyTranfer.setStatus(status);
         moneyTranfer.setUser(user);
         moneyTranfer.setOrderInfor(topUpWalletDTO.getOrderInfor());
@@ -64,5 +86,13 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
         moneyTranfer1.setStatus(status);
         transactionRepository.save(moneyTranfer1);
         return true;
+    }
+
+    @Override
+    public List<MoneyTranfer> GetMoneyTranferTransactionByUserId(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        List<MoneyTranfer> moneyTranferList = new ArrayList<>();
+        if(user == null) return moneyTranferList;
+        return transactionRepository.findByUserOrderByIdAsc(user);
     }
 }

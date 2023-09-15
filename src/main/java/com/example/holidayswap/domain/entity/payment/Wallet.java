@@ -35,7 +35,11 @@ public class Wallet {
     @Column(name = "status")
     private boolean status;
 
-
+//    @OneToMany(mappedBy = "walletFrom")
+//    private Set<TransactLog> transactionsFrom;
+//
+//    @OneToMany(mappedBy = "walletTo")
+//    private Set<TransactLog> transactionsTo;
 
 
 }
