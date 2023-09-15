@@ -7,14 +7,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface PropertyService {
-    Page<PropertyResponse> getProperties(Pageable pageable);
+    Page<PropertyResponse> gets(Pageable pageable);
 
-    PropertyResponse getProperty(Long id);
+    PropertyResponse get(Long id);
 
-    PropertyResponse createProperty(PropertyRegisterRequest propertyRegisterRequest);
+    PropertyResponse create(PropertyRegisterRequest propertyRegisterRequest);
 
-    PropertyResponse updateProperty(Long id, PropertyUpdateRequest propertyUpdateRequest);
+    PropertyResponse update(Long id, PropertyUpdateRequest propertyUpdateRequest);
 
-    void deleteProperty(Long id);
+    void delete(Long id);
 
 }
