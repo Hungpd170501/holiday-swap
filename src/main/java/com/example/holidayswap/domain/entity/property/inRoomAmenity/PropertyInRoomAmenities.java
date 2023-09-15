@@ -12,7 +12,8 @@ import lombok.Setter;
 public class PropertyInRoomAmenities {
     @EmbeddedId
     private PropertyInRoomAmenitiesTypeId id;
-
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
     @MapsId("inRoomAmenityId")
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "in_room_amenity_id", nullable = false)

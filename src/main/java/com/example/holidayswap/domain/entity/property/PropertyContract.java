@@ -30,6 +30,8 @@ public class PropertyContract {
 
     @Column(name = "start_time")
     private OffsetDateTime startTime;
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
 
     @Column(name = "property_id")
     private Long property_id;

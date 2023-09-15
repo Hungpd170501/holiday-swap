@@ -1,6 +1,5 @@
 package com.example.holidayswap.domain.entity.property;
 
-//import com.example.holidayswap.domain.entity.address.Address;
 import com.example.holidayswap.domain.entity.address.Address;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -27,6 +26,9 @@ public class Resort {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id")
     private Address address;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
 
 //    @OneToMany(mappedBy = "resort")
 //    private Set<Property> properties = new LinkedHashSet<>();

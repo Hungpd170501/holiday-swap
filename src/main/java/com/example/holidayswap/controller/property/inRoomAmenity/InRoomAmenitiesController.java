@@ -1,9 +1,8 @@
-package com.example.holidayswap.controller.property;
+package com.example.holidayswap.controller.property.inRoomAmenity;
 
-import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
-import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
-import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
-import com.example.holidayswap.service.property.PropertyService;
+import com.example.holidayswap.domain.dto.request.property.inRoomAmenity.InRoomAmenityRequest;
+import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.InRoomAmenityResponse;
+import com.example.holidayswap.service.property.inRoomAmenityService.InRoomAmenityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,43 +16,44 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/properties")
-public class PropertiesController {
-    private final PropertyService propertyService;
+@RequestMapping("api/v1/facilities")
+public class InRoomAmenitiesController {
+    final private InRoomAmenityService inRoomAmenityService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<PropertyResponse>> gets(
-            @RequestParam(defaultValue = "") Long resortId,
+    public ResponseEntity<Page<InRoomAmenityResponse>> gets(
+            @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var properties = propertyService.gets(pageable);
-        return ResponseEntity.ok(properties);
+        var inRoomAmenityResponses = inRoomAmenityService.gets(name, pageable);
+        return ResponseEntity.ok(inRoomAmenityResponses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PropertyResponse> get(
+    public ResponseEntity<InRoomAmenityResponse> get(
             @PathVariable("id") Long id) {
-        var property = propertyService.get(id);
-        return ResponseEntity.ok(property);
+        var inRoomAmenityResponse = inRoomAmenityService.get(id);
+        return ResponseEntity.ok(inRoomAmenityResponse);
     }
 
     @PostMapping
-    public ResponseEntity<PropertyResponse> create(@RequestBody PropertyRegisterRequest propertyRegisterRequest) {
-        var propertyCreated = propertyService.create(propertyRegisterRequest);
+    public ResponseEntity<InRoomAmenityResponse> create(
+            @RequestBody InRoomAmenityRequest inRoomAmenityRequest) {
+        var inRoomAmenityCreated = inRoomAmenityService.create(inRoomAmenityRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(propertyCreated.getId())
+                .buildAndExpand(inRoomAmenityCreated.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(propertyCreated);
+        return ResponseEntity.created(location).body(inRoomAmenityCreated);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @RequestBody PropertyUpdateRequest propertyUpdateRequest) {
-        propertyService.update(id, propertyUpdateRequest);
+                                       @RequestBody InRoomAmenityRequest inRoomAmenityRequest) {
+        inRoomAmenityService.update(id, inRoomAmenityRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -64,8 +64,7 @@ public class PropertiesController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        propertyService.delete(id);
+        inRoomAmenityService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

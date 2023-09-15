@@ -17,7 +17,8 @@ public class PropertyImage {
 
     @Column(name = "link", length = Integer.MAX_VALUE)
     private String link;
-
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
     @Column(name = "property_id")
     private Long property_id;
     @ManyToOne(fetch = FetchType.LAZY)

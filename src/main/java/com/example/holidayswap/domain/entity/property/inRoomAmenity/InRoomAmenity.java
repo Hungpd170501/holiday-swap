@@ -20,6 +20,8 @@ public class InRoomAmenity {
 
     @Column(name = "in_room_amenity_name", length = Integer.MAX_VALUE)
     private String inRoomAmenitiesName;
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @Column(name = "in_room_amenity_type_id")
     private Long inRoomAmenitiesTypeId;
