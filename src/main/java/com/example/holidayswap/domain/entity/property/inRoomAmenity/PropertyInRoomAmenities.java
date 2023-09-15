@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.entity.property.facility;
+package com.example.holidayswap.domain.entity.property.inRoomAmenity;
 
 import com.example.holidayswap.domain.entity.property.Property;
 import jakarta.persistence.*;
@@ -8,15 +8,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "property_facility", schema = "public")
-public class PropertyFacility {
+@Table(name = "property_in_room_amenity", schema = "public")
+public class PropertyInRoomAmenities {
     @EmbeddedId
-    private PropertyFacilityId id;
+    private PropertyInRoomAmenitiesTypeId id;
 
-    @MapsId("facilityTypeId")
+    @MapsId("inRoomAmenityId")
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "facility_type_id", nullable = false)
-    private FacilityType facilityType;
+    @JoinColumn(name = "in_room_amenity_id", nullable = false)
+    private InRoomAmenity inRoomAmenity;
 
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.EAGER, optional = false)

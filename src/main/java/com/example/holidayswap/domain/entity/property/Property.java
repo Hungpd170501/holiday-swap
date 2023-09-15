@@ -1,9 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
-//import com.example.holidayswap.domain.entity.property.facility.FacilityType;
+
 import com.example.holidayswap.domain.entity.auth.User;
-import com.example.holidayswap.domain.entity.property.facility.FacilityType;
-import com.example.holidayswap.domain.entity.property.service.ServiceType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,11 +24,34 @@ public class Property {
     @Column(name = "property_id", nullable = false)
     private Long id;
 
+    @Column(name = "number_king_beds")
+    private int numberKingBeds;
+    @Column(name = "number_qeen_beds")
+    private int numerQeensBeds;
+    @Column(name = "number_twin_beds")
+    private int numberTwinBeds;
+    @Column(name = "number_full_beds")
+    private int numberFullBeds;
+    @Column(name = "number_sofa_beds")
+    private int numberSofaBeds;
+    @Column(name = "number_murphyBeds")
+    private int numberMurphyBeds;
+    @Column(name = "number_beds_room")
+    private int numberBedsRoom;
+    @Column(name = "number_baths_room")
+    private int numberBathRoom;
+    @Column(name = "room_size")
+    private double roomSize;
+
+    @Column(name = "room_view_id")
+    private int roomViewId;
+
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
     @Column(name = "status", length = Integer.MAX_VALUE)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PropertyStatus status;
 
     @Column(name = "property_type_id")
     private Long propertyTypeId;
@@ -65,22 +86,20 @@ public class Property {
     private User user;
 
     @OneToMany(mappedBy = "property")
-    private Set<PropertyContract> propertyContracts= new LinkedHashSet<>();
-
-
+    private Set<PropertyContract> propertyContracts = new LinkedHashSet<>();
+    
     @OneToMany(mappedBy = "property")
     private Set<PropertyImage> propertyImages = new LinkedHashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "property_facility",
-            joinColumns = @JoinColumn(name = "property_id"),
-            inverseJoinColumns = @JoinColumn(name = "facility_type_id"))
-    private Set<FacilityType> facilityType = new LinkedHashSet<>();
-
-    @ManyToMany
-    @JoinTable(name = "property_service",
-            joinColumns = @JoinColumn(name = "property_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_type_id"))
-    private Set<ServiceType> serviceType = new LinkedHashSet<>();
-
+//    @ManyToMany
+//    @JoinTable(name = "property_facility",
+//            joinColumns = @JoinColumn(name = "property_id"),
+//            inverseJoinColumns = @JoinColumn(name = "facility_id"))
+//    private Set<Facility> facilities = new LinkedHashSet<>();
+//
+//    @ManyToMany
+//    @JoinTable(name = "property_service",
+//            joinColumns = @JoinColumn(name = "property_id"),
+//            inverseJoinColumns = @JoinColumn(name = "service_id"))
+//    private Set<Service> services = new LinkedHashSet<>();
 }
