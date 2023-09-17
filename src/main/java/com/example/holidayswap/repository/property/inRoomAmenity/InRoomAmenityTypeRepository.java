@@ -1,4 +1,4 @@
-package com.example.holidayswap.repository.property.inRoomAmenityType;
+package com.example.holidayswap.repository.property.inRoomAmenity;
 
 import com.example.holidayswap.domain.entity.property.inRoomAmenity.InRoomAmenityType;
 import io.lettuce.core.dynamic.annotation.Param;

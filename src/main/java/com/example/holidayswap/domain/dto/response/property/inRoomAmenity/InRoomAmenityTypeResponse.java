@@ -10,6 +10,6 @@ import java.util.Set;
 public class InRoomAmenityTypeResponse {
     private Long id;
     private String inRoomAmenityTypeName;
-    private boolean isDeleted;
+    private Boolean isDeleted;
     private Set<InRoomAmenity> inRoomAmenities = new LinkedHashSet<>();
 }

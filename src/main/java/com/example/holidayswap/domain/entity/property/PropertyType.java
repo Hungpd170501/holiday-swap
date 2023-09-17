@@ -16,7 +16,7 @@ public class PropertyType {
 
     @Column(name = "property_type_description", length = Integer.MAX_VALUE)
     private String propertyTypeDescription;
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
 
     @Column(name = "property_type_name", length = Integer.MAX_VALUE)

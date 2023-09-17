@@ -5,13 +5,13 @@ import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.InRoom
 import com.example.holidayswap.domain.entity.property.inRoomAmenity.InRoomAmenityType;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.inRoomAmenity.InRoomAmenityTypeMapper;
-import com.example.holidayswap.repository.property.inRoomAmenityType.InRoomAmenityTypeRepository;
+import com.example.holidayswap.repository.property.inRoomAmenity.InRoomAmenityTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_TYPE;
+import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_TYPE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
     @Override
     public InRoomAmenityTypeResponse get(Long id) {
         var inRoomAmenityTypeFound = inRoomAmenityTypeRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE));
+                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
         var inRoomAmenityTypeResponse = inRoomAmenityTypeMapper.toInRoomAmenityTypeResponse(inRoomAmenityTypeFound);
         return inRoomAmenityTypeResponse;
     }
@@ -45,7 +45,7 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
     @Override
     public InRoomAmenityTypeResponse update(Long id, InRoomAmenityTypeRequest inRoomAmenityTypeRequest) {
         var inRoomAmenityTypeFound = inRoomAmenityTypeRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE));
+                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
         inRoomAmenityTypeMapper.updateEntityFromDTO(inRoomAmenityTypeRequest, inRoomAmenityTypeFound);
         inRoomAmenityTypeRepository.save(inRoomAmenityTypeFound);
         return inRoomAmenityTypeMapper.toInRoomAmenityTypeResponse(inRoomAmenityTypeFound);
@@ -54,7 +54,7 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
     @Override
     public void delete(Long id) {
         var inRoomAmenityTypeFound = inRoomAmenityTypeRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE));
+                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
         inRoomAmenityTypeFound.setIsDeleted(true);
         inRoomAmenityTypeRepository.save(inRoomAmenityTypeFound);
     }

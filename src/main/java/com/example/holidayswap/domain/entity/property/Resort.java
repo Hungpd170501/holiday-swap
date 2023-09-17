@@ -1,6 +1,5 @@
 package com.example.holidayswap.domain.entity.property;
 
-import com.example.holidayswap.domain.entity.address.Address;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -23,11 +22,12 @@ public class Resort {
     @Column(name = "resort_name")
     private String resortName;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "address_id")
-    private Address address;
+    //    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "address_id")
+    @Column(name = "address_id")
+    private Long address;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
 
 //    @OneToMany(mappedBy = "resort")

@@ -4,7 +4,6 @@ import com.example.holidayswap.domain.dto.request.property.PropertyRegisterReque
 import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.entity.property.Property;
-import com.example.holidayswap.domain.mapper.auth.UserMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -13,9 +12,10 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface PropertyMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+    PropertyMapper INSTANCE = Mappers.getMapper(PropertyMapper.class);
     PropertyResponse toPropertyResponse(Property property);
 
+    @Mapping(target = "propertyContracts", ignore = true)
     Property toProperty(PropertyRegisterRequest propertyRegisterRequest);
 
     Property toProperty(PropertyUpdateRequest propertyUpdateRequest);

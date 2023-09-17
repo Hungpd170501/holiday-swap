@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -30,11 +32,11 @@ public class PropertyContract {
 
     @Column(name = "start_time")
     private OffsetDateTime startTime;
-    @Column(name = "is_deleted")
-    private boolean isDeleted;
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
+    private boolean isDeleted = false;
 
     @Column(name = "property_id")
-    private Long property_id;
+    private Long propertyId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "property_id",
@@ -43,4 +45,6 @@ public class PropertyContract {
             insertable = false,
             updatable = false)
     private Property property;
+    @OneToMany(mappedBy = "propertyContract")
+    private Set<ContractImage> contractImages = new LinkedHashSet<>();
 }

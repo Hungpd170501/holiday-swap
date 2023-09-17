@@ -1,6 +1,6 @@
 package com.example.holidayswap.controller.resort;
 
-import com.example.holidayswap.domain.dto.request.auth.resort.ResortRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.service.resort.ResortService;
 import lombok.RequiredArgsConstructor;

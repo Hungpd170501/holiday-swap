@@ -21,7 +21,7 @@ public class ResortImage {
 
     @Column(name = "link", length = Integer.MAX_VALUE)
     private String link;
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
 
     @ManyToOne

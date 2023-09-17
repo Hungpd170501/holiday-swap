@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.dto.request.auth.resort;
+package com.example.holidayswap.domain.dto.request.resort;
 
 import com.example.holidayswap.domain.entity.address.Address;
 import com.example.holidayswap.domain.entity.property.ResortImage;

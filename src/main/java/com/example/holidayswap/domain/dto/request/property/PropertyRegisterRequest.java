@@ -1,7 +1,6 @@
 package com.example.holidayswap.domain.dto.request.property;
 
-import com.example.holidayswap.domain.entity.property.PropertyImage;
-import com.example.holidayswap.domain.entity.property.inRoomAmenity.InRoomAmenity;
+import com.example.holidayswap.domain.dto.request.property.inRoomAmenity.PropertyInRoomAmenityRequest;
 import lombok.Data;
 
 import java.util.LinkedHashSet;
@@ -12,6 +11,7 @@ public class PropertyRegisterRequest {
     private Long propertyTypeId;
     private Long resortId;
     private Long userId;
+    private int viewId;
     private int kingBeds;
     private int qeenBeds;
     private int twinBeds;
@@ -20,8 +20,6 @@ public class PropertyRegisterRequest {
     private int murphyBeds;
     private int numberBedsRoom;
     private int numberBathRoom;
-    private int viewId;
-    //    private PropertyContract propertyContracts;
-    private Set<PropertyImage> propertyImages = new LinkedHashSet<>();
-    private Set<InRoomAmenity> facilities = new LinkedHashSet<>();
+    private PropertyContractRequest propertyContractRequest;
+    private Set<PropertyInRoomAmenityRequest> propertyInRoomAmenityRequests = new LinkedHashSet<>();
 }

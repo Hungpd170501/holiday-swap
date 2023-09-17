@@ -46,8 +46,8 @@ public class Property {
     @Column(name = "room_view_id")
     private int roomViewId;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
+    private Boolean isDeleted = false;
 
     @Column(name = "status", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)

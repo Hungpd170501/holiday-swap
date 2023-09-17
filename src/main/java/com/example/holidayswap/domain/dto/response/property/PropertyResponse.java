@@ -29,5 +29,5 @@ public class PropertyResponse {
     private Set<PropertyContract> propertyContracts = new LinkedHashSet<>();
     private Set<PropertyImage> propertyImages = new LinkedHashSet<>();
     //    private Set<Facility> facilities = new LinkedHashSet<>();
-    private Set<InRoomAmenityType> facilityTypes = new LinkedHashSet<>();
+    private Set<InRoomAmenityType> inRoomAmenityTypes = new LinkedHashSet<>();
 }

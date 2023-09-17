@@ -20,8 +20,8 @@ public class InRoomAmenity {
 
     @Column(name = "in_room_amenity_name", length = Integer.MAX_VALUE)
     private String inRoomAmenitiesName;
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean isDeleted = false;
 
     @Column(name = "in_room_amenity_type_id")
     private Long inRoomAmenitiesTypeId;
@@ -36,5 +36,5 @@ public class InRoomAmenity {
 
     @OneToMany(mappedBy = "inRoomAmenity")
     @JsonIgnore
-    private Set<PropertyInRoomAmenities> propertyInRoomAmenities = new LinkedHashSet<>();
+    private Set<PropertyInRoomAmenity> propertyInRoomAmenities = new LinkedHashSet<>();
 }

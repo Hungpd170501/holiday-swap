@@ -1,6 +1,6 @@
 package com.example.holidayswap.domain.mapper.resort;
 
-import com.example.holidayswap.domain.dto.request.auth.resort.ResortRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.Resort;
 import org.mapstruct.Mapper;

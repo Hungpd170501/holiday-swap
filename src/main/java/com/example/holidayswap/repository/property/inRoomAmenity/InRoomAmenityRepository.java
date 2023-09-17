@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface InRoomAmenityRepository extends JpaRepository<InRoomAmenity, Long> {
-    Page<InRoomAmenity> findInRoomAmenitiesByInRoomAmenitiesNameAndIsDeletedIsFalse(String name, Pageable pageable);
+    Page<InRoomAmenity> findInRoomAmenitiesByInRoomAmenitiesNameContainingAndAndIsDeletedIsFalse(String name, Pageable pageable);
 
     Optional<InRoomAmenity> findByIdAndIsDeletedIsFalse(Long id);
 }
