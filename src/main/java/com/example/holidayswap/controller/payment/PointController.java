@@ -1,5 +1,6 @@
 package com.example.holidayswap.controller.payment;
 
+import com.example.holidayswap.domain.entity.payment.Point;
 import com.example.holidayswap.service.payment.IPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class PointController {
         pointService.CreateNewPointPrice(price);
     }
     @GetMapping
-    public ResponseEntity<?> GetActivePoint(){
+    public ResponseEntity<Point> GetActivePoint(){
         return ResponseEntity.ok(pointService.GetActivePoint());
     }
 }

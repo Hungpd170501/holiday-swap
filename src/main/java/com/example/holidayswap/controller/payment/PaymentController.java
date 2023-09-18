@@ -27,7 +27,7 @@ public class PaymentController {
     @Autowired
     private IMoneyTranferService moneyTranferService;
     @GetMapping("/Create_payment")
-    public ResponseEntity<?> createPayment(@RequestParam String amount, @RequestParam String orderInfor ) throws UnsupportedEncodingException {
+    public ResponseEntity<PaymentResDTO> createPayment(@RequestParam String amount, @RequestParam String orderInfor ) throws UnsupportedEncodingException {
 
         Long total = Long.parseLong(amount)*100;
         String vnp_TxnRef = BankingConfig.getRandomNumber(8);
