@@ -6,4 +6,5 @@ public interface IWalletService {
     boolean TopUpWallet(Long userId, int amount);
 
     Wallet CreateWallet(Long userId);
+    Wallet GetWalletByUserId(Long userId);
 }

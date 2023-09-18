@@ -4,6 +4,8 @@ import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 
+import java.util.List;
+
 
 public interface IMoneyTranferService {
     MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status);
@@ -11,4 +13,6 @@ public interface IMoneyTranferService {
     MoneyTranfer GetMoneyTranferTransaction(Long id);
 
     boolean UpdateStatusMoneyTranferTransaction(Long id, EnumPaymentStatus.StatusMoneyTranfer status);
+    List<MoneyTranfer> GetMoneyTranferTransactionByUserId(Long id);
+
 }
