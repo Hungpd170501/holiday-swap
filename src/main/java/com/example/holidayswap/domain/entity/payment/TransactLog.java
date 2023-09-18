@@ -20,13 +20,13 @@ public class TransactLog {
     )
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name="wallet_id", nullable=false)
-//    private Wallet walletFrom;
-//
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name="wallet_id", nullable=false)
-//    private Wallet walletTo;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="wallet_from", nullable=false)
+    private Wallet walletFrom;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="wallet_to", nullable=false)
+    private Wallet walletTo;
 
     private long amountPoint;
     private String createdOn;
