@@ -5,8 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,9 +30,9 @@ public class Resort {
     private boolean isDeleted;
 
 //    @OneToMany(mappedBy = "resort")
-//    private Set<Property> properties = new LinkedHashSet<>();
+//    private List<Property> properties = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "resort")
-    private Set<ResortImage> resortImages = new LinkedHashSet<>();
+    private List<ResortImage> resortImages;
 
 }

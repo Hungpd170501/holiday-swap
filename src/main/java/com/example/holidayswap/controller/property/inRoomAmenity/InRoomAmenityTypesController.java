@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,12 +23,19 @@ public class InRoomAmenityTypesController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<InRoomAmenityTypeResponse>> gets(
-            @RequestParam(defaultValue = "") String name,
+            @RequestParam(defaultValue = "") String searchName,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(name, pageable);
+        var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(searchName, pageable);
+        return ResponseEntity.ok(inRoomAmenityTypeResponses);
+    }
+
+    @GetMapping("/property")
+    public ResponseEntity<List<InRoomAmenityTypeResponse>> gets(
+            @RequestParam Long propertyId) {
+        var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(propertyId);
         return ResponseEntity.ok(inRoomAmenityTypeResponses);
     }
 

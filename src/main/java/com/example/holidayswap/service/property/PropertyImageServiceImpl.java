@@ -25,14 +25,14 @@ public class PropertyImageServiceImpl implements PropertyImageService {
     @Override
     public List<PropertyImageResponse> gets(Long idProperty) {
         List<PropertyImage> propertyImages = propertyImageRepository.findAllByPropertyId(idProperty);
-        List<PropertyImageResponse> propertyImageResponses = propertyImages.stream().map(propertyImageMapper::toPropertyImageResponse).toList();
+        List<PropertyImageResponse> propertyImageResponses = propertyImages.stream().map(propertyImageMapper::toDtoResponse).toList();
         return propertyImageResponses;
     }
 
     @Override
     public PropertyImageResponse get(Long id) {
         PropertyImage propertyImage = propertyImageRepository.findById(id).orElseThrow();
-        PropertyImageResponse propertyImageResponse = propertyImageMapper.toPropertyImageResponse(propertyImage);
+        PropertyImageResponse propertyImageResponse = propertyImageMapper.toDtoResponse(propertyImage);
         return propertyImageResponse;
     }
 

@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,7 +21,7 @@ public class InRoomAmenityType {
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "inRoomAmenityType")
-    private Set<InRoomAmenity> inRoomAmenities = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "inRoomAmenityType", fetch = FetchType.LAZY)
+    private List<InRoomAmenity> inRoomAmenities;
 
 }

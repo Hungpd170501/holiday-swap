@@ -3,8 +3,7 @@ package com.example.holidayswap.domain.dto.request.property;
 import com.example.holidayswap.domain.dto.request.property.inRoomAmenity.PropertyInRoomAmenityRequest;
 import lombok.Data;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Data
 public class PropertyUpdateRequest {
@@ -20,6 +19,6 @@ public class PropertyUpdateRequest {
     private int numberBedsRoom;
     private int numberBathRoom;
     private PropertyContractRequest propertyContractRequest;
-    private Set<PropertyImageRequest> propertyImageRequests = new LinkedHashSet<>();
-    private Set<PropertyInRoomAmenityRequest> propertyInRoomAmenityRequests = new LinkedHashSet<>();
+    private List<PropertyImageRequest> propertyImageRequests;
+    private List<PropertyInRoomAmenityRequest> propertyInRoomAmenityRequests;
 }

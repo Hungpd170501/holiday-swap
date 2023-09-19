@@ -15,9 +15,9 @@ import org.mapstruct.factory.Mappers;
 public interface PropertyInRoomAmenityMapper {
     PropertyInRoomAmenityMapper INSTANCE = Mappers.getMapper(PropertyInRoomAmenityMapper.class);
 
-    PropertyImageResponse toPropertyImageResponse(PropertyImage propertyImage);
+    PropertyImageResponse toDtoResponse(PropertyImage propertyImage);
 
-    PropertyInRoomAmenity toPropertyInRoomAmenity(PropertyInRoomAmenityRequest propertyInRoomAmenityRequest);
+    PropertyInRoomAmenity toEntity(PropertyInRoomAmenityRequest propertyInRoomAmenityRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(PropertyImageRequest dto, @MappingTarget PropertyImage entity);

@@ -9,8 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -86,20 +85,20 @@ public class Property {
     private User user;
 
     @OneToMany(mappedBy = "property")
-    private Set<PropertyContract> propertyContracts = new LinkedHashSet<>();
+    private List<PropertyContract> propertyContracts;
     
     @OneToMany(mappedBy = "property")
-    private Set<PropertyImage> propertyImages = new LinkedHashSet<>();
+    private List<PropertyImage> propertyImages;
 
 //    @ManyToMany
 //    @JoinTable(name = "property_facility",
 //            joinColumns = @JoinColumn(name = "property_id"),
 //            inverseJoinColumns = @JoinColumn(name = "facility_id"))
-//    private Set<Facility> facilities = new LinkedHashSet<>();
+//    private List<Facility> facilities = new LinkedHashSet<>();
 //
 //    @ManyToMany
 //    @JoinTable(name = "property_service",
 //            joinColumns = @JoinColumn(name = "property_id"),
 //            inverseJoinColumns = @JoinColumn(name = "service_id"))
-//    private Set<Service> services = new LinkedHashSet<>();
+//    private List<Service> services = new LinkedHashSet<>();
 }

@@ -9,5 +9,4 @@ public class PropertyContractRequest {
     private OffsetDateTime endPeriod;
     private OffsetDateTime endTime;
     private OffsetDateTime startTime;
-    private String imgContract;
 }

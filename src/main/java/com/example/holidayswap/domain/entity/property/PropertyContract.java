@@ -5,8 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.OffsetDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,9 +26,6 @@ public class PropertyContract {
     @Column(name = "end_time")
     private OffsetDateTime endTime;
 
-    @Column(name = "img_contract", length = Integer.MAX_VALUE)
-    private String imgContract;
-
     @Column(name = "start_time")
     private OffsetDateTime startTime;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
@@ -46,5 +42,6 @@ public class PropertyContract {
             updatable = false)
     private Property property;
     @OneToMany(mappedBy = "propertyContract")
-    private Set<ContractImage> contractImages = new LinkedHashSet<>();
+//    @Fetch(FetchMode.SUBSELECT)
+    private List<ContractImage> contractImages;
 }

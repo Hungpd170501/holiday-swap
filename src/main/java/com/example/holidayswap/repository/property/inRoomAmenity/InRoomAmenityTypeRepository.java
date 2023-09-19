@@ -8,18 +8,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface InRoomAmenityTypeRepository extends JpaRepository<InRoomAmenityType, Long> {
-    @Query("SELECT a FROM InRoomAmenityType a " +
-            "JOIN a.inRoomAmenities b " +
-            "JOIN b.propertyInRoomAmenities c " +
-            "JOIN c.property d " +
-            "WHERE d.id = :id")
-    Set<InRoomAmenityType> findFacilitiesTypesByPropertyId(@Param("id") Long id);
+    @Query("""
+            select iType from InRoomAmenityType iType
+             join iType.inRoomAmenities i
+             join i.propertyInRoomAmenities pI
+             join pI.property p
+             where p.id = :propertyId and iType.isDeleted = false""")
+    List<InRoomAmenityType> findInRoomAmenityTypesByPropertyId(@Param("propertyId") Long propertyId);
 
+    @Query("""
+            select i from InRoomAmenityType i
+            where upper(i.inRoomAmenityTypeName) like upper(concat('%', ?1, '%')) and i.isDeleted = false""")
     Page<InRoomAmenityType> findAllByInRoomAmenityTypeNameContainingIgnoreCaseAndIsDeletedIsFalse(String name, Pageable pageable);
 
     Optional<InRoomAmenityType> findByIdAndIsDeletedIsFalse(Long id);

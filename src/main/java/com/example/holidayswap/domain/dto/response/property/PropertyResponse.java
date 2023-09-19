@@ -1,12 +1,9 @@
 package com.example.holidayswap.domain.dto.response.property;
 
-import com.example.holidayswap.domain.entity.property.PropertyContract;
-import com.example.holidayswap.domain.entity.property.PropertyImage;
-import com.example.holidayswap.domain.entity.property.inRoomAmenity.InRoomAmenityType;
+import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.InRoomAmenityTypeResponse;
 import lombok.Data;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Data
 public class PropertyResponse {
@@ -26,8 +23,8 @@ public class PropertyResponse {
     private int sofaBeds;
     private int murphyBeds;
     private int viewId;
-    private Set<PropertyContract> propertyContracts = new LinkedHashSet<>();
-    private Set<PropertyImage> propertyImages = new LinkedHashSet<>();
+    private List<PropertyContractResponse> propertyContracts;
+    private List<PropertyImageResponse> propertyImages;
     //    private Set<Facility> facilities = new LinkedHashSet<>();
-    private Set<InRoomAmenityType> inRoomAmenityTypes = new LinkedHashSet<>();
+    private List<InRoomAmenityTypeResponse> inRoomAmenityTypes;
 }

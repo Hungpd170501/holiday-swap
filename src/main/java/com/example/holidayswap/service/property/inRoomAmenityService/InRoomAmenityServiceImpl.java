@@ -11,50 +11,61 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 public class InRoomAmenityServiceImpl implements InRoomAmenityService {
     private final InRoomAmenityRepository inRoomAmenityRepository;
-    private final InRoomAmenityMapper inRoomAmenityMapper;
 
     @Override
-    public Page<InRoomAmenityResponse> gets(String name, Pageable pageable) {
-        Page<InRoomAmenity> inRoomAmenityPage = inRoomAmenityRepository.
-                findInRoomAmenitiesByInRoomAmenitiesNameContainingAndAndIsDeletedIsFalse(name, pageable);
-        Page<InRoomAmenityResponse> inRoomAmenityResponsePage = inRoomAmenityPage.map(inRoomAmenityMapper::toInRoomAmenityResponse);
+    public Page<InRoomAmenityResponse> gets(String searchName, Long idInRoomAmenityType, Pageable pageable) {
+        Page<InRoomAmenity> inRoomAmenityPage = inRoomAmenityRepository.findInRoomAmenitiesByInRoomAmenitiesNameContainingIgnoreCaseAndAndInRoomAmenitiesTypeIdAndIsDeletedIsFalse(searchName, idInRoomAmenityType, pageable);
+        Page<InRoomAmenityResponse> inRoomAmenityResponsePage = inRoomAmenityPage.map(InRoomAmenityMapper.INSTANCE::toDtoResponse);
         return inRoomAmenityResponsePage;
     }
 
     @Override
+    public List<InRoomAmenityResponse> gets(Long properId) {
+        List<InRoomAmenity> inRoomAmenities = inRoomAmenityRepository.findInRoomAmenitiesByPropertyId(properId);
+        List<InRoomAmenityResponse> inRoomAmenityResponses = inRoomAmenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
+        return inRoomAmenityResponses;
+    }
+
+    @Override
+    public List<InRoomAmenityResponse> gets(Long propertyId, Long inRoomAmenityTypeId) {
+        List<InRoomAmenity> inRoomAmenities = inRoomAmenityRepository.findInRoomAmenitiesByPropertyIdAndInRoomAmenityTypeId(propertyId, inRoomAmenityTypeId);
+        List<InRoomAmenityResponse> inRoomAmenityResponses = inRoomAmenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
+        return inRoomAmenityResponses;
+    }
+
+    @Override
     public InRoomAmenityResponse get(Long id) {
-        var inRoomAmenityFound = inRoomAmenityRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
-        var inRoomAmenityResponse = inRoomAmenityMapper.toInRoomAmenityResponse(inRoomAmenityFound);
+        var inRoomAmenityFound = inRoomAmenityRepository.findInRoomAmenityByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
+        var inRoomAmenityResponse = InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityFound);
         return inRoomAmenityResponse;
     }
 
     @Override
     public InRoomAmenityResponse create(InRoomAmenityRequest inRoomAmenityRequest) {
-        var inRoomAmenity = inRoomAmenityMapper.toInRoomAmenity(inRoomAmenityRequest);
+        var inRoomAmenity = InRoomAmenityMapper.INSTANCE.toEntity(inRoomAmenityRequest);
         var inRoomAmenityNew = inRoomAmenityRepository.save(inRoomAmenity);
-        return inRoomAmenityMapper.toInRoomAmenityResponse(inRoomAmenityNew);
+        return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityNew);
     }
 
     @Override
     public InRoomAmenityResponse update(Long id, InRoomAmenityRequest inRoomAmenityRequest) {
-        var inRoomAmenityFound = inRoomAmenityRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
-        inRoomAmenityMapper.updateEntityFromDTO(inRoomAmenityRequest, inRoomAmenityFound);
+        var inRoomAmenityFound = inRoomAmenityRepository.findInRoomAmenityByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
+        InRoomAmenityMapper.INSTANCE.updateEntityFromDTO(inRoomAmenityRequest, inRoomAmenityFound);
         inRoomAmenityRepository.save(inRoomAmenityFound);
-        return inRoomAmenityMapper.toInRoomAmenityResponse(inRoomAmenityFound);
+        return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityFound);
     }
 
     @Override
     public void delete(Long id) {
-        var inRoomAmenityFound = inRoomAmenityRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
+        var inRoomAmenityFound = inRoomAmenityRepository.findInRoomAmenityByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
         inRoomAmenityFound.setIsDeleted(true);
         inRoomAmenityRepository.save(inRoomAmenityFound);
     }

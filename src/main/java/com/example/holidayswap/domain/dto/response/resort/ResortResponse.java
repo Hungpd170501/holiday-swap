@@ -1,17 +1,14 @@
 package com.example.holidayswap.domain.dto.response.resort;
 
-import com.example.holidayswap.domain.entity.address.Address;
-import com.example.holidayswap.domain.entity.property.ResortImage;
 import lombok.Data;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 @Data
 public class ResortResponse {
     private Long id;
     private String resortName;
-    private Address address;
+    private Long address;
     private boolean isDeleted;
-    private Set<ResortImage> resortImages = new LinkedHashSet<>();
+    private List<ResortImageResponse> resortImages;
 }

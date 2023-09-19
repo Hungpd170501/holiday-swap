@@ -7,9 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "contract_image")
@@ -33,5 +33,4 @@ public class ContractImage {
             insertable = false,
             updatable = false)
     private PropertyContract propertyContract;
-
 }

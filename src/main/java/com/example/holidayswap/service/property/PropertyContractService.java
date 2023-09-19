@@ -2,19 +2,18 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyContractRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyContractResponse;
-import com.example.holidayswap.domain.entity.property.PropertyImage;
-import org.springframework.web.multipart.MultipartFile;
+import com.example.holidayswap.domain.entity.property.PropertyContract;
 
 import java.util.List;
 
 public interface PropertyContractService {
-    List<PropertyContractResponse> gets();
+    List<PropertyContractResponse> gets(Long propertyId);
 
     PropertyContractResponse get(Long id);
 
-    PropertyImage create(Long idProperty, MultipartFile multipartFile);
+    PropertyContract create(Long propertyId, PropertyContractRequest propertyContractRequest);
 
-    PropertyImage update(Long Id, Long idProperty, PropertyContractRequest propertyImage);
+    PropertyContract update(Long Id, PropertyContractRequest propertyContractRequest);
 
-    void create(Long id);
+    void delete(Long id);
 }

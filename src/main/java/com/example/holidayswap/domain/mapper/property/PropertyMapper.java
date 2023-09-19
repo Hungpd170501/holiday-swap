@@ -13,12 +13,13 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface PropertyMapper {
     PropertyMapper INSTANCE = Mappers.getMapper(PropertyMapper.class);
-    PropertyResponse toPropertyResponse(Property property);
+
+    PropertyResponse toDtoResponse(Property property);
 
     @Mapping(target = "propertyContracts", ignore = true)
-    Property toProperty(PropertyRegisterRequest propertyRegisterRequest);
+    Property toEntity(PropertyRegisterRequest propertyRegisterRequest);
 
-    Property toProperty(PropertyUpdateRequest propertyUpdateRequest);
+    Property toEntity(PropertyUpdateRequest propertyUpdateRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(PropertyUpdateRequest dto, @MappingTarget Property entity);

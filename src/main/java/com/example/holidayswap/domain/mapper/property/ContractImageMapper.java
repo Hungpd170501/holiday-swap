@@ -12,10 +12,10 @@ import org.mapstruct.factory.Mappers;
 public interface ContractImageMapper {
     ContractImageMapper INSTANCE = Mappers.getMapper(ContractImageMapper.class);
 
-    ContractImageResponse toPropertyImageResponse(ContractImage contractImage);
+    ContractImageResponse toDtoResponse(ContractImage contractImage);
 
     @Mapping(target = "propertyContractId", ignore = true)
-    ContractImage toPropertyImage(ContractImageRequest contractImageRequest);
+    ContractImage toEntity(ContractImageRequest contractImageRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(ContractImageRequest dto, @MappingTarget ContractImage entity);

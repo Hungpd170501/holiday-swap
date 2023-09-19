@@ -12,10 +12,10 @@ import org.mapstruct.factory.Mappers;
 public interface PropertyContractMapper {
     PropertyContractMapper INSTANCE = Mappers.getMapper(PropertyContractMapper.class);
 
-    PropertyContractResponse toPropertyContractResponse(PropertyContract propertyContract);
+    PropertyContractResponse toDtoResponse(PropertyContract propertyContract);
 
     @Mapping(target = "propertyId", ignore = true)
-    PropertyContract toPropertyContract(PropertyContractRequest propertyContractRequest);
+    PropertyContract toEntity(PropertyContractRequest propertyContractRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(PropertyContractRequest dto, @MappingTarget PropertyContract entity);

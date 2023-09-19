@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,12 +23,28 @@ public class InRoomAmenitiesController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<InRoomAmenityResponse>> gets(
-            @RequestParam(defaultValue = "") String name,
+            @RequestParam(defaultValue = "") String searchName,
+            @RequestParam(defaultValue = "") Long inRoomAmenityTypeId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var inRoomAmenityResponses = inRoomAmenityService.gets(name, pageable);
+        var inRoomAmenityResponses = inRoomAmenityService.gets(searchName, inRoomAmenityTypeId, pageable);
+        return ResponseEntity.ok(inRoomAmenityResponses);
+    }
+
+    @GetMapping("/property")
+    public ResponseEntity<List<InRoomAmenityResponse>> gets(
+            @RequestParam Long propertyId) {
+        var inRoomAmenityResponses = inRoomAmenityService.gets(propertyId);
+        return ResponseEntity.ok(inRoomAmenityResponses);
+    }
+
+    @GetMapping("/property/inRoomAmenityType")
+    public ResponseEntity<List<InRoomAmenityResponse>> gets(
+            @RequestParam Long propertyId,
+            @RequestParam Long inRoomAmenityType) {
+        var inRoomAmenityResponses = inRoomAmenityService.gets(propertyId, inRoomAmenityType);
         return ResponseEntity.ok(inRoomAmenityResponses);
     }
 
