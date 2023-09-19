@@ -44,7 +44,6 @@ public class TransferPointServiceImpl implements ITransferPointService{
         try {
             fromWallet = walletService.GetWalletByUserId(from);
             toWallet = walletService.GetWalletByUserId(to);
-
         } catch (AccountException accountException){
             loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.ID_NOT_FOUND, accountException.getMessage());
             throw new BankException("Account Error");
