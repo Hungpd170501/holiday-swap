@@ -32,14 +32,13 @@ public class TransferPointServiceImpl implements ITransferPointService{
 
     @Autowired
     private WalletRepository walletRepository;
-    private static final Lock sharedLock = new ReentrantLock(true);
 
     @Override
     @Transactional(rollbackFor = { BankException.class })
     public TransferResponse transferPoint(long from, long to, long amount) {
         Wallet fromWallet ;
         Wallet toWallet ;
-        String currentDate;
+        String currentDate = null;
 
         try {
             fromWallet = walletService.GetWalletByUserId(from);
@@ -48,6 +47,9 @@ public class TransferPointServiceImpl implements ITransferPointService{
             loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.ID_NOT_FOUND, accountException.getMessage());
             throw new BankException("Account Error");
         }
+        if(walletLocks.get(fromWallet.getId()).tryLock()){
+
+        try {
 
 
             if (fromWallet.getTotalPoint() < amount) {
@@ -57,7 +59,7 @@ public class TransferPointServiceImpl implements ITransferPointService{
             }
 
             boolean check = fromWallet.withdraw(amount);
-            if(!check){
+            if (!check) {
                 String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
                 loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail);
                 throw new BankException(detail);
@@ -75,6 +77,10 @@ public class TransferPointServiceImpl implements ITransferPointService{
             walletRepository.save(toWallet);
             transactLogRepository.save(transactLog);
             loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success");
+        } finally {
+            walletLocks.get(fromWallet.getId()).unlock();
+        }
+        }
 
         return new TransferResponse(EnumPaymentStatus.BankCodeError.SUCCESS, "Success",currentDate);
     }

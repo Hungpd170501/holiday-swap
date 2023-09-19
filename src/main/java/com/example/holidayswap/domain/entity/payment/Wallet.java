@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Entity
 @Table(name = "wallet")
@@ -18,7 +16,6 @@ import java.util.concurrent.locks.ReentrantLock;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Wallet {
-    private ReentrantLock lock = new ReentrantLock();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
@@ -29,7 +26,7 @@ public class Wallet {
     @OneToOne(mappedBy = "wallet")
     private User user;
 
-    @OneToMany(mappedBy="wallet")
+    @OneToMany(mappedBy = "wallet")
     private Set<TransactionTopUpWallet> transactionTopUpWallets;
 
     @Column(name = "total_point")
@@ -44,20 +41,17 @@ public class Wallet {
     @OneToMany(mappedBy = "walletTo")
     private Set<TransactLog> transactionsTo;
 
-    public synchronized boolean withdraw(double amount) {
+    public boolean withdraw(double amount) {
 
-        boolean check= false;
-        lock.lock();
-        try {
-            if (totalPoint >= amount) {
-                totalPoint -= amount;
-                check = true;
-            } else {
-                System.out.println("Insufficient funds.");
-            }
-        } finally {
-            lock.unlock();
+        boolean check = false;
+
+        if (totalPoint >= amount) {
+            totalPoint -= amount;
+            check = true;
+        } else {
+            System.out.println("Insufficient funds.");
         }
+
         return check;
     }
 

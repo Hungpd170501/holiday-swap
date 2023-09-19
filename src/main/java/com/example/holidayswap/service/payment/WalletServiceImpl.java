@@ -73,7 +73,7 @@ public class WalletServiceImpl implements IWalletService{
          if(walletLocks.isEmpty()){
                 List<Wallet> wallets = walletRepository.findAll();
                 for(Wallet wallet : wallets){
-                    walletLocks.put(wallet.getId(), new ReentrantLock());
+                    walletLocks.put(wallet.getId(), new ReentrantLock(true));
                 }
          }
          return walletLocks;
