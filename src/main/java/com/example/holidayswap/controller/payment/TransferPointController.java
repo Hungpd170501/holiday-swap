@@ -31,7 +31,7 @@ public class TransferPointController {
             fromWalletLock.lock();
             try {
                 Thread.sleep(3000);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 Logger.getLogger(e.getMessage());
             }
             result = transferPointService.transferPoint(request.getFrom(), request.getTo(), request.getAmount());
