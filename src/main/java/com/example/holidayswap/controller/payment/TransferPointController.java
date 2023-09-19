@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.locks.ReentrantLock;
+
+import static com.example.holidayswap.service.payment.WalletServiceImpl.walletLocks;
+
 @RestController
 public class TransferPointController {
 
@@ -17,8 +21,20 @@ public class TransferPointController {
 
     @PostMapping("/transfer")
     public ResponseEntity<TransferResponse> transferPoint(@RequestBody TransferRequest request) {
-        TransferResponse result = transferPointService.transferPoint(request.getFrom(), request.getTo(), request.getAmount());
-        return  ResponseEntity.ok(result);
+        ReentrantLock fromWalletLock = walletLocks.get(request.getFrom());
+        TransferResponse result;
+        try {
+            fromWalletLock.lock();
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            result = transferPointService.transferPoint(request.getFrom(), request.getTo(), request.getAmount());
+        } finally {
+            fromWalletLock.unlock();
+        }
+        return ResponseEntity.ok(result);
     }
 
 }
