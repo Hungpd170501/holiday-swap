@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.dto.request.property.inRoomAmenity;
+package com.example.holidayswap.domain.dto.request.property;
 
 import lombok.Data;
 

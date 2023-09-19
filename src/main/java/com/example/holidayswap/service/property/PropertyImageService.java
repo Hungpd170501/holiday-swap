@@ -1,6 +1,5 @@
 package com.example.holidayswap.service.property;
 
-import com.example.holidayswap.domain.dto.request.property.PropertyImageRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyImageResponse;
 import com.example.holidayswap.domain.entity.property.PropertyImage;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,13 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface PropertyImageService {
-    List<PropertyImageResponse> gets(Long idProperty);
+    List<PropertyImageResponse> gets(Long propertyId);
 
     PropertyImageResponse get(Long id);
 
-    PropertyImage create(Long idProperty, MultipartFile multipartFile);
+    PropertyImage create(Long propertyId, MultipartFile multipartFile);
 
-    PropertyImage update(Long Id, Long idProperty, PropertyImageRequest propertyImage);
+    PropertyImage update(Long Id, MultipartFile multipartFile);
 
     void delete(Long id);
 }

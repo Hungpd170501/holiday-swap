@@ -1,8 +1,8 @@
 package com.example.holidayswap.controller.property;
 
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
-import com.example.holidayswap.domain.mapper.property.ContractImageMapper;
-import com.example.holidayswap.service.property.ContractImageService;
+import com.example.holidayswap.domain.dto.response.property.PropertyImageResponse;
+import com.example.holidayswap.domain.mapper.property.PropertyImageMapper;
+import com.example.holidayswap.service.property.PropertyImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,41 +15,41 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/contractImages")
-public class ContractImagesController {
-    private final ContractImageService contractImageService;
+@RequestMapping("api/v1/propertyImages")
+public class PropertyImagesController {
+    private final PropertyImageService propertyImageService;
 
     @GetMapping
-    public ResponseEntity<List<ContractImageResponse>> gets(
+    public ResponseEntity<List<PropertyImageResponse>> gets(
             @RequestParam Long contractId) {
-        var inRoomAmenityResponses = contractImageService.gets(contractId);
-        return ResponseEntity.ok(inRoomAmenityResponses);
+        var propertyImageResponses = propertyImageService.gets(contractId);
+        return ResponseEntity.ok(propertyImageResponses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ContractImageResponse> get(
+    public ResponseEntity<PropertyImageResponse> get(
             @PathVariable("id") Long id) {
-        var inRoomAmenityResponse = contractImageService.get(id);
-        return ResponseEntity.ok(inRoomAmenityResponse);
+        var propertyImageResponses = propertyImageService.get(id);
+        return ResponseEntity.ok(propertyImageResponses);
     }
 
     @PostMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ContractImageResponse> create(
+    public ResponseEntity<PropertyImageResponse> create(
             @PathVariable Long id,
             @RequestPart MultipartFile contractImage) {
-        var contractImageCreated = contractImageService.create(id, contractImage);
+        var propertyImageCreated = propertyImageService.create(id, contractImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(contractImageCreated.getId())
+                .buildAndExpand(propertyImageCreated.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(ContractImageMapper.INSTANCE.toDtoResponse(contractImageCreated));
+        return ResponseEntity.created(location).body(PropertyImageMapper.INSTANCE.toDtoResponse(propertyImageCreated));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> update(@PathVariable Long id,
                                        @RequestPart MultipartFile contractImage) {
-        contractImageService.update(id, contractImage);
+        propertyImageService.update(id, contractImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -60,7 +60,7 @@ public class ContractImagesController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        contractImageService.delete(id);
+        propertyImageService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
