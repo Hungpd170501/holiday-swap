@@ -62,6 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void register(RegisterRequest request) {
+
         userRepository.getUserByEmailEquals(request.getEmail())
                 .ifPresent(user -> {
                     throw new DataIntegrityViolationException(EMAIL_HAS_ALREADY_BEEN_TAKEN);
@@ -82,6 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build());
             emailService.sendVerificationEmail(user.getEmail(), token.getValue());
         } catch (Exception e) {
+
             log.error("Error sending verification email", e);
         }
     }
