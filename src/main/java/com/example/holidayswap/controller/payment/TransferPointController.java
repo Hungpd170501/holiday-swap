@@ -30,12 +30,15 @@ public class TransferPointController {
     public ResponseEntity<TransferResponse> transferPoint(@RequestBody TransferRequest request) throws InterruptedException {
         RLock fairLock = RedissonLockUtils.getFairLock("wallet-" + (walletService.GetWalletByUserId(request.getFrom()).getId()).toString());
         TransferResponse result = null;
-        fairLock.lock(30, TimeUnit.SECONDS);
-        try {
-            Thread.sleep(3000);
-            result = transferPointService.transferPoint(request.getFrom(), request.getTo(), request.getAmount());
-        } finally {
-            fairLock.unlock();
+        boolean tryLock = fairLock.tryLock(10,10, TimeUnit.SECONDS);
+        if (tryLock){
+            try {
+                fairLock.lock();
+                Thread.sleep(3000);
+                result = transferPointService.transferPoint(request.getFrom(), request.getTo(), request.getAmount());
+            } finally {
+                fairLock.unlock();
+            }
         }
         return result == null ? ResponseEntity.badRequest().body(new TransferResponse(EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, "fail", helper.getCurrentDate())) : ResponseEntity.ok(result);
     }
