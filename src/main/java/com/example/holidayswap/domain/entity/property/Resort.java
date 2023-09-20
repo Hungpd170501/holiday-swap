@@ -1,5 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
+import com.example.holidayswap.domain.entity.address.Address;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -21,10 +23,16 @@ public class Resort {
     @Column(name = "resort_name")
     private String resortName;
 
-    //    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "address_id")
     @Column(name = "address_id")
-    private Long address;
+    private Long addressId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "address_id",
+            referencedColumnName = "address_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+    private Address address;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;

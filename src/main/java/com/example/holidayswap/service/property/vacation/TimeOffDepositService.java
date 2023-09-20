@@ -1,0 +1,21 @@
+package com.example.holidayswap.service.property.vacation;
+
+import com.example.holidayswap.domain.dto.request.property.vacation.TimeOffDepositRequest;
+import com.example.holidayswap.domain.dto.response.property.vacation.TimeOffDepositResponse;
+import com.example.holidayswap.domain.entity.property.vacation.TimeOffDeposit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TimeOffDepositService {
+    Page<TimeOffDepositResponse> gets(Long vacationId, Pageable pageable);
+
+    TimeOffDepositResponse get(Long id);
+
+    TimeOffDeposit create(Long vacationId, TimeOffDepositRequest timeOffDepositRequest);
+
+    TimeOffDeposit update(Long id, TimeOffDepositRequest timeOffDepositRequest);
+
+    void delete(Long id);
+}

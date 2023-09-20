@@ -1,36 +1,35 @@
-package com.example.holidayswap.domain.entity.property;
+package com.example.holidayswap.domain.entity.property.vacation;
 
+import com.example.holidayswap.domain.entity.property.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 
+@Entity
 @Getter
 @Setter
-@Entity
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Table(name = "property_contract")
-public class PropertyContract {
+@AllArgsConstructor
+@Table(name = "vacation")
+public class Vacation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "property_contract_id", nullable = false)
+    @Column(name = "vacation_id", nullable = false)
     private Long id;
-
-    @Column(name = "end_period")
-    private OffsetDateTime endPeriod;
-
-    @Column(name = "end_time")
-    private OffsetDateTime endTime;
-
     @Column(name = "start_time")
-    private OffsetDateTime startTime;
+    private Date startTime;
+    @Column(name = "end_time")
+    private Date endTime;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
-
+    @Column(name = "status")
+    private String status;
     @Column(name = "property_id")
     private Long propertyId;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,6 +40,8 @@ public class PropertyContract {
             insertable = false,
             updatable = false)
     private Property property;
-    @OneToMany(mappedBy = "propertyContract")
-    private List<ContractImage> contractImages;
+
+    @OneToMany(mappedBy = "vacation")
+    private List<TimeOffDeposit> timeOffDeposits;
+
 }
