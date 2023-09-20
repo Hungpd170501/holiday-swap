@@ -10,6 +10,8 @@ public class ErrorMessage {
     public static final String USER_NOT_VERIFIED = "User not verified.";
     public static final String USER_BLOCKED = "User is blocked.";
     public static final String EMAIL_NOT_FOUND = "Email not found.";
+    public static final String USER_NOT_IN_CONVERSATION = "User is not in conversation.";
+    public static final String EMAIL_ALREADY_EXISTS = "Email already exists.";
     public static final String EMAIL_HAS_ALREADY_BEEN_TAKEN = "Email has already been taken.";
     public static final String ROLE_NOT_FOUND = "Role not found.";
     public static final String ROLE_ALREADY_EXISTS = "Role already exists.";

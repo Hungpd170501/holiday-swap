@@ -61,7 +61,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    @Transactional
     public void register(RegisterRequest request) {
 
         userRepository.getUserByEmailEquals(request.getEmail())
