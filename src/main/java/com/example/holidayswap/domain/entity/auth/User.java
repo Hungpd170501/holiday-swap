@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.auth;
 
+import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -96,6 +98,10 @@ public class User implements UserDetails, Serializable {
             orphanRemoval = true
     )
     private List<Token> tokens;
+
+    @OneToMany(mappedBy = "user")
+    private List<ConversationParticipant> conversationParticipants = new ArrayList<>();
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

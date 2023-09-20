@@ -3,6 +3,7 @@ package com.example.holidayswap.controller.auth;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.service.auth.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
+    @Operation(
+            description = "Get current user info"
+    )
     @GetMapping("/profile")
     public ResponseEntity<UserProfileResponse> getUserInfo() {
         return ResponseEntity.ok(userService.getUserInfo());
