@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/facilities")
+@RequestMapping("api/v1/inRoomAmenities")
 public class InRoomAmenitiesController {
     final private InRoomAmenityService inRoomAmenityService;
 

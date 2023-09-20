@@ -5,16 +5,9 @@ import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
-import com.example.holidayswap.domain.entity.property.inRoomAmenity.PropertyInRoomAmenity;
-import com.example.holidayswap.domain.entity.property.inRoomAmenity.PropertyInRoomAmenityId;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.PropertyMapper;
-import com.example.holidayswap.domain.mapper.property.inRoomAmenity.PropertyContractMapper;
-import com.example.holidayswap.repository.property.PropertyContractRepository;
-import com.example.holidayswap.repository.property.PropertyInRoomAmenityRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
-import com.example.holidayswap.repository.property.inRoomAmenity.InRoomAmenityRepository;
-import com.example.holidayswap.repository.property.inRoomAmenity.InRoomAmenityTypeRepository;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,16 +22,14 @@ import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_NOT_FOUND;
 @Service
 @RequiredArgsConstructor
 public class PropertyServiceImpl implements PropertyService {
+
     private final PropertyImageService propertyImageService;
+
+    private final PropertyContractService propertyContractService;
     private final ContractImageService contractImageService;
+    private final PropertyInRoomAmenityService propertyInRoomAmenityService;
 
     private final PropertyRepository propertyRepository;
-    private final InRoomAmenityRepository inRoomAmenityRepository;
-    private final InRoomAmenityTypeRepository inRoomAmenitiesTypeRepository;
-    private final PropertyContractRepository propertyContractRepository;
-    private final PropertyInRoomAmenityRepository propertyInRoomAmenityRepository;
-
-//    private final PropertyMapper propertyMapper;
 
     @Override
     public Page<PropertyResponse> gets(Pageable pageable) {
@@ -52,48 +43,42 @@ public class PropertyServiceImpl implements PropertyService {
         var propertyFound = propertyRepository.findPropertyById(id).
                 orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var propertyResponse = PropertyMapper.INSTANCE.toDtoResponse(propertyFound);
-//        propertyResponse.setInRoomAmenityTypes(inRoomAmenitiesTypeRepository.findInRoomAmenityTypesByPropertyId(propertyFound.getId()));
         return propertyResponse;
     }
 
     @Override
-    public PropertyResponse create(PropertyRegisterRequest propertyRegisterRequest,
-                                   List<MultipartFile> propertyImages,
-                                   List<MultipartFile> propertyContractImages) throws IOException {
+    public Property create(Long userId,
+                           PropertyRegisterRequest propertyRegisterRequest,
+                           List<MultipartFile> propertyImages,
+                           List<MultipartFile> propertyContractImages) throws IOException {
         var property = PropertyMapper.INSTANCE.toEntity(propertyRegisterRequest);
+        property.setUserId(userId);
         property.setStatus(PropertyStatus.WAITING);
-        var propertyNew = propertyRepository.save(property);
+        var propertyCreated = propertyRepository.save(property);
         propertyImages.forEach(element -> {
-            propertyImageService.create(propertyNew.getId(), element);
+            propertyImageService.create(propertyCreated.getId(), element);
         });
         {
-            var contract = PropertyContractMapper.INSTANCE.toEntity(propertyRegisterRequest.getPropertyContractRequest());
-            contract.setPropertyId(propertyNew.getId());
-            var contractNew = propertyContractRepository.save(contract);
+            var contractCreated = propertyContractService.create(propertyCreated.getId(), propertyRegisterRequest.getPropertyContractRequest());
             propertyContractImages.forEach(element -> {
-                contractImageService.create(contractNew.getId(), element);
+                contractImageService.create(contractCreated.getId(), element);
             });
         }
         {
             propertyRegisterRequest.getPropertyInRoomAmenityRequests().stream().toList().forEach(element -> {
-                PropertyInRoomAmenity propertyInRoomAmenity = new PropertyInRoomAmenity(
-                        new PropertyInRoomAmenityId(propertyNew.getId(), element.getInRoomAmenityId()),
-                        false,
-                        propertyNew,
-                        inRoomAmenityRepository.findById(element.getInRoomAmenityId()).orElseThrow());
-                propertyInRoomAmenityRepository.save(propertyInRoomAmenity);
+                propertyInRoomAmenityService.create(propertyCreated.getId(), element.getInRoomAmenityId());
             });
         }
-        return PropertyMapper.INSTANCE.toDtoResponse(propertyNew);
+        return propertyCreated;
     }
 
     @Override
-    public PropertyResponse update(Long id, PropertyUpdateRequest propertyUpdateRequest) {
-        var propertyFound = propertyRepository.findById(id).
+    public Property update(Long id, PropertyUpdateRequest propertyUpdateRequest) {
+        var property = propertyRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
-        PropertyMapper.INSTANCE.updateEntityFromDTO(propertyUpdateRequest, propertyFound);
-        propertyRepository.save(propertyFound);
-        return PropertyMapper.INSTANCE.toDtoResponse(propertyFound);
+        PropertyMapper.INSTANCE.updateEntityFromDTO(propertyUpdateRequest, property);
+        propertyRepository.save(property);
+        return property;
     }
 
     @Override

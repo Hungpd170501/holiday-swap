@@ -16,7 +16,7 @@ public interface PropertyMapper {
 
     PropertyResponse toDtoResponse(Property property);
 
-    @Mapping(target = "propertyContracts", ignore = true)
+    //    @Mapping(target = "propertyContracts", ignore = true)
     Property toEntity(PropertyRegisterRequest propertyRegisterRequest);
 
     Property toEntity(PropertyUpdateRequest propertyUpdateRequest);

@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.dto.request.property;
 
 import com.example.holidayswap.domain.dto.request.property.inRoomAmenity.PropertyInRoomAmenityRequest;
+import com.example.holidayswap.domain.dto.request.property.vacation.VacationRequest;
 import lombok.Data;
 
 import java.util.List;
@@ -9,16 +10,17 @@ import java.util.List;
 public class PropertyRegisterRequest {
     private Long propertyTypeId;
     private Long resortId;
-    private Long userId;
-    private int viewId;
+    //    private Long userId;
+    private Long viewId;
     private int kingBeds;
-    private int qeenBeds;
+    private int queenBeds;
     private int twinBeds;
     private int fullBeds;
     private int sofaBeds;
     private int murphyBeds;
     private int numberBedsRoom;
     private int numberBathRoom;
+    private List<VacationRequest> vacation;
     private PropertyContractRequest propertyContractRequest;
     private List<PropertyInRoomAmenityRequest> propertyInRoomAmenityRequests;
 }

@@ -43,7 +43,7 @@ public class Property {
     private double roomSize;
 
     @Column(name = "room_view_id")
-    private int roomViewId;
+    private Long roomViewId;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private Boolean isDeleted = false;
@@ -63,6 +63,7 @@ public class Property {
     private PropertyType propertyType;
 
     @Column(name = "resort_id")
+//    @NotNull
     private Long resortId;
     @ManyToOne
     @JsonIgnore
@@ -86,19 +87,7 @@ public class Property {
 
     @OneToMany(mappedBy = "property")
     private List<PropertyContract> propertyContracts;
-    
-    @OneToMany(mappedBy = "property")
-    private List<PropertyImage> propertyImages;
 
-//    @ManyToMany
-//    @JoinTable(name = "property_facility",
-//            joinColumns = @JoinColumn(name = "property_id"),
-//            inverseJoinColumns = @JoinColumn(name = "facility_id"))
-//    private List<Facility> facilities = new LinkedHashSet<>();
-//
-//    @ManyToMany
-//    @JoinTable(name = "property_service",
-//            joinColumns = @JoinColumn(name = "property_id"),
-//            inverseJoinColumns = @JoinColumn(name = "service_id"))
-//    private List<Service> services = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "property")
+//    private List<PropertyImage> propertyImages;
 }

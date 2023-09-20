@@ -4,12 +4,16 @@ import com.example.holidayswap.domain.dto.request.auth.LoginRequest;
 import com.example.holidayswap.domain.dto.request.auth.RefreshTokenRequest;
 import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.ResetPasswordRequest;
+import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
 import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
 import com.example.holidayswap.service.auth.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,8 +29,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerUser(@RequestBody RegisterRequest registerRequest) {
-        authenticationService.register(registerRequest);
+    public ResponseEntity<Void> registerUser(@RequestBody RegisterRequest registerRequest,
+                                             @RequestPart List<MultipartFile> propertyImages,
+                                             @RequestPart List<MultipartFile> propertyContractImages,
+                                             @RequestPart PropertyRegisterRequest propertyRegisterRequest) {
+        authenticationService.register(registerRequest, propertyRegisterRequest, propertyImages, propertyContractImages);
         return ResponseEntity.noContent().build();
     }
 

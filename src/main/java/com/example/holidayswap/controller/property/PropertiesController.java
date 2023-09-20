@@ -43,9 +43,10 @@ public class PropertiesController {
     public ResponseEntity<PropertyResponse> create(
             @RequestPart List<MultipartFile> propertyImages,
             @RequestPart List<MultipartFile> propertyContractImages,
+            @RequestPart Long userId,
             @RequestPart PropertyRegisterRequest propertyRegisterRequest
     ) throws IOException {
-        var propertyCreated = propertyService.create(propertyRegisterRequest, propertyImages, propertyContractImages);
+        var propertyCreated = propertyService.create(userId, propertyRegisterRequest, propertyImages, propertyContractImages);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

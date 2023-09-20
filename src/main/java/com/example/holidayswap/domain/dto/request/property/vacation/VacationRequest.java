@@ -10,5 +10,4 @@ public class VacationRequest {
     private Date endTime;
     private String status;
     private Long propertyId;
-//    private Property property;
 }
