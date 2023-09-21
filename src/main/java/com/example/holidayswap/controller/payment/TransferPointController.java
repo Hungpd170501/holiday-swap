@@ -5,15 +5,14 @@ import com.example.holidayswap.domain.dto.response.payment.TransferResponse;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.service.payment.IWalletService;
-import com.example.holidayswap.utils.helper;
+import com.example.holidayswap.utils.RedissonLockUtils;
+import com.example.holidayswap.utils.Helper;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
-
-import static com.example.holidayswap.service.payment.WalletServiceImpl.walletLocks;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/transfer")
@@ -25,31 +24,25 @@ public class TransferPointController {
     private IWalletService walletService;
 
 
+    @GetMapping
+    public ResponseEntity<?> getTransactionTranferPointByUserId(@RequestParam Long userId) {
+        return ResponseEntity.ok(transferPointService.getTransactionTranferPointByUserId(userId));
+    }
     @PostMapping
-    public ResponseEntity<TransferResponse> transferPoint(@RequestBody TransferRequest request) {
-
-        ReentrantLock fromWalletLock = walletLocks.get(walletService.GetWalletByUserId(request.getFrom()).getId());
+    public ResponseEntity<TransferResponse> transferPoint(@RequestBody TransferRequest request) throws InterruptedException {
+        RLock fairLock = RedissonLockUtils.getFairLock("wallet-" + (walletService.GetWalletByUserId(request.getFrom()).getId()).toString());
         TransferResponse result = null;
-        if (fromWalletLock.tryLock()) {
-            fromWalletLock.lock();
+        boolean tryLock = fairLock.tryLock(10,10, TimeUnit.SECONDS);
+        if (tryLock){
             try {
-
-                try {
-                    Thread.sleep(3000);
-                    result = transferPointService.transferPoint(request.getFrom(), request.getTo(), request.getAmount());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                fairLock.lock();
+                Thread.sleep(3000);
+                result = transferPointService.transferPoint(request.getFrom(), request.getTo(), request.getAmount());
             } finally {
-                fromWalletLock.unlock();
+                fairLock.unlock();
             }
         }
-        return result == null ? ResponseEntity.badRequest().body(new TransferResponse(EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, "fail", helper.getCurrentDate())) : ResponseEntity.ok(result);
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getTransactionTranferPointByUserId(@RequestParam Long userId){
-        return ResponseEntity.ok(transferPointService.getTransactionTranferPointByUserId(userId));
+        return result == null ? ResponseEntity.badRequest().body(new TransferResponse(EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, "fail", Helper.getCurrentDate())) : ResponseEntity.ok(result);
     }
 
 }

@@ -16,8 +16,8 @@ public class AllLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private long fromID;
-    private long toID;
+    private long fromId;
+    private long toId;
     private long amount;
     private EnumPaymentStatus.BankCodeError resultCode;
     private String detail;

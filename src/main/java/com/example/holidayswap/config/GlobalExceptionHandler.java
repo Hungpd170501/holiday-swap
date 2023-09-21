@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -24,18 +25,17 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 public class GlobalExceptionHandler {
     //400
     @ExceptionHandler({
-            ResourceNotFoundException.class,
-            EntityNotFoundException.class
+            MethodArgumentNotValidException.class
     })
-    public <T extends RuntimeException> ResponseEntity<ApiError> resourceNotFoundExceptionHandler(T ex, WebRequest request) {
+    public <T extends RuntimeException> ResponseEntity<ApiError> handleValidationException(T ex, WebRequest request) {
         ApiError message = ApiError.builder()
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.BAD_REQUEST)
                 .message(ex.getMessage())
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
         log.warn("Resource not found: %s".formatted(message));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 
     //401
@@ -90,6 +90,22 @@ public class GlobalExceptionHandler {
                 .build();
         log.warn("Access denied exception: %s".formatted(message));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
+    }
+
+    //404
+    @ExceptionHandler({
+            ResourceNotFoundException.class,
+            EntityNotFoundException.class,
+    })
+    public <T extends RuntimeException> ResponseEntity<ApiError> resourceNotFoundExceptionHandler(T ex, WebRequest request) {
+        ApiError message = ApiError.builder()
+                .status(HttpStatus.NOT_FOUND)
+                .message(ex.getMessage())
+                .description(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
+        log.warn("Resource not found: %s".formatted(message));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 
     //409

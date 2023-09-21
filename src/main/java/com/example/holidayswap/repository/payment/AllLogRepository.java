@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface AllLogRepository extends JpaRepository<AllLog, Long> {
-    List<AllLog> findAllByFromUserIdOrToUserId(Long fromUserId, Long toUserId);
+    List<AllLog> findAllByFromIdOrToId(Long fromUserId, Long toUserId);
 }
