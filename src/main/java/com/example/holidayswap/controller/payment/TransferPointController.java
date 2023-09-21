@@ -8,10 +8,7 @@ import com.example.holidayswap.service.payment.IWalletService;
 import com.example.holidayswap.utils.helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,21 +24,15 @@ public class TransferPointController {
     @Autowired
     private IWalletService walletService;
 
-    private Condition condition ;
 
     @PostMapping
     public ResponseEntity<TransferResponse> transferPoint(@RequestBody TransferRequest request) {
 
         ReentrantLock fromWalletLock = walletLocks.get(walletService.GetWalletByUserId(request.getFrom()).getId());
         TransferResponse result = null;
-//        condition = fromWalletLock.newCondition();
-        if(fromWalletLock.tryLock()) {
-        fromWalletLock.lock();
-//            if(fromWalletLock.getHoldCount() > 1) {
-//                condition.await();
-//            }
-
-        try {
+        if (fromWalletLock.tryLock()) {
+            fromWalletLock.lock();
+            try {
 
                 try {
                     Thread.sleep(3000);
@@ -50,11 +41,15 @@ public class TransferPointController {
                     throw new RuntimeException(e);
                 }
             } finally {
-//                condition.signal();
                 fromWalletLock.unlock();
             }
         }
-        return result == null ? ResponseEntity.badRequest().body( new TransferResponse(EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH,"fail", helper.getCurrentDate())) : ResponseEntity.ok(result);
+        return result == null ? ResponseEntity.badRequest().body(new TransferResponse(EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, "fail", helper.getCurrentDate())) : ResponseEntity.ok(result);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getTransactionTranferPointByUserId(@RequestParam Long userId){
+        return ResponseEntity.ok("123");
     }
 
 }

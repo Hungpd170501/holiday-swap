@@ -1,9 +1,12 @@
 package com.example.holidayswap.service.payment;
 
+import com.example.holidayswap.domain.dto.response.payment.TransactionTranferPointResponse;
 import com.example.holidayswap.domain.dto.response.payment.TransferResponse;
+import com.example.holidayswap.domain.entity.payment.AllLog;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.domain.entity.payment.TransactLog;
 import com.example.holidayswap.domain.entity.payment.Wallet;
+import com.example.holidayswap.repository.payment.AllLogRepository;
 import com.example.holidayswap.repository.payment.TransactLogRepository;
 import com.example.holidayswap.repository.payment.WalletRepository;
 import com.example.holidayswap.service.AccountException;
@@ -13,8 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.List;
 
 import static com.example.holidayswap.service.payment.WalletServiceImpl.walletLocks;
 
@@ -32,6 +34,9 @@ public class TransferPointServiceImpl implements ITransferPointService{
 
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private AllLogRepository allLogRepository;
 
     @Override
     @Transactional(rollbackFor = { BankException.class })
@@ -83,5 +88,12 @@ public class TransferPointServiceImpl implements ITransferPointService{
         }
 
         return new TransferResponse(EnumPaymentStatus.BankCodeError.SUCCESS, "Success",currentDate);
+    }
+
+    @Override
+    public List<TransactionTranferPointResponse> getTransactionTranferPointByUserId(Long userId){
+        List<AllLog> allLogs = allLogRepository.findAllByFromUserIdOrToUserId(userId, userId);
+        List<TransactionTranferPointResponse> transactionTranferPointResponses = helper.convertAllLogToTransactionTranferPointResponse(allLogs);
+        return transactionTranferPointResponses;
     }
 }
