@@ -20,31 +20,35 @@ import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_TYP
 @RequiredArgsConstructor
 public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
     private final InRoomAmenityTypeRepository inRoomAmenityTypeRepository;
+
     private final InRoomAmenityService inRoomAmenityService;
 
     @Override
     public Page<InRoomAmenityTypeResponse> gets(String searchName, Pageable pageable) {
         Page<InRoomAmenityType> inRoomAmenityTypePage = inRoomAmenityTypeRepository.findAllByInRoomAmenityTypeNameContainingIgnoreCaseAndIsDeletedIsFalse(searchName, pageable);
-        Page<InRoomAmenityTypeResponse> inRoomAmenityTypeResponsePage = inRoomAmenityTypePage.map(InRoomAmenityTypeMapper.INSTANCE::toDtoResponse);
-        return inRoomAmenityTypeResponsePage;
+        return inRoomAmenityTypePage.map(element -> {
+            var dtoResponse = InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(element);
+            dtoResponse.setInRoomAmenities(inRoomAmenityService.getsByInRoomAmenityTypeId(element.getId()));
+            return dtoResponse;
+        });
     }
 
     @Override
     public List<InRoomAmenityTypeResponse> gets(Long propertyId) {
-        List<InRoomAmenityType> inRoomAmenityTypes = inRoomAmenityTypeRepository.findInRoomAmenityTypesByPropertyId(propertyId);
-        List<InRoomAmenityTypeResponse> inRoomAmenityTypeResponses = inRoomAmenityTypes.stream().map(element -> {
+        List<InRoomAmenityType> inRoomAmenityTypes = inRoomAmenityTypeRepository.findInRoomAmenityTypesByPropertyIdAndDeletedFalse(propertyId);
+        return inRoomAmenityTypes.stream().map(element -> {
             var dtoResponse = InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(element);
             dtoResponse.setInRoomAmenities(inRoomAmenityService.gets(propertyId, element.getId()));
             return dtoResponse;
         }).toList();
-        return inRoomAmenityTypeResponses;
     }
 
     @Override
     public InRoomAmenityTypeResponse get(Long id) {
         var inRoomAmenityTypeFound = inRoomAmenityTypeRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
-        var inRoomAmenityTypeResponse = InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeFound);
-        return inRoomAmenityTypeResponse;
+        var dtoResponse = InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeFound);
+        dtoResponse.setInRoomAmenities(inRoomAmenityService.getsByInRoomAmenityTypeId(inRoomAmenityTypeFound.getId()));
+        return dtoResponse;
     }
 
     @Override

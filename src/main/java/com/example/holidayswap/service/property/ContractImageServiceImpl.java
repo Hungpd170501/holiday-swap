@@ -24,8 +24,7 @@ public class ContractImageServiceImpl implements ContractImageService {
     @Override
     public List<ContractImageResponse> gets(Long contractId) {
         var contractImages = contractImageRepository.findContractImagesByPropertyContractIdAndIsDeletedIsFalse(contractId);
-        var contractImageResponse = contractImages.stream().map(ContractImageMapper.INSTANCE::toDtoResponse).toList();
-        return contractImageResponse;
+        return contractImages.stream().map(ContractImageMapper.INSTANCE::toDtoResponse).toList();
     }
 
     @Override
@@ -37,7 +36,7 @@ public class ContractImageServiceImpl implements ContractImageService {
     }
 
     @Override
-    public ContractImage create(Long contractId, MultipartFile multipartFile) {
+    public ContractImageResponse create(Long contractId, MultipartFile multipartFile) {
         String link = null;
         try {
             link = fileService.uploadFile(multipartFile);
@@ -48,11 +47,11 @@ public class ContractImageServiceImpl implements ContractImageService {
         contractImage.setPropertyContractId(contractId);
         contractImage.setLink(link);
         var contractImageNew = contractImageRepository.save(contractImage);
-        return contractImageNew;
+        return ContractImageMapper.INSTANCE.toDtoResponse(contractImageNew);
     }
 
     @Override
-    public ContractImage update(Long id, MultipartFile multipartFile) {
+    public ContractImageResponse update(Long id, MultipartFile multipartFile) {
         var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
         contractImage.setDeleted(true);

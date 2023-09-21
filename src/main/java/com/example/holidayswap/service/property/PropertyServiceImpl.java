@@ -8,6 +8,7 @@ import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.PropertyMapper;
 import com.example.holidayswap.repository.property.PropertyRepository;
+import com.example.holidayswap.service.property.inRoomAmenityTypeService.InRoomAmenityTypeService;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,13 +29,20 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyContractService propertyContractService;
     private final ContractImageService contractImageService;
     private final PropertyInRoomAmenityService propertyInRoomAmenityService;
+    private final InRoomAmenityTypeService inRoomAmenityTypeService;
 
     private final PropertyRepository propertyRepository;
 
     @Override
     public Page<PropertyResponse> gets(Pageable pageable) {
         Page<Property> propertyPage = propertyRepository.findAll(pageable);
-        Page<PropertyResponse> propertyResponsePage = propertyPage.map(PropertyMapper.INSTANCE::toDtoResponse);
+        Page<PropertyResponse> propertyResponsePage = propertyPage.map(element -> {
+            PropertyResponse toDtoResponse = PropertyMapper.INSTANCE.toDtoResponse(element);
+            toDtoResponse.setPropertyContracts(propertyContractService.gets(element.getId()));
+            toDtoResponse.setPropertyImages(propertyImageService.gets(element.getId()));
+            toDtoResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(element.getId()));
+            return toDtoResponse;
+        });
         return propertyResponsePage;
     }
 
@@ -43,11 +51,14 @@ public class PropertyServiceImpl implements PropertyService {
         var propertyFound = propertyRepository.findPropertyById(id).
                 orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var propertyResponse = PropertyMapper.INSTANCE.toDtoResponse(propertyFound);
+        propertyResponse.setPropertyContracts(propertyContractService.gets(propertyFound.getId()));
+        propertyResponse.setPropertyImages(propertyImageService.gets(propertyFound.getId()));
+        propertyResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(propertyFound.getId()));
         return propertyResponse;
     }
 
     @Override
-    public Property create(Long userId,
+    public PropertyResponse create(Long userId,
                            PropertyRegisterRequest propertyRegisterRequest,
                            List<MultipartFile> propertyImages,
                            List<MultipartFile> propertyContractImages) throws IOException {
@@ -69,16 +80,16 @@ public class PropertyServiceImpl implements PropertyService {
                 propertyInRoomAmenityService.create(propertyCreated.getId(), element.getInRoomAmenityId());
             });
         }
-        return propertyCreated;
+        return PropertyMapper.INSTANCE.toDtoResponse(propertyCreated);
     }
 
     @Override
-    public Property update(Long id, PropertyUpdateRequest propertyUpdateRequest) {
+    public PropertyResponse update(Long id, PropertyUpdateRequest propertyUpdateRequest) {
         var property = propertyRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         PropertyMapper.INSTANCE.updateEntityFromDTO(propertyUpdateRequest, property);
         propertyRepository.save(property);
-        return property;
+        return PropertyMapper.INSTANCE.toDtoResponse(property);
     }
 
     @Override

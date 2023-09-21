@@ -15,6 +15,8 @@ public interface InRoomAmenityService {
 
     List<InRoomAmenityResponse> gets(Long propertyId, Long inRoomAmenityTypeId);
 
+    List<InRoomAmenityResponse> getsByInRoomAmenityTypeId(Long inRoomAmenityTypeId);
+
     InRoomAmenityResponse get(Long id);
 
     InRoomAmenityResponse create(InRoomAmenityRequest inRoomAmenityRequest);

@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyContractRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyContractResponse;
-import com.example.holidayswap.domain.entity.property.PropertyContract;
 
 import java.util.List;
 
@@ -11,9 +10,9 @@ public interface PropertyContractService {
 
     PropertyContractResponse get(Long id);
 
-    PropertyContract create(Long propertyId, PropertyContractRequest propertyContractRequest);
+    PropertyContractResponse create(Long propertyId, PropertyContractRequest propertyContractRequest);
 
-    PropertyContract update(Long Id, PropertyContractRequest propertyContractRequest);
+    PropertyContractResponse update(Long Id, PropertyContractRequest propertyContractRequest);
 
     void delete(Long id);
 }

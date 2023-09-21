@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyContractRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyContractResponse;
-import com.example.holidayswap.domain.entity.property.PropertyContract;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.inRoomAmenity.PropertyContractMapper;
 import com.example.holidayswap.repository.property.PropertyContractRepository;
@@ -18,32 +17,36 @@ import static com.example.holidayswap.constants.ErrorMessage.CONTRACT_NOT_FOUND;
 public class PropertyContractServiceImpl implements PropertyContractService {
     private final PropertyContractRepository propertyContractRepository;
 
+    private final ContractImageService contractImageService;
+
     @Override
     public List<PropertyContractResponse> gets(Long propertyId) {
         var propertyContract = propertyContractRepository.findAllByPropertyIdAndIsDeletedIsFalse(propertyId);
-        var propertyContractResponse = propertyContract.stream().map(PropertyContractMapper.INSTANCE::toDtoResponse).toList();
-        return propertyContractResponse;
+        return propertyContract.stream().map(element -> {
+            var dtoResponse = PropertyContractMapper.INSTANCE.toDtoResponse(element);
+            dtoResponse.setContractImages(contractImageService.gets(element.getId()));
+            return dtoResponse;
+        }).toList();
     }
 
     @Override
     public PropertyContractResponse get(Long id) {
         var propetyContract = propertyContractRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(CONTRACT_NOT_FOUND));
-        var propetyContractRespones = PropertyContractMapper.INSTANCE.toDtoResponse(propetyContract);
-        return propetyContractRespones;
+        return PropertyContractMapper.INSTANCE.toDtoResponse(propetyContract);
     }
 
     @Override
-    public PropertyContract create(Long propertyId, PropertyContractRequest propertyContractRequest) {
+    public PropertyContractResponse create(Long propertyId, PropertyContractRequest propertyContractRequest) {
         var propertyContracts = propertyContractRepository.findAllByPropertyIdAndIsDeletedIsFalse(propertyId);
-        if (propertyContracts.size() >= 1) throw new EntityNotFoundException(CONTRACT_NOT_FOUND);
+        if (!propertyContracts.isEmpty()) throw new EntityNotFoundException(CONTRACT_NOT_FOUND);
         var propertyContract = PropertyContractMapper.INSTANCE.toEntity(propertyContractRequest);
         propertyContract.setPropertyId(propertyId);
         var propertyContractNew = propertyContractRepository.save(propertyContract);
-        return propertyContractNew;
+        return PropertyContractMapper.INSTANCE.toDtoResponse(propertyContractNew);
     }
 
     @Override
-    public PropertyContract update(Long id, PropertyContractRequest propertyContractRequest) {
+    public PropertyContractResponse update(Long id, PropertyContractRequest propertyContractRequest) {
         var propertyContract = propertyContractRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(CONTRACT_NOT_FOUND));
         propertyContract.setDeleted(true);
         propertyContractRepository.save(propertyContract);

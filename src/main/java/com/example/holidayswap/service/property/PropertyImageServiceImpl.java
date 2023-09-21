@@ -39,7 +39,7 @@ public class PropertyImageServiceImpl implements PropertyImageService {
     }
 
     @Override
-    public PropertyImage create(Long propertyId, MultipartFile propertyImageFile) {
+    public PropertyImageResponse create(Long propertyId, MultipartFile propertyImageFile) {
         String link = null;
         try {
             link = fileService.uploadFile(propertyImageFile);
@@ -50,11 +50,11 @@ public class PropertyImageServiceImpl implements PropertyImageService {
         propertyImage.setPropertyId(propertyId);
         propertyImage.setLink(link);
         var propertyImageNew = propertyImageRepository.save(propertyImage);
-        return propertyImageNew;
+        return PropertyImageMapper.INSTANCE.toDtoResponse(propertyImageNew);
     }
 
     @Override
-    public PropertyImage update(Long id, MultipartFile multipartFile) {
+    public PropertyImageResponse update(Long id, MultipartFile multipartFile) {
 
         var propertyImage = propertyImageRepository.findByIdAndDeletedIsFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(PROPERTY_IMAGE_NOT_FOUND));

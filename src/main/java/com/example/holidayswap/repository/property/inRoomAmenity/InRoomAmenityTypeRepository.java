@@ -19,7 +19,7 @@ public interface InRoomAmenityTypeRepository extends JpaRepository<InRoomAmenity
              join i.propertyInRoomAmenities pI
              join pI.property p
              where p.id = :propertyId and iType.isDeleted = false""")
-    List<InRoomAmenityType> findInRoomAmenityTypesByPropertyId(@Param("propertyId") Long propertyId);
+    List<InRoomAmenityType> findInRoomAmenityTypesByPropertyIdAndDeletedFalse(@Param("propertyId") Long propertyId);
 
     @Query("""
             select i from InRoomAmenityType i

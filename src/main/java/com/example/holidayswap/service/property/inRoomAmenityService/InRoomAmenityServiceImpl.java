@@ -23,22 +23,25 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
     @Override
     public Page<InRoomAmenityResponse> gets(String searchName, Long idInRoomAmenityType, Pageable pageable) {
         Page<InRoomAmenity> inRoomAmenityPage = inRoomAmenityRepository.findInRoomAmenitiesByInRoomAmenitiesNameContainingIgnoreCaseAndAndInRoomAmenitiesTypeIdAndIsDeletedIsFalse(searchName, idInRoomAmenityType, pageable);
-        Page<InRoomAmenityResponse> inRoomAmenityResponsePage = inRoomAmenityPage.map(InRoomAmenityMapper.INSTANCE::toDtoResponse);
-        return inRoomAmenityResponsePage;
+        return inRoomAmenityPage.map(InRoomAmenityMapper.INSTANCE::toDtoResponse);
     }
 
     @Override
     public List<InRoomAmenityResponse> gets(Long properId) {
         List<InRoomAmenity> inRoomAmenities = inRoomAmenityRepository.findInRoomAmenitiesByPropertyId(properId);
-        List<InRoomAmenityResponse> inRoomAmenityResponses = inRoomAmenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
-        return inRoomAmenityResponses;
+        return inRoomAmenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
     }
 
     @Override
     public List<InRoomAmenityResponse> gets(Long propertyId, Long inRoomAmenityTypeId) {
         List<InRoomAmenity> inRoomAmenities = inRoomAmenityRepository.findInRoomAmenitiesByPropertyIdAndInRoomAmenityTypeId(propertyId, inRoomAmenityTypeId);
-        List<InRoomAmenityResponse> inRoomAmenityResponses = inRoomAmenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
-        return inRoomAmenityResponses;
+        return inRoomAmenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
+    }
+
+    @Override
+    public List<InRoomAmenityResponse> getsByInRoomAmenityTypeId(Long inRoomAmenityTypeId) {
+        List<InRoomAmenity> inRoomAmenities = inRoomAmenityRepository.findAllByInRoomAmenityTypeIdAndIsDeletedFalse(inRoomAmenityTypeId);
+        return inRoomAmenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
     }
 
     @Override
