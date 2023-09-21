@@ -13,7 +13,7 @@ public class TransactionTranferPointResponse {
     private Long id;
     private String from;
     private String to;
-    private double amount;
+    private String amount;
     private double totalPoint;
     private String status;
     private String date;

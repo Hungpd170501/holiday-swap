@@ -22,4 +22,6 @@ public class AllLog {
     private EnumPaymentStatus.BankCodeError resultCode;
     private String detail;
     private String createdOn;
+    private int fromBalance;
+    private int toBalance;
 }

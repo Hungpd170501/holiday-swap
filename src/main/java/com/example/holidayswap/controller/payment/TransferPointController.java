@@ -49,7 +49,7 @@ public class TransferPointController {
 
     @GetMapping
     public ResponseEntity<?> getTransactionTranferPointByUserId(@RequestParam Long userId){
-        return ResponseEntity.ok("123");
+        return ResponseEntity.ok(transferPointService.getTransactionTranferPointByUserId(userId));
     }
 
 }

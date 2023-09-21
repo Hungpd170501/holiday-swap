@@ -28,6 +28,13 @@ public class TransactLog {
     @JoinColumn(name="wallet_to", nullable=false)
     private Wallet walletTo;
 
+    @Column(name = "from_total_point")
+    private int fromTotalPoint;
+
+    @Column(name = "to_total_point")
+    private int toTotalPoint;
+
+
     private long amountPoint;
     private String createdOn;
 }

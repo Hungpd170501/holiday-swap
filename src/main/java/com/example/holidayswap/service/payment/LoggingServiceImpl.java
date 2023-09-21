@@ -3,6 +3,7 @@ package com.example.holidayswap.service.payment;
 import com.example.holidayswap.domain.entity.payment.AllLog;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.repository.payment.AllLogRepository;
+import com.example.holidayswap.utils.helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,14 +15,16 @@ public class LoggingServiceImpl implements ILoggingService {
     private AllLogRepository allLogRepo;
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveLog(long fromID, long toID, Long amount, EnumPaymentStatus.BankCodeError resultCode, String detail) {
+    public void saveLog(long fromID, long toID, Long amount, EnumPaymentStatus.BankCodeError resultCode, String detail, int fromBalance, int toBalance) {
         AllLog allLog = new AllLog();
         allLog.setAmount(amount);
         allLog.setDetail(detail);
-        allLog.setCreatedOn("123");
+        allLog.setCreatedOn(helper.getCurrentDate());
         allLog.setFromID(fromID);
         allLog.setToID(toID);
         allLog.setResultCode(resultCode);
+        allLog.setFromBalance(fromBalance);
+        allLog.setToBalance(toBalance);
         allLogRepo.save(allLog);
     }
 }
