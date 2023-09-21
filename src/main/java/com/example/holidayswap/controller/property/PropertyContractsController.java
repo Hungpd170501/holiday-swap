@@ -2,7 +2,6 @@ package com.example.holidayswap.controller.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyContractRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyContractResponse;
-import com.example.holidayswap.domain.mapper.property.inRoomAmenity.PropertyContractMapper;
 import com.example.holidayswap.service.property.PropertyContractService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +41,7 @@ public class PropertyContractsController {
                 .path("/{id}")
                 .buildAndExpand(propertyContract.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(PropertyContractMapper.INSTANCE.toDtoResponse(propertyContract));
+        return ResponseEntity.created(location).body(propertyContract);
     }
 
     @PutMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

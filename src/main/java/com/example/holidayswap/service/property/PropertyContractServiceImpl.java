@@ -2,6 +2,8 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyContractRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyContractResponse;
+import com.example.holidayswap.domain.entity.property.PropertyContractStatus;
+import com.example.holidayswap.domain.entity.property.PropertyContractType;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.inRoomAmenity.PropertyContractMapper;
 import com.example.holidayswap.repository.property.PropertyContractRepository;
@@ -38,9 +40,16 @@ public class PropertyContractServiceImpl implements PropertyContractService {
     @Override
     public PropertyContractResponse create(Long propertyId, PropertyContractRequest propertyContractRequest) {
         var propertyContracts = propertyContractRepository.findAllByPropertyIdAndIsDeletedIsFalse(propertyId);
-        if (!propertyContracts.isEmpty()) throw new EntityNotFoundException(CONTRACT_NOT_FOUND);
+//        if (!propertyContracts.isEmpty()) throw new EntityNotFoundException(CONTRACT_NOT_FOUND);
+        if (propertyContractRequest.getPropertyContractType() == PropertyContractType.DEEDED) {
+
+        }
+        if (propertyContractRequest.getPropertyContractType() == PropertyContractType.RIGHT_TO_USE) {
+
+        }
         var propertyContract = PropertyContractMapper.INSTANCE.toEntity(propertyContractRequest);
         propertyContract.setPropertyId(propertyId);
+        propertyContract.setStatus(PropertyContractStatus.PENDING);
         var propertyContractNew = propertyContractRepository.save(propertyContract);
         return PropertyContractMapper.INSTANCE.toDtoResponse(propertyContractNew);
     }

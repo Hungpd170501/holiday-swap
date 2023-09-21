@@ -8,6 +8,5 @@ import java.util.Date;
 public class VacationRequest {
     private Date startTime;
     private Date endTime;
-    private String status;
     private Long propertyId;
 }

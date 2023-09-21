@@ -2,7 +2,8 @@ package com.example.holidayswap.service.property.vacation;
 
 import com.example.holidayswap.domain.dto.request.property.vacation.VacationRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.VacationResponse;
-import com.example.holidayswap.domain.entity.property.vacation.Vacation;
+import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
+import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.vacation.VacationMapper;
 import com.example.holidayswap.repository.property.vacation.VacationRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,11 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public Page<VacationResponse> gets(Long propertyId, Pageable pageable) {
         var vactionPage = vacationRepository.findAllByPropertyIdAndDeletedIsFalse(propertyId, pageable);
-        var vactionPageResponse = vactionPage.map(VacationMapper.INSTANCE::toDtoResponse);
-        return vactionPageResponse;
+        return vactionPage.map(element -> {
+            var toDtoResponse = VacationMapper.INSTANCE.toDtoResponse(element);
+            toDtoResponse.setTimeOffDeposits(null);
+            return toDtoResponse;
+        });
     }
 
     @Override
@@ -30,18 +34,23 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public Vacation create(Long propertyId, VacationRequest vacationRequest) {
+    public VacationResponse create(Long propertyId, VacationRequest vacationRequest) {
         var vaction = VacationMapper.INSTANCE.toEntity(vacationRequest);
         var vacations = vacationRepository.findAllByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(propertyId, vacationRequest.getStartTime(), vacationRequest.getEndTime());
-        if (!vacations.isEmpty()) new Exception();
-        return vacationRepository.save(vaction);
+        var vacationPresent = vacationRepository.findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(propertyId, vacationRequest.getStartTime(), vacationRequest.getEndTime());
+        if (vacationPresent.isPresent()) throw new EntityNotFoundException("da ton tai 1 ban ghi ");
+        vaction.setStatus(VacationStatus.PENDING);
+        vaction.setPropertyId(propertyId);
+        var vacationCreated = vacationRepository.save(vaction);
+        return VacationMapper.INSTANCE.toDtoResponse(vacationCreated);
     }
 
     @Override
-    public Vacation update(Long id, VacationRequest vacationRequest) {
+    public VacationResponse update(Long id, VacationRequest vacationRequest) {
         var vacationFound = vacationRepository.findByIdAndDeletedFalse(id).orElseThrow();
         VacationMapper.INSTANCE.updateEntityFromDTO(vacationRequest, vacationFound);
-        return vacationRepository.save(vacationFound);
+        var vacationCreated = vacationRepository.save(vacationFound);
+        return VacationMapper.INSTANCE.toDtoResponse(vacationCreated);
     }
 
     @Override

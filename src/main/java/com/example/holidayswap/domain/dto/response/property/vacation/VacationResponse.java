@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.dto.response.property.vacation;
 
+import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
 import lombok.Data;
 
 import java.util.Date;
@@ -11,7 +12,7 @@ public class VacationResponse {
     private Date startTime;
     private Date endTime;
     private boolean isDeleted;
-    private String status;
+    private VacationStatus status;
     private Long propertyId;
     private List<TimeOffDepositResponse> timeOffDeposits;
 

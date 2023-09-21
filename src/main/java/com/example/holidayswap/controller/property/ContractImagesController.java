@@ -1,7 +1,6 @@
 package com.example.holidayswap.controller.property;
 
 import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
-import com.example.holidayswap.domain.mapper.property.ContractImageMapper;
 import com.example.holidayswap.service.property.ContractImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,7 +42,7 @@ public class ContractImagesController {
                 .path("/{id}")
                 .buildAndExpand(contractImageCreated.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(ContractImageMapper.INSTANCE.toDtoResponse(contractImageCreated));
+        return ResponseEntity.created(location).body(contractImageCreated);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

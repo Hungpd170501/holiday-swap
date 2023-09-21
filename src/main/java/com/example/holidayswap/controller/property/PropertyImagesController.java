@@ -1,7 +1,6 @@
 package com.example.holidayswap.controller.property;
 
 import com.example.holidayswap.domain.dto.response.property.PropertyImageResponse;
-import com.example.holidayswap.domain.mapper.property.PropertyImageMapper;
 import com.example.holidayswap.service.property.PropertyImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,7 +42,7 @@ public class PropertyImagesController {
                 .path("/{id}")
                 .buildAndExpand(propertyImageCreated.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(PropertyImageMapper.INSTANCE.toDtoResponse(propertyImageCreated));
+        return ResponseEntity.created(location).body(propertyImageCreated);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

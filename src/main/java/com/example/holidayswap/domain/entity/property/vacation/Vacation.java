@@ -29,7 +29,8 @@ public class Vacation {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private VacationStatus status;
     @Column(name = "property_id")
     private Long propertyId;
     @ManyToOne(fetch = FetchType.LAZY)

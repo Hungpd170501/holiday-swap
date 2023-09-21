@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property.vacation;
 
 import com.example.holidayswap.domain.dto.request.property.vacation.TimeOffDepositRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.TimeOffDepositResponse;
-import com.example.holidayswap.domain.entity.property.vacation.TimeOffDeposit;
 import com.example.holidayswap.domain.mapper.property.vacation.TimeOffDepositMapper;
 import com.example.holidayswap.repository.property.vacation.TimeOffDepositRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,18 +29,20 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
     }
 
     @Override
-    public TimeOffDeposit create(Long vacationId, TimeOffDepositRequest timeOffDepositRequest) {
+    public TimeOffDepositResponse create(Long vacationId, TimeOffDepositRequest timeOffDepositRequest) {
         var timeOffDeposit = TimeOffDepositMapper.INSTANCE.toEntity(timeOffDepositRequest);
         var timeOffDeposits = timeOffDepositRepository.findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(vacationId, timeOffDepositRequest.getStartTime(), timeOffDepositRequest.getEndTime());
         if (!timeOffDeposits.isEmpty()) new Exception();
-        return timeOffDepositRepository.save(timeOffDeposit);
+        var timeOffDepositCreated = timeOffDepositRepository.save(timeOffDeposit);
+        return TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
     }
 
     @Override
-    public TimeOffDeposit update(Long id, TimeOffDepositRequest timeOffDepositRequest) {
+    public TimeOffDepositResponse update(Long id, TimeOffDepositRequest timeOffDepositRequest) {
         var timeOffDeposit = timeOffDepositRepository.findByIdAndDeletedFalse(id).orElseThrow();
         TimeOffDepositMapper.INSTANCE.updateEntityFromDTO(timeOffDepositRequest, timeOffDeposit);
-        return timeOffDepositRepository.save(timeOffDeposit);
+        var timeOffDepositCreated = timeOffDepositRepository.save(timeOffDeposit);
+        return TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
     }
 
     @Override

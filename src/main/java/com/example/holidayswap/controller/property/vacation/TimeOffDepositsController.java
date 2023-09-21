@@ -2,7 +2,6 @@ package com.example.holidayswap.controller.property.vacation;
 
 import com.example.holidayswap.domain.dto.request.property.vacation.TimeOffDepositRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.TimeOffDepositResponse;
-import com.example.holidayswap.domain.mapper.property.vacation.TimeOffDepositMapper;
 import com.example.holidayswap.service.property.vacation.TimeOffDepositService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -49,7 +48,7 @@ public class TimeOffDepositsController {
                 .path("/{id}")
                 .buildAndExpand(timeOffDeposit.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDeposit));
+        return ResponseEntity.created(location).body(timeOffDeposit);
     }
 
     @PutMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

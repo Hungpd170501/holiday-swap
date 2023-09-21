@@ -24,4 +24,9 @@ public interface VacationRepository extends JpaRepository<Vacation, Long> {
             where v.propertyId = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
     List<Vacation> findAllByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
 
+    @Query("""
+            select v from Vacation v
+            where v.propertyId = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
+    Optional<Vacation> findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
+
 }

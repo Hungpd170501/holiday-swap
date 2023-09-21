@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registerUser(@RequestBody RegisterRequest registerRequest,
+    public ResponseEntity<Void> registerUser(@RequestPart RegisterRequest registerRequest,
                                              @RequestPart List<MultipartFile> propertyImages,
                                              @RequestPart List<MultipartFile> propertyContractImages,
                                              @RequestPart PropertyRegisterRequest propertyRegisterRequest) {

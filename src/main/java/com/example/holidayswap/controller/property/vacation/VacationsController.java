@@ -2,7 +2,6 @@ package com.example.holidayswap.controller.property.vacation;
 
 import com.example.holidayswap.domain.dto.request.property.vacation.VacationRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.VacationResponse;
-import com.example.holidayswap.domain.mapper.property.vacation.VacationMapper;
 import com.example.holidayswap.service.property.vacation.VacationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -49,7 +48,7 @@ public class VacationsController {
                 .path("/{id}")
                 .buildAndExpand(vacation.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(VacationMapper.INSTANCE.toDtoResponse(vacation));
+        return ResponseEntity.created(location).body(vacation);
     }
 
     @PutMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
