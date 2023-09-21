@@ -109,7 +109,7 @@ public class User implements UserDetails, Serializable {
     private List<Token> tokens;
 
     @OneToMany(mappedBy = "user")
-    private List<ConversationParticipant> conversationParticipants = new ArrayList<>();
+    private List<ConversationParticipant> conversationParticipants;
 
 
     @Override

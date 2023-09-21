@@ -12,6 +12,12 @@ import com.example.holidayswap.utils.helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static com.example.holidayswap.service.payment.WalletServiceImpl.walletLocks;
+
 @Service
 public class TransferPointServiceImpl implements ITransferPointService{
 
@@ -32,6 +38,7 @@ public class TransferPointServiceImpl implements ITransferPointService{
     public TransferResponse transferPoint(long from, long to, long amount) {
         Wallet fromWallet ;
         Wallet toWallet ;
+        String currentDate = null;
 
         try {
             fromWallet = walletService.GetWalletByUserId(from);
@@ -40,26 +47,40 @@ public class TransferPointServiceImpl implements ITransferPointService{
             loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.ID_NOT_FOUND, accountException.getMessage());
             throw new BankException("Account Error");
         }
+        if(walletLocks.get(fromWallet.getId()).tryLock()){
 
-        if (fromWallet.getTotalPoint() < amount) {
-            String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
-            loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail);
-            throw new BankException(detail);
+        try {
+
+
+            if (fromWallet.getTotalPoint() < amount) {
+                String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail);
+                throw new BankException(detail);
+            }
+
+            boolean check = fromWallet.withdraw(amount);
+            if (!check) {
+                String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail);
+                throw new BankException(detail);
+            }
+
+            toWallet.setTotalPoint((int) (toWallet.getTotalPoint() + amount));
+            currentDate = helper.getCurrentDate();
+            TransactLog transactLog = new TransactLog();
+            transactLog.setAmountPoint(amount);
+            transactLog.setCreatedOn(currentDate);
+            transactLog.setWalletFrom(fromWallet);
+            transactLog.setWalletTo(toWallet);
+
+            walletRepository.save(fromWallet);
+            walletRepository.save(toWallet);
+            transactLogRepository.save(transactLog);
+            loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success");
+        } finally {
+            walletLocks.get(fromWallet.getId()).unlock();
         }
-        fromWallet.setTotalPoint((int) (fromWallet.getTotalPoint() - amount));
-
-        toWallet.setTotalPoint((int) (toWallet.getTotalPoint() + amount));
-        String currentDate = helper.getCurrentDate();
-        TransactLog transactLog= new TransactLog();
-        transactLog.setAmountPoint(amount);
-        transactLog.setCreatedOn(currentDate);
-        transactLog.setWalletFrom(fromWallet);
-        transactLog.setWalletTo(toWallet);
-
-        walletRepository.save(fromWallet);
-        walletRepository.save(toWallet);
-        transactLogRepository.save(transactLog);
-        loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success");
+        }
 
         return new TransferResponse(EnumPaymentStatus.BankCodeError.SUCCESS, "Success",currentDate);
     }

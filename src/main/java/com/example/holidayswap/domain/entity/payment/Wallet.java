@@ -26,7 +26,7 @@ public class Wallet {
     @OneToOne(mappedBy = "wallet")
     private User user;
 
-    @OneToMany(mappedBy="wallet")
+    @OneToMany(mappedBy = "wallet")
     private Set<TransactionTopUpWallet> transactionTopUpWallets;
 
     @Column(name = "total_point")
@@ -41,5 +41,18 @@ public class Wallet {
     @OneToMany(mappedBy = "walletTo")
     private Set<TransactLog> transactionsTo;
 
+    public boolean withdraw(double amount) {
+
+        boolean check = false;
+
+        if (totalPoint >= amount) {
+            totalPoint -= amount;
+            check = true;
+        } else {
+            System.out.println("Insufficient funds.");
+        }
+
+        return check;
+    }
 
 }
