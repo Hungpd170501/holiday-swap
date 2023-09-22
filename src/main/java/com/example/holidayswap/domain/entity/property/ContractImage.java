@@ -1,11 +1,13 @@
 package com.example.holidayswap.domain.entity.property;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -19,18 +21,15 @@ public class ContractImage {
     @Column(name = "contract_image_id", nullable = false)
     private Long id;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Column(name = "link", length = Integer.MAX_VALUE)
     private String link;
-    @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
-    private boolean isDeleted = false;
-    @Column(name = "property_contract_id")
-    private Long propertyContractId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinColumn(name = "property_contract_id",
-            referencedColumnName = "property_contract_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-    private PropertyContract propertyContract;
+
+    @Column(name = "ownership_id")
+    private Long ownershipId;
+
+    @OneToMany(mappedBy = "contractImage")
+    private Set<Ownership> ownerships = new LinkedHashSet<>();
 }

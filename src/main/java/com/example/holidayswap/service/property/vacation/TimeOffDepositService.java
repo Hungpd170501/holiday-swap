@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 public interface TimeOffDepositService {
     Page<TimeOffDepositResponse> gets(Long vacationId, Pageable pageable);
 
+    Page<TimeOffDepositResponse> getByResortId(Long resortId, Pageable pageable);
+
     TimeOffDepositResponse get(Long id);
 
     TimeOffDepositResponse create(Long vacationId, TimeOffDepositRequest timeOffDepositRequest);

@@ -44,7 +44,7 @@ public class ContractImageServiceImpl implements ContractImageService {
             throw new RuntimeException(e);
         }
         ContractImage contractImage = new ContractImage();
-        contractImage.setPropertyContractId(contractId);
+//        contractImage.setPropertyContractId(contractId);
         contractImage.setLink(link);
         var contractImageNew = contractImageRepository.save(contractImage);
         return ContractImageMapper.INSTANCE.toDtoResponse(contractImageNew);
@@ -54,16 +54,17 @@ public class ContractImageServiceImpl implements ContractImageService {
     public ContractImageResponse update(Long id, MultipartFile multipartFile) {
         var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
-        contractImage.setDeleted(true);
-        var contractImageNew = create(contractImage.getPropertyContractId(), multipartFile);
-        return contractImageNew;
+        contractImage.setIsDeleted(true);
+//        var contractImageNew = create(contractImage.getPropertyContractId(), multipartFile);
+//        return contractImageNew;
+        return null;
     }
 
     @Override
     public void delete(Long id) {
         var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
-        contractImage.setDeleted(true);
+        contractImage.setIsDeleted(true);
         contractImageRepository.save(contractImage);
     }
 }

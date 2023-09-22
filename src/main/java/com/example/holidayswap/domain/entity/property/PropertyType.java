@@ -1,5 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
+import com.example.holidayswap.domain.entity.resort.Resort;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,4 +23,14 @@ public class PropertyType {
 
     @Column(name = "property_type_name", length = Integer.MAX_VALUE)
     private String propertyTypeName;
+    @Column(name = "resort_id")
+    private Long resortId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "resort_id",
+            referencedColumnName = "resort_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+    private Resort resort;
 }

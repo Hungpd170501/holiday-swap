@@ -14,7 +14,7 @@ public interface ContractImageMapper {
 
     ContractImageResponse toDtoResponse(ContractImage contractImage);
 
-    @Mapping(target = "propertyContractId", ignore = true)
+    //    @Mapping(target = "propertyContractId", ignore = true)
     ContractImage toEntity(ContractImageRequest contractImageRequest);
 
     @Mapping(target = "id", ignore = true)

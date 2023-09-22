@@ -32,7 +32,11 @@ public class TimeOffDeposit {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TimeOffDepositStatus status;
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private TimeOffDepositType type;
 
     @Column(name = "vacation_id")
     private Long vacationId;

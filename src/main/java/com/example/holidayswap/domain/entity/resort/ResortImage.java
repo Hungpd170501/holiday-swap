@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.entity.property;
+package com.example.holidayswap.domain.entity.resort;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

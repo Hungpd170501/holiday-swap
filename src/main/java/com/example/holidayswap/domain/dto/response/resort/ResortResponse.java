@@ -8,7 +8,7 @@ import java.util.List;
 public class ResortResponse {
     private Long id;
     private String resortName;
-    private Long address;
+    private Long addressId;
     private boolean isDeleted;
     private List<ResortImageResponse> resortImages;
 }

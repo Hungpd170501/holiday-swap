@@ -15,6 +15,13 @@ import java.util.Optional;
 public interface TimeOffDepositRepository extends JpaRepository<TimeOffDeposit, Long> {
     @Query("select t from TimeOffDeposit t where t.vacationId = ?1 and t.isDeleted = false")
     Page<TimeOffDeposit> findAllByVacationIdAndDeletedIsFalse(Long vacationId, Pageable pageable);
+//    @Query("""
+//            select t from TimeOffDeposit t
+//            join t.vacation v
+//            join v.property p
+//            join p.resort r
+//            where r.id = :resortId and t.isDeleted = false""")
+//    Page<TimeOffDeposit> findAllByResortIdAndDeletedFalse(@Param("resortId")Long resortId, Pageable pageable);
 
     @Query("select t from TimeOffDeposit t where t.id = ?1 and t.isDeleted = false")
     Optional<TimeOffDeposit> findByIdAndDeletedFalse(Long id);

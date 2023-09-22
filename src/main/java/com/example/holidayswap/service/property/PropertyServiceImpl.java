@@ -9,6 +9,7 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.PropertyMapper;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.service.property.inRoomAmenityTypeService.InRoomAmenityTypeService;
+import com.example.holidayswap.service.property.vacation.VacationService;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,11 +26,12 @@ import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_NOT_FOUND;
 public class PropertyServiceImpl implements PropertyService {
 
     private final PropertyImageService propertyImageService;
-
-    private final PropertyContractService propertyContractService;
     private final ContractImageService contractImageService;
+
+    //    private final PropertyContractService propertyContractService;
     private final PropertyInRoomAmenityService propertyInRoomAmenityService;
     private final InRoomAmenityTypeService inRoomAmenityTypeService;
+    private final VacationService vacationService;
 
     private final PropertyRepository propertyRepository;
 
@@ -38,7 +40,7 @@ public class PropertyServiceImpl implements PropertyService {
         Page<Property> propertyPage = propertyRepository.findAll(pageable);
         Page<PropertyResponse> propertyResponsePage = propertyPage.map(element -> {
             PropertyResponse toDtoResponse = PropertyMapper.INSTANCE.toDtoResponse(element);
-            toDtoResponse.setPropertyContracts(propertyContractService.gets(element.getId()));
+//            toDtoResponse.setPropertyContracts(propertyContractService.gets(element.getId()));
             toDtoResponse.setPropertyImages(propertyImageService.gets(element.getId()));
             toDtoResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(element.getId()));
             return toDtoResponse;
@@ -51,7 +53,7 @@ public class PropertyServiceImpl implements PropertyService {
         var propertyFound = propertyRepository.findPropertyById(id).
                 orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var propertyResponse = PropertyMapper.INSTANCE.toDtoResponse(propertyFound);
-        propertyResponse.setPropertyContracts(propertyContractService.gets(propertyFound.getId()));
+//        propertyResponse.setPropertyContracts(propertyContractService.gets(propertyFound.getId()));
         propertyResponse.setPropertyImages(propertyImageService.gets(propertyFound.getId()));
         propertyResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(propertyFound.getId()));
         return propertyResponse;
@@ -59,27 +61,31 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public PropertyResponse create(Long userId,
-                           PropertyRegisterRequest propertyRegisterRequest,
-                           List<MultipartFile> propertyImages,
-                           List<MultipartFile> propertyContractImages) throws IOException {
+                                   PropertyRegisterRequest propertyRegisterRequest,
+                                   List<MultipartFile> propertyImages,
+                                   List<MultipartFile> propertyContractImages) throws IOException {
         var property = PropertyMapper.INSTANCE.toEntity(propertyRegisterRequest);
-        property.setUserId(userId);
+//        property.setUserId(userId);
         property.setStatus(PropertyStatus.WAITING);
         var propertyCreated = propertyRepository.save(property);
+
         propertyImages.forEach(element -> {
             propertyImageService.create(propertyCreated.getId(), element);
         });
-        {
-            var contractCreated = propertyContractService.create(propertyCreated.getId(), propertyRegisterRequest.getPropertyContractRequest());
-            propertyContractImages.forEach(element -> {
-                contractImageService.create(contractCreated.getId(), element);
-            });
-        }
-        {
-            propertyRegisterRequest.getPropertyInRoomAmenityRequests().stream().toList().forEach(element -> {
-                propertyInRoomAmenityService.create(propertyCreated.getId(), element.getInRoomAmenityId());
-            });
-        }
+
+//        var contractCreated = propertyContractService.create(propertyCreated.getId(), propertyRegisterRequest.getPropertyContractRequest());
+//        propertyContractImages.forEach(element -> {
+//            contractImageService.create(contractCreated.getId(), element);
+//        });
+
+        propertyRegisterRequest.getVacation().forEach(element -> {
+            vacationService.create(propertyCreated.getId(), element);
+        });
+
+        propertyRegisterRequest.getPropertyInRoomAmenityRequests().forEach(element -> {
+            propertyInRoomAmenityService.create(propertyCreated.getId(), element.getInRoomAmenityId());
+        });
+
         return PropertyMapper.INSTANCE.toDtoResponse(propertyCreated);
     }
 

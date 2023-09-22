@@ -1,6 +1,6 @@
-package com.example.holidayswap.domain.entity.property;
+package com.example.holidayswap.domain.entity.resort;
 
-import com.example.holidayswap.domain.entity.address.Address;
+import com.example.holidayswap.domain.entity.address.Location;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -23,16 +23,16 @@ public class Resort {
     @Column(name = "resort_name")
     private String resortName;
 
-    @Column(name = "address_id")
-    private Long addressId;
+    @Column(name = "location_id")
+    private Long locationId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "address_id",
-            referencedColumnName = "address_id",
+    @JoinColumn(name = "location_id",
+            referencedColumnName = "location_id",
             nullable = false,
             insertable = false,
             updatable = false)
-    private Address address;
+    private Location location;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;

@@ -2,7 +2,7 @@ package com.example.holidayswap.service.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
-import com.example.holidayswap.domain.entity.property.Resort;
+import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.resort.ResortRepository;

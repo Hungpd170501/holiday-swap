@@ -2,7 +2,7 @@ package com.example.holidayswap.domain.mapper.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
-import com.example.holidayswap.domain.entity.property.Resort;
+import com.example.holidayswap.domain.entity.resort.Resort;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

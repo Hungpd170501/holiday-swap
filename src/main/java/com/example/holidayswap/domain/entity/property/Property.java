@@ -1,15 +1,11 @@
 package com.example.holidayswap.domain.entity.property;
 
 
-import com.example.holidayswap.domain.entity.auth.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -61,32 +57,41 @@ public class Property {
             insertable = false,
             updatable = false)
     private PropertyType propertyType;
-
-    @Column(name = "resort_id")
-//    @NotNull
-    private Long resortId;
+    @Column(name = "property_view_id")
+    private Long propertyViewId;
     @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "resort_id",
-            referencedColumnName = "resort_id",
+    @JoinColumn(name = "property_view_id",
+            referencedColumnName = "property_view_id",
             nullable = false,
             insertable = false,
             updatable = false)
-    private Resort resort;
+    private PropertyView propertyView;
 
-    @Column(name = "user_id")
-    private Long userId;
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "user_id",
-            referencedColumnName = "user_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-    private User user;
+//    @Column(name = "resort_id")
+////    @NotNull
+//    private Long resortId;
+//    @ManyToOne
+//    @JsonIgnore
+//    @JoinColumn(name = "resort_id",
+//            referencedColumnName = "resort_id",
+//            nullable = false,
+//            insertable = false,
+//            updatable = false)
+//    private Resort resort;
 
-    @OneToMany(mappedBy = "property")
-    private List<PropertyContract> propertyContracts;
+//    @Column(name = "user_id")
+//    private Long userId;
+//    @ManyToOne
+//    @JsonIgnore
+//    @JoinColumn(name = "user_id",
+//            referencedColumnName = "user_id",
+//            nullable = false,
+//            insertable = false,
+//            updatable = false)
+//    private User user;
+
+//    @OneToMany(mappedBy = "property")
+//    private List<PropertyContract> propertyContracts;
 
 //    @OneToMany(mappedBy = "property")
 //    private List<PropertyImage> propertyImages;

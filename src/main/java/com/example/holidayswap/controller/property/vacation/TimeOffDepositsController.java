@@ -38,6 +38,17 @@ public class TimeOffDepositsController {
         return ResponseEntity.ok(timeOffDepositResponse);
     }
 
+    @GetMapping("/resort")
+    public ResponseEntity<Page<TimeOffDepositResponse>> getByResort(
+            @RequestParam Long resortId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        var timeOffDepositResponse = timeOffDepositService.getByResortId(resortId, pageable);
+        return ResponseEntity.ok(timeOffDepositResponse);
+    }
+
     @PostMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TimeOffDepositResponse> create(
             @PathVariable Long id,

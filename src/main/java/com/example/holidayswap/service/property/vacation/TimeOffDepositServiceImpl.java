@@ -22,6 +22,14 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
     }
 
     @Override
+    public Page<TimeOffDepositResponse> getByResortId(Long resortId, Pageable pageable) {
+//        var timeOffDepositPage = timeOffDepositRepository.findAllByResortIdAndDeletedFalse(resortId, pageable);
+//        Page<TimeOffDepositResponse> timeOffDepositPageResponse = timeOffDepositPage.map(TimeOffDepositMapper.INSTANCE::toDtoResponse);
+//        return timeOffDepositPageResponse;
+        return null;
+    }
+
+    @Override
     public TimeOffDepositResponse get(Long id) {
         var timeOffDepositFound = timeOffDepositRepository.findByIdAndDeletedFalse(id).orElseThrow();
         var timeOffDepositResponse = TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositFound);
