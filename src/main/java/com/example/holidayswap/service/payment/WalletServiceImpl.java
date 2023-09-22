@@ -7,6 +7,7 @@ import com.example.holidayswap.repository.payment.WalletRepository;
 import com.example.holidayswap.service.BankException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +53,7 @@ public class WalletServiceImpl implements IWalletService{
         if(userWallet == null){
             Wallet wallet = new Wallet();
             wallet.setUser(user);
-            wallet.setTotalPoint(0);
+            wallet.setTotalPoint(0D);
             wallet.setStatus(true);
             walletRepository.save(wallet);
             user.setWallet(wallet);
@@ -78,4 +79,6 @@ public class WalletServiceImpl implements IWalletService{
          }
          return walletLocks;
     }
+
+
 }

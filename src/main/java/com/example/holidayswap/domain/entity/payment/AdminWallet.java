@@ -6,23 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Table(name = "all_transaction_log")
 @Entity
+@Table(name = "admin_wallet")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AllLog {
+public class AdminWallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Long id;
-    private long fromId;
-    private long toId;
-    private long amount;
-    private EnumPaymentStatus.BankCodeError resultCode;
-    private String detail;
-    private String createdOn;
-    private Double fromBalance;
-    private Double toBalance;
-    private Double commission;
+
+    @Column
+    private Double totalPoint;
+
 }

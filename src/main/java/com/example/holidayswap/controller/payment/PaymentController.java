@@ -27,7 +27,7 @@ public class PaymentController {
     @Autowired
     private IMoneyTranferService moneyTranferService;
     @GetMapping("/Create_payment")
-    public ResponseEntity<PaymentResDTO> createPayment(@RequestParam String amount, @RequestParam String orderInfor ) throws UnsupportedEncodingException {
+    public ResponseEntity<PaymentResDTO> createPayment(@RequestParam String amount, @RequestParam String orderInfor,@RequestParam(required = false, defaultValue = "http://localhost:8080/api/v1/payment/payment_infor") String returnURL) throws UnsupportedEncodingException {
 
         Long total = Long.parseLong(amount)*100;
         String vnp_TxnRef = BankingConfig.getRandomNumber(8);
@@ -44,9 +44,10 @@ public class PaymentController {
         TopUpWalletDTO topUpWalletDTO = new TopUpWalletDTO();
         topUpWalletDTO.setAmount(Integer.parseInt(amount));
         topUpWalletDTO.setOrderInfor(orderInfor);
-        topUpWalletDTO.setUserId(user.getUserId().toString());
+        topUpWalletDTO.setUserId(String.valueOf(user.getUserId()));
         topUpWalletDTO.setPaymentDate(vnp_CreateDate);
         MoneyTranfer moneyTranfer = moneyTranferService.CreateMoneyTranferTransaction(topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer.WAITING);
+
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", BankingConfig.vnp_Version);
@@ -59,7 +60,7 @@ public class PaymentController {
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", orderInfor);
         vnp_Params.put("vnp_OrderType", "120000");
-        vnp_Params.put("vnp_ReturnUrl", "http://localhost:8080/api/v1/payment/payment_infor/" + moneyTranfer.getId());
+        vnp_Params.put("vnp_ReturnUrl", returnURL + "/" + moneyTranfer.getId());
         vnp_Params.put("vnp_IpAddr", "vnp_IpAddr");
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
