@@ -15,7 +15,7 @@ public class LoggingServiceImpl implements ILoggingService {
     private AllLogRepository allLogRepo;
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveLog(long fromID, long toID, Long amount, EnumPaymentStatus.BankCodeError resultCode, String detail, int fromBalance, int toBalance) {
+    public void saveLog(long fromID, long toID, Long amount, EnumPaymentStatus.BankCodeError resultCode, String detail, Double fromBalance, Double toBalance,Double commission) {
         AllLog allLog = new AllLog();
         allLog.setAmount(amount);
         allLog.setDetail(detail);
@@ -25,6 +25,7 @@ public class LoggingServiceImpl implements ILoggingService {
         allLog.setResultCode(resultCode);
         allLog.setFromBalance(fromBalance);
         allLog.setToBalance(toBalance);
+        allLog.setCommission(commission);
         allLogRepo.save(allLog);
     }
 }

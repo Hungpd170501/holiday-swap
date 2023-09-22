@@ -29,12 +29,13 @@ public class TransactLog {
     private Wallet walletTo;
 
     @Column(name = "from_total_point")
-    private int fromTotalPoint;
+    private Double fromTotalPoint;
 
     @Column(name = "to_total_point")
-    private int toTotalPoint;
+    private Double toTotalPoint;
 
 
     private long amountPoint;
     private String createdOn;
+    private Double commission;
 }

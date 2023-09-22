@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.dto.response.payment;
 
+import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,6 @@ public class TransactionTranferPointResponse {
     private double totalPoint;
     private String status;
     private String date;
+    private EnumPaymentStatus.StatusPointTransfer statusPointTransfer;
+    private Double commission;
 }
