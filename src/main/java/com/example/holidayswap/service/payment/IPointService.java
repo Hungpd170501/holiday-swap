@@ -6,4 +6,7 @@ public interface IPointService {
     void CreateNewPointPrice(Double price);
 
     Point GetActivePoint();
+
+    Object GetPointAdminWallet();
+
 }

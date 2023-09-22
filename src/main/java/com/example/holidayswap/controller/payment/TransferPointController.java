@@ -6,14 +6,11 @@ import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.service.payment.IWalletService;
 import com.example.holidayswap.utils.RedissonLockUtils;
-import com.example.holidayswap.utils.helper;
+import com.example.holidayswap.utils.Helper;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +23,11 @@ public class TransferPointController {
     @Autowired
     private IWalletService walletService;
 
+
+    @GetMapping
+    public ResponseEntity<?> getTransactionTranferPointByUserId(@RequestParam Long userId) {
+        return ResponseEntity.ok(transferPointService.getTransactionTranferPointByUserId(userId));
+    }
     @PostMapping
     public ResponseEntity<TransferResponse> transferPoint(@RequestBody TransferRequest request) throws InterruptedException {
         RLock fairLock = RedissonLockUtils.getFairLock("wallet-" + (walletService.GetWalletByUserId(request.getFrom()).getId()).toString());
@@ -40,7 +42,7 @@ public class TransferPointController {
                 fairLock.unlock();
             }
         }
-        return result == null ? ResponseEntity.badRequest().body(new TransferResponse(EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, "fail", helper.getCurrentDate())) : ResponseEntity.ok(result);
+        return result == null ? ResponseEntity.badRequest().body(new TransferResponse(EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, "fail", Helper.getCurrentDate())) : ResponseEntity.ok(result);
     }
 
 }
