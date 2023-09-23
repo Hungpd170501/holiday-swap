@@ -1,7 +1,7 @@
 package com.example.holidayswap.domain.entity.resort;
 
 import com.example.holidayswap.domain.entity.address.Location;
-import com.example.holidayswap.domain.entity.resort.ResortAmenity.ResortAmenity;
+import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
