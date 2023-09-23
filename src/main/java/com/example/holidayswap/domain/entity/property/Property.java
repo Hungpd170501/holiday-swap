@@ -1,11 +1,15 @@
 package com.example.holidayswap.domain.entity.property;
 
 
+import com.example.holidayswap.domain.entity.property.inRoomAmenity.InRoomAmenity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -67,6 +71,9 @@ public class Property {
             updatable = false)
     private PropertyView propertyView;
 
+    @ManyToMany
+    @JsonIgnore
+    private List<InRoomAmenity> inRoomAmenities;
 //    @Column(name = "resort_id")
 ////    @NotNull
 //    private Long resortId;

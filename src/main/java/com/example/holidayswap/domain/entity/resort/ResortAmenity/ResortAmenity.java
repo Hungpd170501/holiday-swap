@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.resort.ResortAmenity;
 
+import com.example.holidayswap.domain.entity.resort.Resort;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,7 +34,6 @@ public class ResortAmenity {
             updatable = false)
     private ResortAmenityType resortAmenityType;
 
-    @OneToMany(mappedBy = "resortAmenity")
-    @JsonIgnore
-    private List<ResortResortAmenity> resortResortAmenities;
+    @ManyToMany
+    private List<Resort> resorts;
 }

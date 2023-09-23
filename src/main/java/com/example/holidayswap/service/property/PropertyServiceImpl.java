@@ -8,7 +8,6 @@ import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.PropertyMapper;
 import com.example.holidayswap.repository.property.PropertyRepository;
-import com.example.holidayswap.service.property.inRoomAmenityTypeService.InRoomAmenityTypeService;
 import com.example.holidayswap.service.property.vacation.VacationService;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final ContractImageService contractImageService;
 
     //    private final PropertyContractService propertyContractService;
-    private final PropertyInRoomAmenityService propertyInRoomAmenityService;
-    private final InRoomAmenityTypeService inRoomAmenityTypeService;
+//    private final InRoomAmenityTypeService inRoomAmenityTypeService;
     private final VacationService vacationService;
 
     private final PropertyRepository propertyRepository;
@@ -42,7 +40,7 @@ public class PropertyServiceImpl implements PropertyService {
             PropertyResponse toDtoResponse = PropertyMapper.INSTANCE.toDtoResponse(element);
 //            toDtoResponse.setPropertyContracts(propertyContractService.gets(element.getId()));
             toDtoResponse.setPropertyImages(propertyImageService.gets(element.getId()));
-            toDtoResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(element.getId()));
+//            toDtoResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(element.getId()));
             return toDtoResponse;
         });
         return propertyResponsePage;
@@ -55,7 +53,7 @@ public class PropertyServiceImpl implements PropertyService {
         var propertyResponse = PropertyMapper.INSTANCE.toDtoResponse(propertyFound);
 //        propertyResponse.setPropertyContracts(propertyContractService.gets(propertyFound.getId()));
         propertyResponse.setPropertyImages(propertyImageService.gets(propertyFound.getId()));
-        propertyResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(propertyFound.getId()));
+//        propertyResponse.setInRoomAmenityTypes(inRoomAmenityTypeService.gets(propertyFound.getId()));
         return propertyResponse;
     }
 
@@ -82,9 +80,6 @@ public class PropertyServiceImpl implements PropertyService {
             vacationService.create(propertyCreated.getId(), element);
         });
 
-        propertyRegisterRequest.getPropertyInRoomAmenityRequests().forEach(element -> {
-            propertyInRoomAmenityService.create(propertyCreated.getId(), element.getInRoomAmenityId());
-        });
 
         return PropertyMapper.INSTANCE.toDtoResponse(propertyCreated);
     }
