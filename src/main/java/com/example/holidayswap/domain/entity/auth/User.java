@@ -1,5 +1,8 @@
 package com.example.holidayswap.domain.entity.auth;
 
+import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
+import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
+import com.example.holidayswap.domain.entity.payment.Wallet;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -11,9 +14,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -81,6 +86,12 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false)
     private UserStatus status;
 
+    @OneToMany(mappedBy="user")
+    private Set<MoneyTranfer> moneyTranfers;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "wallet_id")
+    private Wallet wallet;
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
@@ -96,6 +107,10 @@ public class User implements UserDetails, Serializable {
             orphanRemoval = true
     )
     private List<Token> tokens;
+
+    @OneToMany(mappedBy = "user")
+    private List<ConversationParticipant> conversationParticipants;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

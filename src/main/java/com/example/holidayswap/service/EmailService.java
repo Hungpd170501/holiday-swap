@@ -28,12 +28,14 @@ public class EmailService {
     private String baseUrl;
 
     public void sendRegistrationReceipt(String email, String name) {
+        Map<String, Object> attribute = new HashMap<>();
+        attribute.put("name", name);
         sendMessage(EmailRequest
                 .builder()
                 .to(email)
                 .subject("HolidaySwap – Receipt of your membership")
                 .template("registration-receipt")
-                .attributes((Map<String, Object>) new HashMap<>().put("name", name)).build());
+                .attributes(attribute).build());
     }
 
     public void sendForgotPasswordEmail(String email, String token) {

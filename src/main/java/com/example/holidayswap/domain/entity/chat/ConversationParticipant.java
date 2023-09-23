@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.chat;
 
+import com.example.holidayswap.domain.entity.auth.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,20 +14,19 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "conversation_participant")
 public class ConversationParticipant {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(
-            name = "participant_id"
-    )
-    private Long participantId;
+    @EmbeddedId
+    private ConversationParticipantPK conversationParticipantId;
 
     @Column(name = "left_chat", columnDefinition = "boolean default false")
     private boolean leftChat = false;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
+    @MapsId("conversationId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conversation_id", nullable = false)
+    @JoinColumn(name = "conversation_id")
     private Conversation conversation;
+
+    @MapsId("userId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

@@ -4,7 +4,6 @@ import com.example.holidayswap.config.security.JwtService;
 import com.example.holidayswap.domain.dto.request.auth.LoginRequest;
 import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.ResetPasswordRequest;
-import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
 import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
 import com.example.holidayswap.domain.entity.auth.*;
 import com.example.holidayswap.domain.exception.AccessDeniedException;
@@ -15,9 +14,7 @@ import com.example.holidayswap.domain.mapper.auth.UserMapper;
 import com.example.holidayswap.repository.auth.TokenRepository;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.service.EmailService;
-import com.example.holidayswap.service.property.PropertyService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,11 +22,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
@@ -37,9 +32,6 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 @Service
 @Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
-    @Autowired
-    PropertyService propertyService;
-
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
@@ -69,11 +61,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    @Transactional
-    public void register(RegisterRequest request,
-                         PropertyRegisterRequest propertyRegisterRequest,
-                         List<MultipartFile> propertyImages,
-                         List<MultipartFile> propertyContractImages) {
+    public void register(RegisterRequest request) {
+
         userRepository.getUserByEmailEquals(request.getEmail())
                 .ifPresent(user -> {
                     throw new DataIntegrityViolationException(EMAIL_HAS_ALREADY_BEEN_TAKEN);
@@ -81,8 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = UserMapper.INSTANCE.toUserEntity(request);
         user.setStatus(UserStatus.PENDING);
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        var userRegist = userRepository.save(user);
-        propertyService.create(user.getUserId(), propertyRegisterRequest, propertyImages, propertyContractImages);
+        userRepository.save(user);
         try {
             emailService.sendRegistrationReceipt(user.getEmail(), user.getUsername());
             var token = tokenRepository.save(Token
@@ -95,6 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build());
             emailService.sendVerificationEmail(user.getEmail(), token.getValue());
         } catch (Exception e) {
+
             log.error("Error sending verification email", e);
         }
     }

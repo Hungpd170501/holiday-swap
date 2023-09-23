@@ -1,16 +1,14 @@
 package com.example.holidayswap.domain.entity.chat;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 @Entity
 @Table
@@ -22,14 +20,21 @@ public class Message {
     )
     private Long messageId;
 
-    @Column(name = "text", nullable = false)
+    @Column(name = "text")
     private String text;
+
+    @Column(name = "image")
+    private String image;
 
     @Column(name = "date", columnDefinition = "timestamp default current_timestamp")
     private LocalDateTime date = LocalDateTime.now();
 
     @Column(name = "author_id", nullable = false)
     private Long authorId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "message_type")
+    private MessageType messageType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id", nullable = false)

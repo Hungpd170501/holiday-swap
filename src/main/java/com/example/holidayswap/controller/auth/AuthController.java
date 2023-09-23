@@ -7,6 +7,9 @@ import com.example.holidayswap.domain.dto.request.auth.ResetPasswordRequest;
 import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
 import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
 import com.example.holidayswap.service.auth.AuthenticationService;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,12 +25,67 @@ import java.util.List;
 public class AuthController {
     private final AuthenticationService authenticationService;
 
+    @Operation(
+            description = "Returns new access and refresh token",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "successful operation", content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = AuthenticationResponse.class))
+                    }),
+                    @ApiResponse(responseCode = "401", description = "Incorrect email or password.",content = @Content),
+                    @ApiResponse(responseCode = "403", description = "User not verified. || User is blocked.",content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Email not found.",content = @Content)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoginRequest.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "email": "hungpd170501@gmail.com",
+                                              "password": "password"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    )
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         AuthenticationResponse response = authenticationService.login(loginRequest);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "successful operation"),
+                    @ApiResponse(responseCode = "409", description = "Email has already been taken."),
+                    @ApiResponse(responseCode = "500", description = "Validation exception, constrain violation || Server error.")
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RegisterRequest.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "email": "hungpd170501@gmail.com",
+                                              "password": "password",
+                                              "username": "hung pham",
+                                              "gender": "MALE",
+                                              "dob": "2001-01-01",
+                                              "phone": "0333325363",
+                                              "role": {
+                                                "roleId": 1
+                                              }
+                                            }
+                                            """
+                            )
+                    )
+            )
+    )
     @PostMapping("/register")
     public ResponseEntity<Void> registerUser(@RequestPart RegisterRequest registerRequest,
                                              @RequestPart List<MultipartFile> propertyImages,
@@ -37,41 +95,62 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            description = "Admin/Staff change user status to ACTIVE"
+    )
     @PutMapping("/registration/confirm")
     public ResponseEntity<Void> confirmRegistration(@RequestBody Long userId) {
         authenticationService.confirmRegistration(userId);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            description = "Rotate refresh token to get new access token"
+    )
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest.getRefreshToken()));
     }
 
+    @Operation(
+            description = "Not implemented yet"
+    )
     @PutMapping("/change-email")
     public ResponseEntity<Void> changeRegistrationEmail(@RequestParam String email) {
         authenticationService.changeEmail(email);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            description = "Send email to user to reset password"
+    )
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(@RequestParam String email) {
         authenticationService.forgetPassword(email);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            description = "Update new password by reset password token"
+    )
     @PutMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         authenticationService.resetPassword(resetPasswordRequest);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            description = "Verify email by token when user click on link in email"
+    )
     @GetMapping("/verify-email")
     public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
         authenticationService.verifyEmailToken(token);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            description = "Verify reset password token when user click on link in email"
+    )
     @GetMapping("/forgot-password")
     public ResponseEntity<Void> verifyForgotPasswordToken(@RequestParam String token) {
         authenticationService.verifyForgotPasswordToken(token);
