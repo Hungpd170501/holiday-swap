@@ -20,4 +20,8 @@ public class EnumPaymentStatus {
         DATABASE_ERROR;
 
     }
+
+    public enum StatusPointTransfer{
+        POINT_TRANSFER, POINT_RECEIVE;
+    }
 }

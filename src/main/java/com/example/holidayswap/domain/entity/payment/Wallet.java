@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.payment;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,21 +24,25 @@ public class Wallet {
     )
     private Long id;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "wallet")
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "wallet")
     private Set<TransactionTopUpWallet> transactionTopUpWallets;
 
     @Column(name = "total_point")
-    private int totalPoint;
+    private Double totalPoint;
 
     @Column(name = "status")
     private boolean status;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "walletFrom")
     private Set<TransactLog> transactionsFrom;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "walletTo")
     private Set<TransactLog> transactionsTo;
 

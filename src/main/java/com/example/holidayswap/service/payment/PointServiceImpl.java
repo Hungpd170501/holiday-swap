@@ -2,6 +2,7 @@ package com.example.holidayswap.service.payment;
 
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.domain.entity.payment.Point;
+import com.example.holidayswap.repository.payment.AdminWalletRepository;
 import com.example.holidayswap.repository.payment.PointRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ public class PointServiceImpl implements IPointService{
 
     @Autowired
     private PointRepository pointRepository;
+    @Autowired
+    private AdminWalletRepository adminWalletRepository;
 
     @Override
     public void CreateNewPointPrice(Double price) {
@@ -38,5 +41,10 @@ public class PointServiceImpl implements IPointService{
     @Override
     public Point GetActivePoint(){
         return pointRepository.findByPointStatus(EnumPaymentStatus.StatusPoint.ACTIVE);
+    }
+
+    @Override
+    public Object GetPointAdminWallet() {
+        return adminWalletRepository.findFirstByOrderByIdDesc();
     }
 }

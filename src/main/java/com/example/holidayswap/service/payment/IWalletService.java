@@ -13,4 +13,5 @@ public interface IWalletService {
     Wallet GetWalletByUserId(Long userId);
 
     Map<Long, ReentrantLock> GetAllWallet();
+
 }
