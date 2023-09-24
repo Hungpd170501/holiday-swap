@@ -40,7 +40,7 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
     public TimeOffDepositResponse create(Long vacationId, TimeOffDepositRequest timeOffDepositRequest) {
         var timeOffDeposit = TimeOffDepositMapper.INSTANCE.toEntity(timeOffDepositRequest);
         var timeOffDeposits = timeOffDepositRepository.findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(vacationId, timeOffDepositRequest.getStartTime(), timeOffDepositRequest.getEndTime());
-        if (!timeOffDeposits.isEmpty()) new Exception();
+//        if (!timeOffDeposits.isEmpty()) new Exception();
         var timeOffDepositCreated = timeOffDepositRepository.save(timeOffDeposit);
         return TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
     }
