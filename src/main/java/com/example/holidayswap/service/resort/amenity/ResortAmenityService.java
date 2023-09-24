@@ -14,6 +14,8 @@ public interface ResortAmenityService {
 
     List<ResortAmenityResponse> gets(Long amenityTypeId);
 
+    List<ResortAmenityResponse> gets(Long amenityTypeId, Long resortId);
+
     ResortAmenityResponse get(Long id);
 
     ResortAmenityResponse create(ResortAmenityRequest dtoRequest);

@@ -47,6 +47,13 @@ public class ResortAmenitiesController {
         return ResponseEntity.ok(resortAmenityService.gets(amenityId));
     }
 
+    @GetMapping("/amenityType/resort")
+    public ResponseEntity<List<ResortAmenityResponse>> gets(
+            @RequestParam Long amenityId,
+            @RequestParam Long resortId) {
+        return ResponseEntity.ok(resortAmenityService.gets(amenityId, resortId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ResortAmenityResponse> get(
             @PathVariable("id") Long id) {

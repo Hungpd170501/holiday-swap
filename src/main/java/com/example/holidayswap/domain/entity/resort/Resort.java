@@ -45,6 +45,10 @@ public class Resort {
     private List<ResortImage> resortImages;
 
     @ManyToMany
+    @JoinTable(
+            name = "resorts_amenities",
+            joinColumns = @JoinColumn(name = "resort_id"),
+            inverseJoinColumns = @JoinColumn(name = "resort_amenity_id"))
     private List<ResortAmenity> amenities;
 
 }

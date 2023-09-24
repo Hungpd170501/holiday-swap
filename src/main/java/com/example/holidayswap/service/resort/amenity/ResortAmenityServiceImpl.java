@@ -20,6 +20,7 @@ import static com.example.holidayswap.constants.ErrorMessage.RESORT_AMENITY_NOT_
 @RequiredArgsConstructor
 public class ResortAmenityServiceImpl implements ResortAmenityService {
     private final ResortAmenityRepository resortAmenityRepository;
+    private final ResortAmenityMapper resortAmenityMapper;
 
     @Override
     public Page<ResortAmenityResponse> gets(String name, Pageable pageable) {
@@ -34,6 +35,12 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
     @Override
     public List<ResortAmenityResponse> gets(Long amenityTypeId) {
         return resortAmenityRepository.findAllByResortAmenityTypeId(amenityTypeId).stream().map(ResortAmenityMapper.INSTANCE::toDtoResponse).toList();
+    }
+
+    @Override
+    public List<ResortAmenityResponse> gets(Long amenityTypeId, Long resortId) {
+        var amentities = resortAmenityRepository.findAllByResortAmenityTypeIdAndResortId(amenityTypeId, resortId);
+        return amentities.stream().map(ResortAmenityMapper.INSTANCE::toDtoResponse).toList();
     }
 
     @Override
