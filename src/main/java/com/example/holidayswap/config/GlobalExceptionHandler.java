@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -118,6 +117,18 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         log.warn("Data integrity violation exception: %s".formatted(message));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+    }
+
+    @ExceptionHandler(DuplicateRecordException.class)
+    public ResponseEntity<ApiError> duplicateRecordExceptionHandler(DuplicateRecordException ex, WebRequest request) {
+        ApiError message = ApiError.builder()
+                .status(HttpStatus.CONFLICT)
+                .message(ex.getMessage())
+                .description(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
+        log.warn("Duplicate record exception: %s".formatted(message));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
 

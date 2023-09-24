@@ -1,7 +1,7 @@
 package com.example.holidayswap.domain.entity.resort;
 
 import com.example.holidayswap.domain.entity.address.Location;
-import com.example.holidayswap.domain.entity.resort.ResortAmenity.ResortAmenity;
+import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -45,6 +45,10 @@ public class Resort {
     private List<ResortImage> resortImages;
 
     @ManyToMany
+    @JoinTable(
+            name = "resorts_amenities",
+            joinColumns = @JoinColumn(name = "resort_id"),
+            inverseJoinColumns = @JoinColumn(name = "resort_amenity_id"))
     private List<ResortAmenity> amenities;
 
 }

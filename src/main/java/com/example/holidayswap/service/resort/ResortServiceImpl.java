@@ -22,7 +22,7 @@ public class ResortServiceImpl implements ResortService {
     @Override
     public Page<ResortResponse> gets(Pageable pageable) {
         Page<Resort> inRoomAmenityTypePage = resortRepository.
-                findAllByDeletedIsFalse(pageable);
+                findAllByIsDeletedIsFalse(pageable);
         Page<ResortResponse> resortResponsePage = inRoomAmenityTypePage.map(resortMapper::toResortResponse);
         return resortResponsePage;
     }
