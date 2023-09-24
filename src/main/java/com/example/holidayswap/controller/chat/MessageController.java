@@ -72,6 +72,6 @@ public class MessageController {
         if (chatUtils.isUserInConversation(Long.parseLong(userId), Long.parseLong(String.valueOf(conversationId)))) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
-        messagingTemplate.convertAndSend("/temp-queue/" + conversationId, userId);
+        messagingTemplate.convertAndSend("/queue/typing-" + conversationId, userId);
     }
 }
