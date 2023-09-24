@@ -19,7 +19,6 @@ import java.net.URI;
 @RequestMapping("api/v1/resorts")
 public class ResortsController {
     final private ResortService resortService;
-
     @GetMapping("/search")
     public ResponseEntity<Page<ResortResponse>> gets(
             @RequestParam(defaultValue = "") String name,
