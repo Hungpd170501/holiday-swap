@@ -3,26 +3,31 @@ package com.example.holidayswap.service.resort;
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.resort.Resort;
+import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.resort.ResortRepository;
+import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
+import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_RESORT_NAME;
-import static com.example.holidayswap.constants.ErrorMessage.RESORT_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.*;
 
 @Service
 @RequiredArgsConstructor
 public class ResortServiceImpl implements ResortService {
     private final ResortRepository resortRepository;
     private final ResortImageService resortImageService;
+    private final ResortAmenityTypeService resortAmenityTypeService;
+    private final ResortAmenityRepository resortAmenityRepository;
     @Override
     public Page<ResortResponse> gets(String name, Pageable pageable) {
         Page<Resort> inRoomAmenityTypePage = resortRepository.
@@ -30,6 +35,7 @@ public class ResortServiceImpl implements ResortService {
         return inRoomAmenityTypePage.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
             dto.setResortImages(resortImageService.gets(e.getId()));
+            dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
             return dto;
         });
     }
@@ -40,6 +46,7 @@ public class ResortServiceImpl implements ResortService {
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
         dtoResponse.setResortImages(resortImageService.gets(id));
+        dtoResponse.setResortAmenityTypes(resortAmenityTypeService.gets(entity.getId()));
         return dtoResponse;
     }
 
@@ -48,6 +55,11 @@ public class ResortServiceImpl implements ResortService {
         if (resortRepository.findByResortNameContainingIgnoreCaseAndDeletedFalse(resortRequest.getResortName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         var entity = ResortMapper.INSTANCE.toResort(resortRequest);
+        List<ResortAmenity> resortAmenities = new ArrayList<>();
+        resortRequest.getResortAmentities().forEach(e -> {
+            resortAmenities.add(resortAmenityRepository.findByIdAndIsDeletedFalse(e).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_NOT_FOUND)));
+        });
+        entity.setAmenities(resortAmenities);
         return ResortMapper.INSTANCE.toResortResponse(resortRepository.save(entity));
     }
 

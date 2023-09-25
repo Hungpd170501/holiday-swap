@@ -1,6 +1,6 @@
 package com.example.holidayswap.domain.dto.response.resort;
 
-import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenityType;
+import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
 import lombok.Data;
 
 import java.util.List;
@@ -12,5 +12,5 @@ public class ResortResponse {
     private Long locationId;
     private boolean isDeleted;
     private List<ResortImageResponse> resortImages;
-    private List<ResortAmenityType> resortAmenityTypes;
+    private List<ResortAmenityTypeResponse> resortAmenityTypes;
 }
