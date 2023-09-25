@@ -62,6 +62,7 @@ spring:
     baseline-on-migrate: true
     user: holiday-swap
     password: password
+    locations: classpath:/db/migration,classpath:/dev/db/migration
 
 logging:
   level:
