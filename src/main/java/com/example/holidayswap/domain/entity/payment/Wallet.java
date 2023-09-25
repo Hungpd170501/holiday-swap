@@ -53,10 +53,7 @@ public class Wallet {
         if (totalPoint >= amount) {
             totalPoint -= amount;
             check = true;
-        } else {
-            System.out.println("Insufficient funds.");
         }
-
         return check;
     }
 
