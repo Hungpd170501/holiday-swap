@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChatUtils {
     private final ConversationRepository conversationRepository;
-    public boolean isUserInConversation(Long userId, Long conversationId) {
+    public boolean isUserNotInConversation(Long userId, Long conversationId) {
         return conversationRepository.findByUserIdEqualsAndConversationIdEquals(userId, conversationId).isEmpty();
     }
 }

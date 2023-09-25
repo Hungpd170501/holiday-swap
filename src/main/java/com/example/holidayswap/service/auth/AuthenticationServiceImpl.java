@@ -196,7 +196,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         var user = this.userRepository.getUserByEmailEquals(userEmail)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-        if (jwtService.isTokenValid(refreshToken, user)) {
+        var isTokenValid = tokenRepository.findByValueEquals(refreshToken)
+                .map(t -> t.getStatus().equals(TokenStatus.VALID) && t.getExpirationTime().isAfter(java.time.LocalDateTime.now()))
+                .orElse(false);
+        if (jwtService.isTokenValid(refreshToken, user) && Boolean.TRUE.equals(isTokenValid)) {
             return getAuthenticationResponse(user);
         }
         throw new VerificationException(JWT_TOKEN_INVALID);
