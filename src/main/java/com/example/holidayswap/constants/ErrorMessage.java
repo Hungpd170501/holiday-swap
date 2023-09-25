@@ -27,6 +27,7 @@ public class ErrorMessage {
     public static final String RESORT_AMENITY_TYPE_NOT_FOUND = "Resort amenity type not found.";
     public static final String RESORT_AMENITY_NOT_FOUND = "Resort amenity not found.";
     public static final String DUPLICATE_RESORT_AMENITY = "Duplicate resort amenity.";
+    public static final String DUPLICATE_RESORT_NAME = "Duplicate resort name.";
     public static final String INCORRECT_EMAIL_OR_PASSWORD = "Incorrect email or password.";
     public static final String SERVICE_UNAVAILABLE = "Oops! Something went wrong. Please try again later or contact our support team for assistance.";
 }

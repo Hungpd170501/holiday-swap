@@ -3,6 +3,7 @@ package com.example.holidayswap.service.resort;
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.resort.Resort;
+import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.resort.ResortRepository;
@@ -11,49 +12,49 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_RESORT_NAME;
 import static com.example.holidayswap.constants.ErrorMessage.RESORT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 public class ResortServiceImpl implements ResortService {
     private final ResortRepository resortRepository;
-    private final ResortMapper resortMapper;
 
     @Override
-    public Page<ResortResponse> gets(Pageable pageable) {
+    public Page<ResortResponse> gets(String name, Pageable pageable) {
         Page<Resort> inRoomAmenityTypePage = resortRepository.
-                findAllByIsDeletedIsFalse(pageable);
-        Page<ResortResponse> resortResponsePage = inRoomAmenityTypePage.map(resortMapper::toResortResponse);
-        return resortResponsePage;
+                findAllByResortNameContainingIgnoreCaseAndDeletedFalse(name, pageable);
+        return inRoomAmenityTypePage.map(ResortMapper.INSTANCE::toResortResponse);
     }
 
     @Override
     public ResortResponse get(Long id) {
-        var inRoomAmenityTypeFound = resortRepository.findById(id).
+        var entity = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
-        var inRoomAmenityTypeResponse = resortMapper.toResortResponse(inRoomAmenityTypeFound);
-        return inRoomAmenityTypeResponse;
+        return ResortMapper.INSTANCE.toResortResponse(entity);
     }
 
     @Override
     public ResortResponse create(ResortRequest resortRequest) {
-        var inRoomAmenityType = resortMapper.toResort(resortRequest);
-        var inRoomAmenityTypeNew = resortRepository.save(inRoomAmenityType);
-        return resortMapper.toResortResponse(inRoomAmenityTypeNew);
+        if (resortRepository.findByResortNameContainingIgnoreCaseAndDeletedFalse(resortRequest.getResortName()).isPresent())
+            throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
+        var entity = ResortMapper.INSTANCE.toResort(resortRequest);
+        return ResortMapper.INSTANCE.toResortResponse(resortRepository.save(entity));
     }
 
     @Override
     public ResortResponse update(Long id, ResortRequest resortRequest) {
-        var inRoomAmenityTypeFound = resortRepository.findById(id).
+        if (resortRepository.findByResortNameContainingIgnoreCaseAndDeletedFalse(resortRequest.getResortName()).isPresent())
+            throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
+        var entity = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
-        resortMapper.updateEntityFromDTO(resortRequest, inRoomAmenityTypeFound);
-        resortRepository.save(inRoomAmenityTypeFound);
-        return resortMapper.toResortResponse(inRoomAmenityTypeFound);
+        ResortMapper.INSTANCE.updateEntityFromDTO(resortRequest, entity);
+        return ResortMapper.INSTANCE.toResortResponse(resortRepository.save(entity));
     }
 
     @Override
     public void delete(Long id) {
-        var inRoomAmenityTypeFound = resortRepository.findById(id).
+        var inRoomAmenityTypeFound = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         inRoomAmenityTypeFound.setDeleted(true);
         resortRepository.save(inRoomAmenityTypeFound);
