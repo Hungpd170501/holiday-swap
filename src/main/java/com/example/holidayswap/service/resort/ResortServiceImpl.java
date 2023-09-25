@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_RESORT_NAME;
 import static com.example.holidayswap.constants.ErrorMessage.RESORT_NOT_FOUND;
@@ -19,19 +22,25 @@ import static com.example.holidayswap.constants.ErrorMessage.RESORT_NOT_FOUND;
 @RequiredArgsConstructor
 public class ResortServiceImpl implements ResortService {
     private final ResortRepository resortRepository;
-
+    private final ResortImageService resortImageService;
     @Override
     public Page<ResortResponse> gets(String name, Pageable pageable) {
         Page<Resort> inRoomAmenityTypePage = resortRepository.
                 findAllByResortNameContainingIgnoreCaseAndDeletedFalse(name, pageable);
-        return inRoomAmenityTypePage.map(ResortMapper.INSTANCE::toResortResponse);
+        return inRoomAmenityTypePage.map(e -> {
+            var dto = ResortMapper.INSTANCE.toResortResponse(e);
+            dto.setResortImages(resortImageService.gets(e.getId()));
+            return dto;
+        });
     }
 
     @Override
     public ResortResponse get(Long id) {
         var entity = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
-        return ResortMapper.INSTANCE.toResortResponse(entity);
+        var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
+        dtoResponse.setResortImages(resortImageService.gets(id));
+        return dtoResponse;
     }
 
     @Override
@@ -40,6 +49,15 @@ public class ResortServiceImpl implements ResortService {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         var entity = ResortMapper.INSTANCE.toResort(resortRequest);
         return ResortMapper.INSTANCE.toResortResponse(resortRepository.save(entity));
+    }
+
+    @Override
+    public ResortResponse create(ResortRequest resortRequest, List<MultipartFile> resortImage) {
+        var entity = create(resortRequest);
+        resortImage.forEach(e -> {
+            resortImageService.create(entity.getId(), e);
+        });
+        return get(entity.getId());
     }
 
     @Override
