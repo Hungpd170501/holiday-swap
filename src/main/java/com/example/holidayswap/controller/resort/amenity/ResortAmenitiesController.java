@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/ResortAmenities")
+@RequestMapping("api/v1/resortAmenities")
 public class ResortAmenitiesController {
     private final ResortAmenityService resortAmenityService;
 

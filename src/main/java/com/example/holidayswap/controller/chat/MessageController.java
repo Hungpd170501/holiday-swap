@@ -7,6 +7,7 @@ import com.example.holidayswap.service.chat.MessageService;
 import com.example.holidayswap.utils.AuthUtils;
 import com.example.holidayswap.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -36,13 +37,13 @@ public class MessageController {
         return ResponseEntity.ok(messages);
     }
 
-    @PostMapping("/{conversationId}/send")
+    @PostMapping( value = "/{conversationId}/send", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createMessage(
             @PathVariable("conversationId") Long conversationId,
-            @RequestBody MessageRequest messageRequest
+            @ModelAttribute MessageRequest messageRequest
     ) throws IOException {
         var user = authUtils.getAuthenticatedUser();
-        if (chatUtils.isUserInConversation(Long.parseLong(user.getUserId().toString()), Long.parseLong(String.valueOf(conversationId)))) {
+        if (chatUtils.isUserNotInConversation(Long.parseLong(user.getUserId().toString()), Long.parseLong(String.valueOf(conversationId)))) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
         var message =messageService.createMessage(messageRequest, String.valueOf(conversationId));
@@ -57,7 +58,7 @@ public class MessageController {
             SimpMessageHeaderAccessor headerAccessor
     ) throws IOException {
         String userId = String.valueOf(Objects.requireNonNull(headerAccessor.getUser()).getName());
-        if (chatUtils.isUserInConversation(Long.parseLong(userId), Long.parseLong(conversationId))) {
+        if (chatUtils.isUserNotInConversation(Long.parseLong(userId), Long.parseLong(conversationId))) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
         var message = messageService.createMessage(messageRequest, conversationId);
@@ -69,7 +70,7 @@ public class MessageController {
             @DestinationVariable String conversationId,
             @Payload String userId
     ) {
-        if (chatUtils.isUserInConversation(Long.parseLong(userId), Long.parseLong(String.valueOf(conversationId)))) {
+        if (chatUtils.isUserNotInConversation(Long.parseLong(userId), Long.parseLong(String.valueOf(conversationId)))) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
         messagingTemplate.convertAndSend("/queue/typing-" + conversationId, userId);

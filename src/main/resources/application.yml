@@ -57,6 +57,11 @@ spring:
           github:
             client-id: ${OAUTH2_GITHUB_CLIENT_ID}
             client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    user: holiday-swap
+    password: password
 
 logging:
   level:
