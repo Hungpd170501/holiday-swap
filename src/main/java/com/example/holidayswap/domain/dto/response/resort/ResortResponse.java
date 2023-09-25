@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.dto.response.resort;
 
+import com.example.holidayswap.domain.dto.response.property.PropertyTypeResponse;
 import lombok.Data;
 
 import java.util.List;
@@ -11,4 +12,5 @@ public class ResortResponse {
     private Long addressId;
     private boolean isDeleted;
     private List<ResortImageResponse> resortImages;
+    private List<PropertyTypeResponse> propertyTypes;
 }

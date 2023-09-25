@@ -14,8 +14,13 @@ public interface PropertyTypeRespository extends JpaRepository<PropertyType, Lon
     @Query("""
             select p from PropertyType p
             where upper(p.propertyTypeName) like upper(concat('%', ?1, '%')) and p.isDeleted = false""")
-    Page<PropertyType> findPropertyTypesByPropertyTypeNameContainingIgnoreCaseAndDeletedIsFalse(String name, Pageable pageable);
+    Page<PropertyType> findAllByPropertyTypeNameContainingIgnoreCaseAndDeletedIsFalse(String name, Pageable pageable);
 
     @Query("select p from PropertyType p where p.id = ?1 and p.isDeleted = false")
     Optional<PropertyType> findByIdAndDeletedIsFalse(Long id);
+
+    @Query("""
+            select p from PropertyType p
+            where upper(p.propertyTypeName) like upper(concat('%', ?1, '%')) and p.isDeleted = false""")
+    Optional<PropertyType> findByPropertyTypeNameContainingIgnoreCaseAndIsDeletedIsFalse(String name);
 }
