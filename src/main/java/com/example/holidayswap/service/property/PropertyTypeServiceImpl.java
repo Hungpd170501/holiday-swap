@@ -33,7 +33,7 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
 
     @Override
     public PropertyTypeResponse create(PropertyTypeRequest propertyTypeRequest) {
-        if (propertyTypeRepository.findByPropertyTypeNameContainingIgnoreCaseAndIsDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
+        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
         var entity = PropertyTypeMapper.INSTANCE.toEntity(propertyTypeRequest);
         return PropertyTypeMapper.INSTANCE.toDtoResponse(propertyTypeRepository.save(entity));
@@ -41,7 +41,7 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
 
     @Override
     public PropertyTypeResponse update(Long id, PropertyTypeRequest propertyTypeRequest) {
-        if (propertyTypeRepository.findByPropertyTypeNameContainingIgnoreCaseAndIsDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
+        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
         var entity = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         PropertyTypeMapper.INSTANCE.updateEntityFromDTO(propertyTypeRequest, entity);
