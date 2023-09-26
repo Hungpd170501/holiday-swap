@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,14 +36,17 @@ public class Ownership {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
     private Collection<ContractImage> contractImages;
 
+    @JsonIgnore
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
+    @JsonIgnore
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

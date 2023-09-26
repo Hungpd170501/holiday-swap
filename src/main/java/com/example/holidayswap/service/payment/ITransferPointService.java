@@ -7,7 +7,7 @@ import com.example.holidayswap.domain.entity.payment.AllLog;
 import java.util.List;
 
 public interface ITransferPointService {
-    public TransferResponse transferPoint(long from, long to, long amount);
+    public TransferResponse transferPoint(long from, long to, long amount) throws InterruptedException;
 
     List<TransactionTranferPointResponse> getTransactionTranferPointByUserId(Long userId);
 

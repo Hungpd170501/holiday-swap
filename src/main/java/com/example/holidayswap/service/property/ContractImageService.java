@@ -1,8 +1,8 @@
 package com.example.holidayswap.service.property;
 
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
 import com.example.holidayswap.domain.entity.property.ContractImage;
 import com.example.holidayswap.domain.entity.property.OwnershipId;
+import com.example.holidayswap.domain.dto.response.property.amenity.ContractImageResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

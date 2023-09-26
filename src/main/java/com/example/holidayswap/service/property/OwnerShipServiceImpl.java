@@ -1,10 +1,7 @@
 package com.example.holidayswap.service.property;
 
-import com.example.holidayswap.domain.dto.request.property.ContractImageRequest;
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.*;
-import com.example.holidayswap.domain.mapper.property.ContractImageMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.OwnerShipRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
@@ -42,12 +39,12 @@ public class OwnerShipServiceImpl implements IOwnerShipService {
         User user = (User) principal;
         Ownership ownership1 = new Ownership();
         //set id is composite key
-        ownership1.setId(new OwnershipId(propertyId,4L));
+        ownership1.setId(new OwnershipId(propertyId, 4L));
 //        ownerShipRepository.save(ownership1);
 
         Collection<ContractImage> imageContractResponses = new ArrayList<>();
         for (MultipartFile contractImage : contractImages) {
-            imageContractResponses.add(contractImageService.create(ownership1.getId(),contractImage));
+            imageContractResponses.add(contractImageService.create(ownership1.getId(), contractImage));
         }
         ownership1.setContractImages(imageContractResponses);
         ownership1.setProperty(propertyRepository.findPropertyById(6L).get());

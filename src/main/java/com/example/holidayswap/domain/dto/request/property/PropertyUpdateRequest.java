@@ -1,6 +1,5 @@
 package com.example.holidayswap.domain.dto.request.property;
 
-import com.example.holidayswap.domain.dto.request.property.inRoomAmenity.PropertyInRoomAmenityRequest;
 import lombok.Data;
 
 import java.util.List;
@@ -20,5 +19,5 @@ public class PropertyUpdateRequest {
     private int numberBathRoom;
     private PropertyContractRequest propertyContractRequest;
     private List<PropertyImageRequest> propertyImageRequests;
-    private List<PropertyInRoomAmenityRequest> propertyInRoomAmenityRequests;
+//    private List<PropertyInRoomAmenityRequest> propertyInRoomAmenityRequests;
 }
