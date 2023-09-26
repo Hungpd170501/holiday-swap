@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,18 +19,20 @@ import java.util.Set;
 public class ContractImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contract_image_id", nullable = false)
     private Long id;
+
+//    @EmbeddedId
+//    private OwnershipId ownershipId;
+
+    private Long propertyId;
+    private Long userId;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
     @Column(name = "link", length = Integer.MAX_VALUE)
     private String link;
-
-    @Column(name = "ownership_id")
-    private Long ownershipId;
-
-    @OneToMany(mappedBy = "contractImage")
-    private Set<Ownership> ownerships = new LinkedHashSet<>();
+ 
+    @ManyToOne
+    private Ownership ownership;
 }

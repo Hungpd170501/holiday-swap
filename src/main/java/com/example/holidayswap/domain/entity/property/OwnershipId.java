@@ -17,9 +17,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class OwnershipId implements Serializable {
     private static final long serialVersionUID = -4184519122503267383L;
-    @NotNull
-    @Column(name = "ownership_id", nullable = false)
-    private Long ownershipId;
 
     @NotNull
     @Column(name = "property_id", nullable = false)
