@@ -1,6 +1,6 @@
 package com.example.holidayswap.domain.dto.response.property;
 
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.InRoomAmenityTypeResponse;
+import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
 import lombok.Data;
 
 import java.util.List;
