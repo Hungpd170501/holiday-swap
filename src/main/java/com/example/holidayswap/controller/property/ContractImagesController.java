@@ -1,10 +1,14 @@
 package com.example.holidayswap.controller.property;
 
 import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
+import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.property.ContractImage;
+import com.example.holidayswap.domain.entity.property.OwnershipId;
 import com.example.holidayswap.service.property.ContractImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -33,10 +37,15 @@ public class ContractImagesController {
     }
 
     @PostMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ContractImageResponse> create(
+    public ResponseEntity<ContractImage> create(
             @PathVariable Long id,
             @RequestPart MultipartFile contractImage) {
-        var contractImageCreated = contractImageService.create(id, contractImage);
+
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        User user = (User) principal;
+
+        var contractImageCreated = contractImageService.create(new OwnershipId(user.getUserId(),id), contractImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
