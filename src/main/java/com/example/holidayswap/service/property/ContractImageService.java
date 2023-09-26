@@ -1,6 +1,6 @@
 package com.example.holidayswap.service.property;
 
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
+import com.example.holidayswap.domain.dto.response.property.amenity.ContractImageResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

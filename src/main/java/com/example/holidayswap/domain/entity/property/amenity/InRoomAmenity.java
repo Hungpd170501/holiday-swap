@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.entity.property.inRoomAmenity;
+package com.example.holidayswap.domain.entity.property.amenity;
 
 import com.example.holidayswap.domain.entity.property.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,14 +17,15 @@ public class InRoomAmenity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "in_room_amenity_id", nullable = false)
     private Long id;
-
     @Column(name = "in_room_amenity_name", length = Integer.MAX_VALUE)
-    private String inRoomAmenitiesName;
+    private String inRoomAmenityName;
+    @Column(name = "in_room_amenity_description", length = Integer.MAX_VALUE)
+    private String inRoomAmenityDescription;
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isDeleted = false;
 
     @Column(name = "in_room_amenity_type_id")
-    private Long inRoomAmenitiesTypeId;
+    private Long inRoomAmenityTypeId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "in_room_amenity_type_id",

@@ -1,8 +1,8 @@
-package com.example.holidayswap.domain.mapper.property.inRoomAmenity;
+package com.example.holidayswap.domain.mapper.property.amenity;
 
-import com.example.holidayswap.domain.dto.request.property.inRoomAmenity.InRoomAmenityTypeRequest;
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.InRoomAmenityTypeResponse;
-import com.example.holidayswap.domain.entity.property.inRoomAmenity.InRoomAmenityType;
+import com.example.holidayswap.domain.dto.request.property.amenity.InRoomAmenityTypeRequest;
+import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
+import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenityType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
