@@ -43,7 +43,7 @@ public interface ResortAmenityRepository extends JpaRepository<ResortAmenity, Lo
             select r from ResortAmenity r
             where r.id = ?1
             and r.isDeleted = false""")
-    Optional<ResortAmenity> findByIdAndIsDeletedFalse(Long amenityTypeId);
+    Optional<ResortAmenity> findByIdAndIsDeletedFalse(Long id);
 
     @Query("""
             select r from ResortAmenity r

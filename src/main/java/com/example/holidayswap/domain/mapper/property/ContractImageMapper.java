@@ -1,7 +1,7 @@
 package com.example.holidayswap.domain.mapper.property;
 
 import com.example.holidayswap.domain.dto.request.property.ContractImageRequest;
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
+import com.example.holidayswap.domain.dto.response.property.amenity.ContractImageResponse;
 import com.example.holidayswap.domain.entity.property.ContractImage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

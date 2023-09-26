@@ -8,17 +8,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/resorts")
 public class ResortsController {
     final private ResortService resortService;
+
     @GetMapping("/search")
     public ResponseEntity<Page<ResortResponse>> gets(
             @RequestParam(defaultValue = "") String name,
@@ -26,27 +30,39 @@ public class ResortsController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var resortResponses = resortService.gets(pageable);
-        return ResponseEntity.ok(resortResponses);
+        return ResponseEntity.ok(resortService.gets(name, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResortResponse> get(
             @PathVariable("id") Long id) {
-        var inRoomAmenityTypeResponse = resortService.get(id);
-        return ResponseEntity.ok(inRoomAmenityTypeResponse);
+        return ResponseEntity.ok(resortService.get(id));
     }
 
     @PostMapping
     public ResponseEntity<ResortResponse> create(
             @RequestBody ResortRequest resortRequest) {
-        var resortRequestCreated = resortService.create(resortRequest);
+        var dtoResponse = resortService.create(resortRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(resortRequestCreated.getId())
+                .buildAndExpand(dtoResponse.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(resortRequestCreated);
+        return ResponseEntity.created(location).body(dtoResponse);
+    }
+
+    @PostMapping(path = {"/resortImage"}, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ResortResponse> create(
+            @RequestPart ResortRequest resortRequest,
+            @RequestPart List<MultipartFile> resortImage
+    ) {
+        var dtoResponse = resortService.create(resortRequest, resortImage);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(dtoResponse.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
     @PutMapping("/{id}")
