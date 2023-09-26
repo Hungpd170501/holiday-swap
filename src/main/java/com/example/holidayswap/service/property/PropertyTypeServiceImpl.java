@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_PROPERTY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_TYPE_NOT_FOUND;
 
@@ -41,7 +43,8 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
 
     @Override
     public PropertyTypeResponse update(Long id, PropertyTypeRequest dtoRequest) {
-        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(dtoRequest.getPropertyTypeName()).isPresent())
+        var entityFound = propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(dtoRequest.getPropertyTypeName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
             throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
         var entity = propertyTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         PropertyTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);

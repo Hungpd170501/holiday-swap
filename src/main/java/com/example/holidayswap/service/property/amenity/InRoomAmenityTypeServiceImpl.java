@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_INROOM_AMENITY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_TYPE_NOT_FOUND;
@@ -64,9 +65,9 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
         var entity = inRoomAmenityTypeRepository.
                 findByInRoomAmenityTypeIdAndIsDeletedFalse(id).orElseThrow(
                         () -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
-        if (inRoomAmenityTypeRepository.
-                findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName()).
-                isPresent())
+        var entityFound = inRoomAmenityTypeRepository.
+                findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
             throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
         InRoomAmenityTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         return InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.save(entity));

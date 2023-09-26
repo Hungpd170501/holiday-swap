@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -85,8 +86,10 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public ResortResponse update(Long id, ResortRequest resortRequest) {
-        if (resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName()).isPresent())
+        var entityFound = resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
+        }
         var entity = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         ResortMapper.INSTANCE.updateEntityFromDTO(resortRequest, entity);
