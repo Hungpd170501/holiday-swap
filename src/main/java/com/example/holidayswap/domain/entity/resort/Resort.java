@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.resort;
 
 import com.example.holidayswap.domain.entity.address.Location;
+import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -38,9 +39,6 @@ public class Resort {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
 
-//    @OneToMany(mappedBy = "resort")
-//    private List<Property> properties = new LinkedHashSet<>();
-
     @OneToMany(mappedBy = "resort")
     private List<ResortImage> resortImages;
 
@@ -50,5 +48,11 @@ public class Resort {
             joinColumns = @JoinColumn(name = "resort_id"),
             inverseJoinColumns = @JoinColumn(name = "resort_amenity_id"))
     private List<ResortAmenity> amenities;
+    @ManyToMany
+    @JoinTable(
+            name = "resorts_property_type_property",
+            joinColumns = @JoinColumn(name = "resort_id"),
+            inverseJoinColumns = @JoinColumn(name = "property_type_id"))
+    private List<PropertyType> propertyTypes;
 
 }

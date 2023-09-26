@@ -30,9 +30,11 @@ public class ErrorMessage {
     public static final String DUPLICATE_RESORT_AMENITY = "Duplicate resort amenity.";
     public static final String DUPLICATE_INROOM_AMENITY = "Duplicate in-room amenity.";
     public static final String DUPLICATE_INROOM_AMENITY_TYPE = "Duplicate in-room amenity type.";
+    public static final String DUPLICATE_RESORT_NAME = "Duplicate resort name.";
     public static final String RESORT_AMENITY_TYPE_DELETED = "Resort type amenity has deleted.";
     public static final String INROOM_AMENITY_TYPE_DELETED = "Resort type amenity has deleted.";
     public static final String DUPLICATE_RESORT_AMENITY_TYPE = "Duplicate resort type amenity.";
+    public static final String DUPLICATE_PROPERTY_TYPE = "Duplicate property type amenity.";
     public static final String INCORRECT_EMAIL_OR_PASSWORD = "Incorrect email or password.";
     public static final String SERVICE_UNAVAILABLE = "Oops! Something went wrong. Please try again later or contact our support team for assistance.";
 }
