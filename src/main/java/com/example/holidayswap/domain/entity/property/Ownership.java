@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.entity.auth.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
 import java.util.Date;
 
 @Getter
@@ -14,13 +15,6 @@ import java.util.Date;
 @Builder
 @Table(name = "ownership")
 public class Ownership {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "ownership_id", nullable = false)
-//    private Long id;
-
-    //    @Column(name = "end_period")
-//    private OffsetDateTime endPeriod;
     @EmbeddedId
     private OwnershipId id;
 
@@ -40,13 +34,9 @@ public class Ownership {
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
-//    @OneToMany(mappedBy = "ownership")
-//    private List<ContractImage> contractImages;
 
-    @MapsId("ownershipId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ownership_id", nullable = false)
-    private ContractImage contractImage;
+    @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
+    private Collection<ContractImage> contractImages;
 
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
