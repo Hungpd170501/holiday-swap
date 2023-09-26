@@ -1,7 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
 
-import com.example.holidayswap.domain.entity.property.inRoomAmenity.InRoomAmenity;
+import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
