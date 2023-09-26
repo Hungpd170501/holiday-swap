@@ -12,9 +12,9 @@ import org.mapstruct.factory.Mappers;
 public interface PropertyImageMapper {
     PropertyImageMapper INSTANCE = Mappers.getMapper(PropertyImageMapper.class);
 
-    PropertyImageResponse toDtoResponse(PropertyImage dtoRequest);
+    PropertyImageResponse toDtoResponse(PropertyImage entity);
 
-    PropertyImage toEntity(PropertyImageRequest entity);
+    PropertyImage toEntity(PropertyImageRequest dtoRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(PropertyImageRequest dto, @MappingTarget PropertyImage entity);
