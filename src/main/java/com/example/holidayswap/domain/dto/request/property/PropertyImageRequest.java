@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class PropertyImageRequest {
+    private Long propertyId;
     private String link;
-
 }
