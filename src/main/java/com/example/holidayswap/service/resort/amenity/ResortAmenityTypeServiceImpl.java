@@ -21,20 +21,34 @@ import static com.example.holidayswap.constants.ErrorMessage.RESORT_AMENITY_TYPE
 @RequiredArgsConstructor
 public class ResortAmenityTypeServiceImpl implements ResortAmenityTypeService {
     private final ResortAmenityTypeRepository resortAmenityTypeRepository;
+    private final ResortAmenityService resortAmenityService;
 
     @Override
     public Page<ResortAmenityTypeResponse> gets(String name, Pageable pageable) {
-        return resortAmenityTypeRepository.findAllByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(name, pageable).map(ResortAmenityTypeMapper.INSTANCE::toDtoResponse);
+        var dto =
+                resortAmenityTypeRepository.findAllByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(name, pageable).
+                        map(ResortAmenityTypeMapper.INSTANCE::toDtoResponse);
+        dto.forEach(e -> {
+            e.setResortAmenities(resortAmenityService.gets(e.getId()));
+        });
+        return dto;
     }
 
     @Override
     public List<ResortAmenityTypeResponse> gets(Long resortId) {
-        return resortAmenityTypeRepository.findAllByResortId(resortId).stream().map(ResortAmenityTypeMapper.INSTANCE::toDtoResponse).toList();
+        var dto = resortAmenityTypeRepository.findAllByResortId(resortId).stream().map(
+                ResortAmenityTypeMapper.INSTANCE::toDtoResponse).toList();
+        dto.forEach(e -> {
+            e.setResortAmenities(resortAmenityService.gets(e.getId(), resortId));
+        });
+        return dto;
     }
 
     @Override
     public ResortAmenityTypeResponse get(Long id) {
-        return ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(ErrorMessage.RESORT_AMENITY_TYPE_NOT_FOUND)));
+        var dto = ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(ErrorMessage.RESORT_AMENITY_TYPE_NOT_FOUND)));
+        dto.setResortAmenities(resortAmenityService.gets(dto.getId()));
+        return dto;
     }
 
     @Override
