@@ -2,7 +2,7 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyTypeRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyTypeResponse;
-import com.example.holidayswap.domain.entity.property.PropertyType;
+import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.PropertyTypeMapper;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_PROPERTY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_TYPE_NOT_FOUND;
 
 @Service
@@ -20,39 +21,38 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
 
     @Override
     public Page<PropertyTypeResponse> gets(String name, Pageable pageable) {
-        var propertyTypesPage = propertyTypeRepository.findPropertyTypesByPropertyTypeNameContainingIgnoreCaseAndDeletedIsFalse(name, pageable);
-        var propertyTypesPageResponse = propertyTypesPage.map(PropertyTypeMapper.INSTANCE::toDtoResponse);
-        return propertyTypesPageResponse;
+        var propertyTypesPage = propertyTypeRepository.findAllByPropertyTypeNameContainingIgnoreCaseAndDeletedIsFalse(name, pageable);
+        return propertyTypesPage.map(PropertyTypeMapper.INSTANCE::toDtoResponse);
     }
 
     @Override
     public PropertyTypeResponse get(Long id) {
-        PropertyType propertyType = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
-        PropertyTypeResponse propertyImageResponse = PropertyTypeMapper.INSTANCE.toDtoResponse(propertyType);
-        return propertyImageResponse;
+        var entity = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        return PropertyTypeMapper.INSTANCE.toDtoResponse(entity);
     }
 
     @Override
     public PropertyTypeResponse create(PropertyTypeRequest propertyTypeRequest) {
-        PropertyType propertyType = PropertyTypeMapper.INSTANCE.toEntity(propertyTypeRequest);
-        var propertyTypeResponse = PropertyTypeMapper.INSTANCE.toDtoResponse(propertyTypeRepository.save(propertyType));
-        return propertyTypeResponse;
+        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
+            throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
+        var entity = PropertyTypeMapper.INSTANCE.toEntity(propertyTypeRequest);
+        return PropertyTypeMapper.INSTANCE.toDtoResponse(propertyTypeRepository.save(entity));
     }
 
     @Override
     public PropertyTypeResponse update(Long id, PropertyTypeRequest propertyTypeRequest) {
-
-        PropertyType propertyType = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
-        PropertyTypeMapper.INSTANCE.updateEntityFromDTO(propertyTypeRequest, propertyType);
-        propertyTypeRepository.save(propertyType);
-        return PropertyTypeMapper.INSTANCE.toDtoResponse(propertyType);
-
+        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
+            throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
+        var entity = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        PropertyTypeMapper.INSTANCE.updateEntityFromDTO(propertyTypeRequest, entity);
+        propertyTypeRepository.save(entity);
+        return PropertyTypeMapper.INSTANCE.toDtoResponse(entity);
     }
 
     @Override
     public void delete(Long id) {
-        PropertyType propertyType = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
-        propertyType.setDeleted(true);
-        propertyTypeRepository.save(propertyType);
+        var entity = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        entity.setDeleted(true);
+        propertyTypeRepository.save(entity);
     }
 }
