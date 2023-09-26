@@ -2,6 +2,7 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.response.property.amenity.ContractImageResponse;
 import com.example.holidayswap.domain.entity.property.ContractImage;
+import com.example.holidayswap.domain.entity.property.OwnershipId;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ContractImageMapper;
 import com.example.holidayswap.repository.property.ContractImageRepository;
@@ -23,20 +24,22 @@ public class ContractImageServiceImpl implements ContractImageService {
 
     @Override
     public List<ContractImageResponse> gets(Long contractId) {
-        var contractImages = contractImageRepository.findContractImagesByPropertyContractIdAndIsDeletedIsFalse(contractId);
-        return contractImages.stream().map(ContractImageMapper.INSTANCE::toDtoResponse).toList();
+//        var contractImages = contractImageRepository.findContractImagesByPropertyContractIdAndIsDeletedIsFalse(contractId);
+//        return contractImages.stream().map(ContractImageMapper.INSTANCE::toDtoResponse).toList();
+        return null;
     }
 
     @Override
     public ContractImageResponse get(Long id) {
-        var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
-                orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
-        var contractImageResponse = ContractImageMapper.INSTANCE.toDtoResponse(contractImage);
-        return contractImageResponse;
+//        var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
+//                orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
+//        var contractImageResponse = ContractImageMapper.INSTANCE.toDtoResponse(contractImage);
+//        return contractImageResponse;
+        return null;
     }
 
     @Override
-    public ContractImageResponse create(Long contractId, MultipartFile multipartFile) {
+    public ContractImage create(OwnershipId ownershipId, MultipartFile multipartFile) {
         String link = null;
         try {
             link = fileService.uploadFile(multipartFile);
@@ -45,16 +48,20 @@ public class ContractImageServiceImpl implements ContractImageService {
         }
         ContractImage contractImage = new ContractImage();
 //        contractImage.setPropertyContractId(contractId);
+//        contractImage.set
+        contractImage.setIsDeleted(false);
+        contractImage.setPropertyId(ownershipId.getPropertyId());
+        contractImage.setUserId(ownershipId.getUserId());
         contractImage.setLink(link);
-        var contractImageNew = contractImageRepository.save(contractImage);
-        return ContractImageMapper.INSTANCE.toDtoResponse(contractImageNew);
+        contractImageRepository.save(contractImage);
+        return contractImage;
     }
 
     @Override
     public ContractImageResponse update(Long id, MultipartFile multipartFile) {
-        var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
-                orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
-        contractImage.setIsDeleted(true);
+//        var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
+//                orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
+//        contractImage.setIsDeleted(true);
 //        var contractImageNew = create(contractImage.getPropertyContractId(), multipartFile);
 //        return contractImageNew;
         return null;
@@ -62,9 +69,9 @@ public class ContractImageServiceImpl implements ContractImageService {
 
     @Override
     public void delete(Long id) {
-        var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
-                orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
-        contractImage.setIsDeleted(true);
-        contractImageRepository.save(contractImage);
+//        var contractImage = contractImageRepository.findContractImageByIdAndIsDeleteIsFalse(id).
+//                orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
+//        contractImage.setIsDeleted(true);
+//        contractImageRepository.save(contractImage);
     }
 }
