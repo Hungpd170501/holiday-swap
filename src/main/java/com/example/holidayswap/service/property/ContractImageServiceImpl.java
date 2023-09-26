@@ -1,6 +1,6 @@
 package com.example.holidayswap.service.property;
 
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
+import com.example.holidayswap.domain.dto.response.property.amenity.ContractImageResponse;
 import com.example.holidayswap.domain.entity.property.ContractImage;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ContractImageMapper;

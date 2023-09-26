@@ -1,6 +1,6 @@
 package com.example.holidayswap.domain.dto.response.property;
 
-import com.example.holidayswap.domain.dto.response.property.inRoomAmenity.ContractImageResponse;
+import com.example.holidayswap.domain.dto.response.property.amenity.ContractImageResponse;
 import lombok.Data;
 
 import java.util.Date;

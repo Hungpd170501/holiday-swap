@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.mapper.property.inRoomAmenity;
+package com.example.holidayswap.domain.mapper.property.amenity;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
