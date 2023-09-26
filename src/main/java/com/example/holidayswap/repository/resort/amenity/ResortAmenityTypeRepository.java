@@ -31,4 +31,6 @@ public interface ResortAmenityTypeRepository extends JpaRepository<ResortAmenity
             select r from ResortAmenityType r
             where upper(r.resortAmenityTypeName) like upper(concat('%', ?1, '%')) and r.isDeleted = false""")
     Optional<ResortAmenityType> findByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(String name);
+
+    Optional<ResortAmenityType> findByResortAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
 }

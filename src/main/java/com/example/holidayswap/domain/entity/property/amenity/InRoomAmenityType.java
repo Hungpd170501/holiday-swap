@@ -21,7 +21,6 @@ public class InRoomAmenityType {
     private String inRoomAmenityTypeDescription;
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isDeleted = false;
-
     @OneToMany(mappedBy = "inRoomAmenityType", fetch = FetchType.LAZY)
     private List<InRoomAmenity> inRoomAmenities;
 

@@ -10,9 +10,9 @@ public interface PropertyTypeService {
 
     PropertyTypeResponse get(Long id);
 
-    PropertyTypeResponse create(PropertyTypeRequest propertyTypeRequest);
+    PropertyTypeResponse create(PropertyTypeRequest dtoRequest);
 
-    PropertyTypeResponse update(Long id, PropertyTypeRequest propertyTypeRequest);
+    PropertyTypeResponse update(Long id, PropertyTypeRequest dtoRequest);
 
     void delete(Long id);
 }

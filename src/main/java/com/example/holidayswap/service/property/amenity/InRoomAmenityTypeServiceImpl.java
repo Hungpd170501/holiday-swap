@@ -53,15 +53,20 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
 
     @Override
     public InRoomAmenityTypeResponse create(InRoomAmenityTypeRequest dtoRequest) {
-        var entity = inRoomAmenityTypeRepository.findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName());
-        if (entity.isPresent()) throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
+        if (inRoomAmenityTypeRepository.
+                findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName()).
+                isPresent()) throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
         return InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.save(InRoomAmenityTypeMapper.INSTANCE.toEntity(dtoRequest)));
     }
 
     @Override
     public InRoomAmenityTypeResponse update(Long id, InRoomAmenityTypeRequest dtoRequest) {
-        var entity = inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
-        if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName()).isPresent())
+        var entity = inRoomAmenityTypeRepository.
+                findByInRoomAmenityTypeIdAndIsDeletedFalse(id).orElseThrow(
+                        () -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
+        if (inRoomAmenityTypeRepository.
+                findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName()).
+                isPresent())
             throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
         InRoomAmenityTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         return InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.save(entity));

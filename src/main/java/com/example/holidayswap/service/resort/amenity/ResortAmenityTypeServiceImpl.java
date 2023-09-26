@@ -53,7 +53,7 @@ public class ResortAmenityTypeServiceImpl implements ResortAmenityTypeService {
 
     @Override
     public ResortAmenityTypeResponse create(ResortAmenityTypeRequest dtoRequest) {
-        var entity = resortAmenityTypeRepository.findByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
+        var entity = resortAmenityTypeRepository.findByResortAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
         if (entity.isPresent()) throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY_TYPE);
         return ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.save(ResortAmenityTypeMapper.INSTANCE.toEntity(dtoRequest)));
     }
@@ -61,7 +61,7 @@ public class ResortAmenityTypeServiceImpl implements ResortAmenityTypeService {
     @Override
     public ResortAmenityTypeResponse update(Long id, ResortAmenityTypeRequest dtoRequest) {
         var entity = resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_TYPE_NOT_FOUND));
-        if (resortAmenityTypeRepository.findByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName()).isPresent())
+        if (resortAmenityTypeRepository.findByResortAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY_TYPE);
         ResortAmenityTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         return ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.save(entity));

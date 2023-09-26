@@ -27,15 +27,15 @@ public class TimeOffDepositsController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var timeOffDepositResponses = timeOffDepositService.gets(vacationId, pageable);
-        return ResponseEntity.ok(timeOffDepositResponses);
+        var dtoResponses = timeOffDepositService.gets(vacationId, pageable);
+        return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TimeOffDepositResponse> get(
             @PathVariable("id") Long id) {
-        var timeOffDepositResponse = timeOffDepositService.get(id);
-        return ResponseEntity.ok(timeOffDepositResponse);
+        var dtoResponse = timeOffDepositService.get(id);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @GetMapping("/resort")
@@ -45,27 +45,27 @@ public class TimeOffDepositsController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var timeOffDepositResponse = timeOffDepositService.getByResortId(resortId, pageable);
-        return ResponseEntity.ok(timeOffDepositResponse);
+        var dtoResponses = timeOffDepositService.getByResortId(resortId, pageable);
+        return ResponseEntity.ok(dtoResponses);
     }
 
     @PostMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TimeOffDepositResponse> create(
             @PathVariable Long id,
-            @RequestBody TimeOffDepositRequest timeOffDepositRequest) {
-        var timeOffDeposit = timeOffDepositService.create(id, timeOffDepositRequest);
+            @RequestBody TimeOffDepositRequest dtoRequest) {
+        var dtoResponse = timeOffDepositService.create(id, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(timeOffDeposit.getId())
+                .buildAndExpand(dtoResponse.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(timeOffDeposit);
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
     @PutMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @RequestBody TimeOffDepositRequest timeOffDepositRequest) {
-        timeOffDepositService.update(id, timeOffDepositRequest);
+                                       @RequestBody TimeOffDepositRequest dtoRequest) {
+        timeOffDepositService.update(id, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

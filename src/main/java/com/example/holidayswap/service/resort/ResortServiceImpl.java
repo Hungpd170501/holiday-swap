@@ -2,11 +2,13 @@ package com.example.holidayswap.service.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
+import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.resort.ResortMapper;
+import com.example.holidayswap.repository.property.PropertyTypeRespository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
@@ -28,6 +30,8 @@ public class ResortServiceImpl implements ResortService {
     private final ResortImageService resortImageService;
     private final ResortAmenityTypeService resortAmenityTypeService;
     private final ResortAmenityRepository resortAmenityRepository;
+    private final PropertyTypeRespository propertyTypeRespository;
+
     @Override
     public Page<ResortResponse> gets(String name, Pageable pageable) {
         Page<Resort> inRoomAmenityTypePage = resortRepository.
@@ -52,15 +56,22 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public ResortResponse create(ResortRequest resortRequest) {
-        if (resortRepository.findByResortNameContainingIgnoreCaseAndDeletedFalse(resortRequest.getResortName()).isPresent())
+        if (resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName()).
+                isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         var entity = ResortMapper.INSTANCE.toResort(resortRequest);
         List<ResortAmenity> resortAmenities = new ArrayList<>();
-        resortRequest.getResortAmentities().forEach(e -> {
+        resortRequest.getAmenities().forEach(e -> {
             resortAmenities.add(resortAmenityRepository.findByIdAndIsDeletedFalse(e).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_NOT_FOUND)));
         });
+        List<PropertyType> propertyTypes = new ArrayList<>();
+        resortRequest.getPropertyTypes().forEach(e -> {
+            propertyTypes.add(propertyTypeRespository.findByIdAndIsDeletedFalse(e).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND)));
+        });
         entity.setAmenities(resortAmenities);
-        return ResortMapper.INSTANCE.toResortResponse(resortRepository.save(entity));
+        entity.setPropertyTypes(propertyTypes);
+        Long id = resortRepository.save(entity).getId();
+        return get(id);
     }
 
     @Override
@@ -74,12 +85,13 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public ResortResponse update(Long id, ResortRequest resortRequest) {
-        if (resortRepository.findByResortNameContainingIgnoreCaseAndDeletedFalse(resortRequest.getResortName()).isPresent())
+        if (resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         var entity = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         ResortMapper.INSTANCE.updateEntityFromDTO(resortRequest, entity);
-        return ResortMapper.INSTANCE.toResortResponse(resortRepository.save(entity));
+        Long i = resortRepository.save(entity).getId();
+        return get(i);
     }
 
     @Override

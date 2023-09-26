@@ -51,7 +51,7 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
 
     @Override
     public ResortAmenityResponse create(ResortAmenityRequest dtoRequest) {
-        if (resortAmenityRepository.findByResortAmenityNameContainingIgnoreCase(dtoRequest.getResortAmenityName()).isPresent())
+        if (resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getResortAmenityName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY);
         if (resortAmenityTypeRepository.findByIdAndIsDeletedFalse(dtoRequest.getResortAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(RESORT_AMENITY_TYPE_DELETED);
@@ -61,7 +61,7 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
     @Override
     public ResortAmenityResponse update(Long id, ResortAmenityRequest dtoRequest) {
         var entity = resortAmenityRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_NOT_FOUND));
-        if (resortAmenityRepository.findByResortAmenityNameContainingIgnoreCase(dtoRequest.getResortAmenityName()).isPresent())
+        if (resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getResortAmenityName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY);
         if (resortAmenityTypeRepository.findByIdAndIsDeletedFalse(dtoRequest.getResortAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(RESORT_AMENITY_TYPE_DELETED);

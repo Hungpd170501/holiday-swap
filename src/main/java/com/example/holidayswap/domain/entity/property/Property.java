@@ -2,7 +2,6 @@ package com.example.holidayswap.domain.entity.property;
 
 
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -72,7 +71,10 @@ public class Property {
     private PropertyView propertyView;
 
     @ManyToMany
-    @JsonIgnore
+    @JoinTable(
+            name = "properties_amenities",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "in_room_amenity_id"))
     private List<InRoomAmenity> inRoomAmenities;
 //    @Column(name = "resort_id")
 ////    @NotNull

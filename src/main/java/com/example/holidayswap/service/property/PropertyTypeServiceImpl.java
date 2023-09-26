@@ -27,31 +27,31 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
 
     @Override
     public PropertyTypeResponse get(Long id) {
-        var entity = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        var entity = propertyTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         return PropertyTypeMapper.INSTANCE.toDtoResponse(entity);
     }
 
     @Override
-    public PropertyTypeResponse create(PropertyTypeRequest propertyTypeRequest) {
-        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
+    public PropertyTypeResponse create(PropertyTypeRequest dtoRequest) {
+        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(dtoRequest.getPropertyTypeName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
-        var entity = PropertyTypeMapper.INSTANCE.toEntity(propertyTypeRequest);
+        var entity = PropertyTypeMapper.INSTANCE.toEntity(dtoRequest);
         return PropertyTypeMapper.INSTANCE.toDtoResponse(propertyTypeRepository.save(entity));
     }
 
     @Override
-    public PropertyTypeResponse update(Long id, PropertyTypeRequest propertyTypeRequest) {
-        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(propertyTypeRequest.getPropertyTypeName()).isPresent())
+    public PropertyTypeResponse update(Long id, PropertyTypeRequest dtoRequest) {
+        if (propertyTypeRepository.findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(dtoRequest.getPropertyTypeName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
-        var entity = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
-        PropertyTypeMapper.INSTANCE.updateEntityFromDTO(propertyTypeRequest, entity);
+        var entity = propertyTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        PropertyTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         propertyTypeRepository.save(entity);
         return PropertyTypeMapper.INSTANCE.toDtoResponse(entity);
     }
 
     @Override
     public void delete(Long id) {
-        var entity = propertyTypeRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        var entity = propertyTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         entity.setDeleted(true);
         propertyTypeRepository.save(entity);
     }
