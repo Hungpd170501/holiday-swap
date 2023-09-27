@@ -18,37 +18,37 @@ import java.util.List;
 public class PropertyImagesController {
     private final PropertyImageService propertyImageService;
 
-    @GetMapping
+    @GetMapping("/property")
     public ResponseEntity<List<PropertyImageResponse>> gets(
-            @RequestParam Long contractId) {
-        var propertyImageResponses = propertyImageService.gets(contractId);
-        return ResponseEntity.ok(propertyImageResponses);
+            @RequestParam("propertyId") Long id) {
+        var dtoResponses = propertyImageService.gets(id);
+        return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PropertyImageResponse> get(
             @PathVariable("id") Long id) {
-        var propertyImageResponses = propertyImageService.get(id);
-        return ResponseEntity.ok(propertyImageResponses);
+        var dtoResponse = propertyImageService.get(id);
+        return ResponseEntity.ok(dtoResponse);
     }
 
-    @PostMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<PropertyImageResponse> create(
-            @PathVariable Long id,
-            @RequestPart MultipartFile contractImage) {
-        var propertyImageCreated = propertyImageService.create(id, contractImage);
+            @RequestPart Long propertyId,
+            @RequestPart MultipartFile propertyImage) {
+        var dtoResponse = propertyImageService.create(propertyId, propertyImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(propertyImageCreated.getId())
+                .buildAndExpand(dtoResponse.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(propertyImageCreated);
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @RequestPart MultipartFile contractImage) {
-        propertyImageService.update(id, contractImage);
+                                       @RequestPart MultipartFile propertyImage) {
+        propertyImageService.update(id, propertyImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
