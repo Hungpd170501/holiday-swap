@@ -1,4 +1,4 @@
-package com.example.holidayswap.domain.dto.response.property.amenity;
+package com.example.holidayswap.domain.dto.response.property.ownership;
 
 import lombok.Data;
 
@@ -7,5 +7,6 @@ public class ContractImageResponse {
     private Long id;
     private String link;
     private boolean isDeleted;
-    private Long propertyContractId;
+    private Long propertyId;
+    private Long userId;
 }

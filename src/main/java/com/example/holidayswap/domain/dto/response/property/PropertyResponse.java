@@ -1,6 +1,8 @@
 package com.example.holidayswap.domain.dto.response.property;
 
 import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
+import com.example.holidayswap.domain.dto.response.property.ownership.OwnershipResponse;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import lombok.Data;
 
 import java.util.List;
@@ -8,22 +10,20 @@ import java.util.List;
 @Data
 public class PropertyResponse {
     private Long id;
-    private Long userId;
-    private Long resortId;
-    private Long propertyTypeId;
-    private String status;
+    private int numberKingBeds;
+    private int numberQueensBeds;
+    private int numberTwinBeds;
+    private int numberFullBeds;
+    private int numberSofaBeds;
+    private int numberMurphyBeds;
+    private int numberBedsRoom;
+    private int numberBathRoom;
+    private double roomSize;
     private Boolean isDeleted;
-    private Long viewId;
-    //    private PropertyType propertyType;
-    //    private Resort resort;
-    //    private User user;
-    private int kingBeds;
-    private int queenBeds;
-    private int twinBeds;
-    private int fullBeds;
-    private int sofaBeds;
-    private int murphyBeds;
-    private List<PropertyContractResponse> propertyContracts;
-    private List<PropertyImageResponse> propertyImages;
-    private List<InRoomAmenityTypeResponse> inRoomAmenityTypes;
+    private PropertyStatus status;
+    private PropertyTypeResponse propertyType;
+    private PropertyViewResponse propertyView;
+    private List<InRoomAmenityTypeResponse> inRoomAmenityTypeResponses;
+    private OwnershipResponse ownershipResponse;
+    private List<PropertyImageResponse> propertyImageResponses;
 }

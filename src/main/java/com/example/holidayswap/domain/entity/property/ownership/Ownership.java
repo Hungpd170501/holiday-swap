@@ -1,6 +1,7 @@
-package com.example.holidayswap.domain.entity.property;
+package com.example.holidayswap.domain.entity.property.ownership;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.property.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,11 +28,11 @@ public class Ownership {
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    private PropertyContractType type;
+    private ContractType type;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private PropertyContractStatus status;
+    private ContractStatus status;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;

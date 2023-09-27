@@ -34,10 +34,10 @@ public interface InRoomAmenityRepository extends JpaRepository<InRoomAmenity, Lo
             select i from InRoomAmenity i
             join  i.properties p
             join i.inRoomAmenityType  iType
-            where i.inRoomAmenityTypeId = ?1
-            and p.id = ?2
+            where iType.id = ?2
+            and p.id = ?1
             and i.isDeleted = false""")
-    List<InRoomAmenity> findAllByInRoomAmenityTypeIdAndResortId(Long inRoomAmenityTypeId, Long resortId);
+    List<InRoomAmenity> findAllByPropertyIdAndAmenityTypeId(Long propertyId, Long inRoomAmenityTypeId);
 
     @Query("""
             select i from InRoomAmenity i
@@ -47,4 +47,6 @@ public interface InRoomAmenityRepository extends JpaRepository<InRoomAmenity, Lo
 
     @Query("select i from InRoomAmenity i where upper(i.inRoomAmenityName) = upper(?1) and i.isDeleted = false")
     Optional<InRoomAmenity> findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
+
+    Optional<InRoomAmenity> findByIdAndIsDeletedIsFalse(Long id);
 }
