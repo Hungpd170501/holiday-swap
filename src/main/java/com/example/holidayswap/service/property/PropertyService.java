@@ -10,16 +10,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface PropertyService {
-    Page<PropertyResponse> gets(Pageable pageable);
+    Page<PropertyResponse> gets(Long resortId, Pageable pageable);
 
     PropertyResponse get(Long id);
 
     PropertyResponse create(Long userId,
-                    PropertyRegisterRequest propertyRegisterRequest,
-                    List<MultipartFile> propertyImages,
-                    List<MultipartFile> propertyContractImages);
+                            PropertyRegisterRequest dtoRequest,
+                            List<MultipartFile> propertyImages,
+                            List<MultipartFile> propertyContractImages);
 
-    PropertyResponse update(Long id, PropertyUpdateRequest propertyUpdateRequest);
+    PropertyResponse create(Long userId, PropertyRegisterRequest dtoRequest);
+
+    PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest);
 
     void delete(Long id);
 

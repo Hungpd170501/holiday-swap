@@ -31,7 +31,7 @@ public class InRoomAmenityTypesController {
         return ResponseEntity.ok(inRoomAmenityTypeService.gets(name, pageable));
     }
 
-    @GetMapping("/amenityType/property")
+    @GetMapping("/property")
     public ResponseEntity<List<InRoomAmenityTypeResponse>> gets(
             @RequestParam Long propertyId) {
         return ResponseEntity.ok(inRoomAmenityTypeService.gets(propertyId));

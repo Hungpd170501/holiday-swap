@@ -1,25 +1,23 @@
 package com.example.holidayswap.domain.dto.request.property;
 
-import com.example.holidayswap.domain.dto.request.property.vacation.VacationRequest;
+import com.example.holidayswap.domain.dto.request.property.ownership.OwnershipRequest;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class PropertyRegisterRequest {
-    private Long propertyTypeId;
-    private Long resortId;
-    //    private Long userId;
-    private Long viewId;
-    private int kingBeds;
-    private int queenBeds;
-    private int twinBeds;
-    private int fullBeds;
-    private int sofaBeds;
-    private int murphyBeds;
+    private int numberKingBeds;
+    private int numberQueensBeds;
+    private int numberTwinBeds;
+    private int numberFullBeds;
+    private int numberSofaBeds;
+    private int numberMurphyBeds;
     private int numberBedsRoom;
     private int numberBathRoom;
-    private List<VacationRequest> vacation;
-    private PropertyContractRequest propertyContractRequest;
-//    private List<PropertyInRoomAmenityRequest> propertyInRoomAmenityRequests;
+    private double roomSize;
+    private Long propertyTypeId;
+    private Long propertyViewId;
+    private List<Long> inRoomAmenities;
+    private OwnershipRequest ownershipRequest;
 }

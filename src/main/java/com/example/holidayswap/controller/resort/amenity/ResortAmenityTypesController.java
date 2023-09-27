@@ -31,7 +31,7 @@ public class ResortAmenityTypesController {
         return ResponseEntity.ok(resortAmenityTypeService.gets(name, pageable));
     }
 
-    @GetMapping("/amenityType/resort")
+    @GetMapping("/resort")
     public ResponseEntity<List<ResortAmenityTypeResponse>> gets(
             @RequestParam Long resortId) {
         return ResponseEntity.ok(resortAmenityTypeService.gets(resortId));

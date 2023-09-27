@@ -1,14 +1,11 @@
-package com.example.holidayswap.controller.property;
+package com.example.holidayswap.controller.property.ownership;
 
-import com.example.holidayswap.domain.entity.auth.User;
-import com.example.holidayswap.domain.entity.property.ContractImage;
-import com.example.holidayswap.domain.entity.property.OwnershipId;
-import com.example.holidayswap.domain.dto.response.property.amenity.ContractImageResponse;
-import com.example.holidayswap.service.property.ContractImageService;
+import com.example.holidayswap.domain.dto.request.property.ownership.ContractImageRequest;
+import com.example.holidayswap.domain.dto.response.property.ownership.ContractImageResponse;
+import com.example.holidayswap.service.property.ownership.ContractImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -24,8 +21,10 @@ public class ContractImagesController {
 
     @GetMapping
     public ResponseEntity<List<ContractImageResponse>> gets(
-            @RequestParam Long contractId) {
-        var inRoomAmenityResponses = contractImageService.gets(contractId);
+            @RequestParam Long propertyId,
+            @RequestParam Long userId
+    ) {
+        var inRoomAmenityResponses = contractImageService.gets(propertyId, userId);
         return ResponseEntity.ok(inRoomAmenityResponses);
     }
 
@@ -36,16 +35,16 @@ public class ContractImagesController {
         return ResponseEntity.ok(inRoomAmenityResponse);
     }
 
-    @PostMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ContractImage> create(
-            @PathVariable Long id,
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ContractImageResponse> create(
+            @RequestPart ContractImageRequest dtoRequest,
             @RequestPart MultipartFile contractImage) {
 
-        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        User user = (User) principal;
+//        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+//        Object principal = authentication.getPrincipal();
+//        User user = (User) principal;
 
-        var contractImageCreated = contractImageService.create(new OwnershipId(user.getUserId(),id), contractImage);
+        var contractImageCreated = contractImageService.create(dtoRequest, contractImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
