@@ -12,9 +12,9 @@ import org.mapstruct.factory.Mappers;
 public interface PropertyTypeMapper {
     PropertyTypeMapper INSTANCE = Mappers.getMapper(PropertyTypeMapper.class);
 
-    PropertyTypeResponse toDtoResponse(PropertyType propertyType);
+    PropertyTypeResponse toDtoResponse(PropertyType entity);
 
-    PropertyType toEntity(PropertyTypeRequest propertyTypeRequest);
+    PropertyType toEntity(PropertyTypeRequest dtoRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(PropertyTypeRequest dto, @MappingTarget PropertyType entity);

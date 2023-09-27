@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -51,7 +52,7 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
 
     @Override
     public ResortAmenityResponse create(ResortAmenityRequest dtoRequest) {
-        if (resortAmenityRepository.findByResortAmenityNameContainingIgnoreCase(dtoRequest.getResortAmenityName()).isPresent())
+        if (resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getResortAmenityName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY);
         if (resortAmenityTypeRepository.findByIdAndIsDeletedFalse(dtoRequest.getResortAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(RESORT_AMENITY_TYPE_DELETED);
@@ -61,7 +62,8 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
     @Override
     public ResortAmenityResponse update(Long id, ResortAmenityRequest dtoRequest) {
         var entity = resortAmenityRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_NOT_FOUND));
-        if (resortAmenityRepository.findByResortAmenityNameContainingIgnoreCase(dtoRequest.getResortAmenityName()).isPresent())
+        var entityFound = resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getResortAmenityName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY);
         if (resortAmenityTypeRepository.findByIdAndIsDeletedFalse(dtoRequest.getResortAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(RESORT_AMENITY_TYPE_DELETED);

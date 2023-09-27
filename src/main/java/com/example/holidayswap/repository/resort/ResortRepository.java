@@ -19,4 +19,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
 
     @Query("select r from Resort r where upper(r.resortName) like upper(concat('%', ?1, '%')) and r.isDeleted = false")
     Optional<Resort> findByResortNameContainingIgnoreCaseAndDeletedFalse(String name);
+
+    @Query("select r from Resort r where upper(r.resortName) = upper(?1) and r.isDeleted = false")
+    Optional<Resort> findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
 }
