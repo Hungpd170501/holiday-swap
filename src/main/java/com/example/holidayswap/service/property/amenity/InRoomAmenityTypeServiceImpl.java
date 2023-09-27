@@ -36,10 +36,11 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
 
     @Override
     public List<InRoomAmenityTypeResponse> gets(Long propertyId) {
-        var dto = inRoomAmenityTypeRepository.findAllByResortId(propertyId).stream().map(
+        var dto = inRoomAmenityTypeRepository.findAllByPropertyId(propertyId).stream().map(
                 InRoomAmenityTypeMapper.INSTANCE::toDtoResponse).toList();
         dto.forEach(e -> {
-            e.setInRoomAmenities(inRoomAmenityService.gets(e.getId(), propertyId));
+            var inRoomAmenity = inRoomAmenityService.gets(propertyId, e.getId());
+            e.setInRoomAmenities(inRoomAmenity);
         });
         return dto;
     }

@@ -14,12 +14,13 @@ import org.mapstruct.factory.Mappers;
 public interface PropertyMapper {
     PropertyMapper INSTANCE = Mappers.getMapper(PropertyMapper.class);
 
-    PropertyResponse toDtoResponse(Property property);
+    PropertyResponse toDtoResponse(Property entity);
 
-    //    @Mapping(target = "propertyContracts", ignore = true)
-    Property toEntity(PropertyRegisterRequest propertyRegisterRequest);
+    @Mapping(target = "inRoomAmenities", ignore = true)
+//    @Mapping(target = "ownershipRequest" , ignore = true)
+    Property toEntity(PropertyRegisterRequest dtoRequest);
 
-    Property toEntity(PropertyUpdateRequest propertyUpdateRequest);
+    Property toEntity(PropertyUpdateRequest dtoRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(PropertyUpdateRequest dto, @MappingTarget Property entity);
