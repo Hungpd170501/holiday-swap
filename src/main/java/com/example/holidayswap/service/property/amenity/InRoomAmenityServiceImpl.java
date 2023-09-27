@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -60,9 +61,12 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
 
     @Override
     public InRoomAmenityResponse update(Long id, InRoomAmenityRequest dtoRequest) {
-        var entity = inRoomAmenityRepository.findByInRoomAmenityTypeIdIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
-        if (inRoomAmenityRepository.findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityName()).isPresent())
+        var entity = inRoomAmenityRepository.findByInRoomAmenityTypeIdIdAndIsDeletedFalse(id).
+                orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
+        var entityFound = inRoomAmenityRepository.findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY);
+        }
         if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(INROOM_AMENITY_TYPE_DELETED);
         InRoomAmenityMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);

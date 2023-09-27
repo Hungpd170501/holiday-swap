@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_RESORT_AMENITY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.RESORT_AMENITY_TYPE_NOT_FOUND;
@@ -53,7 +54,7 @@ public class ResortAmenityTypeServiceImpl implements ResortAmenityTypeService {
 
     @Override
     public ResortAmenityTypeResponse create(ResortAmenityTypeRequest dtoRequest) {
-        var entity = resortAmenityTypeRepository.findByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
+        var entity = resortAmenityTypeRepository.findByResortAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
         if (entity.isPresent()) throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY_TYPE);
         return ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.save(ResortAmenityTypeMapper.INSTANCE.toEntity(dtoRequest)));
     }
@@ -61,7 +62,8 @@ public class ResortAmenityTypeServiceImpl implements ResortAmenityTypeService {
     @Override
     public ResortAmenityTypeResponse update(Long id, ResortAmenityTypeRequest dtoRequest) {
         var entity = resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_TYPE_NOT_FOUND));
-        if (resortAmenityTypeRepository.findByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName()).isPresent())
+        var entityFound = resortAmenityTypeRepository.findByResortAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY_TYPE);
         ResortAmenityTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         return ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.save(entity));

@@ -17,7 +17,7 @@ public interface PropertyTypeRespository extends JpaRepository<PropertyType, Lon
     Page<PropertyType> findAllByPropertyTypeNameContainingIgnoreCaseAndDeletedIsFalse(String name, Pageable pageable);
 
     @Query("select p from PropertyType p where p.id = ?1 and p.isDeleted = false")
-    Optional<PropertyType> findByIdAndDeletedIsFalse(Long id);
+    Optional<PropertyType> findByIdAndIsDeletedFalse(Long id);
 
     @Query("select p from PropertyType p where upper(p.propertyTypeName) = upper(?1) and p.isDeleted = false")
     Optional<PropertyType> findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(String name);

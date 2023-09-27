@@ -8,5 +8,6 @@ import java.util.List;
 public class ResortRequest {
     private String resortName;
     private Long locationId;
-    private List<Long> resortAmentities;
+    private List<Long> amenities;
+    private List<Long> propertyTypes;
 }

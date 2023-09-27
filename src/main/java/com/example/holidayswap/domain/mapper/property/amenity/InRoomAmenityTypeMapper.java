@@ -12,9 +12,9 @@ import org.mapstruct.factory.Mappers;
 public interface InRoomAmenityTypeMapper {
     InRoomAmenityTypeMapper INSTANCE = Mappers.getMapper(InRoomAmenityTypeMapper.class);
 
-    InRoomAmenityType toEntity(InRoomAmenityTypeRequest inRoomAmenityTypeRequest);
+    InRoomAmenityType toEntity(InRoomAmenityTypeRequest dtoRequest);
 
-    InRoomAmenityTypeResponse toDtoResponse(InRoomAmenityType inRoomAmenityType);
+    InRoomAmenityTypeResponse toDtoResponse(InRoomAmenityType entity);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(InRoomAmenityTypeRequest dto, @MappingTarget InRoomAmenityType entity);
