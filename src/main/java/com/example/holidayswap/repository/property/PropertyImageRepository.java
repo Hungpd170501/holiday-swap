@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface PropertyImageRepository extends JpaRepository<PropertyImage, Long> {
     @Query("select p from PropertyImage p where p.propertyId = ?1 and p.isDeleted = false")
-    List<PropertyImage> findAllByPropertyIdAndDeletedIsFalse(Long propertyId);
+    List<PropertyImage> findAllByPropertyId(Long propertyId);
 
     @Query("select p from PropertyImage p where p.id = ?1 and p.isDeleted = false")
     Optional<PropertyImage> findByIdAndDeletedIsFalse(Long propertyId);
