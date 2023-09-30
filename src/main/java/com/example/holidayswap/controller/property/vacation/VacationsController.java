@@ -38,18 +38,18 @@ public class VacationsController {
         return ResponseEntity.ok(vacationResponse);
     }
 
-    @PostMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<VacationResponse> create(
-            @PathVariable Long id,
-            @RequestBody VacationRequest vacationRequest) {
-        var vacation = vacationService.create(id, vacationRequest);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(vacation.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(vacation);
-    }
+//    @PostMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<VacationResponse> create(
+//            @PathVariable Long id,
+//            @RequestBody VacationRequest vacationRequest) {
+//        var vacation = vacationService.create(id, vacationRequest);
+//        URI location = ServletUriComponentsBuilder
+//                .fromCurrentRequest()
+//                .path("/{id}")
+//                .buildAndExpand(vacation.getId())
+//                .toUri();
+//        return ResponseEntity.created(location).body(vacation);
+//    }
 
     @PutMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> update(@PathVariable Long id,

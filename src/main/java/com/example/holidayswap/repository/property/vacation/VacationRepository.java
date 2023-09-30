@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface VacationRepository extends JpaRepository<Vacation, Long> {
-    @Query("select v from Vacation v where v.propertyId = ?1 and v.isDeleted = false")
+    @Query("select v from Vacation v where v.ownershipVacation.property.id = ?1 and v.isDeleted = false")
     Page<Vacation> findAllByPropertyIdAndDeletedIsFalse(Long propertyId, Pageable pageable);
 
     @Query("select v from Vacation v where v.id = ?1 and v.isDeleted = false")
@@ -21,12 +21,15 @@ public interface VacationRepository extends JpaRepository<Vacation, Long> {
 
     @Query("""
             select v from Vacation v
-            where v.propertyId = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
+            where v.ownershipVacation.property.id = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
     List<Vacation> findAllByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
 
     @Query("""
             select v from Vacation v
-            where v.propertyId = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
+            where v.ownershipVacation.property.id = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
     Optional<Vacation> findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
 
+//    List<Vacation> findAllByPropertyIdAndUserIdAndRoomId(Long propertyId, Long userId, String roomId);
+
+//    Vacation findByPropertyIdAndDeletedIsFalseAndRoomId(Long propertyId);
 }
