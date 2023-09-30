@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class VacationRequest {
+public class VacationUnitRequest {
     private Date startTime;
     private Date endTime;
 }

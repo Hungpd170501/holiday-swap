@@ -1,7 +1,6 @@
 package com.example.holidayswap.domain.entity.property.vacation;
 
-import com.example.holidayswap.domain.entity.property.Property;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,11 +15,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "vacation")
-public class Vacation {
+@Table(name = "vacation_unit")
+public class VacationUnit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_id", nullable = false)
+    @Column(name = "vacation_unit_id", nullable = false)
     private Long id;
     @Column(name = "start_time")
     private Date startTime;
@@ -31,17 +30,36 @@ public class Vacation {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private VacationStatus status;
+    @Column(name = "ownership_id")
+    private String ownershipId;
     @Column(name = "property_id")
     private Long propertyId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @Column(name = "user_id")
+    private Long userId;
+    //    @Column(name = "room_id")
+//    private Long roomId;
+    @ManyToOne
+    @JoinColumn(name = "ownership_id",
+            referencedColumnName = "ownership_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
     @JoinColumn(name = "property_id",
             referencedColumnName = "property_id",
             nullable = false,
             insertable = false,
             updatable = false)
-    private Property property;
-
+    @JoinColumn(name = "user_id",
+            referencedColumnName = "user_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+//    @JoinColumn(name = "room_id",
+//            referencedColumnName = "room_id",
+//            nullable = false,
+//            insertable = false,
+//            updatable = false)
+    private Ownership ownership;
     @OneToMany(mappedBy = "vacation")
     private List<TimeOffDeposit> timeOffDeposits;
 

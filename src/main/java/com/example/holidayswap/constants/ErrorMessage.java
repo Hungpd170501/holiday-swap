@@ -20,6 +20,7 @@ public class ErrorMessage {
     public static final String CONTRACT_IMAGE_NOT_FOUND = "Contract image not found.";
     public static final String OWNERSHIP_NOT_FOUND = "Contract not found.";
     public static final String RESORT_NOT_FOUND = "Resort not found.";
+    public static final String VACATION_NOT_FOUND = "Vacation not found.";
     public static final String PROPERTY_TYPE_NOT_FOUND = "Property type not found.";
     public static final String PROPERTY_IMAGE_NOT_FOUND = "Property image not found.";
     public static final String IN_ROOM_AMENITY_NOT_FOUND = "In-room amenity not found.";

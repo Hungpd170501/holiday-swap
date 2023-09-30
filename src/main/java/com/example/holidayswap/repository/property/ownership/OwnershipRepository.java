@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 
-public interface OwnerShipRepository extends JpaRepository<Ownership, OwnershipId> {
+public interface OwnershipRepository extends JpaRepository<Ownership, OwnershipId> {
     //    @Query("select o from Ownership o where o.property.id = ?1 and o.user.userId = ?2 and o.isDeleted = false ")
     @Query("select o from Ownership o where o.property.id = ?1 and o.isDeleted = false")
     List<Ownership> findAllByPropertyIdAndIsDeletedIsFalse(Long propertyId);

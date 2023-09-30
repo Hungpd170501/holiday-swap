@@ -1,7 +1,7 @@
 package com.example.holidayswap.controller.property.ownership;
 
 import com.example.holidayswap.domain.dto.request.property.ownership.OwnershipRequest;
-import com.example.holidayswap.service.property.ownership.OwnerShipService;
+import com.example.holidayswap.service.property.ownership.OwnershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,23 +12,23 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ownership")
-public class OwnerShipController {
-    private final OwnerShipService ownerShipService;
+public class OwnershipController {
+    private final OwnershipService ownershipService;
 
     @GetMapping("/property")
     public ResponseEntity<?> getListByPropertyId(@RequestParam Long propertyId) {
-        return ResponseEntity.ok(ownerShipService.getListByPropertyId(propertyId));
+        return ResponseEntity.ok(ownershipService.getListByPropertyId(propertyId));
     }
 
     @GetMapping("/user")
     public ResponseEntity<?> getListByUserId(@RequestParam Long userId) {
-        return ResponseEntity.ok(ownerShipService.getListByUserId(userId));
+        return ResponseEntity.ok(ownershipService.getListByUserId(userId));
     }
 
     @GetMapping
     public ResponseEntity<?> get(@RequestParam Long propertyId,
                                  @RequestParam Long userId) {
-        return ResponseEntity.ok(ownerShipService.get(propertyId, userId));
+        return ResponseEntity.ok(ownershipService.get(propertyId, userId));
     }
 
     @PostMapping
@@ -36,7 +36,7 @@ public class OwnerShipController {
                                     @RequestPart Long userId,
                                     @RequestPart OwnershipRequest dtoRequest,
                                     @RequestPart List<MultipartFile> contractImages) {
-        return ResponseEntity.ok(ownerShipService.create(propertyId, userId, dtoRequest, contractImages));
+        return ResponseEntity.ok(ownershipService.create(propertyId, userId, dtoRequest, contractImages));
 
     }
 
@@ -44,7 +44,7 @@ public class OwnerShipController {
     public ResponseEntity<?> create(@RequestParam Long propertyId,
                                     @RequestParam Long userId,
                                     @RequestBody OwnershipRequest dtoRequest) {
-        return ResponseEntity.ok(ownerShipService.create(propertyId, userId, dtoRequest));
+        return ResponseEntity.ok(ownershipService.create(propertyId, userId, dtoRequest));
     }
 
 }

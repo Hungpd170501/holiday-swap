@@ -26,26 +26,19 @@ public class TimeOffDeposit {
     private Date endTime;
     @Column(name = "price_per_night")
     private double pricePerNight;
-    @Column(name = "number_night")
-    private double numberNight;
-
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TimeOffDepositStatus status;
-    @Column(name = "type")
-    @Enumerated(EnumType.STRING)
-    private TimeOffDepositType type;
-
-    @Column(name = "vacation_id")
+    @Column(name = "vacation_unit_id")
     private Long vacationId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "vacation_id",
-            referencedColumnName = "vacation_id",
+    @JoinColumn(name = "vacation_unit_id",
+            referencedColumnName = "vacation_unit_id",
             nullable = false,
             insertable = false,
             updatable = false)
-    private Vacation vacation;
+    private VacationUnit vacation;
 }

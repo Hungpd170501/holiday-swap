@@ -19,7 +19,6 @@ import java.util.Date;
 public class Ownership {
     @EmbeddedId
     private OwnershipId id;
-
     @Column(name = "start_time")
     private Date startTime;
 
@@ -41,13 +40,11 @@ public class Ownership {
     @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
     private Collection<ContractImage> contractImages;
 
-    @JsonIgnore
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    @JsonIgnore
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
