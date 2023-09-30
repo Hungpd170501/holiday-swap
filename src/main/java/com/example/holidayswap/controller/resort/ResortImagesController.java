@@ -12,7 +12,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/resortImages")
+@RequestMapping("api/v1/resort-images")
 public class ResortImagesController {
     final private ResortImageService resortImageService;
 

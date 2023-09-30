@@ -17,7 +17,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/vactionUnits")
+@RequestMapping("api/v1/vacation-units")
 public class VacationUnitsController {
     private final VacationUnitService vacationUnitService;
 

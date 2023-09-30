@@ -18,7 +18,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/resortAmenityTypes")
+@RequestMapping("api/v1/resort-amenity-types")
 public class ResortAmenityTypesController {
     private final ResortAmenityTypeService resortAmenityTypeService;
     private final ResortAmenityService resortAmenityService;

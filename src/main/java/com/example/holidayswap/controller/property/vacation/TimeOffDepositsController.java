@@ -16,7 +16,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/timeOffDeposit")
+@RequestMapping("api/v1/time-off-deposits")
 public class TimeOffDepositsController {
     private final TimeOffDepositService timeOffDepositService;
 

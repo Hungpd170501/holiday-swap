@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/contractImages")
+@RequestMapping("api/v1/contract-images")
 public class ContractImagesController {
     private final ContractImageService contractImageService;
 

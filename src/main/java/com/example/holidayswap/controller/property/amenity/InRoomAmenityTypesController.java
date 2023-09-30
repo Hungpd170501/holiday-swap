@@ -1,7 +1,9 @@
 package com.example.holidayswap.controller.property.amenity;
 
 import com.example.holidayswap.domain.dto.request.property.amenity.InRoomAmenityTypeRequest;
+import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityResponse;
 import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
+import com.example.holidayswap.service.property.amenity.InRoomAmenityService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,13 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/inRoomAmenityTypes")
 public class InRoomAmenityTypesController {
     final private InRoomAmenityTypeService inRoomAmenityTypeService;
+    final private InRoomAmenityService inRoomAmenityService;
 
     @GetMapping
     public ResponseEntity<Page<InRoomAmenityTypeResponse>> gets(
@@ -31,11 +33,16 @@ public class InRoomAmenityTypesController {
         return ResponseEntity.ok(inRoomAmenityTypeService.gets(name, pageable));
     }
 
-    @GetMapping("/property")
-    public ResponseEntity<List<InRoomAmenityTypeResponse>> gets(
-            @RequestParam Long propertyId) {
-        return ResponseEntity.ok(inRoomAmenityTypeService.gets(propertyId));
+    @GetMapping("/{id}/property-in-room-amenities")
+    public ResponseEntity<Page<InRoomAmenityResponse>> gets(
+            @PathVariable("id") Long amenityTypeId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return ResponseEntity.ok(inRoomAmenityService.gets(amenityTypeId, pageable));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<InRoomAmenityTypeResponse> get(

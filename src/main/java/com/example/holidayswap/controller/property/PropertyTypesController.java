@@ -16,7 +16,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/propertyTypes")
+@RequestMapping("api/v1/property-types")
 public class PropertyTypesController {
     private final PropertyTypeService propertyTypeService;
 
