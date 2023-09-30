@@ -13,20 +13,26 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TimeOffDepositServiceImpl implements TimeOffDepositService {
     private final TimeOffDepositRepository timeOffDepositRepository;
-
     @Override
-    public Page<TimeOffDepositResponse> gets(Long vacationId, Pageable pageable) {
-        var timeOffDepositPage = timeOffDepositRepository.findAllByVacationIdAndDeletedIsFalse(vacationId, pageable);
+    public Page<TimeOffDepositResponse> getAllByVacationUnitId(Long vacationUnitId, Pageable pageable) {
+        var timeOffDepositPage = timeOffDepositRepository.findAllByVacationUnitIdAndDeletedIsFalse(vacationUnitId, pageable);
+        Page<TimeOffDepositResponse> timeOffDepositPageResponse = timeOffDepositPage.map(TimeOffDepositMapper.INSTANCE::toDtoResponse);
+        return timeOffDepositPageResponse;
+    }
+    @Override
+    public Page<TimeOffDepositResponse> getAllByPropertyId(Long propertyId, Pageable pageable) {
+        var timeOffDepositPage = timeOffDepositRepository.
+                findAllByPropertyIdAndDeletedFalse(propertyId, pageable);
         Page<TimeOffDepositResponse> timeOffDepositPageResponse = timeOffDepositPage.map(TimeOffDepositMapper.INSTANCE::toDtoResponse);
         return timeOffDepositPageResponse;
     }
 
     @Override
-    public Page<TimeOffDepositResponse> getByResortId(Long resortId, Pageable pageable) {
-//        var timeOffDepositPage = timeOffDepositRepository.findAllByResortIdAndDeletedFalse(resortId, pageable);
-//        Page<TimeOffDepositResponse> timeOffDepositPageResponse = timeOffDepositPage.map(TimeOffDepositMapper.INSTANCE::toDtoResponse);
-//        return timeOffDepositPageResponse;
-        return null;
+    public Page<TimeOffDepositResponse> getAllByResortId(Long resortId, Pageable pageable) {
+        var timeOffDepositPage = timeOffDepositRepository.
+                findAllByResortIdAndDeletedFalse(resortId, pageable);
+        Page<TimeOffDepositResponse> timeOffDepositPageResponse = timeOffDepositPage.map(TimeOffDepositMapper.INSTANCE::toDtoResponse);
+        return timeOffDepositPageResponse;
     }
 
     @Override
@@ -37,9 +43,9 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
     }
 
     @Override
-    public TimeOffDepositResponse create(Long vacationId, TimeOffDepositRequest timeOffDepositRequest) {
+    public TimeOffDepositResponse create(Long vacationUnitId, TimeOffDepositRequest timeOffDepositRequest) {
         var timeOffDeposit = TimeOffDepositMapper.INSTANCE.toEntity(timeOffDepositRequest);
-        var timeOffDeposits = timeOffDepositRepository.findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(vacationId, timeOffDepositRequest.getStartTime(), timeOffDepositRequest.getEndTime());
+        var timeOffDeposits = timeOffDepositRepository.findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(vacationUnitId, timeOffDepositRequest.getStartTime(), timeOffDepositRequest.getEndTime());
 //        if (!timeOffDeposits.isEmpty()) new Exception();
         var timeOffDepositCreated = timeOffDepositRepository.save(timeOffDeposit);
         return TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);

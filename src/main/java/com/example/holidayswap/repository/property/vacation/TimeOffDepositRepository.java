@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -13,21 +14,32 @@ import java.util.Optional;
 
 @Repository
 public interface TimeOffDepositRepository extends JpaRepository<TimeOffDeposit, Long> {
-    @Query("select t from TimeOffDeposit t where t.vacationId = ?1 and t.isDeleted = false")
-    Page<TimeOffDeposit> findAllByVacationIdAndDeletedIsFalse(Long vacationId, Pageable pageable);
-//    @Query("""
-//            select t from TimeOffDeposit t
-//            join t.vacation v
-//            join v.property p
-//            join p.resort r
-//            where r.id = :resortId and t.isDeleted = false""")
-//    Page<TimeOffDeposit> findAllByResortIdAndDeletedFalse(@Param("resortId")Long resortId, Pageable pageable);
+    @Query("select t from TimeOffDeposit t where t.vacationUnitId = ?1 and t.isDeleted = false")
+    Page<TimeOffDeposit> findAllByVacationUnitIdAndDeletedIsFalse(Long vacationId, Pageable pageable);
+
+    @Query("""
+            select t from TimeOffDeposit t
+            join t.vacation v
+            join v.ownership ow
+            join ow.property p
+            join  p.propertyType pt
+            join pt.resorts r
+            where r.id = :resortId and t.isDeleted = false""")
+    Page<TimeOffDeposit> findAllByResortIdAndDeletedFalse(@Param("resortId") Long resortId, Pageable pageable);
+
+    @Query("""
+            select t from TimeOffDeposit t
+            join t.vacation v
+            join v.ownership ow
+            join ow.property p
+            where p.id = :propertyId and t.isDeleted = false""")
+    Page<TimeOffDeposit> findAllByPropertyIdAndDeletedFalse(@Param("propertyId") Long propertyId, Pageable pageable);
 
     @Query("select t from TimeOffDeposit t where t.id = ?1 and t.isDeleted = false")
     Optional<TimeOffDeposit> findByIdAndDeletedFalse(Long id);
 
     @Query("""
             select t from TimeOffDeposit t
-            where t.vacationId = ?1 and t.isDeleted = false and t.startTime >= ?2 and t.endTime <= ?3""")
+            where t.vacationUnitId = ?1 and t.isDeleted = false and t.startTime >= ?2 and t.endTime <= ?3""")
     List<TimeOffDeposit> findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long vacationId, Date startTime, Date endTime);
 }

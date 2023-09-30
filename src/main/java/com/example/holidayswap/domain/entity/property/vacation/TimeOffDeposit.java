@@ -32,7 +32,7 @@ public class TimeOffDeposit {
     @Enumerated(EnumType.STRING)
     private TimeOffDepositStatus status;
     @Column(name = "vacation_unit_id")
-    private Long vacationId;
+    private Long vacationUnitId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "vacation_unit_id",
