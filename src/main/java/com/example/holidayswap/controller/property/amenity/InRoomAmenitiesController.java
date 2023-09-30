@@ -21,7 +21,7 @@ import java.util.List;
 public class InRoomAmenitiesController {
     final private InRoomAmenityService inRoomAmenityService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<InRoomAmenityResponse>> gets(
             @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") Integer pageNo,

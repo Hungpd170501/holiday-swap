@@ -23,38 +23,53 @@ public class PropertyViewServiceImpl implements PropertyViewService {
 
     @Override
     public Page<PropertyViewResponse> gets(String name, Pageable pageable) {
-        var dtoReponses = propertyViewRepository.findAllByPropertyViewNameContainingIgnoreCaseAndIsDeletedIsFalse(name, pageable);
-        return dtoReponses.map(PropertyViewMapper.INSTANCE::toDtoResponse);
+        var entities = propertyViewRepository.
+                findAllByPropertyViewNameContainingIgnoreCaseAndIsDeletedIsFalse(name, pageable);
+        var dtoReponses = entities.map(PropertyViewMapper.INSTANCE::toDtoResponse);
+        return dtoReponses;
     }
 
     @Override
     public PropertyViewResponse get(Long id) {
-        var entity = propertyViewRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
-        return PropertyViewMapper.INSTANCE.toDtoResponse(entity);
+        var entity = propertyViewRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        var dtoRespone = PropertyViewMapper.INSTANCE.toDtoResponse(entity);
+        return dtoRespone;
     }
 
     @Override
     public PropertyViewResponse create(PropertyViewRequest dtoRequest) {
-        if (propertyViewRepository.findByPropertyViewNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getPropertyViewName()).isPresent())
+        if (propertyViewRepository.
+                findByPropertyViewNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getPropertyViewName()).
+                isPresent())
             throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
         var entity = PropertyViewMapper.INSTANCE.toEntity(dtoRequest);
-        return PropertyViewMapper.INSTANCE.toDtoResponse(propertyViewRepository.save(entity));
+        var created = propertyViewRepository.save(entity);
+        var dtoResponse = PropertyViewMapper.INSTANCE.toDtoResponse(created);
+        return dtoResponse;
     }
 
     @Override
     public PropertyViewResponse update(Long id, PropertyViewRequest dtoRequest) {
-        var entityFound = propertyViewRepository.findByPropertyViewNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getPropertyViewName());
+        var entityFound = propertyViewRepository.
+                findByPropertyViewNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getPropertyViewName());
+
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
             throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
-        var entity = propertyViewRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+
+        var entity = propertyViewRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         PropertyViewMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
-        propertyViewRepository.save(entity);
-        return PropertyViewMapper.INSTANCE.toDtoResponse(entity);
+        var updated = propertyViewRepository.save(entity);
+        var dtoResponse = PropertyViewMapper.INSTANCE.toDtoResponse(updated);
+        return dtoResponse;
     }
 
     @Override
     public void delete(Long id) {
-        var entity = propertyViewRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        var entity = propertyViewRepository.
+                findByIdAndIsDeletedIsFalse(id).orElseThrow(
+                        () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         entity.setDeleted(true);
         propertyViewRepository.save(entity);
     }

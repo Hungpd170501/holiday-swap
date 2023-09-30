@@ -20,7 +20,7 @@ import java.net.URI;
 public class PropertyViewsController {
     private final PropertyViewService propertyViewService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<PropertyViewResponse>> gets(
             @RequestParam(defaultValue = "") String searchName,
             @RequestParam(defaultValue = "0") Integer pageNo,

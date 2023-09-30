@@ -23,7 +23,7 @@ import java.util.List;
 public class PropertiesController {
     private final PropertyService propertyService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<PropertyResponse>> gets(@RequestParam(defaultValue = "") Long resortId,
                                                        @RequestParam(defaultValue = "0") Integer pageNo,
                                                        @RequestParam(defaultValue = "10") Integer pageSize,
