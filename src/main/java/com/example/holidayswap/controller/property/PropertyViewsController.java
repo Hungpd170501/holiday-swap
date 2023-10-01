@@ -1,4 +1,4 @@
-package com.example.holidayswap.controller.property.vacation;
+package com.example.holidayswap.controller.property;
 
 import com.example.holidayswap.domain.dto.request.property.vacation.PropertyViewRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyViewResponse;
@@ -16,11 +16,11 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/propertyView")
+@RequestMapping("api/v1/property-view")
 public class PropertyViewsController {
     private final PropertyViewService propertyViewService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<PropertyViewResponse>> gets(
             @RequestParam(defaultValue = "") String searchName,
             @RequestParam(defaultValue = "0") Integer pageNo,

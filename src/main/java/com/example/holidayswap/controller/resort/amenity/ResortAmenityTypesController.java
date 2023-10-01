@@ -1,7 +1,9 @@
 package com.example.holidayswap.controller.resort.amenity;
 
 import com.example.holidayswap.domain.dto.request.resort.amenity.ResortAmenityTypeRequest;
+import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
+import com.example.holidayswap.service.resort.amenity.ResortAmenityService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,15 +15,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/resortAmenityTypes")
+@RequestMapping("api/v1/resort-amenity-types")
 public class ResortAmenityTypesController {
     private final ResortAmenityTypeService resortAmenityTypeService;
+    private final ResortAmenityService resortAmenityService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<ResortAmenityTypeResponse>> gets(
             @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") Integer pageNo,
@@ -31,10 +33,14 @@ public class ResortAmenityTypesController {
         return ResponseEntity.ok(resortAmenityTypeService.gets(name, pageable));
     }
 
-    @GetMapping("/resort")
-    public ResponseEntity<List<ResortAmenityTypeResponse>> gets(
-            @RequestParam Long resortId) {
-        return ResponseEntity.ok(resortAmenityTypeService.gets(resortId));
+    @GetMapping("/{id}/resort-amenities")
+    public ResponseEntity<Page<ResortAmenityResponse>> getResortAmenities(
+            @PathVariable("id") Long amenityTypeId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return ResponseEntity.ok(resortAmenityService.gets(amenityTypeId, pageable));
     }
 
     @GetMapping("/{id}")
