@@ -32,4 +32,5 @@ public interface VacationRepository extends JpaRepository<Vacation, Long> {
 //    List<Vacation> findAllByPropertyIdAndUserIdAndRoomId(Long propertyId, Long userId, String roomId);
 
 //    Vacation findByPropertyIdAndDeletedIsFalseAndRoomId(Long propertyId);
+    List<Vacation> findAllByPropertyIdAndRoomId(Long propertyId, String roomId);
 }

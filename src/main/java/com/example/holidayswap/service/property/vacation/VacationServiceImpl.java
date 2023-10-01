@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
 
@@ -43,47 +46,32 @@ public class VacationServiceImpl implements VacationService {
     @Transactional
     public VacationResponse create(Ownership ownership, VacationRequest vacationRequest) {
         var vaction = VacationMapper.INSTANCE.toEntity(vacationRequest);
-//        var vacations = vacationRepository.findAllByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(propertyId, vacationRequest.getStartTime(), vacationRequest.getEndTime());
-//        var vacationPresent = vacationRepository.findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(propertyId, vacationRequest.getStartTime(), vacationRequest.getEndTime());
-//        if (vacationPresent.isPresent()) throw new EntityNotFoundException("da ton tai 1 ban ghi ");
-        Calendar calStart = Calendar.getInstance();
-        calStart.setTime(vacationRequest.getStartTime());
+        var vacationListOfThisApartment = vacationRepository.findAllByPropertyIdAndRoomId(ownership.getId().getPropertyId(),ownership.getId().getRoomId());
 
-        Calendar calEnd = Calendar.getInstance();
-        calEnd.setTime(vacationRequest.getEndTime());
-        if(calEnd.get(Calendar.MONTH) < calStart.get(Calendar.MONTH)){
-            throw new EntityNotFoundException("enddate can not less than startdate");
+        if(vacationListOfThisApartment.size() >0){
+            for (Vacation v : vacationListOfThisApartment) {
+                if(v.getStartTime().before(vaction.getStartTime())
+                        && v.getEndTime().after(vaction.getEndTime())) {
+                    throw new EntityNotFoundException("This time is not available");
+                }
+                if(vaction.getStartTime().before(v.getStartTime())
+                        && v.getStartTime().before(vaction.getEndTime())) {
+                    throw new EntityNotFoundException("This time is not available");
+                }
+                if(vaction.getStartTime().before(v.getEndTime())
+                        && v.getEndTime().before(vaction.getEndTime())) {
+                    throw new EntityNotFoundException("This time is not available");
+                }
+                if(vaction.getStartTime().before(v.getStartTime())
+                        && v.getEndTime().before(vaction.getEndTime())) {
+                    throw new EntityNotFoundException("This time is not available");
+                }if(vaction.getStartTime().compareTo(v.getStartTime()) == 0
+                        && v.getEndTime().compareTo(vaction.getEndTime()) ==0)  {
+                    throw new EntityNotFoundException("This time is not available");
+                }
+            }
         }
-        if(calEnd.get(Calendar.MONTH) == calStart.get(Calendar.MONTH)
-                && calEnd.get(Calendar.DAY_OF_MONTH) < calStart.get(Calendar.DAY_OF_MONTH)){
-            throw new EntityNotFoundException("enddate can not less than startdate");
-        }
-//        List<Vacation> vacationsOfOwnerShip = vacationRepository.findAllByPropertyIdAndUserIdAndRoomId(ownership.getId().getPropertyId(), ownership.getId().getUserId(), ownership.getId().getRoomId());
-//        vacationsOfOwnerShip.stream().forEach(e -> {
-//            Calendar calStart1 = Calendar.getInstance();
-//            calStart1.setTime(e.getStartTime());
-//
-//            Calendar calEnd1 = Calendar.getInstance();
-//            calEnd1.setTime(e.getEndTime());
-//            if(calStart1.get(Calendar.MONTH) > calStart.get(Calendar.MONTH) && calStart.get(Calendar.MONTH) < calEnd1.get(Calendar.MONTH)){
-//                throw new EntityNotFoundException("This time coincides with the previously created time period ");
-//            }
-//            if(calStart1.get(Calendar.MONTH) > calEnd.get(Calendar.MONTH) && calEnd.get(Calendar.MONTH) < calEnd1.get(Calendar.MONTH)){
-//                throw new EntityNotFoundException("This time coincides with the previously created time period ");
-//            }
-//            if(calStart1.get(Calendar.MONTH) == calStart.get(Calendar.MONTH)
-//                    && calEnd1.get(Calendar.MONTH) == calStart.get(Calendar.MONTH)
-//                    && calStart1.get(Calendar.DAY_OF_MONTH) > calStart.get(Calendar.DAY_OF_MONTH)
-//                    && calStart.get(Calendar.DAY_OF_MONTH) < calEnd1.get(Calendar.DAY_OF_MONTH)){
-//                throw new EntityNotFoundException("This time coincides with the previously created time period ");
-//            }
-//            if(calStart1.get(Calendar.MONTH) == calEnd.get(Calendar.MONTH)
-//                    && calEnd1.get(Calendar.MONTH) == calEnd.get(Calendar.MONTH)
-//                    && calStart1.get(Calendar.DAY_OF_MONTH) > calEnd.get(Calendar.DAY_OF_MONTH)
-//                    && calEnd.get(Calendar.DAY_OF_MONTH) < calEnd1.get(Calendar.DAY_OF_MONTH)){
-//                throw new EntityNotFoundException("This time coincides with the previously created time period ");
-//            }
-//        });
+
         vaction.setPropertyId(ownership.getId().getPropertyId());
         vaction.setRoomId(ownership.getId().getRoomId());
         vaction.setUserId(ownership.getId().getUserId());

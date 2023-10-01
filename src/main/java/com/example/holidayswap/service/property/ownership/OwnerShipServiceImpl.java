@@ -15,7 +15,9 @@ import com.example.holidayswap.domain.mapper.property.ownership.OwnershipMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.ownership.OwnerShipRepository;
+import com.example.holidayswap.repository.property.vacation.VacationRepository;
 import com.example.holidayswap.service.property.vacation.VacationService;
+import com.example.holidayswap.utils.Helper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,8 @@ public class OwnerShipServiceImpl implements OwnerShipService {
     private final PropertyRepository propertyRepository;
     private final OwnerShipRepository ownerShipRepository;
     private final ContractImageService contractImageService;
+
+    private final VacationRepository vacationRepository;
 
     @Autowired
     private final VacationService vacationService;
@@ -94,6 +98,16 @@ public class OwnerShipServiceImpl implements OwnerShipService {
                                     OwnershipRequest dtoRequest,
                                     List<MultipartFile> contractImages) {
 //
+        var flag = false;
+        //check validation vacation of this apartment already exist in database ?
+        if(dtoRequest.getVacations().size() >1 ){
+            flag = Helper.checkOverlapTime(dtoRequest.getVacations());
+        }else {
+            flag = true;
+        }
+
+        if(!flag) throw new EntityNotFoundException("This time coincides with the previously created time period ");
+
 //        // get id user is login
 //        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
 //        Object principal = authentication.getPrincipal();
@@ -111,17 +125,13 @@ public class OwnerShipServiceImpl implements OwnerShipService {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
         var id = new OwnershipId(propertyId, userId, dtoRequest.getRoomId());
+
+        //check validation vacation
         Ownership checkOwnerShipAlreadyExist = ownerShipRepository.findByIdAndStatus(id, ContractStatus.ACCEPTED);
         if (checkOwnerShipAlreadyExist != null) {
             throw new EntityNotFoundException("This apartment you already created");
         }
         if(dtoRequest.getStartTime().after(dtoRequest.getEndTime())) throw new EntityNotFoundException("Start year must be before end year");
-
-        dtoRequest.getVacations().forEach(e -> {
-            if(e.getStartTime().after(e.getEndTime())) throw new EntityNotFoundException("Start time must be before end time");
-        });
-
-
 
         entity.setId(id);
         entity.setProperty(property);
