@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -46,7 +45,7 @@ public class OwnershipServiceImpl implements OwnershipService {
     }
 
     @Override
-    public OwnershipResponse get(Long ownershipId) {
+    public OwnershipResponse get(OwnershipId ownershipId) {
         var dtoResponse = OwnershipMapper.INSTANCE.toDtoResponse(
                 ownershipRepository.findById(ownershipId).
                         orElseThrow(() -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND)));
@@ -74,8 +73,6 @@ public class OwnershipServiceImpl implements OwnershipService {
 
 
         var id = new OwnershipId();
-        UUID uuid = UUID.randomUUID();
-        id.setOwnershipId(uuid.toString());
         id.setPropertyId(propertyId);
         id.setUserId(userId);
         id.setRoomId(dtoRequest.getRoomId());

@@ -30,20 +30,13 @@ public class VacationUnit {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private VacationStatus status;
-    @Column(name = "ownership_id")
-    private String ownershipId;
     @Column(name = "property_id")
     private Long propertyId;
     @Column(name = "user_id")
     private Long userId;
     @Column(name = "room_id")
-    private Long roomId;
+    private String roomId;
     @ManyToOne
-    @JoinColumn(name = "ownership_id",
-            referencedColumnName = "ownership_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
     @JoinColumn(name = "property_id",
             referencedColumnName = "property_id",
             nullable = false,

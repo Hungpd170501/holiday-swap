@@ -6,12 +6,13 @@ import com.example.holidayswap.service.property.ownership.OwnershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/ownership")
+@RequestMapping("/api/ownerships")
 public class OwnershipController {
     private final OwnershipService ownershipService;
 
@@ -25,17 +26,17 @@ public class OwnershipController {
         return ResponseEntity.ok(ownershipService.getListByUserId(userId));
     }
 
-    @GetMapping
-    public ResponseEntity<OwnershipResponse> get(
-            @RequestParam Long ownershipId) {
-        return ResponseEntity.ok(ownershipService.get(ownershipId));
-    }
+//    @GetMapping
+//    public ResponseEntity<OwnershipResponse> get(
+//            @RequestParam OwnershipId ownershipId) {
+//        return ResponseEntity.ok(ownershipService.get(ownershipId));
+//    }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestPart Long propertyId,
                                     @RequestPart Long userId,
-                                    @RequestPart OwnershipRequest dtoRequest
-                                    //, @RequestPart List<MultipartFile> contractImages
+                                    @RequestPart OwnershipRequest dtoRequest,
+                                    @RequestPart List<MultipartFile> contractImages
     ) {
         return ResponseEntity.ok(ownershipService.create(propertyId, userId, dtoRequest));
 

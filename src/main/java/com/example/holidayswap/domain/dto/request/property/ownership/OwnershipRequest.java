@@ -12,7 +12,7 @@ public class OwnershipRequest {
     private Date endTime;
     private Date startTime;
     private ContractType type;
-    private Long roomId;
+    private String roomId;
     private List<VacationUnitRequest> vacations;
 
 }

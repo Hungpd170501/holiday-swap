@@ -25,8 +25,8 @@ public interface OwnershipRepository extends JpaRepository<Ownership, OwnershipI
     @Query("select o from Ownership o where o.property.id = ?1 and o.user.userId = ?2 and o.isDeleted = false ")
     Optional<Ownership> findAllByPropertyIdAndUserIdAndIsDeleteIsFalse(Long propertyId, Long userId);
 
-    @Query("select o from Ownership o where o.id.ownershipId = ?1 and o.isDeleted = false ")
-    Optional<Ownership> findById(Long ownershipId);
+    @Query("select o from Ownership o where o.id = ?1 and o.isDeleted = false ")
+    Optional<Ownership> findById(OwnershipId ownershipId);
 
     @Query("""
             select o from Ownership o
@@ -41,7 +41,7 @@ public interface OwnershipRepository extends JpaRepository<Ownership, OwnershipI
     Optional<Ownership> findByTypeIsRightToUse(
             Long propertyId,
             Long userId,
-            Long roomId,
+            String roomId,
             Date startTime,
             Date endTime,
             ContractType type,
@@ -58,7 +58,7 @@ public interface OwnershipRepository extends JpaRepository<Ownership, OwnershipI
     Optional<Ownership> findByTypeIsDeeded(
             Long propertyId,
             Long userId,
-            Long roomId,
+            String roomId,
             ContractType type,
             ContractStatus status);
 }

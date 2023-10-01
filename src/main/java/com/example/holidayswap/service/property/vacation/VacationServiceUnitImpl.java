@@ -75,7 +75,7 @@ public class VacationServiceUnitImpl implements VacationUnitService {
         );
         if (checkVacationUnit.isPresent()) throw new DuplicateRecordException("Time vacation already exist.");
 
-        entity.setOwnershipId(ownershipId.getOwnershipId());
+//        entity.setOwnershipId(ownershipId.getOwnershipId());
         entity.setPropertyId(ownershipId.getPropertyId());
         entity.setUserId(ownershipId.getUserId());
         entity.setRoomId(ownershipId.getRoomId());

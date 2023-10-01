@@ -2,6 +2,7 @@ package com.example.holidayswap.service.property.ownership;
 
 import com.example.holidayswap.domain.dto.request.property.ownership.OwnershipRequest;
 import com.example.holidayswap.domain.dto.response.property.ownership.OwnershipResponse;
+import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface OwnershipService {
 
     List<OwnershipResponse> getListByUserId(Long userId);
 
-    OwnershipResponse get(Long ownershipId);
+    OwnershipResponse get(OwnershipId ownershipId);
 
     OwnershipResponse create(Long propertyId, Long userId, OwnershipRequest dtoRequest);
 

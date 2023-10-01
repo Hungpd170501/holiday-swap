@@ -12,7 +12,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/propertyImages")
+@RequestMapping("api/v1/property-images")
 public class PropertyImagesController {
     private final PropertyImageService propertyImageService;
 

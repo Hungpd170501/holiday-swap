@@ -54,15 +54,16 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
             select v from VacationUnit v
             where v.propertyId = ?1
             and v.roomId = ?2
-            and v.startTime between ?3 and ?4 
-            or v.endTime between ?3 and ?4 
-            and v.isDeleted = false and v.status = ?5""")
+            and v.isDeleted = false
+            and v.status = ?5
+            and v.startTime between ?3 and ?4
+            or v.endTime between ?3 and ?4""")
     Optional<VacationUnit> findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
             Long propertyId,
-            Long roomId,
+            String roomId,
             Date startTime,
             Date endTime,
-            VacationStatus vacationUnitStatus
+            VacationStatus vacationStatus
     );
 
     @Query("""
@@ -74,9 +75,9 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
             and v.isDeleted = false and v.status = ?5""")
     Optional<VacationUnit> findByStartTimeAndEndTimeIsInVacationUnitTime(
             Long propertyId,
-            Long roomId,
+            String roomId,
             Date startTime,
             Date endTime,
-            VacationStatus vacationUnitStatus
+            VacationStatus vacationStatus
     );
 }
