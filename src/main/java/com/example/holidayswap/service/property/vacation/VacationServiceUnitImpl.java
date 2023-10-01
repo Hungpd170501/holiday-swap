@@ -4,15 +4,10 @@ import com.example.holidayswap.domain.dto.request.property.vacation.VacationUnit
 import com.example.holidayswap.domain.dto.response.property.vacation.VacationUnitResponse;
 import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.vacation.VacationUnitMapper;
-import com.example.holidayswap.repository.auth.UserRepository;
-import com.example.holidayswap.repository.property.PropertyRepository;
-import com.example.holidayswap.repository.property.ownership.OwnershipRepository;
 import com.example.holidayswap.repository.property.vacation.VacationUnitRepository;
-import com.example.holidayswap.service.auth.UserService;
-import com.example.holidayswap.service.property.PropertyService;
-import com.example.holidayswap.service.property.ownership.OwnershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,12 +19,12 @@ import static com.example.holidayswap.constants.ErrorMessage.VACATION_NOT_FOUND;
 @RequiredArgsConstructor
 public class VacationServiceUnitImpl implements VacationUnitService {
     private final VacationUnitRepository vacationRepository;
-    private final UserRepository userRepository;
-    private final PropertyRepository propertyRepository;
-    private final OwnershipRepository ownershipRepository;
-    private final UserService userService;
-    private final PropertyService propertyService;
-    private final OwnershipService ownershipService;
+//    private final UserRepository userRepository;
+//    private final PropertyRepository propertyRepository;
+//    private final OwnershipRepository ownershipRepository;
+//    private final UserService userService;
+//    private final PropertyService propertyService;
+//    private final OwnershipService ownershipService;
 
     @Override
     public Page<VacationUnitResponse> getAllByPropertyId(Long propertyId, Pageable pageable) {
@@ -61,6 +56,9 @@ public class VacationServiceUnitImpl implements VacationUnitService {
     @Override
     public VacationUnitResponse create(OwnershipId ownershipId, VacationUnitRequest dtoRequest) {
         var entity = VacationUnitMapper.INSTANCE.toEntity(dtoRequest);
+
+        if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
+            throw new DataIntegrityViolationException("Start time must be before end time");
 
         entity.setOwnershipId(ownershipId.getOwnershipId());
         entity.setPropertyId(ownershipId.getPropertyId());

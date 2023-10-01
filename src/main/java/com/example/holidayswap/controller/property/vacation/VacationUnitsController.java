@@ -21,7 +21,7 @@ import java.net.URI;
 public class VacationUnitsController {
     private final VacationUnitService vacationUnitService;
 
-    @GetMapping("/property")
+    @GetMapping("/properties")
     public ResponseEntity<Page<VacationUnitResponse>> getAllByPropertyId(
             @RequestParam Long propertyId,
             @RequestParam(defaultValue = "0") Integer pageNo,
@@ -32,7 +32,7 @@ public class VacationUnitsController {
         return ResponseEntity.ok(vacationResponses);
     }
 
-    @GetMapping("/resort")
+    @GetMapping("/resorts")
     public ResponseEntity<Page<VacationUnitResponse>> getAllByResortId(
             @RequestParam Long resortId,
             @RequestParam(defaultValue = "0") Integer pageNo,

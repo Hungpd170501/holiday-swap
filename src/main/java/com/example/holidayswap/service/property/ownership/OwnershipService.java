@@ -11,7 +11,7 @@ public interface OwnershipService {
 
     List<OwnershipResponse> getListByUserId(Long userId);
 
-    OwnershipResponse get(Long propertyId, Long userId);
+    OwnershipResponse get(Long ownershipId);
 
     OwnershipResponse create(Long propertyId, Long userId, OwnershipRequest dtoRequest);
 

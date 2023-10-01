@@ -18,7 +18,6 @@ import java.io.Serializable;
 public class OwnershipId implements Serializable {
     private static final long serialVersionUID = -4184519122503267383L;
     @NotNull
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ownership_id", nullable = false)
     private String ownershipId;
     @NotNull
@@ -27,6 +26,6 @@ public class OwnershipId implements Serializable {
     @NotNull
     @Column(name = "user_id", nullable = false)
     private Long userId;
-//    @Column(name = "room_id")
-//    private Long roomId;
+    @Column(name = "room_id")
+    private Long roomId;
 }

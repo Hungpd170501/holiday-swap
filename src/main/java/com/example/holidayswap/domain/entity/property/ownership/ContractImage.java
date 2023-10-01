@@ -26,14 +26,14 @@ public class ContractImage {
     private Long propertyId;
     @Column(name = "user_id")
     private Long userId;
-    //    @Column(name = "room_id")
-//    private Long roomId;
+    @Column(name = "room_id")
+    private Long roomId;
     @ManyToOne
-//    @JoinColumn(name = "room_id",
-//            referencedColumnName = "room_id",
-//            nullable = false,
-//            insertable = false,
-//            updatable = false)
+    @JoinColumn(name = "room_id",
+            referencedColumnName = "room_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
     @JoinColumn(name = "ownership_id",
             referencedColumnName = "ownership_id",
             nullable = false,

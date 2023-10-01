@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.property.ownership;
 
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.Property;
+import com.example.holidayswap.domain.entity.property.vacation.VacationUnit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,6 +40,9 @@ public class Ownership {
     @JsonIgnore
     @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
     private Collection<ContractImage> contractImages;
+
+    @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
+    private Collection<VacationUnit> vacations;
 
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
