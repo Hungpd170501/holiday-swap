@@ -2,7 +2,6 @@ package com.example.holidayswap.domain.entity.property.ownership;
 
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.Property;
-import com.example.holidayswap.domain.entity.property.vacation.Vacation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,10 +21,10 @@ public class Ownership {
     private OwnershipId id;
 
     @Column(name = "start_time")
-    private String startTime;
+    private Date startTime;
 
     @Column(name = "end_time")
-    private String endTime;
+    private Date endTime;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
@@ -43,10 +42,6 @@ public class Ownership {
     private Collection<ContractImage> contractImages;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "ownershipVacation", fetch = FetchType.LAZY)
-    private Collection<Vacation> vacations;
-
-    @JsonIgnore
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "property_id", nullable = false)
@@ -57,5 +52,4 @@ public class Ownership {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 }

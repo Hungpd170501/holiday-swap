@@ -1,7 +1,6 @@
 package com.example.holidayswap.domain.entity.property.vacation;
 
 import com.example.holidayswap.domain.entity.property.Property;
-import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,32 +31,18 @@ public class Vacation {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private VacationStatus status;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "vacation")
-    private List<TimeOffDeposit> timeOffDeposits;
     @Column(name = "property_id")
     private Long propertyId;
-    @Column(name = "user_id")
-    private Long userId;
-    @Column(name = "room_id")
-    private String roomId;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "property_id",
             referencedColumnName = "property_id",
             nullable = false,
             insertable = false,
             updatable = false)
-    @JoinColumn(name = "user_id",
-            referencedColumnName = "user_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-    @JoinColumn(name = "room_id",
-            referencedColumnName = "room_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-    private Ownership ownershipVacation;
+    private Property property;
+
+    @OneToMany(mappedBy = "vacation")
+    private List<TimeOffDeposit> timeOffDeposits;
+
 }

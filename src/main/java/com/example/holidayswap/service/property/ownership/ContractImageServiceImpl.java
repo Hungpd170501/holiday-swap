@@ -9,7 +9,6 @@ import com.example.holidayswap.repository.property.ownership.ContractImageReposi
 import com.example.holidayswap.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -66,18 +65,5 @@ public class ContractImageServiceImpl implements ContractImageService {
                 orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
         contractImage.setIsDeleted(true);
         contractImageRepository.save(contractImage);
-    }
-    @Transactional
-    @Override
-    public ContractImage createAndReturnObject(ContractImageRequest dtoRequest, MultipartFile multipartFile) {
-        String link = null;
-        try {
-            link = fileService.uploadFile(multipartFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        ContractImage contractImage = ContractImageMapper.INSTANCE.toEntity(dtoRequest);
-        contractImage.setLink(link);
-        return contractImageRepository.save(contractImage);
     }
 }

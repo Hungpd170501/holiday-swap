@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property.vacation;
 
 import com.example.holidayswap.domain.dto.request.property.vacation.VacationRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.VacationResponse;
-import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,7 @@ public interface VacationService {
 
     VacationResponse get(Long id);
 
-    VacationResponse create(Ownership ownership, VacationRequest vacationRequest);
+    VacationResponse create(Long propertyId, VacationRequest vacationRequest);
 
     VacationResponse update(Long id, VacationRequest vacationRequest);
 

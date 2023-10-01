@@ -92,7 +92,7 @@ public class PropertyServiceImpl implements PropertyService {
         });
         entity.setInRoomAmenities(amenities);
         var created = propertyRepository.save(entity);
-        ownerShipService.create12312(created.getId(), userId, dtoRequest.getOwnershipRequest());
+        ownerShipService.create(created.getId(), userId, dtoRequest.getOwnershipRequest());
         return PropertyMapper.INSTANCE.toDtoResponse(created);
     }
 

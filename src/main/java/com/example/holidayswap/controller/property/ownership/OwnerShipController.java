@@ -15,32 +15,28 @@ import java.util.List;
 public class OwnerShipController {
     private final OwnerShipService ownerShipService;
 
-//    @GetMapping("/property")
-//    public ResponseEntity<?> getListByPropertyId(@RequestParam Long propertyId) {
-//        return ResponseEntity.ok(ownerShipService.getListByPropertyId(propertyId));
-//    }
+    @GetMapping("/property")
+    public ResponseEntity<?> getListByPropertyId(@RequestParam Long propertyId) {
+        return ResponseEntity.ok(ownerShipService.getListByPropertyId(propertyId));
+    }
 
-//    @GetMapping("/user")
-//    public ResponseEntity<?> getListByUserId(@RequestParam Long userId) {
-//        return ResponseEntity.ok(ownerShipService.getListByUserId(userId));
-//    }
+    @GetMapping("/user")
+    public ResponseEntity<?> getListByUserId(@RequestParam Long userId) {
+        return ResponseEntity.ok(ownerShipService.getListByUserId(userId));
+    }
 
-//    @GetMapping
-//    public ResponseEntity<?> get(@RequestParam Long propertyId,
-//                                 @RequestParam Long userId) {
-//        return ResponseEntity.ok(ownerShipService.get(propertyId, userId));
-//    }
+    @GetMapping
+    public ResponseEntity<?> get(@RequestParam Long propertyId,
+                                 @RequestParam Long userId) {
+        return ResponseEntity.ok(ownerShipService.get(propertyId, userId));
+    }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestPart Long propertyId,
                                     @RequestPart Long userId,
                                     @RequestPart OwnershipRequest dtoRequest,
                                     @RequestPart List<MultipartFile> contractImages) {
-        try {
-            return ResponseEntity.ok(ownerShipService.create(propertyId, userId, dtoRequest, contractImages));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(ownerShipService.create(propertyId, userId, dtoRequest, contractImages));
 
     }
 
@@ -48,7 +44,7 @@ public class OwnerShipController {
     public ResponseEntity<?> create(@RequestParam Long propertyId,
                                     @RequestParam Long userId,
                                     @RequestBody OwnershipRequest dtoRequest) {
-        return ResponseEntity.ok(ownerShipService.create12312(propertyId, userId, dtoRequest));
+        return ResponseEntity.ok(ownerShipService.create(propertyId, userId, dtoRequest));
     }
 
 }
