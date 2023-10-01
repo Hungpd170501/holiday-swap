@@ -20,7 +20,7 @@ import java.net.URI;
 public class TimeOffDepositsController {
     private final TimeOffDepositService timeOffDepositService;
 
-    @GetMapping("/vacation")
+    @GetMapping("/vacation-units")
     public ResponseEntity<Page<TimeOffDepositResponse>> getAllByVacationUnitId(
             @RequestParam Long vacationId,
             @RequestParam(defaultValue = "0") Integer pageNo,
@@ -31,7 +31,7 @@ public class TimeOffDepositsController {
         return ResponseEntity.ok(dtoResponses);
     }
 
-    @GetMapping("/property")
+    @GetMapping("/properties")
     public ResponseEntity<Page<TimeOffDepositResponse>> getAllByPropertyId(
             @RequestParam Long vacationId,
             @RequestParam(defaultValue = "0") Integer pageNo,
@@ -60,7 +60,7 @@ public class TimeOffDepositsController {
         return ResponseEntity.ok(dtoResponse);
     }
 
-    @PostMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/{id}")
     public ResponseEntity<TimeOffDepositResponse> create(
             @PathVariable Long id,
             @RequestBody TimeOffDepositRequest dtoRequest) {
@@ -73,7 +73,7 @@ public class TimeOffDepositsController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id,
                                        @RequestBody TimeOffDepositRequest dtoRequest) {
         timeOffDepositService.update(id, dtoRequest);

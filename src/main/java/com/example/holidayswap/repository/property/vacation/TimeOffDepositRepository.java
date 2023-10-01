@@ -1,6 +1,7 @@
 package com.example.holidayswap.repository.property.vacation;
 
 import com.example.holidayswap.domain.entity.property.vacation.TimeOffDeposit;
+import com.example.holidayswap.domain.entity.property.vacation.TimeOffDepositStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,4 +43,17 @@ public interface TimeOffDepositRepository extends JpaRepository<TimeOffDeposit, 
             select t from TimeOffDeposit t
             where t.vacationUnitId = ?1 and t.isDeleted = false and t.startTime >= ?2 and t.endTime <= ?3""")
     List<TimeOffDeposit> findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long vacationId, Date startTime, Date endTime);
+
+    @Query("""
+            select t from TimeOffDeposit t
+            where t.vacationUnitId = ?1
+            and t.startTime between ?2 and ?3
+            or t.endTime between ?2 and ?3
+            and t.isDeleted = false and t.status = ?4""")
+    Optional<TimeOffDeposit> findDuplicateWhichAnyTimeDeposit(
+            Long vacationUnitId,
+            Date startTime,
+            Date endTime,
+            TimeOffDepositStatus timeOffDepositStatus
+    );
 }

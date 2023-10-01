@@ -65,7 +65,8 @@ public class VacationServiceUnitImpl implements VacationUnitService {
             throw new DataIntegrityViolationException("Start time must be before end time");
 
         Optional<VacationUnit> checkVacationUnit;
-        checkVacationUnit = vacationUnitRepository.findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
+        checkVacationUnit = vacationUnitRepository.
+                findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
                 ownershipId.getPropertyId(),
                 ownershipId.getRoomId(),
                 dtoRequest.getStartTime(),
