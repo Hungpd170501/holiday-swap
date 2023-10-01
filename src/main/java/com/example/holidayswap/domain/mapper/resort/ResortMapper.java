@@ -12,10 +12,14 @@ import org.mapstruct.factory.Mappers;
 public interface ResortMapper {
     ResortMapper INSTANCE = Mappers.getMapper(ResortMapper.class);
 
+    @Mapping(target = "amenities", source = "propertyTypes", ignore = true)
+    @Mapping(target = "propertyTypes", source = "propertyTypes", ignore = true)
     Resort toResort(ResortRequest resortRequest);
 
     ResortResponse toResortResponse(Resort resort);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "amenities", source = "propertyTypes", ignore = true)
+    @Mapping(target = "propertyTypes", source = "propertyTypes", ignore = true)
     void updateEntityFromDTO(ResortRequest dto, @MappingTarget Resort entity);
 }

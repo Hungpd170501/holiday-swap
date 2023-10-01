@@ -1,9 +1,14 @@
 package com.example.holidayswap.controller.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
-import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
+import com.example.holidayswap.domain.dto.response.property.PropertyImageResponse;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
+import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityResponse;
+import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
+import com.example.holidayswap.service.property.PropertyImageService;
 import com.example.holidayswap.service.property.PropertyService;
+import com.example.holidayswap.service.property.amenity.InRoomAmenityService;
+import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -23,12 +27,38 @@ import java.util.List;
 @RequestMapping("api/v1/properties")
 public class PropertiesController {
     private final PropertyService propertyService;
+    private final InRoomAmenityTypeService inRoomAmenityTypeService;
+    private final InRoomAmenityService inRoomAmenityService;
+    private final PropertyImageService propertyImageService;
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<PropertyResponse>> gets(@RequestParam(defaultValue = "") Long resortId, @RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "id") String sortBy) {
+    @GetMapping
+    public ResponseEntity<Page<PropertyResponse>> gets(@RequestParam(defaultValue = "") Long resortId,
+                                                       @RequestParam(defaultValue = "0") Integer pageNo,
+                                                       @RequestParam(defaultValue = "10") Integer pageSize,
+                                                       @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var properties = propertyService.gets(pageable);
+        var properties = propertyService.gets(resortId, pageable);
         return ResponseEntity.ok(properties);
+    }
+
+    @GetMapping("/{id}/property-in-room-amenity-types")
+    public ResponseEntity<List<InRoomAmenityTypeResponse>> getPropertyInRoomAmenityTypes(
+            @PathVariable("id") Long propertyId) {
+        return ResponseEntity.ok(inRoomAmenityTypeService.gets(propertyId));
+    }
+
+    @GetMapping("/{id}/property-image")
+    public ResponseEntity<List<PropertyImageResponse>> getPropertyImages(
+            @PathVariable("id") Long id) {
+        var dtoResponses = propertyImageService.gets(id);
+        return ResponseEntity.ok(dtoResponses);
+    }
+
+    @GetMapping("/{id}/property-in-room-amenity-types/{propertyInRoomAmenityTypeId}/property-in-room-amenities")
+    public ResponseEntity<List<InRoomAmenityResponse>> getPropertyInRoomAmenities(
+            @PathVariable("id") Long propertyId,
+            @PathVariable("propertyInRoomAmenityTypeId") Long amenityTypeId) {
+        return ResponseEntity.ok(inRoomAmenityService.gets(amenityTypeId, propertyId));
     }
 
     @GetMapping("/{id}")
@@ -38,15 +68,15 @@ public class PropertiesController {
     }
 
     @PostMapping
-//            (consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE},
-//            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PropertyResponse> create(
-            @RequestPart List<MultipartFile> propertyImages,
-            @RequestPart List<MultipartFile> propertyContractImages,
             @RequestPart Long userId,
-            @RequestPart PropertyRegisterRequest propertyRegisterRequest
-    ) throws IOException {
-        var propertyCreated = propertyService.create(userId, propertyRegisterRequest, propertyImages, propertyContractImages);
+            @RequestPart PropertyRegisterRequest propertyRegisterRequest,
+            @RequestPart List<MultipartFile> propertyImages,
+            @RequestPart List<MultipartFile> propertyContractImages) {
+        var propertyCreated = propertyService.create(userId,
+                propertyRegisterRequest,
+                propertyImages,
+                propertyContractImages);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -55,12 +85,12 @@ public class PropertiesController {
         return ResponseEntity.created(location).body(propertyService.get(propertyCreated.getId()));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody PropertyUpdateRequest propertyUpdateRequest) {
-        propertyService.update(id, propertyUpdateRequest);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
-        return ResponseEntity.created(location).build();
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody PropertyUpdateRequest propertyUpdateRequest) {
+//        propertyService.update(id, propertyUpdateRequest);
+//        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
+//        return ResponseEntity.created(location).build();
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

@@ -2,7 +2,6 @@ package com.example.holidayswap.domain.entity.property;
 
 
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +25,7 @@ public class Property {
     @Column(name = "number_king_beds")
     private int numberKingBeds;
     @Column(name = "number_qeen_beds")
-    private int numerQeensBeds;
+    private int numberQueensBeds;
     @Column(name = "number_twin_beds")
     private int numberTwinBeds;
     @Column(name = "number_full_beds")
@@ -41,10 +40,6 @@ public class Property {
     private int numberBathRoom;
     @Column(name = "room_size")
     private double roomSize;
-
-    @Column(name = "room_view_id")
-    private Long roomViewId;
-
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private Boolean isDeleted = false;
 
@@ -72,34 +67,11 @@ public class Property {
     private PropertyView propertyView;
 
     @ManyToMany
-    @JsonIgnore
+    @JoinTable(
+            name = "properties_amenities",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "in_room_amenity_id"))
     private List<InRoomAmenity> inRoomAmenities;
-//    @Column(name = "resort_id")
-////    @NotNull
-//    private Long resortId;
-//    @ManyToOne
-//    @JsonIgnore
-//    @JoinColumn(name = "resort_id",
-//            referencedColumnName = "resort_id",
-//            nullable = false,
-//            insertable = false,
-//            updatable = false)
-//    private Resort resort;
-
-//    @Column(name = "user_id")
-//    private Long userId;
-//    @ManyToOne
-//    @JsonIgnore
-//    @JoinColumn(name = "user_id",
-//            referencedColumnName = "user_id",
-//            nullable = false,
-//            insertable = false,
-//            updatable = false)
-//    private User user;
-
-//    @OneToMany(mappedBy = "property")
-//    private List<PropertyContract> propertyContracts;
-
-//    @OneToMany(mappedBy = "property")
-//    private List<PropertyImage> propertyImages;
+//    @OneToMany
+//    private List<Ownership> ownerships;
 }

@@ -23,12 +23,18 @@ public class ResortImageServiceImpl implements ResortImageService {
 
     @Override
     public List<ResortImageResponse> gets(Long resortId) {
-        return resortImageRepository.findAllByResortId(resortId).stream().map(ResortImageMapper.INSTANCE::toDtoResponse).toList();
+        var entities = resortImageRepository.findAllByResortId(resortId);
+
+        var dtoResponse = entities.stream().map(ResortImageMapper.INSTANCE::toDtoResponse).toList();
+        return dtoResponse;
     }
 
     @Override
     public ResortImageResponse get(Long id) {
-        return ResortImageMapper.INSTANCE.toDtoResponse(resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND)));
+        var entity = resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND));
+        var dtoRespones = ResortImageMapper.INSTANCE.toDtoResponse(entity);
+        return dtoRespones;
     }
 
     @Override
@@ -42,27 +48,25 @@ public class ResortImageServiceImpl implements ResortImageService {
         var dtoRequest = new ResortImageRequest();
         dtoRequest.setResortId(resortId);
         dtoRequest.setLink(link);
-        return ResortImageMapper.INSTANCE.toDtoResponse(resortImageRepository.save(ResortImageMapper.INSTANCE.toEntity(dtoRequest)));
+        var entity = ResortImageMapper.INSTANCE.toEntity(dtoRequest);
+        var created = resortImageRepository.save(entity);
+        var dtoReponse = ResortImageMapper.INSTANCE.toDtoResponse(created);
+        return dtoReponse;
     }
 
     @Override
     public ResortImageResponse update(Long id, MultipartFile multipartFile) {
-        String link;
-        try {
-            link = fileService.uploadFile(multipartFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        var entity = resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND));
-        var dtoRequset = new ResortImageRequest();
-        dtoRequset.setLink(link);
-        ResortImageMapper.INSTANCE.updateEntityFromDTO(dtoRequset, entity);
-        return ResortImageMapper.INSTANCE.toDtoResponse(resortImageRepository.save(entity));
+        var entity = resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND));
+        delete(id);
+        var dtoReponse = create(id, multipartFile);
+        return dtoReponse;
     }
 
     @Override
     public void delete(Long id) {
-        var entity = (resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND)));
+        var entity = (resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND)));
         entity.setDeleted(true);
         resortImageRepository.save(entity);
     }

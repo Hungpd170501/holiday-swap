@@ -18,14 +18,16 @@ public class ErrorMessage {
     public static final String PROFILE_NOT_FOUND = "Profile not found.";
     public static final String PROPERTY_NOT_FOUND = "Property not found.";
     public static final String CONTRACT_IMAGE_NOT_FOUND = "Contract image not found.";
-    public static final String CONTRACT_NOT_FOUND = "Contract not found.";
+    public static final String OWNERSHIP_NOT_FOUND = "Contract not found.";
     public static final String RESORT_NOT_FOUND = "Resort not found.";
+    public static final String VACATION_NOT_FOUND = "Vacation not found.";
     public static final String PROPERTY_TYPE_NOT_FOUND = "Property type not found.";
     public static final String PROPERTY_IMAGE_NOT_FOUND = "Property image not found.";
     public static final String IN_ROOM_AMENITY_NOT_FOUND = "In-room amenity not found.";
     public static final String IN_ROOM_AMENITY_TYPE_NOT_FOUND = "In-room amenity type not found.";
     public static final String RESORT_AMENITY_TYPE_NOT_FOUND = "Resort amenity type not found.";
     public static final String RESORT_IMAMGE_NOT_FOUND = "Resort image not found.";
+    public static final String PROPERTY_IMAMGE_NOT_FOUND = "Property image not found.";
     public static final String RESORT_AMENITY_NOT_FOUND = "Resort amenity not found.";
     public static final String DUPLICATE_RESORT_AMENITY = "Duplicate resort amenity.";
     public static final String DUPLICATE_INROOM_AMENITY = "Duplicate in-room amenity.";

@@ -36,6 +36,9 @@ public class InRoomAmenity {
     private InRoomAmenityType inRoomAmenityType;
 
     @ManyToMany
-    @JsonIgnore
+    @JoinTable(
+            name = "properties_amenities",
+            joinColumns = @JoinColumn(name = "in_room_amenity_id"),
+            inverseJoinColumns = @JoinColumn(name = "property_id"))
     private List<Property> properties;
 }

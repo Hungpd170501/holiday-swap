@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_RESORT_AMENITY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.RESORT_AMENITY_TYPE_NOT_FOUND;
@@ -25,51 +26,67 @@ public class ResortAmenityTypeServiceImpl implements ResortAmenityTypeService {
 
     @Override
     public Page<ResortAmenityTypeResponse> gets(String name, Pageable pageable) {
-        var dto =
-                resortAmenityTypeRepository.findAllByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(name, pageable).
-                        map(ResortAmenityTypeMapper.INSTANCE::toDtoResponse);
-        dto.forEach(e -> {
+        var entities = resortAmenityTypeRepository.findAllByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(name, pageable);
+
+        var dtoReponse = entities.map(ResortAmenityTypeMapper.INSTANCE::toDtoResponse);
+        dtoReponse.forEach(e -> {
             e.setResortAmenities(resortAmenityService.gets(e.getId()));
         });
-        return dto;
+        return dtoReponse;
     }
 
     @Override
     public List<ResortAmenityTypeResponse> gets(Long resortId) {
-        var dto = resortAmenityTypeRepository.findAllByResortId(resortId).stream().map(
+        var entities = resortAmenityTypeRepository.findAllByResortId(resortId);
+
+        var dtoReponse = entities.stream().map(
                 ResortAmenityTypeMapper.INSTANCE::toDtoResponse).toList();
-        dto.forEach(e -> {
+        dtoReponse.forEach(e -> {
             e.setResortAmenities(resortAmenityService.gets(e.getId(), resortId));
         });
-        return dto;
+        return dtoReponse;
     }
 
     @Override
     public ResortAmenityTypeResponse get(Long id) {
-        var dto = ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(ErrorMessage.RESORT_AMENITY_TYPE_NOT_FOUND)));
-        dto.setResortAmenities(resortAmenityService.gets(dto.getId()));
-        return dto;
+        var entity = resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(ErrorMessage.RESORT_AMENITY_TYPE_NOT_FOUND));
+        var dtoReponse = ResortAmenityTypeMapper.INSTANCE.toDtoResponse(entity);
+        dtoReponse.setResortAmenities(resortAmenityService.gets(dtoReponse.getId()));
+        return dtoReponse;
     }
 
     @Override
     public ResortAmenityTypeResponse create(ResortAmenityTypeRequest dtoRequest) {
-        var entity = resortAmenityTypeRepository.findByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
+        var entity = resortAmenityTypeRepository.
+                findByResortAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
+
         if (entity.isPresent()) throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY_TYPE);
-        return ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.save(ResortAmenityTypeMapper.INSTANCE.toEntity(dtoRequest)));
+
+        var created = resortAmenityTypeRepository.save(ResortAmenityTypeMapper.INSTANCE.toEntity(dtoRequest));
+        var dtoResponse = ResortAmenityTypeMapper.INSTANCE.toDtoResponse(created);
+        return dtoResponse;
     }
 
     @Override
     public ResortAmenityTypeResponse update(Long id, ResortAmenityTypeRequest dtoRequest) {
-        var entity = resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_TYPE_NOT_FOUND));
-        if (resortAmenityTypeRepository.findByResortAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName()).isPresent())
+        var entity = resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(RESORT_AMENITY_TYPE_NOT_FOUND));
+
+        var entityFound = resortAmenityTypeRepository.
+                findByResortAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getResortAmenityTypeName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY_TYPE);
         ResortAmenityTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
-        return ResortAmenityTypeMapper.INSTANCE.toDtoResponse(resortAmenityTypeRepository.save(entity));
+        var updated = resortAmenityTypeRepository.save(entity);
+        var dtoResponse = ResortAmenityTypeMapper.INSTANCE.toDtoResponse(updated);
+        return dtoResponse;
     }
 
     @Override
     public void delete(Long id) {
-        var entity = resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_TYPE_NOT_FOUND));
+        var entity = resortAmenityTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(RESORT_AMENITY_TYPE_NOT_FOUND));
         entity.setIsDeleted(true);
         resortAmenityTypeRepository.save(entity);
     }

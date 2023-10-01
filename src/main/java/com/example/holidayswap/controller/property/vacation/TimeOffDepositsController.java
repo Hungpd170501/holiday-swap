@@ -16,56 +16,67 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/timeOffDeposit")
+@RequestMapping("api/v1/time-off-deposits")
 public class TimeOffDepositsController {
     private final TimeOffDepositService timeOffDepositService;
 
-    @GetMapping
-    public ResponseEntity<Page<TimeOffDepositResponse>> gets(
+    @GetMapping("/vacation-units")
+    public ResponseEntity<Page<TimeOffDepositResponse>> getAllByVacationUnitId(
             @RequestParam Long vacationId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var timeOffDepositResponses = timeOffDepositService.gets(vacationId, pageable);
-        return ResponseEntity.ok(timeOffDepositResponses);
+        var dtoResponses = timeOffDepositService.getAllByVacationUnitId(vacationId, pageable);
+        return ResponseEntity.ok(dtoResponses);
+    }
+
+    @GetMapping("/properties")
+    public ResponseEntity<Page<TimeOffDepositResponse>> getAllByPropertyId(
+            @RequestParam Long vacationId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        var dtoResponses = timeOffDepositService.getAllByPropertyId(vacationId, pageable);
+        return ResponseEntity.ok(dtoResponses);
+    }
+
+    @GetMapping("/resort")
+    public ResponseEntity<Page<TimeOffDepositResponse>> getAllByResortId(
+            @RequestParam Long vacationId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        var dtoResponses = timeOffDepositService.getAllByResortId(vacationId, pageable);
+        return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TimeOffDepositResponse> get(
             @PathVariable("id") Long id) {
-        var timeOffDepositResponse = timeOffDepositService.get(id);
-        return ResponseEntity.ok(timeOffDepositResponse);
+        var dtoResponse = timeOffDepositService.get(id);
+        return ResponseEntity.ok(dtoResponse);
     }
 
-    @GetMapping("/resort")
-    public ResponseEntity<Page<TimeOffDepositResponse>> getByResort(
-            @RequestParam Long resortId,
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var timeOffDepositResponse = timeOffDepositService.getByResortId(resortId, pageable);
-        return ResponseEntity.ok(timeOffDepositResponse);
-    }
-
-    @PostMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/{id}")
     public ResponseEntity<TimeOffDepositResponse> create(
             @PathVariable Long id,
-            @RequestBody TimeOffDepositRequest timeOffDepositRequest) {
-        var timeOffDeposit = timeOffDepositService.create(id, timeOffDepositRequest);
+            @RequestBody TimeOffDepositRequest dtoRequest) {
+        var dtoResponse = timeOffDepositService.create(id, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(timeOffDeposit.getId())
+                .buildAndExpand(dtoResponse.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(timeOffDeposit);
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping(value = "/{id}")//, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @RequestBody TimeOffDepositRequest timeOffDepositRequest) {
-        timeOffDepositService.update(id, timeOffDepositRequest);
+                                       @RequestBody TimeOffDepositRequest dtoRequest) {
+        timeOffDepositService.update(id, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

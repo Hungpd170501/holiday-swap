@@ -1,5 +1,6 @@
 package com.example.holidayswap.service.property;
 
+import com.example.holidayswap.domain.dto.request.property.PropertyImageRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyImageResponse;
 import com.example.holidayswap.domain.entity.property.PropertyImage;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -14,53 +15,48 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_IMAGE_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_IMAMGE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 public class PropertyImageServiceImpl implements PropertyImageService {
     private final PropertyImageRepository propertyImageRepository;
-
     private final FileService fileService;
-
-    private final PropertyImageMapper propertyImageMapper;
 
     @Override
     public List<PropertyImageResponse> gets(Long propertyId) {
-        List<PropertyImage> propertyImages = propertyImageRepository.findAllByPropertyIdAndDeletedIsFalse(propertyId);
-        List<PropertyImageResponse> propertyImageResponses = propertyImages.stream().map(propertyImageMapper::toDtoResponse).toList();
-        return propertyImageResponses;
+        return propertyImageRepository.findAllByPropertyId(propertyId).stream().
+                map(PropertyImageMapper.INSTANCE::toDtoResponse).toList();
     }
 
     @Override
     public PropertyImageResponse get(Long id) {
-        PropertyImage propertyImage = propertyImageRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_IMAGE_NOT_FOUND));
-        PropertyImageResponse propertyImageResponse = propertyImageMapper.toDtoResponse(propertyImage);
-        return propertyImageResponse;
+        return PropertyImageMapper.INSTANCE.toDtoResponse(propertyImageRepository.findByIdAndDeletedIsFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(PROPERTY_IMAMGE_NOT_FOUND)));
     }
 
     @Override
-    public PropertyImageResponse create(Long propertyId, MultipartFile propertyImageFile) {
-        String link = null;
+    public PropertyImageResponse create(Long propertyId, MultipartFile multipartFile) {
+        String link;
         try {
-            link = fileService.uploadFile(propertyImageFile);
+            link = fileService.uploadFile(multipartFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        PropertyImage propertyImage = new PropertyImage();
-        propertyImage.setPropertyId(propertyId);
-        propertyImage.setLink(link);
-        var propertyImageNew = propertyImageRepository.save(propertyImage);
-        return PropertyImageMapper.INSTANCE.toDtoResponse(propertyImageNew);
+        var dtoRequest = new PropertyImageRequest();
+        dtoRequest.setPropertyId(propertyId);
+        dtoRequest.setLink(link);
+        return PropertyImageMapper.INSTANCE.toDtoResponse(propertyImageRepository.
+                save(PropertyImageMapper.INSTANCE.toEntity(dtoRequest)));
     }
 
     @Override
     public PropertyImageResponse update(Long id, MultipartFile multipartFile) {
-
-        var propertyImage = propertyImageRepository.findByIdAndDeletedIsFalse(id).
-                orElseThrow(() -> new EntityNotFoundException(PROPERTY_IMAGE_NOT_FOUND));
-        propertyImage.setDeleted(true);
-        var contractImageNew = create(propertyImage.getPropertyId(), multipartFile);
-        return contractImageNew;
+        var entity = propertyImageRepository.findByIdAndDeletedIsFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(PROPERTY_IMAMGE_NOT_FOUND));
+        delete(id);
+        var dtoResponse = create(entity.getPropertyId(), multipartFile);
+        return dtoResponse;
     }
 
     @Override

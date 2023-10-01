@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_INROOM_AMENITY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_TYPE_NOT_FOUND;
@@ -24,21 +25,22 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
 
     @Override
     public Page<InRoomAmenityTypeResponse> gets(String name, Pageable pageable) {
-        var dto =
+        var dtoResponse =
                 inRoomAmenityTypeRepository.findAllByInRoomAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(name, pageable).
                         map(InRoomAmenityTypeMapper.INSTANCE::toDtoResponse);
-        dto.forEach(e -> {
+        dtoResponse.forEach(e -> {
             e.setInRoomAmenities(inRoomAmenityService.gets(e.getId()));
         });
-        return dto;
+        return dtoResponse;
     }
 
     @Override
     public List<InRoomAmenityTypeResponse> gets(Long propertyId) {
-        var dto = inRoomAmenityTypeRepository.findAllByResortId(propertyId).stream().map(
+        var dto = inRoomAmenityTypeRepository.findAllByPropertyId(propertyId).stream().map(
                 InRoomAmenityTypeMapper.INSTANCE::toDtoResponse).toList();
         dto.forEach(e -> {
-            e.setInRoomAmenities(inRoomAmenityService.gets(e.getId(), propertyId));
+            var inRoomAmenity = inRoomAmenityService.gets(propertyId, e.getId());
+            e.setInRoomAmenities(inRoomAmenity);
         });
         return dto;
     }
@@ -53,15 +55,20 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
 
     @Override
     public InRoomAmenityTypeResponse create(InRoomAmenityTypeRequest dtoRequest) {
-        var entity = inRoomAmenityTypeRepository.findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName());
-        if (entity.isPresent()) throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
+        if (inRoomAmenityTypeRepository.
+                findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName()).
+                isPresent()) throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
         return InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.save(InRoomAmenityTypeMapper.INSTANCE.toEntity(dtoRequest)));
     }
 
     @Override
     public InRoomAmenityTypeResponse update(Long id, InRoomAmenityTypeRequest dtoRequest) {
-        var entity = inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
-        if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName()).isPresent())
+        var entity = inRoomAmenityTypeRepository.
+                findByInRoomAmenityTypeIdAndIsDeletedFalse(id).orElseThrow(
+                        () -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND));
+        var entityFound = inRoomAmenityTypeRepository.
+                findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName());
+        if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
             throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
         InRoomAmenityTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         return InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.save(entity));

@@ -13,15 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/inRoomAmenities")
+@RequestMapping("api/v1/in-room-amenities")
 public class InRoomAmenitiesController {
     final private InRoomAmenityService inRoomAmenityService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<InRoomAmenityResponse>> gets(
             @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") Integer pageNo,
@@ -30,30 +29,6 @@ public class InRoomAmenitiesController {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         return ResponseEntity.ok(inRoomAmenityService.gets(name, pageable));
     }
-
-    @GetMapping("/amenityType")
-    public ResponseEntity<Page<InRoomAmenityResponse>> gets(
-            @RequestParam(defaultValue = "") Long amenityId,
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(inRoomAmenityService.gets(amenityId, pageable));
-    }
-
-    @GetMapping("/amenityType/list")
-    public ResponseEntity<List<InRoomAmenityResponse>> gets(
-            @RequestParam Long amenityId) {
-        return ResponseEntity.ok(inRoomAmenityService.gets(amenityId));
-    }
-
-    @GetMapping("/amenityType/resort")
-    public ResponseEntity<List<InRoomAmenityResponse>> gets(
-            @RequestParam Long amenityId,
-            @RequestParam Long resortId) {
-        return ResponseEntity.ok(inRoomAmenityService.gets(amenityId, resortId));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<InRoomAmenityResponse> get(
             @PathVariable("id") Long id) {

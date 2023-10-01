@@ -16,11 +16,11 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/propertyTypes")
+@RequestMapping("api/v1/property-types")
 public class PropertyTypesController {
     private final PropertyTypeService propertyTypeService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<PropertyTypeResponse>> gets(
             @RequestParam(defaultValue = "") String searchName,
             @RequestParam(defaultValue = "0") Integer pageNo,
