@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.property.vacation;
 
+import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
 import com.example.holidayswap.domain.entity.property.vacation.VacationUnit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,4 +49,19 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
 //    List<VacationUnit> findAllByPropertyIdAndUserIdAndRoomId(Long propertyId, Long userId, String roomId);
 
 //    VacationUnit findByPropertyIdAndDeletedIsFalseAndRoomId(Long propertyId);
+
+    @Query("""
+            select v from VacationUnit v
+            where v.propertyId = ?1
+            and v.roomId = ?2 
+            and v.startTime between ?3 and ?4 
+            or v.endTime between ?3 and ?4 
+            and v.isDeleted = false and v.status = ?5""")
+    Optional<VacationUnit> findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
+            Long propertyId,
+            Long roomId,
+            Date startTime,
+            Date endTime,
+            VacationStatus vacationUnitStatus
+    );
 }

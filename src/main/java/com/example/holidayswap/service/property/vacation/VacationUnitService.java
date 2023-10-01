@@ -9,11 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VacationUnitService {
-    /**
-     * @param propertyId
-     * @param pageable
-     * @return list of vacation unit by property id
-     */
     Page<VacationUnitResponse> getAllByPropertyId(Long propertyId, Pageable pageable);
 
     Page<VacationUnitResponse> getAllByResortId(Long resortId, Pageable pageable);

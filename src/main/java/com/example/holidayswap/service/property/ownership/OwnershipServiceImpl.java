@@ -5,10 +5,8 @@ import com.example.holidayswap.domain.dto.request.property.ownership.OwnershipRe
 import com.example.holidayswap.domain.dto.response.property.ownership.OwnershipResponse;
 import com.example.holidayswap.domain.entity.property.ownership.ContractStatus;
 import com.example.holidayswap.domain.entity.property.ownership.ContractType;
-import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
-import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ownership.OwnershipMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
@@ -68,6 +65,7 @@ public class OwnershipServiceImpl implements OwnershipService {
             dtoRequest.setEndTime(null);
         } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
             throw new DataIntegrityViolationException("Start time must be before end time");
+
         var entity = OwnershipMapper.INSTANCE.toEntity(dtoRequest);
         var property = propertyRepository.findPropertyById(propertyId).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
@@ -82,29 +80,29 @@ public class OwnershipServiceImpl implements OwnershipService {
         id.setUserId(userId);
         id.setRoomId(dtoRequest.getRoomId());
 
-        Optional<Ownership> checkOwnerShipAlreadyExist;
-        if (dtoRequest.getType() == ContractType.RIGHT_TO_USE) {
-            checkOwnerShipAlreadyExist = ownershipRepository.findByTypeIsRightToUse(
-                    propertyId,
-                    userId,
-                    dtoRequest.getRoomId(),
-                    dtoRequest.getStartTime(),
-                    dtoRequest.getEndTime(),
-                    dtoRequest.getType(),
-                    ContractStatus.ACCEPTED
-            );
-        } else {
-            checkOwnerShipAlreadyExist = ownershipRepository.findByTypeIsDeeded(
-                    propertyId,
-                    userId,
-                    dtoRequest.getRoomId(),
-                    dtoRequest.getType(),
-                    ContractStatus.ACCEPTED
-            );
-        }
-        if (checkOwnerShipAlreadyExist.isPresent()) {
-            throw new DuplicateRecordException("Ownership already created");
-        }
+//        Optional<Ownership> checkOwnerShipAlreadyExist;
+//        if (dtoRequest.getType() == ContractType.RIGHT_TO_USE) {
+//            checkOwnerShipAlreadyExist = ownershipRepository.findByTypeIsRightToUse(
+//                    propertyId,
+//                    userId,
+//                    dtoRequest.getRoomId(),
+//                    dtoRequest.getStartTime(),
+//                    dtoRequest.getEndTime(),
+//                    dtoRequest.getType(),
+//                    ContractStatus.ACCEPTED
+//            );
+//        } else {
+//            checkOwnerShipAlreadyExist = ownershipRepository.findByTypeIsDeeded(
+//                    propertyId,
+//                    userId,
+//                    dtoRequest.getRoomId(),
+//                    dtoRequest.getType(),
+//                    ContractStatus.ACCEPTED
+//            );
+//        }
+//        if (checkOwnerShipAlreadyExist.isPresent()) {
+//            throw new DuplicateRecordException("Ownership already created");
+//        }
         entity.setId(id);
         entity.setProperty(property);
         entity.setUser(user);
