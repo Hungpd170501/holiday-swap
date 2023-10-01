@@ -3,7 +3,6 @@ package com.example.holidayswap.service.resort;
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyType;
-import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -35,14 +34,16 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public Page<ResortResponse> gets(String name, Pageable pageable) {
-        Page<Resort> inRoomAmenityTypePage = resortRepository.
+        var entities = resortRepository.
                 findAllByResortNameContainingIgnoreCaseAndDeletedFalse(name, pageable);
-        return inRoomAmenityTypePage.map(e -> {
+
+        var dtoReponses = entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
             dto.setResortImages(resortImageService.gets(e.getId()));
             dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
             return dto;
         });
+        return dtoReponses;
     }
 
     @Override
@@ -86,7 +87,8 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public ResortResponse update(Long id, ResortRequest resortRequest) {
-        var entityFound = resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
+        var entityFound = resortRepository.
+                findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         }

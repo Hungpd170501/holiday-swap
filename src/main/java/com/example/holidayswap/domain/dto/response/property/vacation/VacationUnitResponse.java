@@ -7,13 +7,12 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class VacationResponse {
+public class VacationUnitResponse {
     private Long id;
     private Date startTime;
     private Date endTime;
     private boolean isDeleted;
     private VacationStatus status;
-    private Long propertyId;
+    //    private Ownership ownershipId;
     private List<TimeOffDepositResponse> timeOffDeposits;
-
 }

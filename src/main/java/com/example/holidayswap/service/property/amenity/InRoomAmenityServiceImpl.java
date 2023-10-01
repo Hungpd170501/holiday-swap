@@ -26,17 +26,26 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
 
     @Override
     public Page<InRoomAmenityResponse> gets(String name, Pageable pageable) {
-        return inRoomAmenityRepository.findAllByInRoomAmenitiesName(name, pageable).map(InRoomAmenityMapper.INSTANCE::toDtoResponse);
+        var entities = inRoomAmenityRepository.
+                findAllByInRoomAmenitiesName(name, pageable);
+        var dtoResponses = entities.map(InRoomAmenityMapper.INSTANCE::toDtoResponse);
+        return dtoResponses;
     }
 
     @Override
     public Page<InRoomAmenityResponse> gets(Long inRoomAmenityTypeId, Pageable pageable) {
-        return inRoomAmenityRepository.findAllByInRoomAmenityTypeId(inRoomAmenityTypeId, pageable).map(InRoomAmenityMapper.INSTANCE::toDtoResponse);
+        var entities = inRoomAmenityRepository.
+                findAllByInRoomAmenityTypeId(inRoomAmenityTypeId, pageable);
+        var dtoResponses = entities.
+                map(InRoomAmenityMapper.INSTANCE::toDtoResponse);
+        return dtoResponses;
     }
 
     @Override
     public List<InRoomAmenityResponse> gets(Long propertyId) {
-        return inRoomAmenityRepository.findAllByInRoomAmenityTypeId(propertyId).stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
+        var entities = inRoomAmenityRepository.findAllByInRoomAmenityTypeId(propertyId);
+        var dtoResponses = entities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
+        return dtoResponses;
     }
 
     @Override
@@ -48,13 +57,16 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
 
     @Override
     public InRoomAmenityResponse get(Long id) {
-        return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityRepository.findByInRoomAmenityTypeIdIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND)));
+        return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityRepository.
+                findByInRoomAmenityTypeIdIdAndIsDeletedFalse(id).orElseThrow(
+                        () -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND)));
     }
 
     @Override
     public InRoomAmenityResponse create(InRoomAmenityRequest dtoRequest) {
         if (inRoomAmenityRepository.findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY);
+
         if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(INROOM_AMENITY_TYPE_DELETED);
         return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityRepository.save(InRoomAmenityMapper.INSTANCE.toEntity(dtoRequest)));

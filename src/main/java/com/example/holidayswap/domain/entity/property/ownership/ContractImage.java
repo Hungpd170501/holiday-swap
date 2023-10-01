@@ -24,7 +24,14 @@ public class ContractImage {
     private Long propertyId;
     @Column(name = "user_id")
     private Long userId;
+    @Column(name = "room_id")
+    private String roomId;
     @ManyToOne
+    @JoinColumn(name = "room_id",
+            referencedColumnName = "room_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
     @JoinColumn(name = "property_id",
             referencedColumnName = "property_id",
             nullable = false,

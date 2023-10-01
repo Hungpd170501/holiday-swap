@@ -12,9 +12,9 @@ import org.mapstruct.factory.Mappers;
 public interface TimeOffDepositMapper {
     TimeOffDepositMapper INSTANCE = Mappers.getMapper(TimeOffDepositMapper.class);
 
-    TimeOffDepositResponse toDtoResponse(TimeOffDeposit timeOffDeposit);
+    TimeOffDepositResponse toDtoResponse(TimeOffDeposit entity);
 
-    TimeOffDeposit toEntity(TimeOffDepositRequest timeOffDepositRequest);
+    TimeOffDeposit toEntity(TimeOffDepositRequest dtoRequest);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(TimeOffDepositRequest dto, @MappingTarget TimeOffDeposit entity);

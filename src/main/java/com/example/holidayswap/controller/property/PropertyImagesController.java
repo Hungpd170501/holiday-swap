@@ -3,27 +3,18 @@ package com.example.holidayswap.controller.property;
 import com.example.holidayswap.domain.dto.response.property.PropertyImageResponse;
 import com.example.holidayswap.service.property.PropertyImageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/propertyImages")
+@RequestMapping("api/v1/property-images")
 public class PropertyImagesController {
     private final PropertyImageService propertyImageService;
-
-    @GetMapping("/property")
-    public ResponseEntity<List<PropertyImageResponse>> gets(
-            @RequestParam("propertyId") Long id) {
-        var dtoResponses = propertyImageService.gets(id);
-        return ResponseEntity.ok(dtoResponses);
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<PropertyImageResponse> get(
@@ -32,7 +23,7 @@ public class PropertyImagesController {
         return ResponseEntity.ok(dtoResponse);
     }
 
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping
     public ResponseEntity<PropertyImageResponse> create(
             @RequestPart Long propertyId,
             @RequestPart MultipartFile propertyImage) {

@@ -10,6 +10,7 @@ public interface UserService {
 
     UserProfileResponse getUserInfo();
 
+
     void deleteUser(Long userId);
 
     List<UserProfileResponse> findAllByEmailNamePhoneWithPagination(String email, String name, String phone, Integer limit, Integer offset);

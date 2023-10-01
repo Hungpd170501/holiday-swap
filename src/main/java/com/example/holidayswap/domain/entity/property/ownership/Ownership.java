@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.property.ownership;
 
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.Property;
+import com.example.holidayswap.domain.entity.property.vacation.VacationUnit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +20,6 @@ import java.util.Date;
 public class Ownership {
     @EmbeddedId
     private OwnershipId id;
-
     @Column(name = "start_time")
     private Date startTime;
 
@@ -41,13 +41,14 @@ public class Ownership {
     @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
     private Collection<ContractImage> contractImages;
 
-    @JsonIgnore
+    @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
+    private Collection<VacationUnit> vacations;
+
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
 
-    @JsonIgnore
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

@@ -25,13 +25,13 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
 
     @Override
     public Page<InRoomAmenityTypeResponse> gets(String name, Pageable pageable) {
-        var dto =
+        var dtoResponse =
                 inRoomAmenityTypeRepository.findAllByInRoomAmenityTypeNameContainingIgnoreCaseAndIsDeletedFalse(name, pageable).
                         map(InRoomAmenityTypeMapper.INSTANCE::toDtoResponse);
-        dto.forEach(e -> {
+        dtoResponse.forEach(e -> {
             e.setInRoomAmenities(inRoomAmenityService.gets(e.getId()));
         });
-        return dto;
+        return dtoResponse;
     }
 
     @Override
