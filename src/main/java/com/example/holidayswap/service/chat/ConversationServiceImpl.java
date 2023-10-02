@@ -39,7 +39,6 @@ public class ConversationServiceImpl implements ConversationService{
             var latestMessage = messageRepository.findLatestMessageByConversation(conversation.getConversationId());
             return ConversationResponse.builder()
                     .conversationId(conversation.getConversationId())
-                    .creationDate(conversation.getCreationDate())
                     .message(latestMessage.map(messageMapper::toMessageResponse).orElse(null))
                     .build();
         }).toList();

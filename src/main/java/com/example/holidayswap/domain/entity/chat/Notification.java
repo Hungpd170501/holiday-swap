@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @NoArgsConstructor
@@ -29,14 +31,8 @@ public class Notification {
     @Column
     private String content;
 
-    @Column(
-            name = "created_date",
-            nullable = false,
-            updatable = false,
-            columnDefinition = "TIMESTAMP WITHOUT TIME ZONE"
-    )
-    @CreatedDate
-    private LocalDateTime createdDate;
+    @CreationTimestamp
+    private ZonedDateTime createdOn;
 
     @Column
     private Integer status;

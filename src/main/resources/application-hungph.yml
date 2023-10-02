@@ -16,7 +16,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         use_nationalized_character_data: true
-    show-sql: true
   rabbitmq:
     addresses: ${RABBITMQ_HOST:localhost}:5672
     stomp:
@@ -58,11 +57,8 @@ spring:
             client-id: ${OAUTH2_GITHUB_CLIENT_ID}
             client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
   flyway:
-    enabled: true
-    baseline-on-migrate: true
-    user: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
-    locations: classpath:/db/migration,classpath:/dev/db/migration
+    enabled: false
+    locations: classpath:/db/postgres/migrations
 
 
 logging:
