@@ -58,8 +58,15 @@ public class ResortImageServiceImpl implements ResortImageService {
     public ResortImageResponse update(Long id, MultipartFile multipartFile) {
         var entity = resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
                 () -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND));
-        delete(id);
-        var dtoReponse = create(id, multipartFile);
+        String link;
+        try {
+            link = fileService.uploadFile(multipartFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        entity.setLink(link);
+        var updated = resortImageRepository.save(entity);
+        var dtoReponse = ResortImageMapper.INSTANCE.toDtoResponse(updated);
         return dtoReponse;
     }
 

@@ -16,16 +16,16 @@ import java.net.URI;
 public class ResortImagesController {
     final private ResortImageService resortImageService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{resortImageId}")
     public ResponseEntity<ResortImageResponse> get(
-            @PathVariable("id") Long id) {
-        var dtoResponse = resortImageService.get(id);
+            @PathVariable("resortImageId") Long resortImageId) {
+        var dtoResponse = resortImageService.get(resortImageId);
         return ResponseEntity.ok(dtoResponse);
     }
 
     @PostMapping
     public ResponseEntity<ResortImageResponse> create(
-            @RequestPart Long resortId,
+            @RequestPart("resortId") Long resortId,
             @RequestPart MultipartFile resortImage) {
         var dtoResponse = resortImageService.create(resortId, resortImage);
         URI location = ServletUriComponentsBuilder
@@ -36,21 +36,21 @@ public class ResortImagesController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
+    @PutMapping("/{resortImageId}")
+    public ResponseEntity<ResortImageResponse> update(@PathVariable("resortImageId") Long resortImageId,
                                        @RequestPart MultipartFile resortImage) {
-        resortImageService.update(id, resortImage);
+        var dtoReponse = resortImageService.update(resortImageId, resortImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(resortImageId)
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(dtoReponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        resortImageService.delete(id);
+    @DeleteMapping("/{resortImageId}")
+    public ResponseEntity<Void> delete(@PathVariable("resortImageId") Long resortImageId) {
+        resortImageService.delete(resortImageId);
         return ResponseEntity.noContent().build();
     }
 }
