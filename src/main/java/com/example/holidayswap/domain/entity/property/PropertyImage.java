@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.property;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,12 +19,14 @@ public class PropertyImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id", nullable = false)
     private Long id;
-
+    @NotNull
     @Column(name = "link", length = Integer.MAX_VALUE)
     private String link;
+    @NotNull
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
     @Column(name = "property_id")
+    @NotNull
     private Long propertyId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore

@@ -4,6 +4,7 @@ package com.example.holidayswap.domain.entity.property;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class Property {
     private Long id;
 
     @Column(name = "property_name")
+    @NotNull
     private String propertyName;
     @Column(name = "property_description")
     private String propertyDescription;
@@ -40,19 +42,23 @@ public class Property {
     @Column(name = "number_murphyBeds")
     private int numberMurphyBeds;
     @Column(name = "number_beds_room")
+    @NotNull
     private int numberBedsRoom;
     @Column(name = "number_baths_room")
+    @NotNull
     private int numberBathRoom;
     @Column(name = "room_size")
     private double roomSize;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
+    @NotNull
     private Boolean isDeleted = false;
-
     @Column(name = "status", length = Integer.MAX_VALUE)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private PropertyStatus status;
 
     @Column(name = "property_type_id")
+    @NotNull
     private Long propertyTypeId;
     @ManyToOne
     @JoinColumn(name = "property_type_id",
@@ -62,6 +68,7 @@ public class Property {
             updatable = false)
     private PropertyType propertyType;
     @Column(name = "property_view_id")
+    @NotNull
     private Long propertyViewId;
     @ManyToOne
     @JoinColumn(name = "property_view_id",

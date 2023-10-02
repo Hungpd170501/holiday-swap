@@ -23,11 +23,12 @@ public class InRoomAmenity {
     private String inRoomAmenityName;
     @Column(name = "in_room_amenity_description", length = Integer.MAX_VALUE)
     private String inRoomAmenityDescription;
+    @NotNull
     @Column(name = "in_room_amenity_link_icon", length = Integer.MAX_VALUE)
     private String inRoomAmenityLinkIcon;
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
+    @NotNull
     private Boolean isDeleted = false;
-
     @Column(name = "in_room_amenity_type_id")
     private Long inRoomAmenityTypeId;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,7 +39,6 @@ public class InRoomAmenity {
             insertable = false,
             updatable = false)
     private InRoomAmenityType inRoomAmenityType;
-
     @ManyToMany
     @JoinTable(
             name = "properties_amenities",

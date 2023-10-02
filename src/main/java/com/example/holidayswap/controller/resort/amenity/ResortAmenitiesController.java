@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -31,16 +32,17 @@ public class ResortAmenitiesController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/{resortAmenityId}")
     public ResponseEntity<ResortAmenityResponse> get(
-            @PathVariable("id") Long id) {
-        return ResponseEntity.ok(resortAmenityService.get(id));
+            @PathVariable("resortAmenityId") Long resortAmenityId) {
+        return ResponseEntity.ok(resortAmenityService.get(resortAmenityId));
     }
 
     @PostMapping
     public ResponseEntity<ResortAmenityResponse> create(
-            @RequestBody ResortAmenityRequest dtoRequest) {
-        var dtoResponse = resortAmenityService.create(dtoRequest);
+            @RequestPart(name = "resortAmenity") ResortAmenityRequest dtoRequest,
+            @RequestPart(name = "inRoomAmenityIcon") MultipartFile resortAmenityIcon) {
+        var dtoResponse = resortAmenityService.create(dtoRequest, resortAmenityIcon);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -49,21 +51,22 @@ public class ResortAmenitiesController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @RequestBody ResortAmenityRequest dtoRequest) {
-        resortAmenityService.update(id, dtoRequest);
+    @PutMapping("/{resortAmenityId}")
+    public ResponseEntity<ResortAmenityResponse> update(@PathVariable("resortAmenityId") Long resortAmenityId,
+                                                        @RequestPart(name = "resortAmenity") ResortAmenityRequest dtoRequest,
+                                                        @RequestPart(name = "inRoomAmenityIcon", required = false) MultipartFile resortAmenityIcon) {
+        var dtoResponse = resortAmenityService.update(resortAmenityId, dtoRequest, resortAmenityIcon);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(resortAmenityId)
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        resortAmenityService.delete(id);
+    @DeleteMapping("/{resortAmenityId}")
+    public ResponseEntity<Void> delete(@PathVariable("resortAmenityId") Long resortAmenityId) {
+        resortAmenityService.delete(resortAmenityId);
         return ResponseEntity.noContent().build();
     }
 }
