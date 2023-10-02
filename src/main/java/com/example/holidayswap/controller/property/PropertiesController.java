@@ -37,9 +37,9 @@ public class PropertiesController {
     @GetMapping
     public ResponseEntity<Page<PropertyResponse>> gets(
             @RequestParam(defaultValue = "") Long resortId,
-            @RequestParam("timeCheckIn")
+            @RequestParam(value = "timeCheckIn", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckIn,
-            @RequestParam("timeCheckOut")
+            @RequestParam(value = "timeCheckOut", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,

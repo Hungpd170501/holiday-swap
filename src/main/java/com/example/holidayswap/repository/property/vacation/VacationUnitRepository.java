@@ -62,8 +62,7 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
             and v.roomId = ?2
             and v.isDeleted = false
             and v.status = ?5
-            and v.startTime between ?3 and ?4
-            or v.endTime between ?3 and ?4""")
+            and (v.startTime between ?3 and ?4 or v.endTime between ?3 and ?4)""")
     Optional<VacationUnit> findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
             Long propertyId,
             String roomId,

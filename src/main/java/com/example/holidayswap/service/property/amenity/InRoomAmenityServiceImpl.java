@@ -54,9 +54,9 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
 
     @Override
     public List<InRoomAmenityResponse> gets(Long propertyId, Long inRoomAmenityTypeId) {
-        var amentities =
+        var amenities =
                 inRoomAmenityRepository.findAllByPropertyIdAndAmenityTypeId(propertyId, inRoomAmenityTypeId);
-        return amentities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
+        return amenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
     }
 
     @Override

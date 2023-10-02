@@ -51,5 +51,5 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
                                                                              Pageable pageable);
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")
-    Optional<Property> findPropertyById(Long propertyId);
+    Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);
 }

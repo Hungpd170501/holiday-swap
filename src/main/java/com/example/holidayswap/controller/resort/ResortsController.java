@@ -36,9 +36,9 @@ public class ResortsController {
     @GetMapping
     public ResponseEntity<Page<ResortResponse>> gets(
             @RequestParam(defaultValue = "") String nameResort,
-            @RequestParam("timeCheckIn")
+            @RequestParam(value = "timeCheckIn", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckIn,
-            @RequestParam("timeCheckOut")
+            @RequestParam(value = "timeCheckOut", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,

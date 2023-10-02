@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -23,12 +24,6 @@ import static com.example.holidayswap.constants.ErrorMessage.VACATION_NOT_FOUND;
 @RequiredArgsConstructor
 public class VacationServiceUnitImpl implements VacationUnitService {
     private final VacationUnitRepository vacationUnitRepository;
-//    private final UserRepository userRepository;
-//    private final PropertyRepository propertyRepository;
-//    private final OwnershipRepository ownershipRepository;
-//    private final UserService userService;
-//    private final PropertyService propertyService;
-//    private final OwnershipService ownershipService;
 
     @Override
     public Page<VacationUnitResponse> getAllByPropertyId(Long propertyId, Pageable pageable) {
@@ -58,6 +53,7 @@ public class VacationServiceUnitImpl implements VacationUnitService {
     }
 
     @Override
+    @Transactional
     public VacationUnitResponse create(OwnershipId ownershipId, VacationUnitRequest dtoRequest) {
         var entity = VacationUnitMapper.INSTANCE.toEntity(dtoRequest);
 
@@ -74,8 +70,16 @@ public class VacationServiceUnitImpl implements VacationUnitService {
                 VacationStatus.ACCEPTED
         );
         if (checkVacationUnit.isPresent()) throw new DuplicateRecordException("Time vacation already exist.");
+        checkVacationUnit = vacationUnitRepository.
+                findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
+                        ownershipId.getPropertyId(),
+                        ownershipId.getRoomId(),
+                        dtoRequest.getStartTime(),
+                        dtoRequest.getEndTime(),
+                        VacationStatus.PENDING);
+        if (checkVacationUnit.isPresent())
+            throw new DuplicateRecordException("Time vacation-unit only contain 1 record.");
 
-//        entity.setOwnershipId(ownershipId.getOwnershipId());
         entity.setPropertyId(ownershipId.getPropertyId());
         entity.setUserId(ownershipId.getUserId());
         entity.setRoomId(ownershipId.getRoomId());

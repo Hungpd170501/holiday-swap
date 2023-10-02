@@ -15,6 +15,7 @@ import com.example.holidayswap.repository.property.ownership.OwnershipRepository
 import com.example.holidayswap.service.property.vacation.VacationUnitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -45,17 +46,19 @@ public class OwnershipServiceImpl implements OwnershipService {
     }
 
     @Override
-    public OwnershipResponse get(OwnershipId ownershipId) {
+    public OwnershipResponse get(Long propertyId, Long userId, String roomId) {
         var dtoResponse = OwnershipMapper.INSTANCE.toDtoResponse(
-                ownershipRepository.findById(ownershipId).
+                ownershipRepository.findByPropertyIdAndUserUserIdAndIdRoomId(propertyId, userId, roomId).
                         orElseThrow(() -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND)));
         dtoResponse.setContractImages(contractImageService.gets(
                 dtoResponse.getId().getPropertyId(),
-                dtoResponse.getId().getUserId()));
+                dtoResponse.getId().getUserId(),
+                dtoResponse.getId().getRoomId()));
         return dtoResponse;
     }
 
     @Override
+    @Transactional
     public OwnershipResponse create(Long propertyId,
                                     Long userId,
                                     OwnershipRequest dtoRequest) {
@@ -66,40 +69,16 @@ public class OwnershipServiceImpl implements OwnershipService {
             throw new DataIntegrityViolationException("Start time must be before end time");
 
         var entity = OwnershipMapper.INSTANCE.toEntity(dtoRequest);
-        var property = propertyRepository.findPropertyById(propertyId).orElseThrow(
+        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(propertyId).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
-
 
         var id = new OwnershipId();
         id.setPropertyId(propertyId);
         id.setUserId(userId);
         id.setRoomId(dtoRequest.getRoomId());
 
-//        Optional<Ownership> checkOwnerShipAlreadyExist;
-//        if (dtoRequest.getType() == ContractType.RIGHT_TO_USE) {
-//            checkOwnerShipAlreadyExist = ownershipRepository.findByTypeIsRightToUse(
-//                    propertyId,
-//                    userId,
-//                    dtoRequest.getRoomId(),
-//                    dtoRequest.getStartTime(),
-//                    dtoRequest.getEndTime(),
-//                    dtoRequest.getType(),
-//                    ContractStatus.ACCEPTED
-//            );
-//        } else {
-//            checkOwnerShipAlreadyExist = ownershipRepository.findByTypeIsDeeded(
-//                    propertyId,
-//                    userId,
-//                    dtoRequest.getRoomId(),
-//                    dtoRequest.getType(),
-//                    ContractStatus.ACCEPTED
-//            );
-//        }
-//        if (checkOwnerShipAlreadyExist.isPresent()) {
-//            throw new DuplicateRecordException("Ownership already created");
-//        }
         entity.setId(id);
         entity.setProperty(property);
         entity.setUser(user);
@@ -112,20 +91,17 @@ public class OwnershipServiceImpl implements OwnershipService {
     }
 
     @Override
+    @Transactional
     public OwnershipResponse create(Long propertyId,
                                     Long userId,
                                     OwnershipRequest dtoRequest,
                                     List<MultipartFile> contractImages) {
-//
-//        // get id user is login
-//        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-//        Object principal = authentication.getPrincipal();
-//        User user = (User) principal;
         var dtoResponse = create(propertyId, userId, dtoRequest);
         contractImages.forEach(e -> {
             ContractImageRequest c = new ContractImageRequest();
             c.setPropertyId(propertyId);
             c.setUserId(userId);
+            c.setRoomId(dtoRequest.getRoomId());
             contractImageService.create(c, e);
         });
         return dtoResponse;

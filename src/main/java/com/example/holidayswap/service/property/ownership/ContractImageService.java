@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ContractImageService {
-    List<ContractImageResponse> gets(Long propertyId, Long userId);
+    List<ContractImageResponse> gets(Long propertyId, Long userId, String roomId);
 
     ContractImageResponse get(Long id);
 

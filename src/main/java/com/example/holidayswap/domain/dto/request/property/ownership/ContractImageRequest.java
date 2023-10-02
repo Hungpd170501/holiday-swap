@@ -6,5 +6,6 @@ import lombok.Data;
 public class ContractImageRequest {
     private Long propertyId;
     private Long userId;
-    private Long roomId;
+    private String roomId;
+
 }

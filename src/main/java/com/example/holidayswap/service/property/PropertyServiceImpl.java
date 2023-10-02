@@ -58,7 +58,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public PropertyResponse get(Long id) {
-        var entity = propertyRepository.findPropertyById(id).orElseThrow(
+        var entity = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var dtoResponse = PropertyMapper.INSTANCE.toDtoResponse(entity);
         var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(entity.getId());
@@ -126,7 +126,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void delete(Long id) {
-        var propertyFound = propertyRepository.findPropertyById(id)
+        var propertyFound = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         propertyFound.setIsDeleted(true);
         propertyRepository.save(propertyFound);

@@ -22,9 +22,10 @@ public class ContractImagesController {
     @GetMapping
     public ResponseEntity<List<ContractImageResponse>> gets(
             @RequestParam Long propertyId,
-            @RequestParam Long userId
+            @RequestParam Long userId,
+            @RequestParam String roomId
     ) {
-        var inRoomAmenityResponses = contractImageService.gets(propertyId, userId);
+        var inRoomAmenityResponses = contractImageService.gets(propertyId, userId, roomId);
         return ResponseEntity.ok(inRoomAmenityResponses);
     }
 

@@ -26,11 +26,11 @@ public class OwnershipController {
         return ResponseEntity.ok(ownershipService.getListByUserId(userId));
     }
 
-//    @GetMapping
-//    public ResponseEntity<OwnershipResponse> get(
-//            @RequestParam OwnershipId ownershipId) {
-//        return ResponseEntity.ok(ownershipService.get(ownershipId));
-//    }
+    @GetMapping
+    public ResponseEntity<OwnershipResponse> get(
+            @RequestParam Long propertyId, @RequestParam Long userId, @RequestParam String roomId) {
+        return ResponseEntity.ok(ownershipService.get(propertyId, userId, roomId));
+    }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestPart Long propertyId,
@@ -38,7 +38,7 @@ public class OwnershipController {
                                     @RequestPart OwnershipRequest dtoRequest,
                                     @RequestPart List<MultipartFile> contractImages
     ) {
-        return ResponseEntity.ok(ownershipService.create(propertyId, userId, dtoRequest));
+        return ResponseEntity.ok(ownershipService.create(propertyId, userId, dtoRequest, contractImages));
 
     }
 }
