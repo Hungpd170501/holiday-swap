@@ -1,8 +1,10 @@
 package com.example.holidayswap.domain.entity.auth;
 
 import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
+import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.Wallet;
+import com.example.holidayswap.domain.entity.subscription.Subscription;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -14,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Set;
 @Entity
 @ToString
 @Table(name = "users")
-public class User implements UserDetails, Serializable {
+public class User extends BaseEntityAudit implements UserDetails, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id
@@ -86,7 +87,7 @@ public class User implements UserDetails, Serializable {
     @Column(nullable = false)
     private UserStatus status;
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(mappedBy = "user")
     private Set<MoneyTranfer> moneyTranfers;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -95,6 +96,11 @@ public class User implements UserDetails, Serializable {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @OneToMany(mappedBy = "user",
+            orphanRemoval = true
+    )
+    private List<Subscription> subscriptions;
 
     @ManyToMany
     @JoinTable(name = "user_blocked",

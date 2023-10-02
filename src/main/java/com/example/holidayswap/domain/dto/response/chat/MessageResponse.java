@@ -12,7 +12,7 @@ public class MessageResponse {
     private Long messageId;
     private String text;
     private String image;
-    private LocalDateTime date;
+    private LocalDateTime createdOn;
     private Long authorId;
     private MessageType messageType;
 }

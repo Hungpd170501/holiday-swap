@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -31,6 +33,9 @@ public class Role {
     @NotNull(message = "Status must be specified.")
     @Column(nullable = false)
     private boolean status;
+
+    @CreationTimestamp
+    private LocalDateTime createdOn;
 
     @OneToMany(mappedBy = "role",
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},

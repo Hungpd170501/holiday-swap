@@ -69,7 +69,6 @@ services:
     networks:
       - cluster-network
 
-
 networks:
   postgres:
     driver: bridge
