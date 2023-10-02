@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,8 +23,11 @@ public class Resort {
     private Long id;
 
     @Size(max = 255)
+    @NotNull
     @Column(name = "resort_name")
     private String resortName;
+    @Column(name = "resort_description")
+    private String resortDescription;
 
     @Column(name = "location_id")
     private Long locationId;

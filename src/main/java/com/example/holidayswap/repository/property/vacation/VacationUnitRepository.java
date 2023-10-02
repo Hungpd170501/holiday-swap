@@ -38,12 +38,18 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
 
     @Query("""
             select v from VacationUnit v
-            where v.ownership.property.id = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
+            where v.ownership.property.id = ?1
+            and v.isDeleted = false
+            and v.startTime >= ?2
+            and v.endTime <= ?3""")
     List<VacationUnit> findAllByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
 
     @Query("""
             select v from VacationUnit v
-            where v.ownership.property.id = ?1 and v.isDeleted = false and v.startTime >= ?2 and v.endTime <= ?3""")
+            where v.ownership.property.id = ?1
+            and v.isDeleted = false
+            and v.startTime >= ?2
+            and v.endTime <= ?3""")
     Optional<VacationUnit> findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
 
 //    List<VacationUnit> findAllByPropertyIdAndUserIdAndRoomId(Long propertyId, Long userId, String roomId);

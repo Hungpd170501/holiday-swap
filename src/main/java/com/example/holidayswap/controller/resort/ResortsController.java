@@ -14,12 +14,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -33,24 +35,28 @@ public class ResortsController {
 
     @GetMapping
     public ResponseEntity<Page<ResortResponse>> gets(
-            @RequestParam(defaultValue = "") String name,
+            @RequestParam(defaultValue = "") String nameResort,
+            @RequestParam("timeCheckIn")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckIn,
+            @RequestParam("timeCheckOut")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(resortService.gets(name, pageable));
+        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, pageable));
     }
 
-    @GetMapping("/{id}/resort-images")
+    @GetMapping("/{resortId}/resort-images")
     public ResponseEntity<List<ResortImageResponse>> getResortImages(
-            @PathVariable("id") Long id) {
-        var dtoResponses = resortImageService.gets(id);
+            @PathVariable("resortId") Long resortId) {
+        var dtoResponses = resortImageService.gets(resortId);
         return ResponseEntity.ok(dtoResponses);
     }
 
-    @GetMapping("/{id}/resort-amenity-types")
+    @GetMapping("/{resortId}/resort-amenity-types")
     public ResponseEntity<List<ResortAmenityTypeResponse>> getResortAmenityTypes(
-            @PathVariable("id") Long resortId) {
+            @PathVariable("resortId") Long resortId) {
         return ResponseEntity.ok(resortAmenityTypeService.gets(resortId));
     }
 
@@ -61,10 +67,10 @@ public class ResortsController {
         return ResponseEntity.ok(resortAmenityService.gets(amenityId, resortId));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{resortId}")
     public ResponseEntity<ResortResponse> get(
-            @PathVariable("id") Long id) {
-        return ResponseEntity.ok(resortService.get(id));
+            @PathVariable("resortId") Long resortId) {
+        return ResponseEntity.ok(resortService.get(resortId));
     }
 
     @PostMapping
@@ -81,21 +87,21 @@ public class ResortsController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
+    @PutMapping("/{resortId}")
+    public ResponseEntity<Void> update(@PathVariable("resortId") Long resortId,
                                        @RequestBody ResortRequest resortRequest) {
-        resortService.update(id, resortRequest);
+        resortService.update(resortId, resortRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(resortId)
                 .toUri();
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        resortService.delete(id);
+    @DeleteMapping("/{resortId}")
+    public ResponseEntity<Void> delete(@PathVariable("resortId") Long resortId) {
+        resortService.delete(resortId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -30,4 +30,6 @@ public class PropertyType {
             joinColumns = @JoinColumn(name = "property_type_id"),
             inverseJoinColumns = @JoinColumn(name = "resort_id"))
     private List<Resort> resorts;
+    @OneToMany
+    private List<Property> properties;
 }

@@ -13,6 +13,8 @@ public class VacationUnitResponse {
     private Date endTime;
     private boolean isDeleted;
     private VacationStatus status;
-    //    private Ownership ownershipId;
+    private Long propertyId;
+    private Long userId;
+    private String roomId;
     private List<TimeOffDepositResponse> timeOffDeposits;
 }

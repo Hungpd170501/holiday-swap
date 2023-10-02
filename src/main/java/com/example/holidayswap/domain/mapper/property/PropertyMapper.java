@@ -13,7 +13,6 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface PropertyMapper {
     PropertyMapper INSTANCE = Mappers.getMapper(PropertyMapper.class);
-
     PropertyResponse toDtoResponse(Property entity);
 
     @Mapping(target = "inRoomAmenities", ignore = true)
@@ -24,4 +23,8 @@ public interface PropertyMapper {
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(PropertyUpdateRequest dto, @MappingTarget Property entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "inRoomAmenities", target = "inRoomAmenities", ignore = true)
+    void updateEntityFromDTO(PropertyRegisterRequest dto, @MappingTarget Property entity);
 }

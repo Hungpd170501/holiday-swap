@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.property;
 
 
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
+import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,10 @@ public class Property {
     @Column(name = "property_id", nullable = false)
     private Long id;
 
+    @Column(name = "property_name")
+    private String propertyName;
+    @Column(name = "property_description")
+    private String propertyDescription;
     @Column(name = "number_king_beds")
     private int numberKingBeds;
     @Column(name = "number_qeen_beds")
@@ -72,6 +77,6 @@ public class Property {
             joinColumns = @JoinColumn(name = "property_id"),
             inverseJoinColumns = @JoinColumn(name = "in_room_amenity_id"))
     private List<InRoomAmenity> inRoomAmenities;
-//    @OneToMany
-//    private List<Ownership> ownerships;
+    @OneToMany
+    private List<Ownership> ownerships;
 }
