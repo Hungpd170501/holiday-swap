@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.chat;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -26,10 +27,10 @@ public class Message {
     @Column(name = "image")
     private String image;
 
-    @Column(name = "date", columnDefinition = "timestamp default current_timestamp")
-    private LocalDateTime date = LocalDateTime.now();
+    @CreationTimestamp
+    private LocalDateTime createdOn;
 
-    @Column(name = "author_id", nullable = false)
+    @Column(name = "author_id")
     private Long authorId;
 
     @Enumerated(EnumType.STRING)

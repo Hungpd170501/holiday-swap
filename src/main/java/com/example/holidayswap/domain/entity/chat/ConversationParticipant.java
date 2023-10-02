@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.chat;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "conversation_participant")
-public class ConversationParticipant {
+public class ConversationParticipant extends BaseEntityAudit {
     @EmbeddedId
     private ConversationParticipantPK conversationParticipantId;
 

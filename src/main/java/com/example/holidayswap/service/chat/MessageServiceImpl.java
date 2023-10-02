@@ -38,7 +38,6 @@ public class MessageServiceImpl implements MessageService {
             throw new DataIntegrityViolationException( "Message cannot be null");
         }
         Message message = messageMapper.toMessage(messageRequest);
-        message.setDate(LocalDateTime.now());
         message.setMessageType(MessageType.TEXT);
         message.setConversation(conversationRepository.findById(Long.valueOf(conversationId))
                 .orElseThrow(EntityNotFoundException::new));

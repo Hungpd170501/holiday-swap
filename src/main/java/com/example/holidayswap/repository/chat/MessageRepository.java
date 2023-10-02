@@ -14,14 +14,14 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("""
             SELECT m FROM Message m
             WHERE m.conversation.conversationId = :conversationId
-            ORDER BY m.date DESC LIMIT 1
+            ORDER BY m.createdOn DESC LIMIT 1
             """)
     Optional<Message> findLatestMessageByConversation(@Param("conversationId") Long conversationId);
 
     @Query("""
             SELECT m FROM Message m
             WHERE m.conversation.conversationId = :conversationId
-            ORDER BY m.date DESC
+            ORDER BY m.createdOn DESC
             """)
     List<Message> findAllByConversationIdEquals(@Param("conversationId") Long conversationId);
 }
