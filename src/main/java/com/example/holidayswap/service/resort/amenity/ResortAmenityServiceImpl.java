@@ -8,11 +8,14 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.resort.amenity.ResortAmenityMapper;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityTypeRepository;
+import com.example.holidayswap.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +26,7 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 public class ResortAmenityServiceImpl implements ResortAmenityService {
     private final ResortAmenityRepository resortAmenityRepository;
     private final ResortAmenityTypeRepository resortAmenityTypeRepository;
+    private final FileService fileService;
 
     @Override
     public Page<ResortAmenityResponse> gets(String name, Pageable pageable) {
@@ -67,7 +71,7 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
     }
 
     @Override
-    public ResortAmenityResponse create(ResortAmenityRequest dtoRequest) {
+    public ResortAmenityResponse create(ResortAmenityRequest dtoRequest, MultipartFile resortAmenityIcon) {
         if (resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse
                 (dtoRequest.getResortAmenityName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_RESORT_AMENITY);
@@ -75,13 +79,21 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
         if (resortAmenityTypeRepository.findByIdAndIsDeletedFalse(dtoRequest.getResortAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(RESORT_AMENITY_TYPE_DELETED);
 
-        var created = resortAmenityRepository.save(ResortAmenityMapper.INSTANCE.toEntity(dtoRequest));
+        String link = null;
+        try {
+            link = fileService.uploadFile(resortAmenityIcon);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        var entity = ResortAmenityMapper.INSTANCE.toEntity(dtoRequest);
+        entity.setResortAmenityLinkIcon(link);
+        var created = resortAmenityRepository.save(entity);
         var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(created);
         return dtoResponse;
     }
 
     @Override
-    public ResortAmenityResponse update(Long id, ResortAmenityRequest dtoRequest) {
+    public ResortAmenityResponse update(Long id, ResortAmenityRequest dtoRequest, MultipartFile resortAmenityIcon) {
         var entity = resortAmenityRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_NOT_FOUND));
 
         var entityFound = resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getResortAmenityName());
@@ -93,6 +105,15 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
             throw new DataIntegrityViolationException(RESORT_AMENITY_TYPE_DELETED);
 
         ResortAmenityMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
+        if (resortAmenityIcon != null) {
+            String link = null;
+            try {
+                link = fileService.uploadFile(resortAmenityIcon);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            entity.setResortAmenityLinkIcon(link);
+        }
         var updated = resortAmenityRepository.save(entity);
         var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(updated);
         return dtoResponse;

@@ -22,34 +22,34 @@ public class TimeOffDepositsController {
 
     @GetMapping("/vacation-units")
     public ResponseEntity<Page<TimeOffDepositResponse>> getAllByVacationUnitId(
-            @RequestParam Long vacationId,
+            @RequestParam(value = "vacationUnitId") Long vacationUnitId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = timeOffDepositService.getAllByVacationUnitId(vacationId, pageable);
+        var dtoResponses = timeOffDepositService.getAllByVacationUnitId(vacationUnitId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/properties")
     public ResponseEntity<Page<TimeOffDepositResponse>> getAllByPropertyId(
-            @RequestParam Long vacationId,
+            @RequestParam("vacationUnitId") Long vacationUnitId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = timeOffDepositService.getAllByPropertyId(vacationId, pageable);
+        var dtoResponses = timeOffDepositService.getAllByPropertyId(vacationUnitId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/resort")
     public ResponseEntity<Page<TimeOffDepositResponse>> getAllByResortId(
-            @RequestParam Long vacationId,
+            @RequestParam Long vacationUnitId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = timeOffDepositService.getAllByResortId(vacationId, pageable);
+        var dtoResponses = timeOffDepositService.getAllByResortId(vacationUnitId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
@@ -60,11 +60,11 @@ public class TimeOffDepositsController {
         return ResponseEntity.ok(dtoResponse);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/{vacationUnitId}")
     public ResponseEntity<TimeOffDepositResponse> create(
-            @PathVariable Long id,
+            @PathVariable("vacationUnitId") Long vacationUnitId,
             @RequestBody TimeOffDepositRequest dtoRequest) {
-        var dtoResponse = timeOffDepositService.create(id, dtoRequest);
+        var dtoResponse = timeOffDepositService.create(vacationUnitId, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -73,14 +73,14 @@ public class TimeOffDepositsController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
+    @PutMapping(value = "/{timeOffDepositId}")
+    public ResponseEntity<Void> update(@PathVariable("timeOffDepositId") Long timeOffDepositId,
                                        @RequestBody TimeOffDepositRequest dtoRequest) {
-        timeOffDepositService.update(id, dtoRequest);
+        timeOffDepositService.update(timeOffDepositId, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(timeOffDepositId)
                 .toUri();
         return ResponseEntity.created(location).build();
     }

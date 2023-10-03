@@ -1,12 +1,13 @@
 package com.example.holidayswap.domain.dto.request.property;
 
-import com.example.holidayswap.domain.dto.request.property.ownership.OwnershipRequest;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class PropertyRegisterRequest {
+    private String propertyName;
+    private String propertyDescription;
     private int numberKingBeds;
     private int numberQueensBeds;
     private int numberTwinBeds;
@@ -19,5 +20,4 @@ public class PropertyRegisterRequest {
     private Long propertyTypeId;
     private Long propertyViewId;
     private List<Long> inRoomAmenities;
-    private OwnershipRequest ownershipRequest;
 }

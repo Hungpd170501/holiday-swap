@@ -9,4 +9,6 @@ public class ContractImageResponse {
     private boolean isDeleted;
     private Long propertyId;
     private Long userId;
+    private String roomId;
+
 }

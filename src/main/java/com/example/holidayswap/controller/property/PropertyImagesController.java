@@ -16,16 +16,16 @@ import java.net.URI;
 public class PropertyImagesController {
     private final PropertyImageService propertyImageService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{propertyImageId}")
     public ResponseEntity<PropertyImageResponse> get(
-            @PathVariable("id") Long id) {
-        var dtoResponse = propertyImageService.get(id);
+            @PathVariable("propertyImageId") Long propertyImageId) {
+        var dtoResponse = propertyImageService.get(propertyImageId);
         return ResponseEntity.ok(dtoResponse);
     }
 
     @PostMapping
     public ResponseEntity<PropertyImageResponse> create(
-            @RequestPart Long propertyId,
+            @RequestPart("propertyId") Long propertyId,
             @RequestPart MultipartFile propertyImage) {
         var dtoResponse = propertyImageService.create(propertyId, propertyImage);
         URI location = ServletUriComponentsBuilder
@@ -36,21 +36,21 @@ public class PropertyImagesController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
+    @PutMapping("/{propertyImageId}")
+    public ResponseEntity<PropertyImageResponse> update(@PathVariable("propertyImageId") Long propertyImageId,
                                        @RequestPart MultipartFile propertyImage) {
-        propertyImageService.update(id, propertyImage);
+        var dtoResponse = propertyImageService.update(propertyImageId, propertyImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(propertyImageId)
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        propertyImageService.delete(id);
+    @DeleteMapping("/{propertyImageId}")
+    public ResponseEntity<Void> delete(@PathVariable("propertyImageId") Long propertyImageId) {
+        propertyImageService.delete(propertyImageId);
         return ResponseEntity.noContent().build();
     }
 }

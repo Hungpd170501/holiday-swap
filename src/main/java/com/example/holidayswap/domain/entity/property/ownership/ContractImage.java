@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.property.ownership;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,15 @@ public class ContractImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "link", length = Integer.MAX_VALUE)
+    @NotNull
     private String link;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private Boolean isDeleted = false;
     @Column(name = "property_id")
+    @NotNull
     private Long propertyId;
     @Column(name = "user_id")
+    @NotNull
     private Long userId;
     @Column(name = "room_id")
     private String roomId;
