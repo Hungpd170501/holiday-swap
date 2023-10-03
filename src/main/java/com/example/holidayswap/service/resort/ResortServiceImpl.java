@@ -10,6 +10,7 @@ import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
+import com.example.holidayswap.service.property.PropertyService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,14 +33,19 @@ public class ResortServiceImpl implements ResortService {
     private final ResortAmenityTypeService resortAmenityTypeService;
     private final ResortAmenityRepository resortAmenityRepository;
     private final PropertyTypeRespository propertyTypeRespository;
+    private final PropertyService propertyService;
 
     @Override
-    public Page<ResortResponse> gets(String name, Pageable pageable) {
+    public Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, Pageable pageable) {
         var entities = resortRepository.
-                findAllByResortNameContainingIgnoreCaseAndDeletedFalse(name, pageable);
-
+                findAllByFilter(
+                        name,
+                        timeCheckIn,
+                        timeCheckOut,
+                        pageable);
         var dtoReponses = entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
+            dto.setPropertyResponses(propertyService.getByResortId(e.getId()));
             dto.setResortImages(resortImageService.gets(e.getId()));
             dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
             return dto;
@@ -51,8 +58,11 @@ public class ResortServiceImpl implements ResortService {
         var entity = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
+
+        dtoResponse.setPropertyResponses(propertyService.getByResortId(id));
         dtoResponse.setResortImages(resortImageService.gets(id));
         dtoResponse.setResortAmenityTypes(resortAmenityTypeService.gets(entity.getId()));
+
         return dtoResponse;
     }
 

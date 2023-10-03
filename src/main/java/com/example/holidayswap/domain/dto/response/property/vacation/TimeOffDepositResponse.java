@@ -13,5 +13,5 @@ public class TimeOffDepositResponse {
     private double pricePerNight;
     private boolean isDeleted;
     private TimeOffDepositStatus status;
-    private Long vacationId;
+    private Long vacationUnitId;
 }

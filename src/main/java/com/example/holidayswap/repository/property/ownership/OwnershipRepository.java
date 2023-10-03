@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -25,8 +26,14 @@ public interface OwnershipRepository extends JpaRepository<Ownership, OwnershipI
     @Query("select o from Ownership o where o.property.id = ?1 and o.user.userId = ?2 and o.isDeleted = false ")
     Optional<Ownership> findAllByPropertyIdAndUserIdAndIsDeleteIsFalse(Long propertyId, Long userId);
 
-    @Query("select o from Ownership o where o.id = ?1 and o.isDeleted = false ")
-    Optional<Ownership> findById(OwnershipId ownershipId);
+    @Query("select o from Ownership o " +
+           "where upper(o.id.roomId) = upper( :roomId)" +
+           "and o.id.propertyId = :propertyId " +
+           "and o.id.userId = :userId " +
+           "and o.isDeleted = false ")
+    Optional<Ownership> findByPropertyIdAndUserUserIdAndIdRoomId(@Param("propertyId") Long propertyId,
+                                                                 @Param("userId") Long userId,
+                                                                 @Param("roomId") String roomId);
 
     @Query("""
             select o from Ownership o

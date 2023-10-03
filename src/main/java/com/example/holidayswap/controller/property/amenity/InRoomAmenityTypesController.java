@@ -33,9 +33,9 @@ public class InRoomAmenityTypesController {
         return ResponseEntity.ok(inRoomAmenityTypeService.gets(name, pageable));
     }
 
-    @GetMapping("/{id}/property-in-room-amenities")
+    @GetMapping("/{amenityTypeId}/property-in-room-amenities")
     public ResponseEntity<Page<InRoomAmenityResponse>> gets(
-            @PathVariable("id") Long amenityTypeId,
+            @PathVariable("amenityTypeId") Long amenityTypeId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
@@ -44,10 +44,10 @@ public class InRoomAmenityTypesController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/{amenityTypeId}")
     public ResponseEntity<InRoomAmenityTypeResponse> get(
-            @PathVariable("id") Long id) {
-        return ResponseEntity.ok(inRoomAmenityTypeService.get(id));
+            @PathVariable("amenityTypeId") Long amenityTypeId) {
+        return ResponseEntity.ok(inRoomAmenityTypeService.get(amenityTypeId));
     }
 
     @PostMapping
@@ -62,21 +62,21 @@ public class InRoomAmenityTypesController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
+    @PutMapping("/{amenityTypeId}")
+    public ResponseEntity<InRoomAmenityTypeResponse> update(@PathVariable("amenityTypeId") Long amenityTypeId,
                                        @RequestBody InRoomAmenityTypeRequest dtoRequest) {
-        inRoomAmenityTypeService.update(id, dtoRequest);
+        var dtoResponse = inRoomAmenityTypeService.update(amenityTypeId, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(amenityTypeId)
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        inRoomAmenityTypeService.delete(id);
+    @DeleteMapping("/{amenityTypeId}")
+    public ResponseEntity<Void> delete(@PathVariable("amenityTypeId") Long amenityTypeId) {
+        inRoomAmenityTypeService.delete(amenityTypeId);
         return ResponseEntity.noContent().build();
     }
 }

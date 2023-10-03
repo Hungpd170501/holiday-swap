@@ -47,8 +47,7 @@ public interface TimeOffDepositRepository extends JpaRepository<TimeOffDeposit, 
     @Query("""
             select t from TimeOffDeposit t
             where t.vacationUnitId = ?1
-            and t.startTime between ?2 and ?3
-            or t.endTime between ?2 and ?3
+            and (t.startTime between ?2 and ?3 or t.endTime between ?2 and ?3)
             and t.isDeleted = false and t.status = ?4""")
     Optional<TimeOffDeposit> findDuplicateWhichAnyTimeDeposit(
             Long vacationUnitId,

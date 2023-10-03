@@ -77,6 +77,7 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
         if (checkDuplicateWhichAnyTimeDeposit.isPresent())
             throw new DataIntegrityViolationException("Duplicate with another time off deposit");
         var timeOffDeposit = TimeOffDepositMapper.INSTANCE.toEntity(dtoRequest);
+        timeOffDeposit.setStatus(TimeOffDepositStatus.OPEN);
         var timeOffDepositCreated = timeOffDepositRepository.save(timeOffDeposit);
         return TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
     }

@@ -1,7 +1,6 @@
 package com.example.holidayswap.domain.dto.response.property;
 
 import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
-import com.example.holidayswap.domain.dto.response.property.ownership.OwnershipResponse;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import lombok.Data;
 
@@ -10,6 +9,8 @@ import java.util.List;
 @Data
 public class PropertyResponse {
     private Long id;
+    private String propertyName;
+    private String propertyDescription;
     private int numberKingBeds;
     private int numberQueensBeds;
     private int numberTwinBeds;
@@ -24,6 +25,5 @@ public class PropertyResponse {
     private PropertyTypeResponse propertyType;
     private PropertyViewResponse propertyView;
     private List<InRoomAmenityTypeResponse> inRoomAmenityTypeResponses;
-    private OwnershipResponse ownershipResponse;
     private List<PropertyImageResponse> propertyImageResponses;
 }

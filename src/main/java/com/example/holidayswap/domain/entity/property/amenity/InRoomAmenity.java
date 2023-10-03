@@ -3,6 +3,7 @@ package com.example.holidayswap.domain.entity.property.amenity;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,13 +18,17 @@ public class InRoomAmenity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "in_room_amenity_id", nullable = false)
     private Long id;
+    @NotNull(message = "In-room amenity name must not null.")
     @Column(name = "in_room_amenity_name", length = Integer.MAX_VALUE)
     private String inRoomAmenityName;
     @Column(name = "in_room_amenity_description", length = Integer.MAX_VALUE)
     private String inRoomAmenityDescription;
+    @NotNull
+    @Column(name = "in_room_amenity_link_icon", length = Integer.MAX_VALUE)
+    private String inRoomAmenityLinkIcon;
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
+    @NotNull
     private Boolean isDeleted = false;
-
     @Column(name = "in_room_amenity_type_id")
     private Long inRoomAmenityTypeId;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,7 +39,6 @@ public class InRoomAmenity {
             insertable = false,
             updatable = false)
     private InRoomAmenityType inRoomAmenityType;
-
     @ManyToMany
     @JoinTable(
             name = "properties_amenities",

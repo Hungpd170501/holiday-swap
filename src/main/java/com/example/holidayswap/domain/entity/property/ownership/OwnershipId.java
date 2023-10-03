@@ -23,6 +23,7 @@ public class OwnershipId implements Serializable {
     @NotNull
     @Column(name = "user_id", nullable = false)
     private Long userId;
-    @Column(name = "room_id")
+    @NotNull
+    @Column(name = "room_id", nullable = false)
     private String roomId;
 }

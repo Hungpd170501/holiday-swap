@@ -25,9 +25,13 @@ public class ResortAmenity {
     @Length(min = 0, max = 255, message = "Resort amenity description must not 255")
     @Column(name = "resort_amenity_description", length = Integer.MAX_VALUE)
     private String resortAmenityDescription;
+    @Column(name = "resort_amenity_link_icon", length = Integer.MAX_VALUE)
+    @NotNull
+    private String resortAmenityLinkIcon;
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isDeleted = false;
     @Column(name = "resort_amenity_type_id")
+    @NotNull
     private Long resortAmenityTypeId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
