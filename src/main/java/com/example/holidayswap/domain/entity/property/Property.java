@@ -3,6 +3,7 @@ package com.example.holidayswap.domain.entity.property;
 
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.entity.property.ownership.Ownership;
+import com.example.holidayswap.domain.entity.resort.Resort;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,8 +32,12 @@ public class Property {
     private String propertyDescription;
     @Column(name = "number_king_beds")
     private int numberKingBeds;
-    @Column(name = "number_qeen_beds")
-    private int numberQueensBeds;
+    @Column(name = "number_queen_beds")
+    private int numberQueenBeds;
+    @Column(name = "number_single_beds")
+    private int numberSingleBeds;
+    @Column(name = "number_double_beds")
+    private int numberDoubleBeds;
     @Column(name = "number_twin_beds")
     private int numberTwinBeds;
     @Column(name = "number_full_beds")
@@ -56,7 +61,6 @@ public class Property {
     @Enumerated(EnumType.STRING)
     @NotNull
     private PropertyStatus status;
-
     @Column(name = "property_type_id")
     @NotNull
     private Long propertyTypeId;
@@ -67,6 +71,15 @@ public class Property {
             insertable = false,
             updatable = false)
     private PropertyType propertyType;
+    @Column(name = "resort_id")
+    private Long resortId;
+    @ManyToOne
+    @JoinColumn(name = "resort_id",
+            referencedColumnName = "resort_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+    private Resort resort;
     @Column(name = "property_view_id")
     @NotNull
     private Long propertyViewId;

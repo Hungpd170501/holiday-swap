@@ -25,7 +25,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     @Query("select p from Property p " +
            "join p.propertyType pt " +
            "join  pt.resorts r " +
-           "where r.id = ?1 " +
+           "where p.resortId = ?1 " +
            "and p.isDeleted = false " +
            "and pt.isDeleted = false " +
            "and r.isDeleted = false ")
@@ -37,7 +37,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
                    "inner join  Ownership o on p.propertyTypeId = o.id.propertyId " +
                    "inner join VacationUnit v on v.propertyId = p.id " +
                    "inner join TimeOffDeposit tod on tod.vacationUnitId = v.id " +
-                   "where r.id = ?1 " +
+                   "where p.resortId = ?1 " +
                    "and p.isDeleted = false " +
                    "and pt.isDeleted = false " +
                    "and r.isDeleted = false " +
@@ -48,6 +48,22 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(Long resortId,
                                                                              Date timeCheckIn,
                                                                              Date timeCheckOut,
+                                                                             Pageable pageable);
+
+    @Query(value = "select distinct p from Property p " +
+                   "inner join PropertyType pt on p.propertyTypeId = pt.id " +
+                   "inner join pt.resorts r " +
+                   "inner join  Ownership o on p.propertyTypeId = o.id.propertyId " +
+                   "inner join VacationUnit v on v.propertyId = p.id " +
+                   "inner join TimeOffDeposit tod on tod.vacationUnitId = v.id " +
+                   "where p.resortId = ?1 " +
+                   "and p.isDeleted = false " +
+                   "and pt.isDeleted = false " +
+                   "and r.isDeleted = false " +
+                   "and o.isDeleted = false " +
+                   "and v.isDeleted = false " +
+                   "and tod.isDeleted = false ")
+    Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(Long resortId,
                                                                              Pageable pageable);
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")

@@ -3,6 +3,7 @@ package com.example.holidayswap.service.resort;
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyType;
+import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -37,12 +38,10 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, Pageable pageable) {
-        var entities = resortRepository.
-                findAllByFilter(
-                        name,
-                        timeCheckIn,
-                        timeCheckOut,
-                        pageable);
+        Page<Resort> entities = null;
+        if (timeCheckIn != null && timeCheckOut != null)
+            entities = resortRepository.findAllByFilter(name, timeCheckIn, timeCheckOut, pageable);
+        else entities = resortRepository.findAllByFilter(name, pageable);
         var dtoReponses = entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
             dto.setPropertyResponses(propertyService.getByResortId(e.getId()));
