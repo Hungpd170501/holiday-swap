@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ResortRepository extends JpaRepository<Resort, Long> {
@@ -39,16 +41,16 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             + p.numberMurphyBeds
             + p.numberSofaBeds
             + p.numberTwinBeds * 2) >= ?4
-            and (r.id in ?5)
-            and (p.id in ?6)
+            and ((:#{#listOfResortAmenity == null} = true) or (r.id in ?5))
+            and ((:#{#listOfInRoomAmenity == null} = true) or (p.id in ?6))
             """)
     Page<Resort> findAllByFilter(
             String name,
             Date startDate,
             Date endDate,
             int numberGuests,
-            Long[] listOfResortAmenity,
-            Long[] listOfInRoomAmenity,
+            @Param("listOfResortAmenity") Set<Long> listOfResortAmenity,
+            @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
             Pageable pageable
     );
 

@@ -19,10 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -39,9 +36,8 @@ public class ResortServiceImpl implements ResortService {
     @Override
     public Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut,
                                      int numberGuests,
-                                     Long[] listOfResortAmenity, Long[] listOfInRoomAmenity,
+                                     Set<Long> listOfResortAmenity, Set<Long> listOfInRoomAmenity,
                                      Pageable pageable) {
-
         Page<Resort> entities = resortRepository.findAllByFilter(name, timeCheckIn, timeCheckOut, numberGuests,
                 listOfResortAmenity,
                 listOfInRoomAmenity,

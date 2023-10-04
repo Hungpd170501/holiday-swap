@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,8 +42,8 @@ public class ResortsController {
             @RequestParam(value = "timeCheckOut", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
             @RequestParam(defaultValue = "0") Integer numberGuests,
-            @RequestParam(value = "resortAmenity", required = false) Long[] listOfResortAmenity,
-            @RequestParam(value = "inRoomAmenity", required = false) Long[] listOfInRoomAmenity,
+            @RequestParam(value = "resortAmenity", required = false) Set<Long> listOfResortAmenity,
+            @RequestParam(value = "inRoomAmenity", required = false) Set<Long> listOfInRoomAmenity,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
