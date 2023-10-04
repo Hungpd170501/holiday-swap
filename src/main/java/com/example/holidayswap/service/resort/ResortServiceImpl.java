@@ -37,11 +37,11 @@ public class ResortServiceImpl implements ResortService {
     private final PropertyService propertyService;
 
     @Override
-    public Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, Pageable pageable) {
+    public Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable) {
         Page<Resort> entities = null;
         if (timeCheckIn != null && timeCheckOut != null)
-            entities = resortRepository.findAllByFilter(name, timeCheckIn, timeCheckOut, pageable);
-        else entities = resortRepository.findAllByFilter(name, pageable);
+            entities = resortRepository.findAllByFilter(name, timeCheckIn, timeCheckOut, numberGuests, pageable);
+        else entities = resortRepository.findAllByFilter(name, numberGuests, pageable);
         var dtoReponses = entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
             dto.setPropertyResponses(propertyService.getByResortId(e.getId()));

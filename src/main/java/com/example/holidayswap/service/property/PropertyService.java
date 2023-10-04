@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface PropertyService {
-    Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, Pageable pageable);
+    Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable);
 
     PropertyResponse get(Long id);
 
