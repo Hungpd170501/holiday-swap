@@ -41,11 +41,13 @@ public class ResortsController {
             @RequestParam(value = "timeCheckOut", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
             @RequestParam(defaultValue = "0") Integer numberGuests,
+            @RequestParam(value = "resortAmenity", required = false) Long[] listOfResortAmenity,
+            @RequestParam(value = "inRoomAmenity", required = false) Long[] listOfInRoomAmenity,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, numberGuests, pageable));
+        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, numberGuests, listOfResortAmenity, listOfInRoomAmenity, pageable));
     }
 
     @GetMapping("/{resortId}/resort-images")

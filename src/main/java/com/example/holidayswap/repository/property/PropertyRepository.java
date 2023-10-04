@@ -33,17 +33,17 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     @Query(value = """
             select distinct p from Property p
-            inner join PropertyType pt on p.propertyTypeId = pt.id  
-            inner join pt.resorts r  
-            inner join  Ownership o on p.propertyTypeId = o.id.propertyId  
-            inner join VacationUnit v on v.propertyId = p.id  
+            inner join PropertyType pt on p.propertyTypeId = pt.id
+            inner join pt.resorts r
+            inner join  Ownership o on p.propertyTypeId = o.id.propertyId
+            inner join VacationUnit v on v.propertyId = p.id
             inner join TimeOffDeposit tod on tod.vacationUnitId = v.id
             where p.resortId = ?1
             and p.isDeleted = false
             and pt.isDeleted = false
             and r.isDeleted = false
             and o.isDeleted = false
-            and v.isDeleted = false  
+            and v.isDeleted = false
             and tod.isDeleted = false
             and (p.numberKingBeds * 2
             + p.numberQueenBeds * 2
@@ -67,6 +67,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             inner join  Ownership o on p.propertyTypeId = o.id.propertyId
             inner join VacationUnit v on v.propertyId = p.id
             inner join TimeOffDeposit tod on tod.vacationUnitId = v.id
+            inner join p.inRoomAmenities ira
             where p.resortId = ?1
             and p.isDeleted = false
             and pt.isDeleted = false
@@ -81,9 +82,11 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             + p.numberMurphyBeds
             + p.numberSofaBeds
             + p.numberTwinBeds * 2) >= ?2
+            and ira in ?3
             and tod.isDeleted = false""")
     Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(Long resortId,
                                                                              int numberGuests,
+                                                                             List<Long> listOfInRoomAmenity,
                                                                              Pageable pageable);
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")

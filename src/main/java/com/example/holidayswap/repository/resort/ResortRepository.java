@@ -18,10 +18,11 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
     @Query("""
             select DISTINCT r  from Resort r
             inner join r.propertyTypes pt
+            inner join r.amenities ra
             inner join Property p on p.resortId = r.id
+            inner join p.inRoomAmenities pa
             inner join Ownership o on o.id.propertyId = p.id
             inner join VacationUnit vu on vu.propertyId = p.id
-                        
             inner join TimeOffDeposit tod on tod.vacationUnitId = vu.id
             where upper(r.resortName) like upper(concat('%', ?1, '%'))
             and r.isDeleted = false
@@ -29,6 +30,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             and o.isDeleted = false
             and vu.isDeleted = false
             and tod.isDeleted = false
+            and ((cast(?2 as date ) is null or cast(?3 as date) is null ) or (tod.startTime between ?2 AND ?3 or tod.endTime  between ?2 AND ?3))
             and (p.numberKingBeds * 2
             + p.numberQueenBeds * 2
             + p.numberSingleBeds
@@ -37,41 +39,16 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             + p.numberMurphyBeds
             + p.numberSofaBeds
             + p.numberTwinBeds * 2) >= ?4
-            and ((?2 is null or ?3 is null ) or (tod.startTime between ?2 AND ?3 or tod.endTime  between ?2 AND ?3))
+            and (r.id in ?5)
+            and (p.id in ?6)
             """)
     Page<Resort> findAllByFilter(
             String name,
             Date startDate,
             Date endDate,
             int numberGuests,
-            Pageable pageable
-    );
-
-    @Query("""
-            select DISTINCT r  from Resort r
-            inner join r.propertyTypes pt
-            inner join Property p on p.resortId = r.id
-            inner join Ownership o on o.id.propertyId = p.id
-            inner join VacationUnit vu on vu.propertyId = p.id
-                       
-            inner join TimeOffDeposit tod on tod.vacationUnitId = vu.id
-            where upper(r.resortName) like upper(concat('%', ?1, '%'))
-            and r.isDeleted = false
-            and p.isDeleted = false
-            and o.isDeleted = false
-            and vu.isDeleted = false
-            and (p.numberKingBeds * 2
-            + p.numberQueenBeds * 2
-            + p.numberSingleBeds
-            + p.numberDoubleBeds * 2
-            + p.numberFullBeds * 2
-            + p.numberMurphyBeds
-            + p.numberSofaBeds
-            + p.numberTwinBeds * 2) >= ?2
-            and tod.isDeleted = false""")
-    Page<Resort> findAllByFilter(
-            String name,
-            int numberGuests,
+            Long[] listOfResortAmenity,
+            Long[] listOfInRoomAmenity,
             Pageable pageable
     );
 

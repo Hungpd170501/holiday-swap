@@ -10,7 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface ResortService {
-    Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable);
+    Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, int numberGuests,
+                              Long[] listOfResortAmenity, Long[] listOfInRoomAmenity, Pageable pageable);
 
     ResortResponse get(Long id);
 

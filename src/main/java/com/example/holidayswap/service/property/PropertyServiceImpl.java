@@ -40,18 +40,13 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable) {
-        Page<Property> entities;
-        if (timeCheckIn != null && timeCheckOut != null)
-            entities = propertyRepository.
-                    findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(
-                            resortId,
-                            timeCheckIn,
-                            timeCheckOut, numberGuests,
-                            pageable);
-        else entities = propertyRepository.
+        Page<Property> entities = propertyRepository.
                 findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(
-                        resortId, numberGuests,
+                        resortId,
+                        timeCheckIn,
+                        timeCheckOut, numberGuests,
                         pageable);
+
         var dtoResponse = entities.
                 map(propertyMapper::toDtoResponse);
         dtoResponse.forEach(e -> {
