@@ -46,14 +46,8 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             + p.numberTwinBeds * 2) >= ?4
             and ((cast(?2 as date ) is null or cast(?3 as date) is null )
             or (
-                 (tod.startTime BETWEEN ?2 AND ?3)
-                 OR
-                 (tod.endTime BETWEEN ?2 AND ?3)
-                 OR
-                 (tod.startTime < ?2 AND tod.endTime > ?3)
-                 OR
-                 (tod.endTime > ?2 AND tod.endTime < ?3)
-                 ))
+            overlaps( cast(tod.startTime as date ),  cast(tod.endTime as date )
+            , cast(?2 as date ), cast(?3 as date )) = true))
             """)
     Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(Long resortId,
                                                                              Date timeCheckIn,
