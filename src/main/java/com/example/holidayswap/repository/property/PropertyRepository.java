@@ -53,7 +53,17 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             + p.numberMurphyBeds
             + p.numberSofaBeds
             + p.numberTwinBeds * 2) >= ?4
-            and (tod.startTime between ?2  and ?3 or tod.endTime  between ?2  and ?3)""")
+            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
+            or (
+                 (tod.startTime BETWEEN ?2 AND ?3)
+                 OR
+                 (tod.endTime BETWEEN ?2 AND ?3)
+                 OR
+                 (tod.startTime < ?2 AND tod.endTime > ?3)
+                 OR
+                 (tod.endTime > ?2 AND tod.endTime < ?3)
+                 ))
+            """)
     Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(Long resortId,
                                                                              Date timeCheckIn,
                                                                              Date timeCheckOut,

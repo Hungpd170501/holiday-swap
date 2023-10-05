@@ -32,7 +32,16 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             and o.isDeleted = false
             and vu.isDeleted = false
             and tod.isDeleted = false
-            and ((cast(?2 as date ) is null or cast(?3 as date) is null ) or (tod.startTime between ?2 AND ?3 or tod.endTime  between ?2 AND ?3))
+            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
+            or (
+                 (tod.startTime BETWEEN ?2 AND ?3)
+                 OR
+                 (tod.endTime BETWEEN ?2 AND ?3)
+                 OR
+                 (tod.startTime < ?2 AND tod.endTime > ?3)
+                 OR
+                 (tod.endTime > ?2 AND tod.endTime < ?3)
+                 ))
             and (p.numberKingBeds * 2
             + p.numberQueenBeds * 2
             + p.numberSingleBeds
