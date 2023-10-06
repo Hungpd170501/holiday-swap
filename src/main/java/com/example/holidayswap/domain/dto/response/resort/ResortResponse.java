@@ -11,6 +11,7 @@ import java.util.List;
 public class ResortResponse {
     private Long id;
     private String resortName;
+    private String resortDescription;
     private Long addressId;
     private boolean isDeleted;
     private List<ResortImageResponse> resortImages;

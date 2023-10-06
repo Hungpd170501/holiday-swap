@@ -45,11 +45,20 @@ public interface TimeOffDepositRepository extends JpaRepository<TimeOffDeposit, 
     List<TimeOffDeposit> findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long vacationId, Date startTime, Date endTime);
 
     @Query("""
-            select t from TimeOffDeposit t
-            where t.vacationUnitId = ?1
-            and (t.startTime between ?2 and ?3 or t.endTime between ?2 and ?3)
-            and t.isDeleted = false and t.status = ?4""")
-    Optional<TimeOffDeposit> findDuplicateWhichAnyTimeDeposit(
+            select tod from TimeOffDeposit tod
+            where tod.vacationUnitId = ?1
+            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
+                 or (
+                 (tod.startTime BETWEEN ?2 AND ?3)
+                 OR
+                 (tod.endTime BETWEEN ?2 AND ?3)
+                 OR
+                 (tod.startTime < ?2 AND tod.endTime > ?3)
+                 OR
+                 (tod.endTime > ?2 AND tod.endTime < ?3)
+                 ))
+            and tod.isDeleted = false and tod.status = ?4""")
+    Optional<TimeOffDeposit> findOverlapsWhichAnyTimeDeposit(
             Long vacationUnitId,
             Date startTime,
             Date endTime,
