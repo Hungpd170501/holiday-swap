@@ -52,79 +52,295 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
             and v.endTime <= ((CAST(?1 AS date)))""")
     Optional<VacationUnit> findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
 
-    //    @Query(value = """
-//                select vu from vacation_unit vu
-//                where ( CASE
-//                            WHEN (EXTRACT(YEAR FROM vu.startTime) % 4 = 0) AND (EXTRACT(YEAR FROM vu.startTime) % 100 != 0 OR EXTRACT(YEAR FROM vu.startTime) % 400 = 0)
-//                            THEN   DATE(DATE ('400-01-01') + (vu.startTime - date_trunc('year', vu.startTime)))
-//                            ELSE   DATE(DATE ('400-01-02') + (vu.startTime - date_trunc('year', vu.startTime)))
-//                        END
-//                    ,  CASE
-//                            WHEN EXTRACT(YEAR FROM vu.endTime) % 4 = 0 AND (EXTRACT(YEAR FROM vu.endTime) % 100 != 0 OR EXTRACT(YEAR FROM vu.endTime) % 400 = 0)
-//                            THEN   DATE(DATE ('400-01-01') + (vu.endTime - date_trunc('year', vu.endTime)))
-//                            ELSE   DATE(DATE ('400-01-02') + (vu.endTime - date_trunc('year', vu.endTime)))
-//                        END)
-//                    OVERLAPS (
-//                     CASE
-//                            WHEN EXTRACT(YEAR FROM DATE (CAST(?1 AS date))) % 4 = 0 AND (EXTRACT(YEAR FROM DATE (CAST(?1 AS date))) % 100 != 0 OR EXTRACT(YEAR FROM DATE ((CAST(?1 AS date)))) % 400 = 0)
-//                            THEN DATE(DATE (('400-01-01')) +  (DATE (CAST(?1 AS date)) - date_trunc('year', DATE (CAST(?1 AS date)))))
-//                            ELSE DATE(DATE ('400-01-02') +  (DATE (CAST(?1 AS date)) - date_trunc('year', DATE (CAST(?1 AS date)))))
-//                        END
-//                     , CASE
-//                    	 WHEN EXTRACT(YEAR FROM DATE(CAST(?2 AS date))) % 4 = 0 AND (EXTRACT(YEAR FROM DATE (CAST(?2 AS date))) % 100 != 0 OR EXTRACT(YEAR FROM DATE (CAST(?2 AS date))) % 400 = 0)
-//                            THEN DATE(DATE ('400-01-01') +  (DATE (CAST(?2 AS date)) - date_trunc('year', DATE (CAST(?2 AS date)))))
-//                            ELSE DATE(DATE ('400-01-02') +  (DATE (CAST(?2 AS date)) - date_trunc('year', DATE (CAST(?2 AS date)))))
-//                            end
-//                    )
-//                    """, nativeQuery = true)
-//    List<VacationUnit> findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
-//            Long propertyId,
-//            String roomId,
-//            Date startTime,
-//            Date endTime,
-//            VacationStatus vacationStatus
-//    );
     @Query(value = """
-            select *
-                from vacation_unit vu
-                where vu.property_id = ?1
-                  and vu.room_id = ?2
-                  and vu.is_deleted = false
-                  and (CASE
-                           WHEN (EXTRACT(YEAR FROM vu.start_time) % 4 = 0) AND
-                                (EXTRACT(YEAR FROM vu.start_time) % 100 != 0 OR EXTRACT(YEAR FROM vu.start_time) % 400 = 0)
-                               THEN DATE(DATE '400-01-01' + (vu.start_time - date_trunc('year', vu.start_time)))
-                           ELSE DATE(DATE '400-01-02' + (vu.start_time - date_trunc('year', vu.start_time)))
-                           END, CASE
-                                    WHEN EXTRACT(YEAR FROM vu.end_time) % 4 = 0 AND
-                                         (EXTRACT(YEAR FROM vu.end_time) % 100 != 0 OR EXTRACT(YEAR FROM vu.end_time) % 400 = 0)
-                                        THEN DATE(DATE '400-01-01' + (vu.end_time - date_trunc('year', vu.end_time)))
-                                    ELSE DATE(DATE '400-01-02' + (vu.end_time - date_trunc('year', vu.end_time)))
-                           END)
-                    OVERLAPS (
-                              CASE
-                                  WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
-                                       (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR
-                                        EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
-                                      THEN DATE(DATE '400-01-01' + (DATE(?3) - date_trunc('year', DATE(?3))))
-                                  ELSE DATE(DATE '400-01-02' + (DATE(?3) - date_trunc('year', DATE(?3))))
-                                  END, CASE
+            SELECT VU.VACATION_UNIT_ID,
+                   VU.END_TIME,
+                   VU.IS_DELETED,
+                   VU.START_TIME,
+                   VU.STATUS,
+                   VU.PROPERTY_ID,
+                   VU.USER_ID,
+                   VU.ROOM_ID
+            FROM VACATION_UNIT VU
+                     JOIN OWNERSHIP O ON VU.PROPERTY_ID = O.PROPERTY_ID AND VU.ROOM_ID = O.ROOM_ID AND VU.USER_ID = O.USER_ID
+            WHERE VU.PROPERTY_ID = ?1
+                AND VU.ROOM_ID = ?2
+                AND VU.IS_DELETED = FALSE
+                AND (?5 IS NULL OR VU.STATUS = ?5)
+                AND (?6 IS NULL OR O.STATUS = ?6)
+                AND ((CASE
+                          WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 4 = 0 AND
+                               (EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 100 != 0 OR
+                                EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 400 = 0)
+                              THEN EXTRACT(DOY FROM DATE(VU.START_TIME))
+                          ELSE
+                              (CASE
+                                   WHEN EXTRACT(MONTH FROM DATE(VU.START_TIME)) > 2
+                                       THEN EXTRACT(DOY FROM DATE(VU.START_TIME)) + 1
+                                   ELSE EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                  END)
+                    END) BETWEEN (CASE
+                                      WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
+                                           (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
+                                          THEN EXTRACT(DOY FROM DATE(?3))
+                                      ELSE
+                                          (CASE
+                                               WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
+                                                   THEN EXTRACT(DOY FROM DATE(?3)) + 1
+                                               ELSE EXTRACT(DOY FROM DATE(?3))
+                                              END)
+                    END) AND (CASE
+                                  WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                                      THEN
+                                      (CASE
                                            WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                                (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR
-                                                 EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                               THEN DATE(DATE '400-01-01' +
-                                                         (DATE(?4) - date_trunc('year', DATE(?4))))
-                                           ELSE DATE(DATE '400-01-02' + (DATE(?4) - date_trunc('year', DATE(?4))))
-                                  end
-                          )
-                    and vu.status = ?5
+                                                (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                               THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                           ELSE
+                                               (CASE
+                                                    WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                        THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
+                                                    ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                                   END)
+                                          END)
+                                  ELSE
+                                      (CASE
+                                           WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
+                                                (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                               THEN EXTRACT(DOY FROM DATE(?4))
+                                           ELSE
+                                               (CASE
+                                                    WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                        THEN EXTRACT(DOY FROM DATE(?4)) + 1
+                                                    ELSE EXTRACT(DOY FROM DATE(?4))
+                                                   END)
+                                          END)
+                    END))
+               OR ((CASE
+                        WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) < EXTRACT(YEAR FROM DATE(VU.END_TIME))
+                            THEN
+                            (CASE
+                                 WHEN EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 4 = 0 AND
+                                      (EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 100 != 0 OR
+                                       EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 400 = 0)
+                                     THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                 ELSE
+                                     (CASE
+                                          WHEN EXTRACT(MONTH FROM DATE(VU.END_TIME)) > 2
+                                              THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + 1 + EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                          ELSE EXTRACT(DOY FROM DATE(VU.END_TIME)) + EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                         END)
+                                END)
+                        ELSE
+                            (CASE
+                                 WHEN EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 4 = 0 AND
+                                      (EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 100 != 0 OR
+                                       EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 400 = 0)
+                                     THEN EXTRACT(DOY FROM DATE(VU.END_TIME))
+                                 ELSE
+                                     (CASE
+                                          WHEN EXTRACT(MONTH FROM DATE(VU.END_TIME)) > 2
+                                              THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + 1
+                                          ELSE EXTRACT(DOY FROM DATE(VU.END_TIME))
+                                         END)
+                                END)
+                END) BETWEEN (CASE
+                                  WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
+                                       (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
+                                      THEN EXTRACT(DOY FROM DATE(?3))
+                                  ELSE
+                                      (CASE
+                                           WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
+                                               THEN EXTRACT(DOY FROM DATE(?3)) + 1
+                                           ELSE EXTRACT(DOY FROM DATE(?3))
+                                          END)
+                END) AND (CASE
+                              WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                                  THEN
+                                  (CASE
+                                       WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                       ELSE
+                                           (CASE
+                                                WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
+                                                ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                               END)
+                                      END)
+                              ELSE
+                                  (CASE
+                                       WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(?4))
+                                       ELSE
+                                           (CASE
+                                                WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(?4)) + 1
+                                                ELSE EXTRACT(DOY FROM DATE(?4))
+                                               END)
+                                      END)
+                END))
+               OR ((CASE
+                        WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 4 = 0 AND
+                             (EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 400 = 0)
+                            THEN EXTRACT(DOY FROM DATE(VU.START_TIME))
+                        ELSE
+                            (CASE
+                                 WHEN EXTRACT(MONTH FROM DATE(VU.START_TIME)) > 2
+                                     THEN EXTRACT(DOY FROM DATE(VU.START_TIME)) + 1
+                                 ELSE EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                END)
+                END) < (CASE
+                            WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
+                                 (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
+                                THEN EXTRACT(DOY FROM DATE(?3))
+                            ELSE
+                                (CASE
+                                     WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
+                                         THEN EXTRACT(DOY FROM DATE(?3)) + 1
+                                     ELSE EXTRACT(DOY FROM DATE(?3))
+                                    END)
+                END) AND (CASE
+                              WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) < EXTRACT(YEAR FROM DATE(VU.END_TIME))
+                                  THEN
+                                  (CASE
+                                       WHEN EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 100 != 0 OR
+                                             EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                       ELSE
+                                           (CASE
+                                                WHEN EXTRACT(MONTH FROM DATE(VU.END_TIME)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + 1 +
+                                                         EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                                ELSE EXTRACT(DOY FROM DATE(VU.END_TIME)) + EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                               END)
+                                      END)
+                              ELSE
+                                  (CASE
+                                       WHEN EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 100 != 0 OR
+                                             EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(VU.END_TIME))
+                                       ELSE
+                                           (CASE
+                                                WHEN EXTRACT(MONTH FROM DATE(VU.END_TIME)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + 1
+                                                ELSE EXTRACT(DOY FROM DATE(VU.END_TIME))
+                                               END)
+                                      END)
+                END) > (CASE
+                            WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                                THEN
+                                (CASE
+                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                     ELSE
+                                         (CASE
+                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
+                                              ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                             END)
+                                    END)
+                            ELSE
+                                (CASE
+                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(?4))
+                                     ELSE
+                                         (CASE
+                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1
+                                              ELSE EXTRACT(DOY FROM DATE(?4))
+                                             END)
+                                    END)
+                END))
+               OR ((CASE
+                        WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 4 = 0 AND
+                             (EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 400 = 0)
+                            THEN EXTRACT(DOY FROM DATE(VU.START_TIME))
+                        ELSE
+                            (CASE
+                                 WHEN EXTRACT(MONTH FROM DATE(VU.START_TIME)) > 2
+                                     THEN EXTRACT(DOY FROM DATE(VU.START_TIME)) + 1
+                                 ELSE EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                END)
+                END) > (CASE
+                            WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
+                                 (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
+                                THEN EXTRACT(DOY FROM DATE(?3))
+                            ELSE
+                                (CASE
+                                     WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
+                                         THEN EXTRACT(DOY FROM DATE(?3)) + 1
+                                     ELSE EXTRACT(DOY FROM DATE(?3))
+                                    END)
+                END) AND (CASE
+                              WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) < EXTRACT(YEAR FROM DATE(VU.END_TIME))
+                                  THEN
+                                  (CASE
+                                       WHEN EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 100 != 0 OR
+                                             EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                       ELSE
+                                           (CASE
+                                                WHEN EXTRACT(MONTH FROM DATE(VU.END_TIME)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + 1 +
+                                                         EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                                ELSE EXTRACT(DOY FROM DATE(VU.END_TIME)) + EXTRACT(DOY FROM DATE(VU.START_TIME))
+                                               END)
+                                      END)
+                              ELSE
+                                  (CASE
+                                       WHEN EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 100 != 0 OR
+                                             EXTRACT(YEAR FROM DATE(VU.END_TIME)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(VU.END_TIME))
+                                       ELSE
+                                           (CASE
+                                                WHEN EXTRACT(MONTH FROM DATE(VU.END_TIME)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(VU.END_TIME)) + 1
+                                                ELSE EXTRACT(DOY FROM DATE(VU.END_TIME))
+                                               END)
+                                      END)
+                END) < (CASE
+                            WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                                THEN
+                                (CASE
+                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                     ELSE
+                                         (CASE
+                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
+                                              ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                             END)
+                                    END)
+                            ELSE
+                                (CASE
+                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(?4))
+                                     ELSE
+                                         (CASE
+                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1
+                                              ELSE EXTRACT(DOY FROM DATE(?4))
+                                             END)
+                                    END)
+                END))
                 """, nativeQuery = true)
     List<VacationUnit> findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
             @Param("propertyId") Long propertyId,
             @Param("roomId") String roomId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
-            @Param("status") String status
+            @Param("statusVacation") String statusVacation,
+            @Param("statusOwnership") String statusOwnership
     );
 
 //    @Query("""

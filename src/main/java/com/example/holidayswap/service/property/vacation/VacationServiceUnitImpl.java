@@ -2,6 +2,7 @@ package com.example.holidayswap.service.property.vacation;
 
 import com.example.holidayswap.domain.dto.request.property.vacation.VacationUnitRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.VacationUnitResponse;
+import com.example.holidayswap.domain.entity.property.ownership.ContractStatus;
 import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
 import com.example.holidayswap.domain.entity.property.vacation.VacationUnit;
@@ -9,6 +10,7 @@ import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.vacation.VacationUnitMapper;
+import com.example.holidayswap.repository.property.ownership.OwnershipRepository;
 import com.example.holidayswap.repository.property.vacation.VacationUnitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import static com.example.holidayswap.constants.ErrorMessage.VACATION_NOT_FOUND;
 @RequiredArgsConstructor
 public class VacationServiceUnitImpl implements VacationUnitService {
     private final VacationUnitRepository vacationUnitRepository;
+    private final OwnershipRepository ownershipRepository;
 
     @Override
     public Page<VacationUnitResponse> getAllByPropertyId(Long propertyId, Pageable pageable) {
@@ -61,20 +64,23 @@ public class VacationServiceUnitImpl implements VacationUnitService {
             throw new DataIntegrityViolationException("Start time must be before end time");
         //Check if type is deeded, check overlap?
         //find ownership
+//        var ownership = ownershipRepository.findByPropertyIdAndUserUserIdAndIdRoomId(ownershipId.getPropertyId(), ownershipId.getUserId(), ownershipId.getRoomId()).orElseThrow(
+//                () -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND));
         //Declare list
         List<VacationUnit> checkVacationUnit;
         //Check overlaps with any
-        {
+
             checkVacationUnit = vacationUnitRepository.
                     findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
                             ownershipId.getPropertyId(),
                             ownershipId.getRoomId(),
                             dtoRequest.getStartTime(),
                             dtoRequest.getEndTime(),
-                            VacationStatus.ACCEPTED.toString()
+                            VacationStatus.ACCEPTED.toString(),
+                            ContractStatus.ACCEPTED.toString()
                     );
             if (!checkVacationUnit.isEmpty()) throw new DuplicateRecordException("Overlaps time.");
-        }
+
         //Check user only create 1 request of each property
         checkVacationUnit = vacationUnitRepository.
                 findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
@@ -82,7 +88,7 @@ public class VacationServiceUnitImpl implements VacationUnitService {
                         ownershipId.getRoomId(),
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
-                        VacationStatus.PENDING.toString());
+                        VacationStatus.PENDING.toString(), null);
         if (!checkVacationUnit.isEmpty())
             throw new DuplicateRecordException("Only 1 request for 1 person in 1 property");
         //pass all then create
