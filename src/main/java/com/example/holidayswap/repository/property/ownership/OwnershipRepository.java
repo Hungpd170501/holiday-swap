@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.property.ownership;
 
+import com.example.holidayswap.domain.dto.response.resort.OwnerShipResponseDTO;
 import com.example.holidayswap.domain.entity.property.ownership.ContractStatus;
 import com.example.holidayswap.domain.entity.property.ownership.ContractType;
 import com.example.holidayswap.domain.entity.property.ownership.Ownership;
@@ -61,4 +62,7 @@ public interface OwnershipRepository extends JpaRepository<Ownership, OwnershipI
             String roomId,
             ContractType type,
             ContractStatus status);
+
+    @Query(value = "SELECT Distinct o.property_id, o.room_id from ownership o",nativeQuery = true)
+    List<OwnerShipResponseDTO> getAllDistinctOwnerShipWithoutUserId();
 }

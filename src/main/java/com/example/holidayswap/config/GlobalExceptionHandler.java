@@ -137,7 +137,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> globalExceptionHandler(Exception ex, WebRequest request) {
         ApiError message = ApiError.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .message(SERVICE_UNAVAILABLE)
+                .message(ex.getMessage())
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
