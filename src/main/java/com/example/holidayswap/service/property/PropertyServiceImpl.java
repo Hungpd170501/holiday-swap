@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
 import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
-import com.example.holidayswap.domain.dto.request.property.ownership.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
@@ -17,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -87,18 +87,13 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    @Transactional
     public PropertyResponse create(Long userId,
                                    PropertyRegisterRequest dtoRequest,
                                    List<MultipartFile> propertyImages) {
         var entity = create(userId, dtoRequest);
         propertyImages.forEach(e -> {
             propertyImageService.create(entity.getId(), e);
-        });
-        propertyImages.forEach(e -> {
-            ContractImageRequest contractImageRequest = new ContractImageRequest();
-            contractImageRequest.setPropertyId(entity.getId());
-            contractImageRequest.setUserId(userId);
-            contractImageService.create(contractImageRequest, e);
         });
         return entity;
     }

@@ -16,7 +16,6 @@ public interface PropertyMapper {
     PropertyResponse toDtoResponse(Property entity);
 
     @Mapping(target = "inRoomAmenities", ignore = true)
-//    @Mapping(target = "ownershipRequest" , ignore = true)
     Property toEntity(PropertyRegisterRequest dtoRequest);
 
     Property toEntity(PropertyUpdateRequest dtoRequest);

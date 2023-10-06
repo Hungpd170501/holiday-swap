@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.VACATION_NOT_FOUND;
 
@@ -56,30 +56,36 @@ public class VacationServiceUnitImpl implements VacationUnitService {
     @Transactional
     public VacationUnitResponse create(OwnershipId ownershipId, VacationUnitRequest dtoRequest) {
         var entity = VacationUnitMapper.INSTANCE.toEntity(dtoRequest);
-
+        //Check begin time and end time is format
         if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
             throw new DataIntegrityViolationException("Start time must be before end time");
-
-        Optional<VacationUnit> checkVacationUnit;
-        checkVacationUnit = vacationUnitRepository.
-                findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
-                ownershipId.getPropertyId(),
-                ownershipId.getRoomId(),
-                dtoRequest.getStartTime(),
-                dtoRequest.getEndTime(),
-                VacationStatus.ACCEPTED
-        );
-        if (checkVacationUnit.isPresent()) throw new DuplicateRecordException("Time vacation already exist.");
+        //Check if type is deeded, check overlap?
+        //find ownership
+        //Declare list
+        List<VacationUnit> checkVacationUnit;
+        //Check overlaps with any
+        {
+            checkVacationUnit = vacationUnitRepository.
+                    findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
+                            ownershipId.getPropertyId(),
+                            ownershipId.getRoomId(),
+                            dtoRequest.getStartTime(),
+                            dtoRequest.getEndTime(),
+                            VacationStatus.ACCEPTED.toString()
+                    );
+            if (!checkVacationUnit.isEmpty()) throw new DuplicateRecordException("Overlaps time.");
+        }
+        //Check user only create 1 request of each property
         checkVacationUnit = vacationUnitRepository.
                 findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
                         ownershipId.getPropertyId(),
                         ownershipId.getRoomId(),
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
-                        VacationStatus.PENDING);
-        if (checkVacationUnit.isPresent())
-            throw new DuplicateRecordException("Time vacation-unit only contain 1 record.");
-
+                        VacationStatus.PENDING.toString());
+        if (!checkVacationUnit.isEmpty())
+            throw new DuplicateRecordException("Only 1 request for 1 person in 1 property");
+        //pass all then create
         entity.setPropertyId(ownershipId.getPropertyId());
         entity.setUserId(ownershipId.getUserId());
         entity.setRoomId(ownershipId.getRoomId());
