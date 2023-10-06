@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.dto.request.property.PropertyRegisterReque
 import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
 import com.example.holidayswap.domain.dto.request.property.ownership.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
+import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -38,13 +39,14 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyMapper propertyMapper;
 
     @Override
-    public Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, Pageable pageable) {
-        var entities = propertyRepository.
+    public Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable) {
+        Page<Property> entities = propertyRepository.
                 findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(
                         resortId,
                         timeCheckIn,
-                        timeCheckOut,
+                        timeCheckOut, numberGuests,
                         pageable);
+
         var dtoResponse = entities.
                 map(propertyMapper::toDtoResponse);
         dtoResponse.forEach(e -> {

@@ -12,7 +12,9 @@ public class PropertyResponse {
     private String propertyName;
     private String propertyDescription;
     private int numberKingBeds;
-    private int numberQueensBeds;
+    private int numberQueenBeds;
+    private int numberSingleBeds;
+    private int numberDoubleBeds;
     private int numberTwinBeds;
     private int numberFullBeds;
     private int numberSofaBeds;
@@ -22,6 +24,7 @@ public class PropertyResponse {
     private double roomSize;
     private Boolean isDeleted;
     private PropertyStatus status;
+    private Long resortId;
     private PropertyTypeResponse propertyType;
     private PropertyViewResponse propertyView;
     private List<InRoomAmenityTypeResponse> inRoomAmenityTypeResponses;

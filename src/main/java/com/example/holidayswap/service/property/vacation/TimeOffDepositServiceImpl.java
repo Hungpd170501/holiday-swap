@@ -68,7 +68,7 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
                 );
         if (checkIsInVacationUnitTime.isEmpty())
             throw new DataIntegrityViolationException("There are no vacation include this range time");
-        var checkDuplicateWhichAnyTimeDeposit = timeOffDepositRepository.findDuplicateWhichAnyTimeDeposit(
+        var checkDuplicateWhichAnyTimeDeposit = timeOffDepositRepository.findOverlapsWhichAnyTimeDeposit(
                 vacationUnitId,
                 dtoRequest.getStartTime(),
                 dtoRequest.getEndTime(),

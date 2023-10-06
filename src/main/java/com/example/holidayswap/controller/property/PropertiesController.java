@@ -41,11 +41,12 @@ public class PropertiesController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckIn,
             @RequestParam(value = "timeCheckOut", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
+            @RequestParam(defaultValue = "0") Integer numberGuest,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var properties = propertyService.gets(resortId, timeCheckIn, timeCheckOut, pageable);
+        var properties = propertyService.gets(resortId, timeCheckIn, timeCheckOut, numberGuest, pageable);
         return ResponseEntity.ok(properties);
     }
 

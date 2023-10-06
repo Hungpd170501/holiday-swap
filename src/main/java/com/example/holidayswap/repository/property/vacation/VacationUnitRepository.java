@@ -25,7 +25,7 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
             join pT.resorts s
             where s.id = ?1
             and v.isDeleted = false""")
-    Page<VacationUnit> findAllByResortId(Long resostId, Pageable pageable);
+    Page<VacationUnit> findAllByResortId(Long resortId, Pageable pageable);
 
     @Query("select v from VacationUnit v where v.id = ?1 and v.isDeleted = false")
     Optional<VacationUnit> findByIdAndIsDeletedIsFalse(Long id);
