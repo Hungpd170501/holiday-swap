@@ -3,6 +3,7 @@ package com.example.holidayswap.service.property.vacation;
 import com.example.holidayswap.domain.dto.request.property.vacation.TimeOffDepositRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.TimeOffDepositResponse;
 import com.example.holidayswap.domain.entity.property.vacation.TimeOffDepositStatus;
+import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.vacation.TimeOffDepositMapper;
@@ -55,18 +56,20 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
     public TimeOffDepositResponse create(Long vacationUnitId, TimeOffDepositRequest dtoRequest) {
         if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
             throw new DataIntegrityViolationException("Start time must be before end time");
-        var vacationUnitFound = vacationUnitRepository.findByIdAndIsDeletedIsFalse(vacationUnitId);
-        if (vacationUnitFound.isEmpty()) throw new EntityNotFoundException(VACATION_NOT_FOUND);
-//        var checkIsInVacationUnitTime = vacationUnitRepository.
-//                findByStartTimeAndEndTimeIsInVacationUnitTime(
-//                        vacationUnitFound.get().getPropertyId(),
-//                        vacationUnitFound.get().getRoomId(),
-//                        dtoRequest.getStartTime(),
-//                        dtoRequest.getEndTime(),
-//                        VacationStatus.ACCEPTED
-//                );
-//        if (checkIsInVacationUnitTime.isEmpty())
-//            throw new DataIntegrityViolationException("There are no vacation include this range time");
+        var vacationUnitFound = vacationUnitRepository.
+                findByIdAndIsDeletedIsFalse(vacationUnitId).orElseThrow(() -> new EntityNotFoundException(VACATION_NOT_FOUND));
+        //check is in vacation unit time
+        var checkIsInVacationUnitTime = vacationUnitRepository.
+                findByStartTimeAndEndTimeIsInVacationUnitTime(
+                        vacationUnitFound.getPropertyId(),
+                        vacationUnitFound.getUserId(),
+                        vacationUnitFound.getRoomId(),
+                        dtoRequest.getStartTime(),
+                        dtoRequest.getEndTime(),
+                        VacationStatus.ACCEPTED.toString()
+                );
+        if (checkIsInVacationUnitTime.isEmpty())
+            throw new DataIntegrityViolationException("Your public time is not in range vacation unit");
         var checkDuplicateWhichAnyTimeDeposit = timeOffDepositRepository.findOverlapsWhichAnyTimeDeposit(
                 vacationUnitId,
                 dtoRequest.getStartTime(),
@@ -77,6 +80,7 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
             throw new DataIntegrityViolationException("Duplicate with another time off deposit");
         var timeOffDeposit = TimeOffDepositMapper.INSTANCE.toEntity(dtoRequest);
         timeOffDeposit.setStatus(TimeOffDepositStatus.OPEN);
+        timeOffDeposit.setVacationUnitId(vacationUnitId);
         var timeOffDepositCreated = timeOffDepositRepository.save(timeOffDeposit);
         return TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
     }

@@ -111,7 +111,7 @@ public class VacationServiceUnitImpl implements VacationUnitService {
                         ownershipId.getRoomId(),
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
-                        VacationStatus.PENDING
+                        VacationStatus.PENDING.toString()
                 );
         if (checkVacationIsCreated.isPresent())
             throw new DuplicateRecordException("Only 1 request for 1 person in 1 property");
