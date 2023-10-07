@@ -9,6 +9,4 @@ public class TimeOffDepositRequest {
     private Date startTime;
     private Date endTime;
     private double pricePerNight;
-    private Long vacationUnitId;
-
 }
