@@ -56,18 +56,20 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
     public TimeOffDepositResponse create(Long vacationUnitId, TimeOffDepositRequest dtoRequest) {
         if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
             throw new DataIntegrityViolationException("Start time must be before end time");
-        var vacationUnitFound = vacationUnitRepository.findByIdAndIsDeletedIsFalse(vacationUnitId);
-        if (vacationUnitFound.isEmpty()) throw new EntityNotFoundException(VACATION_NOT_FOUND);
+        var vacationUnitFound = vacationUnitRepository.
+                findByIdAndIsDeletedIsFalse(vacationUnitId).orElseThrow(() -> new EntityNotFoundException(VACATION_NOT_FOUND));
+        //check is in vacation unit time
         var checkIsInVacationUnitTime = vacationUnitRepository.
                 findByStartTimeAndEndTimeIsInVacationUnitTime(
-                        vacationUnitFound.get().getPropertyId(),
-                        vacationUnitFound.get().getRoomId(),
+                        vacationUnitFound.getPropertyId(),
+                        vacationUnitFound.getUserId(),
+                        vacationUnitFound.getRoomId(),
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
-                        VacationStatus.ACCEPTED
+                        VacationStatus.ACCEPTED.toString()
                 );
         if (checkIsInVacationUnitTime.isEmpty())
-            throw new DataIntegrityViolationException("There are no vacation include this range time");
+            throw new DataIntegrityViolationException("Your public time is not in range vacation unit");
         var checkDuplicateWhichAnyTimeDeposit = timeOffDepositRepository.findOverlapsWhichAnyTimeDeposit(
                 vacationUnitId,
                 dtoRequest.getStartTime(),
@@ -78,6 +80,7 @@ public class TimeOffDepositServiceImpl implements TimeOffDepositService {
             throw new DataIntegrityViolationException("Duplicate with another time off deposit");
         var timeOffDeposit = TimeOffDepositMapper.INSTANCE.toEntity(dtoRequest);
         timeOffDeposit.setStatus(TimeOffDepositStatus.OPEN);
+        timeOffDeposit.setVacationUnitId(vacationUnitId);
         var timeOffDepositCreated = timeOffDepositRepository.save(timeOffDeposit);
         return TimeOffDepositMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
     }

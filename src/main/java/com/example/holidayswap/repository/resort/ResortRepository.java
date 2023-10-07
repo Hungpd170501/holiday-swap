@@ -31,7 +31,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             and tod.isDeleted = false
             and ((cast(?2 as date ) is null or cast(?3 as date) is null )
             or (
-                 (tod.startTime BETWEEN ?2 AND ?3)
+             (tod.startTime BETWEEN ?2 AND ?3)
                  OR
                  (tod.endTime BETWEEN ?2 AND ?3)
                  OR

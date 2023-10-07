@@ -35,6 +35,46 @@ public interface OwnershipRepository extends JpaRepository<Ownership, OwnershipI
                                                                  @Param("userId") Long userId,
                                                                  @Param("roomId") String roomId);
 
+    @Query("select o from Ownership o " +
+           "where upper(o.id.roomId) = upper( :roomId)" +
+           "and o.id.propertyId = :propertyId " +
+           "and o.isDeleted = false ")
+    List<Ownership> findByPropertyIdAndIdRoomId(@Param("propertyId") Long propertyId, @Param("roomId") String roomId);
+
+    @Query(value = """
+            SELECT PROPERTY_ID,
+                                 ROOM_ID,
+                                 USER_ID,
+                                 END_TIME,
+                                 IS_DELETED,
+                                 START_TIME,
+                                 STATUS,
+                                 TYPE
+                          FROM OWNERSHIP O
+                          WHERE UPPER(O.ROOM_ID) = UPPER(:roomId)
+                            AND O.PROPERTY_ID = :propertyId
+                            AND O.USER_ID != :userId
+                            AND O.IS_DELETED = FALSE
+                            AND CASE
+                                    WHEN O.TYPE = 'RIGHT_TO_USE'
+                                        then ((O.START_TIME BETWEEN :startTime AND :endTime)
+                                            OR
+                                             (O.END_TIME BETWEEN :startTime AND :endTime)
+                                            OR
+                                             (O.START_TIME < :startTime AND O.END_TIME > :endTime)
+                                            OR
+                                             (O.END_TIME > :startTime AND O.END_TIME < :endTime)
+                                        )
+                                    ELSE O.IS_DELETED = FALSE and O.TYPE = 'DEEDED'
+                              END
+            """, nativeQuery = true)
+    Optional<Ownership> checkOverlapsTimeOwnership(@Param("propertyId") Long propertyId,
+                                                   @Param("userId") Long userId,
+                                                   @Param("roomId") String roomId,
+                                                   @Param("startTime") Date startTime,
+                                                   @Param("endTime") Date endTime
+    );
+
     @Query("""
             select o from Ownership o
             where o.id.propertyId = ?1
