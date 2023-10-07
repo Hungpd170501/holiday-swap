@@ -14,15 +14,6 @@ import java.util.Set;
 
 @Repository
 public interface ResortRepository extends JpaRepository<Resort, Long> {
-    //    (
-//            (tod.startTime BETWEEN ?2 AND ?3)
-//    OR
-//            (tod.endTime BETWEEN ?2 AND ?3)
-//    OR
-//            (tod.startTime < ?2 AND tod.endTime > ?3)
-//    OR
-//            (tod.endTime > ?2 AND tod.endTime < ?3)
-//                 )
     @Query("""
             select DISTINCT r  from Resort r
             inner join r.propertyTypes pt
@@ -39,7 +30,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             and vu.isDeleted = false
             and tod.isDeleted = false
             and ((cast(?2 as date ) is null or cast(?3 as date) is null )
-            or  (
+            or (
              (tod.startTime BETWEEN ?2 AND ?3)
                  OR
                  (tod.endTime BETWEEN ?2 AND ?3)
@@ -47,8 +38,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                  (tod.startTime < ?2 AND tod.endTime > ?3)
                  OR
                  (tod.endTime > ?2 AND tod.endTime < ?3)
-                 )
-             )
+                 ))
             and (p.numberKingBeds * 2
             + p.numberQueenBeds * 2
             + p.numberSingleBeds
