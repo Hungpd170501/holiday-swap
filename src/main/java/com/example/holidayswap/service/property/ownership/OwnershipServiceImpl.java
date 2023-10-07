@@ -67,7 +67,6 @@ public class OwnershipServiceImpl implements OwnershipService {
             dtoRequest.setEndTime(null);
         } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
             throw new DataIntegrityViolationException("Start time must be before end time");
-
         var entity = OwnershipMapper.INSTANCE.toEntity(dtoRequest);
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(propertyId).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
@@ -98,11 +97,11 @@ public class OwnershipServiceImpl implements OwnershipService {
                                     List<MultipartFile> contractImages) {
         var dtoResponse = create(propertyId, userId, dtoRequest);
         contractImages.forEach(e -> {
-            ContractImageRequest c = new ContractImageRequest();
-            c.setPropertyId(propertyId);
-            c.setUserId(userId);
-            c.setRoomId(dtoRequest.getRoomId());
-            contractImageService.create(c, e);
+            ContractImageRequest id = new ContractImageRequest();
+            id.setPropertyId(propertyId);
+            id.setUserId(userId);
+            id.setRoomId(dtoRequest.getRoomId());
+            contractImageService.create(id, e);
         });
         return dtoResponse;
     }

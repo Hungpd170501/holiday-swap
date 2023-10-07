@@ -3,6 +3,7 @@ package com.example.holidayswap.service.property.vacation;
 import com.example.holidayswap.domain.dto.request.property.vacation.VacationUnitRequest;
 import com.example.holidayswap.domain.dto.response.property.vacation.VacationUnitResponse;
 import com.example.holidayswap.domain.entity.property.ownership.ContractStatus;
+import com.example.holidayswap.domain.entity.property.ownership.ContractType;
 import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
 import com.example.holidayswap.domain.entity.property.vacation.VacationUnit;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.example.holidayswap.constants.ErrorMessage.OWNERSHIP_NOT_FOUND;
 import static com.example.holidayswap.constants.ErrorMessage.VACATION_NOT_FOUND;
 
 @Service
@@ -64,32 +66,54 @@ public class VacationServiceUnitImpl implements VacationUnitService {
             throw new DataIntegrityViolationException("Start time must be before end time");
         //Check if type is deeded, check overlap?
         //find ownership
-//        var ownership = ownershipRepository.findByPropertyIdAndUserUserIdAndIdRoomId(ownershipId.getPropertyId(), ownershipId.getUserId(), ownershipId.getRoomId()).orElseThrow(
-//                () -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND));
+        var ownership = ownershipRepository.findByPropertyIdAndUserUserIdAndIdRoomId(
+                        ownershipId.getPropertyId()
+                        , ownershipId.getUserId()
+                        , ownershipId.getRoomId())
+                .orElseThrow(() -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND));
         //Declare list
         List<VacationUnit> checkVacationUnit;
         //Check overlaps with any
 
-            checkVacationUnit = vacationUnitRepository.
-                    findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
-                            ownershipId.getPropertyId(),
-                            ownershipId.getRoomId(),
-                            dtoRequest.getStartTime(),
-                            dtoRequest.getEndTime(),
-                            VacationStatus.ACCEPTED.toString(),
-                            ContractStatus.ACCEPTED.toString()
-                    );
-            if (!checkVacationUnit.isEmpty()) throw new DuplicateRecordException("Overlaps time.");
-
-        //Check user only create 1 request of each property
         checkVacationUnit = vacationUnitRepository.
-                findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
+                findOverlapWith(
                         ownershipId.getPropertyId(),
+                        ownershipId.getUserId(),
                         ownershipId.getRoomId(),
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
-                        VacationStatus.PENDING.toString(), null);
-        if (!checkVacationUnit.isEmpty())
+                        VacationStatus.ACCEPTED.toString(),
+                        ContractStatus.ACCEPTED.toString()
+                );
+        if (!checkVacationUnit.isEmpty()) {
+            if (ownership.getType() == ContractType.DEEDED)
+                throw new DuplicateRecordException("Overlaps ownership type DEEDED");
+            else checkVacationUnit.forEach(e -> {
+                var ownershipCheck = ownershipRepository.
+                        checkOverlapsTimeOwnership(
+                                ownershipId.getPropertyId(),
+                                ownershipId.getUserId(),
+                                ownershipId.getRoomId(),
+                                ownership.getStartTime(),
+                                ownership.getEndTime());
+                if (ownershipCheck.isPresent())
+                    if (ownershipCheck.get().getType() == ContractType.DEEDED)
+                        throw new DuplicateRecordException("Overlaps ownership type DEEDED");
+                    else throw new DuplicateRecordException("Overlaps ownership type RIGHT TO USE");
+            });
+        }
+//        Check user only create 1 request of each property
+        //kiem tra xem cai request nay da co chua, co roi thi khong dc tao them, chi duoc 1 request duy nhat, tr
+        var checkVacationIsCreated = vacationUnitRepository.
+                findByStartTimeAndEndTimeIsInVacationUnitTime(
+                        ownershipId.getPropertyId(),
+                        ownershipId.getUserId(),
+                        ownershipId.getRoomId(),
+                        dtoRequest.getStartTime(),
+                        dtoRequest.getEndTime(),
+                        VacationStatus.PENDING
+                );
+        if (checkVacationIsCreated.isPresent())
             throw new DuplicateRecordException("Only 1 request for 1 person in 1 property");
         //pass all then create
         entity.setPropertyId(ownershipId.getPropertyId());

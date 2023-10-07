@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.property.vacation;
 
+import com.example.holidayswap.domain.entity.property.vacation.VacationStatus;
 import com.example.holidayswap.domain.entity.property.vacation.VacationUnit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +43,10 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
             and v.isDeleted = false
             and v.startTime >= ?2
             and v.endTime <= ((CAST(?1 AS date)))""")
-    List<VacationUnit> findAllByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
+    List<VacationUnit> findAllByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+            Long propertyId,
+            Date startTime,
+            Date endTime);
 
     @Query("""
             select v from VacationUnit v
@@ -50,7 +54,10 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
             and v.isDeleted = false
             and v.startTime >= ?2
             and v.endTime <= ((CAST(?1 AS date)))""")
-    Optional<VacationUnit> findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long propertyId, Date startTime, Date endTime);
+    Optional<VacationUnit> findByPropertyIdAndDeletedIsFalseAndAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(
+            Long propertyId,
+            Date startTime,
+            Date endTime);
 
     @Query(value = """
             SELECT VU.VACATION_UNIT_ID,
@@ -63,11 +70,12 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
                    VU.ROOM_ID
             FROM VACATION_UNIT VU
                      JOIN OWNERSHIP O ON VU.PROPERTY_ID = O.PROPERTY_ID AND VU.ROOM_ID = O.ROOM_ID AND VU.USER_ID = O.USER_ID
-            WHERE VU.PROPERTY_ID = ?1
-                AND VU.ROOM_ID = ?2
+            WHERE VU.PROPERTY_ID = :propertyId
+                AND VU.ROOM_ID = :roomId
                 AND VU.IS_DELETED = FALSE
-                AND (?5 IS NULL OR VU.STATUS = ?5)
-                AND (?6 IS NULL OR O.STATUS = ?6)
+                AND VU.USER_ID != :userId
+                AND (:statusVacation IS NULL OR VU.STATUS = :statusVacation)
+                AND (:statusOwnership IS NULL OR O.STATUS = :statusOwnership)
                 AND ((CASE
                           WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 4 = 0 AND
                                (EXTRACT(YEAR FROM DATE(VU.START_TIME)) % 100 != 0 OR
@@ -80,39 +88,39 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
                                    ELSE EXTRACT(DOY FROM DATE(VU.START_TIME))
                                   END)
                     END) BETWEEN (CASE
-                                      WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
-                                           (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
-                                          THEN EXTRACT(DOY FROM DATE(?3))
+                                      WHEN EXTRACT(YEAR FROM DATE(:startTime)) % 4 = 0 AND
+                                           (EXTRACT(YEAR FROM DATE(:startTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:startTime)) % 400 = 0)
+                                          THEN EXTRACT(DOY FROM DATE(:startTime))
                                       ELSE
                                           (CASE
-                                               WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
-                                                   THEN EXTRACT(DOY FROM DATE(?3)) + 1
-                                               ELSE EXTRACT(DOY FROM DATE(?3))
+                                               WHEN EXTRACT(MONTH FROM DATE(:startTime)) > 2
+                                                   THEN EXTRACT(DOY FROM DATE(:startTime)) + 1
+                                               ELSE EXTRACT(DOY FROM DATE(:startTime))
                                               END)
                     END) AND (CASE
-                                  WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                                  WHEN EXTRACT(YEAR FROM DATE(:startTime)) < EXTRACT(YEAR FROM DATE(:endTime))
                                       THEN
                                       (CASE
-                                           WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                                (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                               THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                           WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                                (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                               THEN EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                            ELSE
                                                (CASE
-                                                    WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                        THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
-                                                    ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                                    WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                        THEN EXTRACT(DOY FROM DATE(:endTime)) + 1 + EXTRACT(DOY FROM DATE(:startTime))
+                                                    ELSE EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                                    END)
                                           END)
                                   ELSE
                                       (CASE
-                                           WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                                (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                               THEN EXTRACT(DOY FROM DATE(?4))
+                                           WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                                (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                               THEN EXTRACT(DOY FROM DATE(:endTime))
                                            ELSE
                                                (CASE
-                                                    WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                        THEN EXTRACT(DOY FROM DATE(?4)) + 1
-                                                    ELSE EXTRACT(DOY FROM DATE(?4))
+                                                    WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                        THEN EXTRACT(DOY FROM DATE(:endTime)) + 1
+                                                    ELSE EXTRACT(DOY FROM DATE(:endTime))
                                                    END)
                                           END)
                     END))
@@ -145,39 +153,39 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
                                          END)
                                 END)
                 END) BETWEEN (CASE
-                                  WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
-                                       (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
-                                      THEN EXTRACT(DOY FROM DATE(?3))
+                                  WHEN EXTRACT(YEAR FROM DATE(:startTime)) % 4 = 0 AND
+                                       (EXTRACT(YEAR FROM DATE(:startTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:startTime)) % 400 = 0)
+                                      THEN EXTRACT(DOY FROM DATE(:startTime))
                                   ELSE
                                       (CASE
-                                           WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
-                                               THEN EXTRACT(DOY FROM DATE(?3)) + 1
-                                           ELSE EXTRACT(DOY FROM DATE(?3))
+                                           WHEN EXTRACT(MONTH FROM DATE(:startTime)) > 2
+                                               THEN EXTRACT(DOY FROM DATE(:startTime)) + 1
+                                           ELSE EXTRACT(DOY FROM DATE(:startTime))
                                           END)
                 END) AND (CASE
-                              WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                              WHEN EXTRACT(YEAR FROM DATE(:startTime)) < EXTRACT(YEAR FROM DATE(:endTime))
                                   THEN
                                   (CASE
-                                       WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                            (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                           THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                       WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                        ELSE
                                            (CASE
-                                                WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                    THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
-                                                ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                                WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(:endTime)) + 1 + EXTRACT(DOY FROM DATE(:startTime))
+                                                ELSE EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                                END)
                                       END)
                               ELSE
                                   (CASE
-                                       WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                            (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                           THEN EXTRACT(DOY FROM DATE(?4))
+                                       WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                            (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                           THEN EXTRACT(DOY FROM DATE(:endTime))
                                        ELSE
                                            (CASE
-                                                WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                    THEN EXTRACT(DOY FROM DATE(?4)) + 1
-                                                ELSE EXTRACT(DOY FROM DATE(?4))
+                                                WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                    THEN EXTRACT(DOY FROM DATE(:endTime)) + 1
+                                                ELSE EXTRACT(DOY FROM DATE(:endTime))
                                                END)
                                       END)
                 END))
@@ -192,14 +200,14 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
                                  ELSE EXTRACT(DOY FROM DATE(VU.START_TIME))
                                 END)
                 END) < (CASE
-                            WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
-                                 (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
-                                THEN EXTRACT(DOY FROM DATE(?3))
+                            WHEN EXTRACT(YEAR FROM DATE(:startTime)) % 4 = 0 AND
+                                 (EXTRACT(YEAR FROM DATE(:startTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:startTime)) % 400 = 0)
+                                THEN EXTRACT(DOY FROM DATE(:startTime))
                             ELSE
                                 (CASE
-                                     WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
-                                         THEN EXTRACT(DOY FROM DATE(?3)) + 1
-                                     ELSE EXTRACT(DOY FROM DATE(?3))
+                                     WHEN EXTRACT(MONTH FROM DATE(:startTime)) > 2
+                                         THEN EXTRACT(DOY FROM DATE(:startTime)) + 1
+                                     ELSE EXTRACT(DOY FROM DATE(:startTime))
                                     END)
                 END) AND (CASE
                               WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) < EXTRACT(YEAR FROM DATE(VU.END_TIME))
@@ -231,29 +239,29 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
                                                END)
                                       END)
                 END) > (CASE
-                            WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                            WHEN EXTRACT(YEAR FROM DATE(:startTime)) < EXTRACT(YEAR FROM DATE(:endTime))
                                 THEN
                                 (CASE
-                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                         THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                     WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                      ELSE
                                          (CASE
-                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
-                                              ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                              WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(:endTime)) + 1 + EXTRACT(DOY FROM DATE(:startTime))
+                                              ELSE EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                              END)
                                     END)
                             ELSE
                                 (CASE
-                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                         THEN EXTRACT(DOY FROM DATE(?4))
+                                     WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(:endTime))
                                      ELSE
                                          (CASE
-                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1
-                                              ELSE EXTRACT(DOY FROM DATE(?4))
+                                              WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(:endTime)) + 1
+                                              ELSE EXTRACT(DOY FROM DATE(:endTime))
                                              END)
                                     END)
                 END))
@@ -268,14 +276,14 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
                                  ELSE EXTRACT(DOY FROM DATE(VU.START_TIME))
                                 END)
                 END) > (CASE
-                            WHEN EXTRACT(YEAR FROM DATE(?3)) % 4 = 0 AND
-                                 (EXTRACT(YEAR FROM DATE(?3)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?3)) % 400 = 0)
-                                THEN EXTRACT(DOY FROM DATE(?3))
+                            WHEN EXTRACT(YEAR FROM DATE(:startTime)) % 4 = 0 AND
+                                 (EXTRACT(YEAR FROM DATE(:startTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:startTime)) % 400 = 0)
+                                THEN EXTRACT(DOY FROM DATE(:startTime))
                             ELSE
                                 (CASE
-                                     WHEN EXTRACT(MONTH FROM DATE(?3)) > 2
-                                         THEN EXTRACT(DOY FROM DATE(?3)) + 1
-                                     ELSE EXTRACT(DOY FROM DATE(?3))
+                                     WHEN EXTRACT(MONTH FROM DATE(:startTime)) > 2
+                                         THEN EXTRACT(DOY FROM DATE(:startTime)) + 1
+                                     ELSE EXTRACT(DOY FROM DATE(:startTime))
                                     END)
                 END) AND (CASE
                               WHEN EXTRACT(YEAR FROM DATE(VU.START_TIME)) < EXTRACT(YEAR FROM DATE(VU.END_TIME))
@@ -307,54 +315,58 @@ public interface VacationUnitRepository extends JpaRepository<VacationUnit, Long
                                                END)
                                       END)
                 END) < (CASE
-                            WHEN EXTRACT(YEAR FROM DATE(?3)) < EXTRACT(YEAR FROM DATE(?4))
+                            WHEN EXTRACT(YEAR FROM DATE(:startTime)) < EXTRACT(YEAR FROM DATE(:endTime))
                                 THEN
                                 (CASE
-                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                         THEN EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                     WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                      ELSE
                                          (CASE
-                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1 + EXTRACT(DOY FROM DATE(?3))
-                                              ELSE EXTRACT(DOY FROM DATE(?4)) + EXTRACT(DOY FROM DATE(?3))
+                                              WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(:endTime)) + 1 + EXTRACT(DOY FROM DATE(:startTime))
+                                              ELSE EXTRACT(DOY FROM DATE(:endTime)) + EXTRACT(DOY FROM DATE(:startTime))
                                              END)
                                     END)
                             ELSE
                                 (CASE
-                                     WHEN EXTRACT(YEAR FROM DATE(?4)) % 4 = 0 AND
-                                          (EXTRACT(YEAR FROM DATE(?4)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(?4)) % 400 = 0)
-                                         THEN EXTRACT(DOY FROM DATE(?4))
+                                     WHEN EXTRACT(YEAR FROM DATE(:endTime)) % 4 = 0 AND
+                                          (EXTRACT(YEAR FROM DATE(:endTime)) % 100 != 0 OR EXTRACT(YEAR FROM DATE(:endTime)) % 400 = 0)
+                                         THEN EXTRACT(DOY FROM DATE(:endTime))
                                      ELSE
                                          (CASE
-                                              WHEN EXTRACT(MONTH FROM DATE(?4)) > 2
-                                                  THEN EXTRACT(DOY FROM DATE(?4)) + 1
-                                              ELSE EXTRACT(DOY FROM DATE(?4))
+                                              WHEN EXTRACT(MONTH FROM DATE(:endTime)) > 2
+                                                  THEN EXTRACT(DOY FROM DATE(:endTime)) + 1
+                                              ELSE EXTRACT(DOY FROM DATE(:endTime))
                                              END)
                                     END)
                 END))
                 """, nativeQuery = true)
-    List<VacationUnit> findByPropertyIdAndRoomIdAndStartTimeBetweenAndEndTimeBetweenAndDeletedIsFalseAndStatus(
+    List<VacationUnit> findOverlapWith(
             @Param("propertyId") Long propertyId,
-            @Param("roomId") String roomId,
+            @Param("userId") Long userId
+            , @Param("roomId") String roomId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
             @Param("statusVacation") String statusVacation,
             @Param("statusOwnership") String statusOwnership
     );
 
-//    @Query("""
-//            select v from VacationUnit v
-//            where v.propertyId = ?1
-//            and v.roomId = ?2
-//            and v.startTime <= ((CAST(?1 AS date)))
-//            and v.endTime >= (CAST(?2 AS date))
-//            and v.isDeleted = false and v.status = ?5""")
-//    Optional<VacationUnit> findByStartTimeAndEndTimeIsInVacationUnitTime(
-//            Long propertyId,
-//            String roomId,
-//            Date startTime,
-//            Date endTime,
-//            VacationStatus vacationStatus
-//    );
+    @Query("""
+            select v from VacationUnit v
+            where v.propertyId = :propertyId
+            and v.userId = :userId
+            and v.roomId = :roomId
+            and v.startTime <= :startTime
+            and v.endTime >= :endTime
+            and v.isDeleted = false
+            and v.status = :vacationStatus""")
+    Optional<VacationUnit> findByStartTimeAndEndTimeIsInVacationUnitTime(
+            @Param("propertyId") Long propertyId,
+            @Param("userId") Long userId,
+            @Param("roomId") String roomId,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime,
+            @Param("vacationStatus") VacationStatus vacationStatus
+    );
 }
