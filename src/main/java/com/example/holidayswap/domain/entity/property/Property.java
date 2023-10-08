@@ -5,7 +5,9 @@ import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,27 +33,39 @@ public class Property {
     @Column(name = "property_description")
     private String propertyDescription;
     @Column(name = "number_king_beds")
+//    @Positive
     private int numberKingBeds;
     @Column(name = "number_queen_beds")
+//    @Positive
     private int numberQueenBeds;
     @Column(name = "number_single_beds")
+//    @Positive
     private int numberSingleBeds;
     @Column(name = "number_double_beds")
+//    @Positive
     private int numberDoubleBeds;
     @Column(name = "number_twin_beds")
+//    @Positive
     private int numberTwinBeds;
     @Column(name = "number_full_beds")
+//    @Positive
     private int numberFullBeds;
     @Column(name = "number_sofa_beds")
+//    @Positive
     private int numberSofaBeds;
     @Column(name = "number_murphyBeds")
+//    @Positive
     private int numberMurphyBeds;
     @Column(name = "number_beds_room")
+    @Positive
     @NotNull
     private int numberBedsRoom;
     @Column(name = "number_baths_room")
+    @Positive
     @NotNull
     private int numberBathRoom;
+    @Min(value = 10L, message = "The value must be positive, and greater than 10")
+    @Positive
     @Column(name = "room_size")
     private double roomSize;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
@@ -72,6 +86,7 @@ public class Property {
             updatable = false)
     private PropertyType propertyType;
     @Column(name = "resort_id")
+    @NotNull
     private Long resortId;
     @ManyToOne
     @JoinColumn(name = "resort_id",

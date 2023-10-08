@@ -1,7 +1,7 @@
 package com.example.holidayswap.controller.property.coOwner;
 
-import com.example.holidayswap.domain.dto.request.property.coOwner.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.ContractImageResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.service.property.coOwner.ContractImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -38,7 +38,7 @@ public class ContractImagesController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ContractImageResponse> create(
-            @RequestPart ContractImageRequest dtoRequest,
+            @RequestPart(name = "CoOwnerId") CoOwnerId dtoRequest,
             @RequestPart MultipartFile contractImage) {
 
 //        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();

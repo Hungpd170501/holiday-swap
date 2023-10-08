@@ -6,10 +6,15 @@ import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
+import com.example.holidayswap.domain.entity.resort.ResortStatus;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.PropertyMapper;
 import com.example.holidayswap.repository.property.PropertyRepository;
+import com.example.holidayswap.repository.property.PropertyTypeRespository;
+import com.example.holidayswap.repository.property.PropertyViewRepository;
 import com.example.holidayswap.repository.property.amenity.InRoomAmenityRepository;
+import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,8 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_NOT_FOUND;
-import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,9 @@ public class PropertyServiceImpl implements PropertyService {
     private final InRoomAmenityTypeService inRoomAmenityTypeService;
     private final PropertyImageService propertyImageService;
     private final PropertyMapper propertyMapper;
+    private final PropertyViewRepository propertyViewRepository;
+    private final PropertyTypeRespository propertyTypeRespository;
+    private final ResortRepository resortRepository;
 
     @Override
     public Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable) {
@@ -86,10 +93,9 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     @Transactional
-    public PropertyResponse create(Long userId,
-                                   PropertyRegisterRequest dtoRequest,
+    public PropertyResponse create(PropertyRegisterRequest dtoRequest,
                                    List<MultipartFile> propertyImages) {
-        var entity = create(userId, dtoRequest);
+        var entity = create(dtoRequest);
         propertyImages.forEach(e -> {
             propertyImageService.create(entity.getId(), e);
         });
@@ -97,9 +103,26 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public PropertyResponse create(Long userId, PropertyRegisterRequest dtoRequest) {
+    @Transactional
+    public PropertyResponse create(PropertyRegisterRequest dtoRequest) {
+        if (
+                dtoRequest.getNumberKingBeds() == 0 &&
+                dtoRequest.getNumberQueenBeds() == 0 &&
+                dtoRequest.getNumberSingleBeds() == 0 &&
+                dtoRequest.getNumberDoubleBeds() == 0 &&
+                dtoRequest.getNumberTwinBeds() == 0 &&
+                dtoRequest.getNumberFullBeds() == 0 &&
+                dtoRequest.getNumberSofaBeds() == 0 &&
+                dtoRequest.getNumberMurphyBeds() == 0
+        ) throw new DataIntegrityViolationException("Property must have 1 number bed.");
         var entity = PropertyMapper.INSTANCE.toEntity(dtoRequest);
-        entity.setStatus(PropertyStatus.WAITING);
+        entity.setStatus(PropertyStatus.ACTIVE);
+        resortRepository.findByIdAndDeletedFalseAndResortStatus(dtoRequest.getPropertyViewId(), ResortStatus.ACTIVE).orElseThrow(
+                () -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        propertyViewRepository.findByIdAndIsDeletedIsFalse(dtoRequest.getPropertyViewId()).orElseThrow(
+                () -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
+        propertyTypeRespository.findByIdAndIsDeletedFalse(dtoRequest.getPropertyTypeId()).orElseThrow(
+                () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         List<InRoomAmenity> amenities = new ArrayList<>();
         dtoRequest.getInRoomAmenities().forEach(e -> {
             amenities.add(inRoomAmenityRepository.findByIdAndIsDeletedIsFalse(e).orElseThrow(
@@ -109,12 +132,24 @@ public class PropertyServiceImpl implements PropertyService {
         var created = propertyRepository.save(entity);
         return PropertyMapper.INSTANCE.toDtoResponse(created);
     }
+    /*update only field name, description
+    update
+     */
 
     @Override
     public PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest) {
-        var property = propertyRepository.findById(id).
+        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         PropertyMapper.INSTANCE.updateEntityFromDTO(dtoRequest, property);
+        propertyRepository.save(property);
+        return PropertyMapper.INSTANCE.toDtoResponse(property);
+    }
+
+    @Override
+    public PropertyResponse update(Long id, PropertyStatus propertyStatus) {
+        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).
+                orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        property.setStatus(propertyStatus);
         propertyRepository.save(property);
         return PropertyMapper.INSTANCE.toDtoResponse(property);
     }

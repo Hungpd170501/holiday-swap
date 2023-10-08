@@ -1,7 +1,7 @@
 package com.example.holidayswap.service.property.coOwner;
 
-import com.example.holidayswap.domain.dto.request.property.coOwner.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.ContractImageResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractImage;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.coOwner.ContractImageMapper;
@@ -36,14 +36,14 @@ public class ContractImageServiceImpl implements ContractImageService {
     }
 
     @Override
-    public ContractImageResponse create(ContractImageRequest dtoRequest, MultipartFile multipartFile) {
+    public ContractImageResponse create(CoOwnerId dtoRequest, MultipartFile multipartFile) {
         String link = null;
         try {
             link = fileService.uploadFile(multipartFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ContractImage contractImage = ContractImageMapper.INSTANCE.toEntity(dtoRequest);
+        ContractImage contractImage = ContractImageMapper.INSTANCE.toEntityFromEmbeddedId(dtoRequest);
         contractImage.setLink(link);
         return ContractImageMapper.INSTANCE.toDtoResponse(contractImageRepository.save(contractImage));
     }
@@ -53,10 +53,11 @@ public class ContractImageServiceImpl implements ContractImageService {
         var entity = contractImageRepository.findByIdAndIsDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(CONTRACT_IMAGE_NOT_FOUND));
         delete(id);
-        ContractImageRequest dtoRequest = new ContractImageRequest();
-        dtoRequest.setPropertyId(entity.getPropertyId());
-        dtoRequest.setUserId(entity.getUserId());
-        return create(dtoRequest, multipartFile);
+        CoOwnerId CoOwnerId = new CoOwnerId();
+        CoOwnerId.setPropertyId(entity.getPropertyId());
+        CoOwnerId.setUserId(entity.getUserId());
+        CoOwnerId.setRoomId(entity.getRoomId());
+        return create(CoOwnerId, multipartFile);
     }
 
     @Override

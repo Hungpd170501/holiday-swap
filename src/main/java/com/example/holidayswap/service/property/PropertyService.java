@@ -3,6 +3,7 @@ package com.example.holidayswap.service.property;
 import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
 import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,14 +18,14 @@ public interface PropertyService {
 
     List<PropertyResponse> getByResortId(Long resortId);
 
-    PropertyResponse create(Long userId,
-                            PropertyRegisterRequest dtoRequest,
+    PropertyResponse create(PropertyRegisterRequest dtoRequest,
                             List<MultipartFile> propertyImages);
 
-    PropertyResponse create(Long userId, PropertyRegisterRequest dtoRequest);
+    PropertyResponse create(PropertyRegisterRequest dtoRequest);
 
     PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest);
 
+    PropertyResponse update(Long id, PropertyStatus propertyStatus);
     void delete(Long id);
 
 }

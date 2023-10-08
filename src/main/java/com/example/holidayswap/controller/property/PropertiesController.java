@@ -78,10 +78,9 @@ public class PropertiesController {
 
     @PostMapping
     public ResponseEntity<PropertyResponse> create(
-            @RequestPart Long userId,
-            @RequestPart PropertyRegisterRequest propertyRegisterRequest,
+            @RequestPart(name = "property") PropertyRegisterRequest propertyRegisterRequest,
             @RequestPart List<MultipartFile> propertyImages) {
-        var propertyCreated = propertyService.create(userId,
+        var propertyCreated = propertyService.create(
                 propertyRegisterRequest,
                 propertyImages);
         URI location = ServletUriComponentsBuilder

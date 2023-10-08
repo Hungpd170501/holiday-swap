@@ -2,6 +2,7 @@ package com.example.holidayswap.controller.property.coOwner;
 
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.service.property.coOwner.CoOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,18 +29,18 @@ public class CoOwnersController {
 
     @GetMapping
     public ResponseEntity<CoOwnerResponse> get(
-            @RequestParam Long propertyId, @RequestParam Long userId, @RequestParam String roomId) {
+            @RequestParam Long propertyId,
+            @RequestParam Long userId,
+            @RequestParam String roomId) {
         return ResponseEntity.ok(ownershipService.get(propertyId, userId, roomId));
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestPart Long propertyId,
-                                    @RequestPart Long userId,
-                                    @RequestPart String roomId,
-                                    @RequestPart CoOwnerRequest dtoRequest,
+    public ResponseEntity<?> create(@RequestPart CoOwnerId coOwnerId,
+                                    @RequestPart("CoOwner") CoOwnerRequest dtoRequest,
                                     @RequestPart List<MultipartFile> contractImages
     ) {
-        return ResponseEntity.ok(ownershipService.create(propertyId, userId, roomId, dtoRequest, contractImages));
+        return ResponseEntity.ok(ownershipService.create(coOwnerId, dtoRequest, contractImages));
 
     }
 }

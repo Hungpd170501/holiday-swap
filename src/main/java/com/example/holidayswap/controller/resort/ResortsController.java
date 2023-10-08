@@ -79,7 +79,7 @@ public class ResortsController {
 
     @PostMapping
     public ResponseEntity<ResortResponse> create(
-            @RequestPart ResortRequest resortRequest,
+            @RequestPart(name = "resort") ResortRequest resortRequest,
             @RequestPart List<MultipartFile> resortImage
     ) {
         var dtoResponse = resortService.create(resortRequest, resortImage);

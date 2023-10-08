@@ -1,6 +1,7 @@
 package com.example.holidayswap.repository.resort;
 
 import com.example.holidayswap.domain.entity.resort.Resort;
+import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,10 @@ import java.util.Set;
 
 @Repository
 public interface ResortRepository extends JpaRepository<Resort, Long> {
+    @Query("select r from Resort r where r.id = :resortId and r.isDeleted = false and r.status = :resortStatus")
+    Optional<Resort> findByIdAndDeletedFalseAndResortStatus(@Param(("resortId")) Long id,
+                                                            @Param(("resortStatus")) ResortStatus resortStatus);
+
     @Query("""
             select DISTINCT r  from Resort r
             inner join r.propertyTypes pt
@@ -60,8 +65,9 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             Pageable pageable
     );
 
-    @Query("select r from Resort r where r.id = ?1 and r.isDeleted = false")
-    Optional<Resort> findByIdAndDeletedFalse(Long id);
+    @Query("select r from Resort r where r.id = :resortId and r.isDeleted = false")
+    Optional<Resort> findByIdAndDeletedFalse(@Param(("resortId")) Long id);
+
     @Query("select r from Resort r where upper(r.resortName) = upper(?1) and r.isDeleted = false")
     Optional<Resort> findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
 }

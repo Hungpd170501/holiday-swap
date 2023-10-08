@@ -59,9 +59,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
 
     @Override
     @Transactional
-    public CoOwnerResponse create(Long propertyId,
-                                  Long userId,
-                                  String roomId,
+    public CoOwnerResponse create(CoOwnerId coOwnerId,
                                   CoOwnerRequest dtoRequest) {
         if (dtoRequest.getType() == ContractType.DEEDED) {
             dtoRequest.setStartTime(null);
@@ -69,41 +67,30 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
             throw new DataIntegrityViolationException("Start time must be before end time");
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
-        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(propertyId).orElseThrow(
+        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(coOwnerId.getPropertyId()).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
-        var user = userRepository.findById(userId).orElseThrow(
+        var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
-
-        var id = new CoOwnerId();
-        id.setPropertyId(propertyId);
-        id.setUserId(userId);
-        id.setRoomId(roomId);
-
-        entity.setId(id);
+        entity.setId(coOwnerId);
         entity.setProperty(property);
         entity.setUser(user);
         entity.setStatus(CoOwnerStatus.PENDING);
         var created = coOwnerRepository.save(entity);
         dtoRequest.getTimeFrames().forEach(e -> {
-            timeFrameService.create(id, e);
+            timeFrameService.create(coOwnerId, e);
         });
         return CoOwnerMapper.INSTANCE.toDtoResponse(created);
     }
 
     @Override
     @Transactional
-    public CoOwnerResponse create(Long propertyId,
-                                  Long userId,
-                                  String roomId,
+    public CoOwnerResponse create(CoOwnerId coOwnerId,
                                   CoOwnerRequest dtoRequest,
                                   List<MultipartFile> contractImages) {
-        var dtoResponse = create(propertyId, userId, roomId, dtoRequest);
+        var dtoResponse = create(coOwnerId, dtoRequest);
         contractImages.forEach(e -> {
             ContractImageRequest id = new ContractImageRequest();
-            id.setPropertyId(propertyId);
-            id.setUserId(userId);
-            id.setRoomId(roomId);
-            contractImageService.create(id, e);
+            contractImageService.create(coOwnerId, e);
         });
         return dtoResponse;
     }

@@ -1,7 +1,7 @@
 package com.example.holidayswap.service.property.coOwner;
 
-import com.example.holidayswap.domain.dto.request.property.coOwner.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.ContractImageResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public interface ContractImageService {
 
     ContractImageResponse get(Long id);
 
-    ContractImageResponse create(ContractImageRequest dtoRequest, MultipartFile multipartFile);
+    ContractImageResponse create(CoOwnerId dtoRequest, MultipartFile multipartFile);
 
     ContractImageResponse update(Long id, MultipartFile multipartFile);
 
