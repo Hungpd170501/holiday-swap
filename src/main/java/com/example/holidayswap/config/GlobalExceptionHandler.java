@@ -5,6 +5,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.example.holidayswap.domain.exception.*;
 import io.jsonwebtoken.JwtException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,8 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 public class GlobalExceptionHandler {
     //400
     @ExceptionHandler({
-            MethodArgumentNotValidException.class
+            MethodArgumentNotValidException.class,
+            ConstraintViolationException.class
     })
     public <T extends RuntimeException> ResponseEntity<ApiError> handleValidationException(T ex, WebRequest request) {
         ApiError message = ApiError.builder()
@@ -33,7 +35,7 @@ public class GlobalExceptionHandler {
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
-        log.warn("Resource not found: %s".formatted(message));
+        log.warn("Validation exception: %s".formatted(message));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 

@@ -1,10 +1,12 @@
 package com.example.holidayswap.domain.entity.resort;
 
 import com.example.holidayswap.domain.entity.address.Location;
+import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,11 +22,12 @@ public class Resort {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "resort_id", nullable = false)
     private Long id;
-
     @Size(max = 255)
+    @NotNull
     @Column(name = "resort_name")
     private String resortName;
-
+    @Column(name = "resort_description")
+    private String resortDescription;
     @Column(name = "location_id")
     private Long locationId;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,13 +38,10 @@ public class Resort {
             insertable = false,
             updatable = false)
     private Location location;
-
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
-
     @OneToMany(mappedBy = "resort")
     private List<ResortImage> resortImages;
-
     @ManyToMany
     @JoinTable(
             name = "resorts_amenities",
@@ -54,5 +54,7 @@ public class Resort {
             joinColumns = @JoinColumn(name = "resort_id"),
             inverseJoinColumns = @JoinColumn(name = "property_type_id"))
     private List<PropertyType> propertyTypes;
+    @OneToMany(mappedBy = "resort")
+    private List<Property> properties;
 
 }

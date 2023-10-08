@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.dto.request.resort.amenity.ResortAmenityRe
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,9 +19,9 @@ public interface ResortAmenityService {
 
     ResortAmenityResponse get(Long id);
 
-    ResortAmenityResponse create(ResortAmenityRequest dtoRequest);
+    ResortAmenityResponse create(ResortAmenityRequest dtoRequest, MultipartFile resortAmenityIcon);
 
-    ResortAmenityResponse update(Long id, ResortAmenityRequest dtoRequest);
+    ResortAmenityResponse update(Long id, ResortAmenityRequest dtoRequest, MultipartFile resortAmenityIcon);
 
     void delete(Long id);
 }

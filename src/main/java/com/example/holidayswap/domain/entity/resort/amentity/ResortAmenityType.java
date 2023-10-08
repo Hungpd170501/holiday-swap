@@ -24,6 +24,7 @@ public class ResortAmenityType {
     @Column(name = "resort_amenity_type_description", length = Integer.MAX_VALUE)
     private String resortAmenityTypeDescription;
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT false")
+    @NotNull
     private Boolean isDeleted = false;
 
     @OneToMany(mappedBy = "resortAmenityType", fetch = FetchType.LAZY)

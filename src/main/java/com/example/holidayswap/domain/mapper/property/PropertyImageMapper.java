@@ -14,7 +14,6 @@ public interface PropertyImageMapper {
 
     PropertyImageResponse toDtoResponse(PropertyImage entity);
 
-    @Mapping(target = "propertyId", ignore = true)
     PropertyImage toEntity(PropertyImageRequest dtoRequest);
 
     @Mapping(target = "id", ignore = true)

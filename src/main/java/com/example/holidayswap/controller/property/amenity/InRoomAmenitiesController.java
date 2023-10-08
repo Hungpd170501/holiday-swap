@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -29,16 +30,18 @@ public class InRoomAmenitiesController {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         return ResponseEntity.ok(inRoomAmenityService.gets(name, pageable));
     }
-    @GetMapping("/{id}")
+
+    @GetMapping("/{inRoomAmenityId}")
     public ResponseEntity<InRoomAmenityResponse> get(
-            @PathVariable("id") Long id) {
-        return ResponseEntity.ok(inRoomAmenityService.get(id));
+            @PathVariable("inRoomAmenityId") Long inRoomAmenityId) {
+        return ResponseEntity.ok(inRoomAmenityService.get(inRoomAmenityId));
     }
 
     @PostMapping
     public ResponseEntity<InRoomAmenityResponse> create(
-            @RequestBody InRoomAmenityRequest dtoRequest) {
-        var dtoResponse = inRoomAmenityService.create(dtoRequest);
+            @RequestPart(name = "inRoomAmenity") InRoomAmenityRequest dtoRequest,
+            @RequestPart(name = "inRoomAmenityIcon") MultipartFile inRoomAmenityIcon) {
+        var dtoResponse = inRoomAmenityService.create(dtoRequest, inRoomAmenityIcon);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -47,21 +50,22 @@ public class InRoomAmenitiesController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @RequestBody InRoomAmenityRequest dtoRequest) {
-        inRoomAmenityService.update(id, dtoRequest);
+    @PutMapping("/{inRoomAmenityId}")
+    public ResponseEntity<InRoomAmenityResponse> update(@PathVariable("inRoomAmenityId") Long inRoomAmenityId,
+                                                        @RequestPart(name = "inRoomAmenity") InRoomAmenityRequest inRoomAmentity,
+                                                        @RequestPart(name = "inRoomAmenityIcon", required = false) MultipartFile inRoomAmenityIcon) {
+        var dtoResponse = inRoomAmenityService.update(inRoomAmenityId, inRoomAmentity, inRoomAmenityIcon);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(inRoomAmenityId)
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        inRoomAmenityService.delete(id);
+    @DeleteMapping("/{inRoomAmenityId}")
+    public ResponseEntity<Void> delete(@PathVariable("inRoomAmenityId") Long inRoomAmenityId) {
+        inRoomAmenityService.delete(inRoomAmenityId);
         return ResponseEntity.noContent().build();
     }
 }

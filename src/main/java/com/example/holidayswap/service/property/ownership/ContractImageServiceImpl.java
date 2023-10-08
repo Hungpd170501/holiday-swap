@@ -23,8 +23,8 @@ public class ContractImageServiceImpl implements ContractImageService {
     private final FileService fileService;
 
     @Override
-    public List<ContractImageResponse> gets(Long propertyId, Long userId) {
-        var dtoResponses = contractImageRepository.findAllByPropertyIdAndUserIdAndIsDeletedIsFalse(propertyId, userId);
+    public List<ContractImageResponse> gets(Long propertyId, Long userId, String roomId) {
+        var dtoResponses = contractImageRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeletedIsFalse(propertyId, userId, roomId);
         return dtoResponses.stream().map(ContractImageMapper.INSTANCE::toDtoResponse).toList();
     }
 

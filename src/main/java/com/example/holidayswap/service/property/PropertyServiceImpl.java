@@ -2,8 +2,8 @@ package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
 import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
-import com.example.holidayswap.domain.dto.request.property.ownership.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
+import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -12,15 +12,17 @@ import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.amenity.InRoomAmenityRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
 import com.example.holidayswap.service.property.ownership.ContractImageService;
-import com.example.holidayswap.service.property.ownership.OwnershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_NOT_FOUND;
 import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_NOT_FOUND;
@@ -32,28 +34,33 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final InRoomAmenityRepository inRoomAmenityRepository;
     private final InRoomAmenityTypeService inRoomAmenityTypeService;
-    private final OwnershipService ownerShipService;
     private final PropertyImageService propertyImageService;
     private final ContractImageService contractImageService;
     private final PropertyMapper propertyMapper;
 
     @Override
-    public Page<PropertyResponse> gets(Long resortId, Pageable pageable) {
-        var dtoResponse = propertyRepository.findAllByResortIdAndIsDeleteIsFalse(resortId, pageable).
+    public Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable) {
+        Page<Property> entities = propertyRepository.
+                findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(
+                        resortId,
+                        timeCheckIn,
+                        timeCheckOut, numberGuests,
+                        pageable);
+
+        var dtoResponse = entities.
                 map(propertyMapper::toDtoResponse);
         dtoResponse.forEach(e -> {
             var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getId());
             var propertyImages = propertyImageService.gets(e.getId());
             e.setInRoomAmenityTypeResponses(inRoomAmenityTypeResponses);
             e.setPropertyImageResponses(propertyImages);
-
         });
         return dtoResponse;
     }
 
     @Override
     public PropertyResponse get(Long id) {
-        var entity = propertyRepository.findPropertyById(id).orElseThrow(
+        var entity = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var dtoResponse = PropertyMapper.INSTANCE.toDtoResponse(entity);
         var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(entity.getId());
@@ -64,19 +71,29 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public List<PropertyResponse> getByResortId(Long resortId) {
+        var entities = propertyRepository.
+                findAllByResortIdAndIsDeleteIsFalse(resortId);
+
+        var dtoResponse = entities.stream().map(propertyMapper::toDtoResponse).collect(Collectors.toList());
+
+        dtoResponse.forEach(e -> {
+            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getId());
+            var propertyImages = propertyImageService.gets(e.getId());
+            e.setInRoomAmenityTypeResponses(inRoomAmenityTypeResponses);
+            e.setPropertyImageResponses(propertyImages);
+        });
+        return dtoResponse;
+    }
+
+    @Override
+    @Transactional
     public PropertyResponse create(Long userId,
                                    PropertyRegisterRequest dtoRequest,
-                                   List<MultipartFile> propertyImages,
-                                   List<MultipartFile> propertyContractImages) {
+                                   List<MultipartFile> propertyImages) {
         var entity = create(userId, dtoRequest);
         propertyImages.forEach(e -> {
             propertyImageService.create(entity.getId(), e);
-        });
-        propertyImages.forEach(e -> {
-            ContractImageRequest contractImageRequest = new ContractImageRequest();
-            contractImageRequest.setPropertyId(entity.getId());
-            contractImageRequest.setUserId(userId);
-            contractImageService.create(contractImageRequest, e);
         });
         return entity;
     }
@@ -92,7 +109,6 @@ public class PropertyServiceImpl implements PropertyService {
         });
         entity.setInRoomAmenities(amenities);
         var created = propertyRepository.save(entity);
-        ownerShipService.create(created.getId(), userId, dtoRequest.getOwnershipRequest());
         return PropertyMapper.INSTANCE.toDtoResponse(created);
     }
 
@@ -107,7 +123,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void delete(Long id) {
-        var propertyFound = propertyRepository.findPropertyById(id)
+        var propertyFound = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         propertyFound.setIsDeleted(true);
         propertyRepository.save(propertyFound);

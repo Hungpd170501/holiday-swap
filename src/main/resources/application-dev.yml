@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/ebdb
+    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/prod
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -39,7 +39,7 @@ spring:
         registration:
           google:
             client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
-            client-secret: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
             scope:
               - email
               - profile
@@ -54,10 +54,7 @@ spring:
             client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
   flyway:
     enabled: true
-    baseline-on-migrate: true
-    user: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
-    locations: classpath:/db/migration,classpath:/dev/db/migration
+    locations: classpath:/db/postgres/migrations
 
 logging:
   level:

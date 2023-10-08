@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.chat;
 
+import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,16 +17,13 @@ import java.util.List;
 @Builder
 @Entity
 @Table
-public class Conversation {
+public class Conversation extends BaseEntityAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(
             name = "conversation_id"
     )
     private Long conversationId;
-
-    @Column(name = "creation_date", columnDefinition = "timestamp default current_timestamp")
-    private LocalDateTime creationDate = LocalDateTime.now();
 
     @OneToMany(mappedBy = "conversation")
     private List<ConversationParticipant> participants = new ArrayList<>();

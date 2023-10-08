@@ -7,6 +7,7 @@ public class ResortAmenityResponse {
     private Long id;
     private String resortAmenityName;
     private String resortAmenityDescription;
+    private String resortAmenityLinkIcon;
     private Boolean isDeleted;
     private Long resortAmenityTypeId;
 }

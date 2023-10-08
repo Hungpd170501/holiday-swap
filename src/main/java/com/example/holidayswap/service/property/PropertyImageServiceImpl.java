@@ -54,9 +54,16 @@ public class PropertyImageServiceImpl implements PropertyImageService {
     public PropertyImageResponse update(Long id, MultipartFile multipartFile) {
         var entity = propertyImageRepository.findByIdAndDeletedIsFalse(id).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_IMAMGE_NOT_FOUND));
-        delete(id);
-        var dtoResponse = create(entity.getPropertyId(), multipartFile);
-        return dtoResponse;
+        String link;
+        try {
+            link = fileService.uploadFile(multipartFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        entity.setLink(link);
+        var updated = propertyImageRepository.save(entity);
+        var dtoReponse = PropertyImageMapper.INSTANCE.toDtoResponse(updated);
+        return dtoReponse;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.property.vacation;
 
 import com.example.holidayswap.domain.entity.property.ownership.Ownership;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,17 +23,22 @@ public class VacationUnit {
     @Column(name = "vacation_unit_id", nullable = false)
     private Long id;
     @Column(name = "start_time")
+    @NotNull
     private Date startTime;
     @Column(name = "end_time")
+    @NotNull
     private Date endTime;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
     @Column(name = "status")
+    @NotNull
     @Enumerated(EnumType.STRING)
     private VacationStatus status;
+    @NotNull
     @Column(name = "property_id")
     private Long propertyId;
     @Column(name = "user_id")
+    @NotNull
     private Long userId;
     @Column(name = "room_id")
     private String roomId;

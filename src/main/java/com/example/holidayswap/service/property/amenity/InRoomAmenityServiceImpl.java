@@ -8,11 +8,14 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.amenity.InRoomAmenityMapper;
 import com.example.holidayswap.repository.property.amenity.InRoomAmenityRepository;
 import com.example.holidayswap.repository.property.amenity.InRoomAmenityTypeRepository;
+import com.example.holidayswap.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +26,7 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 public class InRoomAmenityServiceImpl implements InRoomAmenityService {
     private final InRoomAmenityRepository inRoomAmenityRepository;
     private final InRoomAmenityTypeRepository inRoomAmenityTypeRepository;
+    private final FileService fileService;
 
     @Override
     public Page<InRoomAmenityResponse> gets(String name, Pageable pageable) {
@@ -50,9 +54,9 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
 
     @Override
     public List<InRoomAmenityResponse> gets(Long propertyId, Long inRoomAmenityTypeId) {
-        var amentities =
+        var amenities =
                 inRoomAmenityRepository.findAllByPropertyIdAndAmenityTypeId(propertyId, inRoomAmenityTypeId);
-        return amentities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
+        return amenities.stream().map(InRoomAmenityMapper.INSTANCE::toDtoResponse).toList();
     }
 
     @Override
@@ -63,17 +67,25 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
     }
 
     @Override
-    public InRoomAmenityResponse create(InRoomAmenityRequest dtoRequest) {
+    public InRoomAmenityResponse create(InRoomAmenityRequest dtoRequest, MultipartFile inRoomAmenityIcon) {
         if (inRoomAmenityRepository.findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityName()).isPresent())
             throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY);
 
         if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(INROOM_AMENITY_TYPE_DELETED);
-        return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityRepository.save(InRoomAmenityMapper.INSTANCE.toEntity(dtoRequest)));
+        String link = null;
+        try {
+            link = fileService.uploadFile(inRoomAmenityIcon);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        var entity = InRoomAmenityMapper.INSTANCE.toEntity(dtoRequest);
+        entity.setInRoomAmenityLinkIcon(link);
+        return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityRepository.save(entity));
     }
 
     @Override
-    public InRoomAmenityResponse update(Long id, InRoomAmenityRequest dtoRequest) {
+    public InRoomAmenityResponse update(Long id, InRoomAmenityRequest dtoRequest, MultipartFile inRoomAmenityIcon) {
         var entity = inRoomAmenityRepository.findByInRoomAmenityTypeIdIdAndIsDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
         var entityFound = inRoomAmenityRepository.findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityName());
@@ -82,6 +94,16 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
         }
         if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeId()).isEmpty())
             throw new DataIntegrityViolationException(INROOM_AMENITY_TYPE_DELETED);
+
+        if (inRoomAmenityIcon != null) {
+            String link = null;
+            try {
+                link = fileService.uploadFile(inRoomAmenityIcon);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            entity.setInRoomAmenityLinkIcon(link);
+        }
         InRoomAmenityMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         return InRoomAmenityMapper.INSTANCE.toDtoResponse(inRoomAmenityRepository.save(entity));
     }

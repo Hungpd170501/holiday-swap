@@ -33,9 +33,9 @@ public class ResortAmenityTypesController {
         return ResponseEntity.ok(resortAmenityTypeService.gets(name, pageable));
     }
 
-    @GetMapping("/{id}/resort-amenities")
+    @GetMapping("/{amenityTypeId}/resort-amenities")
     public ResponseEntity<Page<ResortAmenityResponse>> getResortAmenities(
-            @PathVariable("id") Long amenityTypeId,
+            @PathVariable("amenityTypeId") Long amenityTypeId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
@@ -43,10 +43,10 @@ public class ResortAmenityTypesController {
         return ResponseEntity.ok(resortAmenityService.gets(amenityTypeId, pageable));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{amenityTypeId}")
     public ResponseEntity<ResortAmenityTypeResponse> get(
-            @PathVariable("id") Long id) {
-        return ResponseEntity.ok(resortAmenityTypeService.get(id));
+            @PathVariable("amenityTypeId") Long amenityTypeId) {
+        return ResponseEntity.ok(resortAmenityTypeService.get(amenityTypeId));
     }
 
     @PostMapping
@@ -55,27 +55,27 @@ public class ResortAmenityTypesController {
         var dtoResponse = resortAmenityTypeService.create(dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/{id}")
+                .path("/{amenityTypeId}")
                 .buildAndExpand(dtoResponse.getId())
                 .toUri();
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @RequestBody ResortAmenityTypeRequest dtoRequest) {
-        resortAmenityTypeService.update(id, dtoRequest);
+    @PutMapping("/{amenityTypeId}")
+    public ResponseEntity<ResortAmenityTypeResponse> update(@PathVariable("amenityTypeId") Long amenityTypeId,
+                                                            @RequestBody ResortAmenityTypeRequest dtoRequest) {
+        var dtoResponse = resortAmenityTypeService.update(amenityTypeId, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(id)
+                .path("/{amenityTypeId}")
+                .buildAndExpand(amenityTypeId)
                 .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        resortAmenityTypeService.delete(id);
+    @DeleteMapping("/{amenityTypeId}")
+    public ResponseEntity<Void> delete(@PathVariable("amenityTypeId") Long amenityTypeId) {
+        resortAmenityTypeService.delete(amenityTypeId);
         return ResponseEntity.noContent().build();
     }
 }
