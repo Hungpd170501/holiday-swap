@@ -12,4 +12,5 @@ public interface ITransferPointService {
     List<TransactionTranferPointResponse> getTransactionTranferPointByUserId(Long userId);
 
     List<TransactionTranferPointResponse> convertAllLogToTransactionTranferPointResponse(List<AllLog> allLogs, Long userId);
+    TransferResponse payBooking(long userId, long bookingId, Double amount) throws InterruptedException;
 }

@@ -64,4 +64,8 @@ public interface TimeOffDepositRepository extends JpaRepository<TimeOffDeposit, 
             Date endTime,
             TimeOffDepositStatus timeOffDepositStatus
     );
+
+    @Query(value = "select t.* from time_off_deposit t JOIN vacation_unit v on t.vacation_unit_id = v.vacation_unit_id where v.property_id = ?1 AND v.room_id = ?2 AND ((?3 BETWEEN t.start_time AND t.end_time) OR ( ?4 BETWEEN t.start_time AND t.end_time)) Order By t.start_time ASC", nativeQuery = true)
+    List<TimeOffDeposit> findAllByPropertyIdAndRoomIdBetweenDate(Long propertyId, String roomId, Date startTime, Date endTime);
 }
+                                //                                                                                                                                                                               (b.check_in_date BETWEEN ?1 AND ?2)
