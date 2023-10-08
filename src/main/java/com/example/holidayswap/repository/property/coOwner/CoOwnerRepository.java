@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.property.coOwner;
 
+import com.example.holidayswap.domain.dto.response.resort.OwnerShipResponseDTO;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;

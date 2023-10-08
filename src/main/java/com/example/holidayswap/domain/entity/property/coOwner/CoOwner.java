@@ -48,7 +48,7 @@ public class CoOwner {
     @OneToMany(mappedBy = "coOwner", fetch = FetchType.LAZY)
     private Collection<TimeFrame> timeFrames;
 
-    @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "coOwner", fetch = FetchType.LAZY)
     private Collection<BookingDetail> bookingDetails;
 
 
