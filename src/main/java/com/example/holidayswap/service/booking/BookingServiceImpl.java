@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -128,11 +127,8 @@ public class BookingServiceImpl implements IBookingService {
 
                 //TODO trừ point trong ví
 
-                try {
-                    transferPointService.payBooking(bookingRequest.getUserId(), booking.getId(), amount);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+
+                transferPointService.payBooking(bookingRequest.getUserId(), booking.getId(), amount);
 
                 return EnumBookingStatus.BookingStatus.SUCCESS;
             } finally {
