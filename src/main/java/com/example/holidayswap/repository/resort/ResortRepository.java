@@ -20,14 +20,14 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             inner join r.amenities ra
             inner join Property p on p.resortId = r.id
             inner join p.inRoomAmenities pa
-            inner join Ownership o on o.id.propertyId = p.id
-            inner join VacationUnit vu on vu.propertyId = p.id
-            inner join TimeOffDeposit tod on tod.vacationUnitId = vu.id
+            inner join CoOwner o on p.propertyTypeId = o.id.propertyId
+            inner join TimeFrame v on v.propertyId = p.id
+            inner join AvailableTime tod on tod.timeFrameId = v.id
             where upper(r.resortName) like upper(concat('%', ?1, '%'))
             and r.isDeleted = false
             and p.isDeleted = false
             and o.isDeleted = false
-            and vu.isDeleted = false
+            and v.isDeleted = false
             and tod.isDeleted = false
             and ((cast(?2 as date ) is null or cast(?3 as date) is null )
             or (

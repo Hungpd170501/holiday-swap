@@ -26,9 +26,9 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             select distinct p from Property p
             inner join PropertyType pt on p.propertyTypeId = pt.id
             inner join pt.resorts r
-            inner join  Ownership o on p.propertyTypeId = o.id.propertyId
-            inner join VacationUnit v on v.propertyId = p.id
-            inner join TimeOffDeposit tod on tod.vacationUnitId = v.id
+            inner join CoOwner o on p.propertyTypeId = o.id.propertyId
+            inner join TimeFrame v on v.propertyId = p.id
+            inner join AvailableTime tod on tod.timeFrameId = v.id
             where p.resortId = ?1
             and p.isDeleted = false
             and pt.isDeleted = false

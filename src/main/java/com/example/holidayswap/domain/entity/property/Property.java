@@ -2,7 +2,7 @@ package com.example.holidayswap.domain.entity.property;
 
 
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
-import com.example.holidayswap.domain.entity.property.ownership.Ownership;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -98,5 +98,5 @@ public class Property {
             inverseJoinColumns = @JoinColumn(name = "in_room_amenity_id"))
     private List<InRoomAmenity> inRoomAmenities;
     @OneToMany
-    private List<Ownership> ownerships;
+    private List<CoOwner> coOwners;
 }

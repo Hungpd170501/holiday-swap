@@ -1,7 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
 import com.example.holidayswap.domain.entity.auth.User;
-import com.example.holidayswap.domain.entity.property.vacation.TimeOffDeposit;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,15 +53,15 @@ public class Reservation {
 
     @Column(name = "total_price")
     private double totalPrice;
-    @Column(name = "time_off_deposit_id")
-    private Long timeOffDepositId;
+    @Column(name = "available_time_id")
+    private Long availableTimeId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "time_off_deposit_id",
-            referencedColumnName = "time_off_deposit_id",
+    @JoinColumn(name = "available_time_id",
+            referencedColumnName = "available_time_id",
             nullable = false,
             insertable = false,
             updatable = false)
-    private TimeOffDeposit timeOffDeposit;
+    private AvailableTime availableTime;
 
 }

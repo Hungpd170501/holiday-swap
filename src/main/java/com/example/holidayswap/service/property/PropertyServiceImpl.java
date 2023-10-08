@@ -11,7 +11,6 @@ import com.example.holidayswap.domain.mapper.property.PropertyMapper;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.amenity.InRoomAmenityRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
-import com.example.holidayswap.service.property.ownership.ContractImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +34,6 @@ public class PropertyServiceImpl implements PropertyService {
     private final InRoomAmenityRepository inRoomAmenityRepository;
     private final InRoomAmenityTypeService inRoomAmenityTypeService;
     private final PropertyImageService propertyImageService;
-    private final ContractImageService contractImageService;
     private final PropertyMapper propertyMapper;
 
     @Override
