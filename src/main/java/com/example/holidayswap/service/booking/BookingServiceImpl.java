@@ -41,7 +41,7 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     @Transactional
     public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException {
-
+        List<Booking> checkBookingOverlap;
         RLock fairLock = RedissonLockUtils.getFairLock("booking-" + bookingRequest.getPropertyId() + "-" + bookingRequest.getRoomId());
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
         if (tryLock) {
@@ -72,7 +72,7 @@ public class BookingServiceImpl implements IBookingService {
                         throw new EntityNotFoundException("This apartment is not available in this time");
                 }
                 // TODO: check booking of this apartment
-                List<Booking> checkBookingOverlap = bookingRepository.checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getRoomId(), bookingRequest.getPropertyId());
+                checkBookingOverlap = bookingRepository.checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getRoomId(), bookingRequest.getPropertyId());
                 if (!checkBookingOverlap.isEmpty()) {
                     throw new EntityNotFoundException("This apartment is not available in this time");
                 }
