@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.auth;
 
+import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
 import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
@@ -116,6 +117,9 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user")
     private List<ConversationParticipant> conversationParticipants;
+
+    @OneToMany(mappedBy = "user")
+    private List<Booking> bookingList;
 
 
     @Override

@@ -11,6 +11,7 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ownership.OwnershipMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
+
 import com.example.holidayswap.repository.property.ownership.OwnershipRepository;
 import com.example.holidayswap.service.property.vacation.VacationUnitService;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +78,6 @@ public class OwnershipServiceImpl implements OwnershipService {
         id.setPropertyId(propertyId);
         id.setUserId(userId);
         id.setRoomId(dtoRequest.getRoomId());
-
         entity.setId(id);
         entity.setProperty(property);
         entity.setUser(user);

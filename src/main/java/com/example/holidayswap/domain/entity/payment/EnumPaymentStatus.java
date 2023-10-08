@@ -24,4 +24,7 @@ public class EnumPaymentStatus {
     public enum StatusPointTransfer{
         POINT_TRANSFER, POINT_RECEIVE;
     }
+    public enum TransactionStatus{
+        RECIVED,SEND;
+    }
 }
