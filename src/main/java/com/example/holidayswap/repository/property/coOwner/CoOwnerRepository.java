@@ -115,4 +115,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
             String roomId,
             ContractType type,
             CoOwnerStatus status);
+
+    @Query(value = "SELECT Distinct o.property_id, o.room_id from ownership o",nativeQuery = true)
+    List<OwnerShipResponseDTO> getAllDistinctOwnerShipWithoutUserId();
 }

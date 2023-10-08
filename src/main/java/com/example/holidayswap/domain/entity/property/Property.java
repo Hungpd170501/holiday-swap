@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
 
+import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.resort.Resort;
@@ -112,6 +113,8 @@ public class Property {
             joinColumns = @JoinColumn(name = "property_id"),
             inverseJoinColumns = @JoinColumn(name = "in_room_amenity_id"))
     private List<InRoomAmenity> inRoomAmenities;
+    @OneToMany(mappedBy = "property")
+    private List<Booking> bookingList;
     @OneToMany
     private List<CoOwner> coOwners;
 }
