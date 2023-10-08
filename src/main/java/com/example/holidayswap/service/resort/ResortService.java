@@ -13,7 +13,7 @@ import java.util.Set;
 
 public interface ResortService {
     Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, int numberGuests,
-                              Set<Long> listOfResortAmenity, Set<Long> listOfInRoomAmenity, Pageable pageable);
+                              Set<Long> listOfResortAmenity, Set<Long> listOfInRoomAmenity, ResortStatus resortStatus, Pageable pageable);
 
     ResortResponse get(Long id);
 
@@ -23,7 +23,7 @@ public interface ResortService {
 
     ResortResponse update(Long id, ResortRequest resortRequest);
 
-    ResortResponse updateStatus(Long id, ResortStatus resortStatus);
+    ResortResponse update(Long id, ResortStatus resortStatus);
 
     void delete(Long id);
 }

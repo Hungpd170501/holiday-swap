@@ -1,10 +1,12 @@
 package com.example.holidayswap.repository.property;
 
 import com.example.holidayswap.domain.entity.property.Property;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -29,8 +31,9 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             inner join CoOwner o on p.propertyTypeId = o.id.propertyId
             inner join TimeFrame v on v.propertyId = p.id
             inner join AvailableTime tod on tod.timeFrameId = v.id
-            where p.resortId = ?1
+            where p.resortId = :resortId
             and p.isDeleted = false
+            and (:propertyStatus is null  or p.status = :propertyStatus)
             and pt.isDeleted = false
             and r.isDeleted = false
             and o.isDeleted = false
@@ -43,22 +46,23 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             + p.numberFullBeds * 2
             + p.numberMurphyBeds
             + p.numberSofaBeds
-            + p.numberTwinBeds * 2) >= ?4
-            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
-            or ( (tod.startTime BETWEEN ?2 AND ?3)
+            + p.numberTwinBeds * 2) >= :numberGuests
+            and ((cast(:timeCheckIn as date ) is null or cast(:timeCheckOut as date) is null )
+            or ( (tod.startTime BETWEEN :timeCheckIn AND :timeCheckOut)
                  OR
-                 (tod.endTime BETWEEN ?2 AND ?3)
+                 (tod.endTime BETWEEN :timeCheckIn AND :timeCheckOut)
                  OR
-                 (tod.startTime < ?2 AND tod.endTime > ?3)
+                 (tod.startTime < :timeCheckIn AND tod.endTime > :timeCheckOut)
                  OR
-                 (tod.endTime > ?2 AND tod.endTime < ?3)
+                 (tod.endTime > :timeCheckIn AND tod.endTime < :timeCheckOut)
                  )
             )
             """)
-    Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(Long resortId,
-                                                                             Date timeCheckIn,
-                                                                             Date timeCheckOut,
-                                                                             int numberGuests,
+    Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(@Param("resortId") Long resortId,
+                                                                             @Param("timeCheckIn") Date timeCheckIn,
+                                                                             @Param("timeCheckOut") Date timeCheckOut,
+                                                                             @Param("numberGuests") int numberGuests,
+                                                                             @Param("propertyStatus") PropertyStatus propertyStatus,
                                                                              Pageable pageable);
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")

@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.dto.response.property.PropertyImageRespons
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityResponse;
 import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.service.property.PropertyImageService;
 import com.example.holidayswap.service.property.PropertyService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityService;
@@ -42,11 +43,12 @@ public class PropertiesController {
             @RequestParam(value = "timeCheckOut", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
             @RequestParam(defaultValue = "0") Integer numberGuest,
+            @RequestParam(value = "status", required = false) PropertyStatus propertyStatus,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var properties = propertyService.gets(resortId, timeCheckIn, timeCheckOut, numberGuest, pageable);
+        var properties = propertyService.gets(resortId, timeCheckIn, timeCheckOut, numberGuest, propertyStatus, pageable);
         return ResponseEntity.ok(properties);
     }
 
@@ -94,6 +96,14 @@ public class PropertiesController {
     @PutMapping("/{propertyId}")
     public ResponseEntity<Void> update(@PathVariable("propertyId") Long propertyId, @RequestBody PropertyUpdateRequest propertyUpdateRequest) {
         propertyService.update(propertyId, propertyUpdateRequest);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(propertyId).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    @PutMapping("/{propertyId}/status")
+    public ResponseEntity<Void> updateStatus(@PathVariable("propertyId") Long propertyId,
+                                             @RequestBody PropertyStatus propertyStatus) {
+        propertyService.update(propertyId, propertyStatus);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(propertyId).toUri();
         return ResponseEntity.created(location).build();
     }

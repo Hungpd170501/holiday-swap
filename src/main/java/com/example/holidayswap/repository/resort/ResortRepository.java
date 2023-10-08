@@ -28,21 +28,22 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             inner join CoOwner o on p.propertyTypeId = o.id.propertyId
             inner join TimeFrame v on v.propertyId = p.id
             inner join AvailableTime tod on tod.timeFrameId = v.id
-            where upper(r.resortName) like upper(concat('%', ?1, '%'))
+            where upper(r.resortName) like upper(concat('%', :name, '%'))
             and r.isDeleted = false
+            and (:resortStatus is null or r.status = :resortStatus)
             and p.isDeleted = false
             and o.isDeleted = false
             and v.isDeleted = false
             and tod.isDeleted = false
-            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
+            and ((cast(:startDate as date ) is null or cast(:endDate as date) is null )
             or (
-             (tod.startTime BETWEEN ?2 AND ?3)
+             (tod.startTime BETWEEN :startDate AND :endDate)
                  OR
-                 (tod.endTime BETWEEN ?2 AND ?3)
+                 (tod.endTime BETWEEN :startDate AND :endDate)
                  OR
-                 (tod.startTime < ?2 AND tod.endTime > ?3)
+                 (tod.startTime < :startDate AND tod.endTime > :endDate)
                  OR
-                 (tod.endTime > ?2 AND tod.endTime < ?3)
+                 (tod.endTime > :startDate AND tod.endTime < :endDate)
                  ))
             and (p.numberKingBeds * 2
             + p.numberQueenBeds * 2
@@ -51,17 +52,18 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             + p.numberFullBeds * 2
             + p.numberMurphyBeds
             + p.numberSofaBeds
-            + p.numberTwinBeds * 2) >= ?4
-            and ((:#{#listOfResortAmenity == null} = true) or (r.id in ?5))
-            and ((:#{#listOfInRoomAmenity == null} = true) or (p.id in ?6))
+            + p.numberTwinBeds * 2) >= :numberGuests
+            and ((:#{#listOfResortAmenity == null} = true) or (r.id in :listOfResortAmenity))
+            and ((:#{#listOfInRoomAmenity == null} = true) or (p.id in :listOfInRoomAmenity))
             """)
     Page<Resort> findAllByFilter(
-            String name,
-            Date startDate,
-            Date endDate,
-            int numberGuests,
+            @Param("name") String name,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("numberGuests") int numberGuests,
             @Param("listOfResortAmenity") Set<Long> listOfResortAmenity,
             @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
+            @Param("resortStatus") ResortStatus resortStatus,
             Pageable pageable
     );
 

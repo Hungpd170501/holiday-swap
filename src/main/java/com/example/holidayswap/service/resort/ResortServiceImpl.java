@@ -37,11 +37,12 @@ public class ResortServiceImpl implements ResortService {
     @Override
     public Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut,
                                      int numberGuests,
-                                     Set<Long> listOfResortAmenity, Set<Long> listOfInRoomAmenity,
+                                     Set<Long> listOfResortAmenity, Set<Long> listOfInRoomAmenity, ResortStatus resortStatus,
                                      Pageable pageable) {
         Page<Resort> entities = resortRepository.findAllByFilter(name, timeCheckIn, timeCheckOut, numberGuests,
                 listOfResortAmenity,
                 listOfInRoomAmenity,
+                resortStatus,
                 pageable);
         var dtoReponses = entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
@@ -113,7 +114,7 @@ public class ResortServiceImpl implements ResortService {
     }
 
     @Override
-    public ResortResponse updateStatus(Long id, ResortStatus resortStatus) {
+    public ResortResponse update(Long id, ResortStatus resortStatus) {
         var entity = resortRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         entity.setStatus(resortStatus);

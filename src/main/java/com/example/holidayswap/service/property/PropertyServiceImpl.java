@@ -44,12 +44,12 @@ public class PropertyServiceImpl implements PropertyService {
     private final ResortRepository resortRepository;
 
     @Override
-    public Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable) {
+    public Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, PropertyStatus propertyStatus, Pageable pageable) {
         Page<Property> entities = propertyRepository.
                 findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(
                         resortId,
                         timeCheckIn,
-                        timeCheckOut, numberGuests,
+                        timeCheckOut, numberGuests, propertyStatus,
                         pageable);
 
         var dtoResponse = entities.
@@ -135,7 +135,6 @@ public class PropertyServiceImpl implements PropertyService {
     /*update only field name, description
     update
      */
-
     @Override
     public PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest) {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).

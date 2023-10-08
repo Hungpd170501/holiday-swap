@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface PropertyService {
-    Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, Pageable pageable);
+    Page<PropertyResponse> gets(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, PropertyStatus propertyStatus, Pageable pageable);
 
     PropertyResponse get(Long id);
 
