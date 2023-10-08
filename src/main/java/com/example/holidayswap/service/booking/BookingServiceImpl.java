@@ -130,6 +130,9 @@ public class BookingServiceImpl implements IBookingService {
 
                 transferPointService.payBooking(bookingRequest.getUserId(), booking.getId(), amount);
 
+                booking.setStatus(EnumBookingStatus.BookingStatus.SUCCESS);
+                bookingRepository.save(booking);
+
                 return EnumBookingStatus.BookingStatus.SUCCESS;
             } finally {
                 fairLock.unlock();

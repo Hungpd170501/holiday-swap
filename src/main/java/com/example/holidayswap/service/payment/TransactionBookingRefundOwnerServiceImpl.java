@@ -6,6 +6,8 @@ import com.example.holidayswap.repository.payment.TransactionBookingRefundOwnerR
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TransactionBookingRefundOwnerServiceImpl implements ITransactionBookingRefundOwnerService{
 
@@ -24,5 +26,10 @@ public class TransactionBookingRefundOwnerServiceImpl implements ITransactionBoo
         transactionBookingRefundOwner.setMemberBalance(memberBalance);
 
         transactionBookingRefundOwnerRepository.save(transactionBookingRefundOwner);
+    }
+
+    @Override
+    public List<TransactionBookingRefundOwner> getTransactionBookingRefundOwnerByUserId(long id) {
+        return transactionBookingRefundOwnerRepository.findAllByToMemberId(id);
     }
 }

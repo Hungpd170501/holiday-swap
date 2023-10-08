@@ -24,4 +24,6 @@ public class TransactionBookingRefundOwner {
     private String createdOn;
     private Double memberBalance;
     private Double commission;
+
+    private EnumPaymentStatus.TransactionStatus type = EnumPaymentStatus.TransactionStatus.RECIVED;
 }

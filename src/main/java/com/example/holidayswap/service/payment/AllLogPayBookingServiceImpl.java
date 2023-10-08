@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AllLogPayBookingServiceImpl implements IAllLogPayBookingService {
 
@@ -28,5 +30,10 @@ public class AllLogPayBookingServiceImpl implements IAllLogPayBookingService {
 
         allLogPayBookingRepository.save(allLogPayBooking);
 
+    }
+
+    @Override
+    public List<AllLogPayBooking> getAllLogPayBookingByUserId(long userId) {
+        return allLogPayBookingRepository.findAllByFromMemberId(userId);
     }
 }

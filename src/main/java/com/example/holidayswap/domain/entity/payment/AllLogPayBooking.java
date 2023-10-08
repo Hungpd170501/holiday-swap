@@ -23,4 +23,7 @@ public class AllLogPayBooking {
     private String detail;
     private String createdOn;
     private Double fromBalance;
+
+    private EnumPaymentStatus.TransactionStatus type = EnumPaymentStatus.TransactionStatus.SEND;
+
 }

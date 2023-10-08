@@ -30,5 +30,5 @@ public class TransactionTopUpWallet {
     @Column(name = "payment_date")
     private String paymentDate;
     @Column
-    private boolean status;
+    private EnumPaymentStatus.TransactionStatus type = EnumPaymentStatus.TransactionStatus.RECIVED;
 }
