@@ -1,8 +1,8 @@
 package com.example.holidayswap.service.property.coOwner;
 
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
-import com.example.holidayswap.domain.dto.request.property.coOwner.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
@@ -49,7 +49,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     public CoOwnerResponse get(Long propertyId, Long userId, String roomId) {
         var dtoResponse = CoOwnerMapper.INSTANCE.toDtoResponse(
                 coOwnerRepository.findByPropertyIdAndUserUserIdAndIdRoomId(propertyId, userId, roomId).
-                        orElseThrow(() -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND)));
+                        orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND)));
         dtoResponse.setContractImages(contractImageService.gets(
                 dtoResponse.getId().getPropertyId(),
                 dtoResponse.getId().getUserId(),
@@ -64,11 +64,12 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         if (dtoRequest.getType() == ContractType.DEEDED) {
             dtoRequest.setStartTime(null);
             dtoRequest.setEndTime(null);
-        } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
+        } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime())) {
             throw new DataIntegrityViolationException("Start time must be before end time");
+        }
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
-        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(coOwnerId.getPropertyId()).orElseThrow(
-                () -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalseAndStatus(coOwnerId.getPropertyId(), PropertyStatus.ACTIVE).
+                orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
         entity.setId(coOwnerId);
@@ -89,25 +90,28 @@ public class CoOwnerServiceImpl implements CoOwnerService {
                                   List<MultipartFile> contractImages) {
         var dtoResponse = create(coOwnerId, dtoRequest);
         contractImages.forEach(e -> {
-            ContractImageRequest id = new ContractImageRequest();
+            //ContractImageRequest id = new ContractImageRequest();
             contractImageService.create(coOwnerId, e);
         });
         return dtoResponse;
     }
 
+    //Accept the register of Owner
     @Override
-    public CoOwnerResponse update(Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus) {
-        var entity = coOwnerRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(propertyId, userId, roomId).
-                orElseThrow(() -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND));
+    public CoOwnerResponse update(CoOwnerId coOwnerId, CoOwnerStatus coOwnerStatus) {
+        var entity = coOwnerRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).
+                orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         entity.setStatus(coOwnerStatus);
         var updated = coOwnerRepository.save(entity);
         return CoOwnerMapper.INSTANCE.toDtoResponse(updated);
     }
 
     @Override
-    public void delete(Long propertyId, Long userId, String roomId) {
-        var entity = coOwnerRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(propertyId, userId, roomId).
-                orElseThrow(() -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND));
+    public void delete(CoOwnerId coOwnerId) {
+        var entity = coOwnerRepository.
+                findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(
+                        coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).
+                orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         entity.setDeleted(true);
         coOwnerRepository.save(entity);
     }

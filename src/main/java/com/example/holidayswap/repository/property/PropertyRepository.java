@@ -28,7 +28,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             select distinct p from Property p
             inner join PropertyType pt on p.propertyTypeId = pt.id
             inner join pt.resorts r
-            inner join CoOwner o on p.propertyTypeId = o.id.propertyId
+            inner join CoOwner o on p.id = o.id.propertyId
             inner join TimeFrame v on v.propertyId = p.id
             inner join AvailableTime tod on tod.timeFrameId = v.id
             where p.resortId = :resortId
@@ -67,4 +67,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")
     Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);
+
+    Optional<Property> findPropertyByIdAndIsDeletedIsFalseAndStatus(Long propertyId, PropertyStatus propertyStatus);
 }

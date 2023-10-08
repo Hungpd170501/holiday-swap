@@ -2,6 +2,7 @@ package com.example.holidayswap.service.property.timeFame;
 
 import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTimeRequest;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,8 @@ public interface AvailableTimeService {
     AvailableTimeResponse create(Long vacationId, AvailableTimeRequest timeOffDepositRequest);
 
     AvailableTimeResponse update(Long id, AvailableTimeRequest timeOffDepositRequest);
+
+    AvailableTimeResponse update(Long id, AvailableTimeStatus availableTimeStatus);
 
     void delete(Long id);
 }

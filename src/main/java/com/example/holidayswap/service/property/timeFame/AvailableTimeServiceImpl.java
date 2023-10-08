@@ -14,7 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import static com.example.holidayswap.constants.ErrorMessage.VACATION_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.AVAILABLE_TIME_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.TIME_FRAME_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -23,47 +24,48 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final TimeFrameRepository timeFrameRepository;
 
     @Override
-    public Page<AvailableTimeResponse> getAllByVacationUnitId(Long vacationUnitId, Pageable pageable) {
-        var timeOffDepositPage = availableTimeRepository.findAllByVacationUnitIdAndDeletedIsFalse(vacationUnitId, pageable);
-        Page<AvailableTimeResponse> timeOffDepositPageResponse = timeOffDepositPage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
-        return timeOffDepositPageResponse;
+    public Page<AvailableTimeResponse> getAllByVacationUnitId(Long timeFrameId, Pageable pageable) {
+        var availableTimePage = availableTimeRepository.findAllByVacationUnitIdAndDeletedIsFalse(timeFrameId, pageable);
+        Page<AvailableTimeResponse> availableTimePageResponse = availableTimePage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
+        return availableTimePageResponse;
     }
 
     @Override
     public Page<AvailableTimeResponse> getAllByPropertyId(Long propertyId, Pageable pageable) {
-        var timeOffDepositPage = availableTimeRepository.
+        var availableTimePage = availableTimeRepository.
                 findAllByPropertyIdAndDeletedFalse(propertyId, pageable);
-        Page<AvailableTimeResponse> timeOffDepositPageResponse = timeOffDepositPage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
-        return timeOffDepositPageResponse;
+        Page<AvailableTimeResponse> availableTimePageResponse = availableTimePage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
+        return availableTimePageResponse;
     }
 
     @Override
     public Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable) {
-        var timeOffDepositPage = availableTimeRepository.
+        var availableTimePage = availableTimeRepository.
                 findAllByResortIdAndDeletedFalse(resortId, pageable);
-        Page<AvailableTimeResponse> timeOffDepositPageResponse = timeOffDepositPage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
-        return timeOffDepositPageResponse;
+        Page<AvailableTimeResponse> availableTimePageResponse = availableTimePage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
+        return availableTimePageResponse;
     }
 
     @Override
     public AvailableTimeResponse get(Long id) {
-        var timeOffDepositFound = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow();
-        var timeOffDepositResponse = AvailableTimeMapper.INSTANCE.toDtoResponse(timeOffDepositFound);
-        return timeOffDepositResponse;
+        var availableTimeFound = availableTimeRepository.findByIdAndDeletedFalse(id).
+                orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
+        var availableTimeResponse = AvailableTimeMapper.INSTANCE.toDtoResponse(availableTimeFound);
+        return availableTimeResponse;
     }
 
     @Override
-    public AvailableTimeResponse create(Long vacationUnitId, AvailableTimeRequest dtoRequest) {
+    public AvailableTimeResponse create(Long timeFrameId, AvailableTimeRequest dtoRequest) {
         if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
             throw new DataIntegrityViolationException("Start time must be before end time");
-        var vacationUnitFound = timeFrameRepository.
-                findByIdAndIsDeletedIsFalse(vacationUnitId).orElseThrow(() -> new EntityNotFoundException(VACATION_NOT_FOUND));
+        var timeFrame = timeFrameRepository.
+                findByIdAndIsDeletedIsFalse(timeFrameId).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
         //check is in vacation unit time
         var checkIsInVacationUnitTime = timeFrameRepository.
                 findByStartTimeAndEndTimeIsInVacationUnitTime(
-                        vacationUnitFound.getPropertyId(),
-                        vacationUnitFound.getUserId(),
-                        vacationUnitFound.getRoomId(),
+                        timeFrame.getPropertyId(),
+                        timeFrame.getUserId(),
+                        timeFrame.getRoomId(),
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
                         TimeFrameStatus.ACCEPTED.toString()
@@ -71,32 +73,41 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         if (checkIsInVacationUnitTime.isEmpty())
             throw new DataIntegrityViolationException("Your public time is not in range vacation unit");
         var checkDuplicateWhichAnyTimeDeposit = availableTimeRepository.findOverlapsWhichAnyTimeDeposit(
-                vacationUnitId,
+                timeFrameId,
                 dtoRequest.getStartTime(),
                 dtoRequest.getEndTime(),
                 AvailableTimeStatus.OPEN
         );
         if (checkDuplicateWhichAnyTimeDeposit.isPresent())
             throw new DataIntegrityViolationException("Duplicate with another time off deposit");
-        var timeOffDeposit = AvailableTimeMapper.INSTANCE.toEntity(dtoRequest);
-        timeOffDeposit.setStatus(AvailableTimeStatus.OPEN);
-        timeOffDeposit.setTimeFrameId(vacationUnitId);
-        var timeOffDepositCreated = availableTimeRepository.save(timeOffDeposit);
-        return AvailableTimeMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
+        var availableTime = AvailableTimeMapper.INSTANCE.toEntity(dtoRequest);
+        availableTime.setStatus(AvailableTimeStatus.OPEN);
+        availableTime.setTimeFrameId(timeFrameId);
+        var availableTimeCreated = availableTimeRepository.save(availableTime);
+        return AvailableTimeMapper.INSTANCE.toDtoResponse(availableTimeCreated);
     }
 
     @Override
-    public AvailableTimeResponse update(Long id, AvailableTimeRequest timeOffDepositRequest) {
-        var timeOffDeposit = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow();
-        AvailableTimeMapper.INSTANCE.updateEntityFromDTO(timeOffDepositRequest, timeOffDeposit);
-        var timeOffDepositCreated = availableTimeRepository.save(timeOffDeposit);
-        return AvailableTimeMapper.INSTANCE.toDtoResponse(timeOffDepositCreated);
+    public AvailableTimeResponse update(Long id, AvailableTimeRequest availableTimeRequest) {
+        var availableTime = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
+        AvailableTimeMapper.INSTANCE.updateEntityFromDTO(availableTimeRequest, availableTime);
+        var availableTimeCreated = availableTimeRepository.save(availableTime);
+        return AvailableTimeMapper.INSTANCE.toDtoResponse(availableTimeCreated);
+    }
+
+    @Override
+    public AvailableTimeResponse update(Long id, AvailableTimeStatus availableTimeStatus) {
+        var availableTime = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
+        availableTime.setStatus(availableTimeStatus);
+        var availableTimeCreated = availableTimeRepository.save(availableTime);
+        return AvailableTimeMapper.INSTANCE.toDtoResponse(availableTime);
     }
 
     @Override
     public void delete(Long id) {
-        var timeOffDeposit = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow();
-        timeOffDeposit.setDeleted(true);
-        availableTimeRepository.save(timeOffDeposit);
+        var availableTime = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
+        availableTime.setDeleted(true);
+        availableTimeRepository.save(availableTime);
     }
 }

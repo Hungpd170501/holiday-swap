@@ -17,7 +17,7 @@ public interface ContractImageMapper {
 
     ContractImage toEntity(ContractImageRequest dtoRequest);
 
-    ContractImage toEntityFromEmbeddedId(CoOwnerId dtoRequest);
+    ContractImage toEntityFromEmbeddedId(CoOwnerId coOwnerId);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(ContractImageRequest dto, @MappingTarget ContractImage entity);

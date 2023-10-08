@@ -5,6 +5,9 @@ import com.example.holidayswap.domain.dto.response.resort.ResortImageResponse;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.service.resort.ResortImageService;
 import com.example.holidayswap.service.resort.ResortService;
@@ -43,12 +46,15 @@ public class ResortsController {
             @RequestParam(defaultValue = "0") Integer numberGuests,
             @RequestParam(value = "resortAmenity", required = false) Set<Long> listOfResortAmenity,
             @RequestParam(value = "inRoomAmenity", required = false) Set<Long> listOfInRoomAmenity,
-            @RequestParam(value = "status", required = false) ResortStatus resortStatus,
+            @RequestParam(value = "resortStatus", required = false) ResortStatus resortStatus,
+            @RequestParam(value = "coOwnerStatus", required = false) CoOwnerStatus coOwnerStatus,
+            @RequestParam(value = "timeFrameStatus", required = false) TimeFrameStatus timeFrameStatus,
+            @RequestParam(value = "availableTimeStatus", required = false) AvailableTimeStatus availableTimeStatus,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, numberGuests, listOfResortAmenity, listOfInRoomAmenity, resortStatus, pageable));
+        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, numberGuests, listOfResortAmenity, listOfInRoomAmenity, resortStatus, coOwnerStatus, timeFrameStatus, availableTimeStatus, pageable));
     }
 
     @GetMapping("/{resortId}/resort-images")

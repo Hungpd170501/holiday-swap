@@ -19,8 +19,8 @@ public interface CoOwnerService {
 
     CoOwnerResponse create(CoOwnerId coOwnerId, CoOwnerRequest dtoRequest, List<MultipartFile> propertyImages);
 
-    CoOwnerResponse update(Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus);
+    CoOwnerResponse update(CoOwnerId coOwnerId, CoOwnerStatus coOwnerStatus);
 //    CoOwnerResponse update(Long propertyId, Long userId, String roomId, CoOwnerRequest dtoRequest);
 
-    void delete(Long propertyId, Long userId, String roomId);
+    void delete(CoOwnerId coOwnerId);
 }

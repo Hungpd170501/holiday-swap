@@ -18,6 +18,8 @@ public interface PropertyService {
 
     List<PropertyResponse> getByResortId(Long resortId);
 
+    List<PropertyResponse> getByResortId(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, PropertyStatus propertyStatus, Pageable pageable);
+
     PropertyResponse create(PropertyRegisterRequest dtoRequest,
                             List<MultipartFile> propertyImages);
 

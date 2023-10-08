@@ -36,14 +36,14 @@ public class ContractImageServiceImpl implements ContractImageService {
     }
 
     @Override
-    public ContractImageResponse create(CoOwnerId dtoRequest, MultipartFile multipartFile) {
+    public ContractImageResponse create(CoOwnerId coOwnerId, MultipartFile multipartFile) {
         String link = null;
         try {
             link = fileService.uploadFile(multipartFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ContractImage contractImage = ContractImageMapper.INSTANCE.toEntityFromEmbeddedId(dtoRequest);
+        ContractImage contractImage = ContractImageMapper.INSTANCE.toEntityFromEmbeddedId(coOwnerId);
         contractImage.setLink(link);
         return ContractImageMapper.INSTANCE.toDtoResponse(contractImageRepository.save(contractImage));
     }

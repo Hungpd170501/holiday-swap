@@ -3,6 +3,9 @@ package com.example.holidayswap.service.resort;
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyType;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
@@ -35,14 +38,23 @@ public class ResortServiceImpl implements ResortService {
     private final PropertyService propertyService;
 
     @Override
-    public Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut,
+    public Page<ResortResponse> gets(String name, Date timeCheckIn,
+                                     Date timeCheckOut,
                                      int numberGuests,
-                                     Set<Long> listOfResortAmenity, Set<Long> listOfInRoomAmenity, ResortStatus resortStatus,
+                                     Set<Long> listOfResortAmenity,
+                                     Set<Long> listOfInRoomAmenity,
+                                     ResortStatus resortStatus,
+                                     CoOwnerStatus coOwnerStatus,
+                                     TimeFrameStatus timeFrameStatus,
+                                     AvailableTimeStatus availableTimeStatus,
                                      Pageable pageable) {
         Page<Resort> entities = resortRepository.findAllByFilter(name, timeCheckIn, timeCheckOut, numberGuests,
                 listOfResortAmenity,
                 listOfInRoomAmenity,
                 resortStatus,
+                coOwnerStatus,
+                timeFrameStatus,
+                availableTimeStatus,
                 pageable);
         var dtoReponses = entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);

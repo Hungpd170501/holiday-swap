@@ -3,6 +3,7 @@ package com.example.holidayswap.controller.property.timeFrame;
 import com.example.holidayswap.domain.dto.request.property.timeFrame.TimeFrameRequest;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.TimeFrameResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,8 +29,8 @@ public class TimeFramesController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var vacationResponses = timeFrameService.getAllByPropertyId(propertyId, pageable);
-        return ResponseEntity.ok(vacationResponses);
+        var dtoResponses = timeFrameService.getAllByPropertyId(propertyId, pageable);
+        return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/resorts")
@@ -39,15 +40,15 @@ public class TimeFramesController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var vacationResponses = timeFrameService.getAllByResortId(resortId, pageable);
-        return ResponseEntity.ok(vacationResponses);
+        var dtoResponses = timeFrameService.getAllByResortId(resortId, pageable);
+        return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TimeFrameResponse> get(
             @PathVariable("id") Long id) {
-        var vacationResponse = timeFrameService.get(id);
-        return ResponseEntity.ok(vacationResponse);
+        var dtoResponse = timeFrameService.get(id);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @PostMapping
@@ -55,26 +56,26 @@ public class TimeFramesController {
             @RequestPart CoOwnerId ownershipId,
             @RequestPart TimeFrameRequest dtoRequest
     ) {
-        var vacation = timeFrameService.create(ownershipId, dtoRequest);
+        var timeFrameResponse = timeFrameService.create(ownershipId, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(vacation.getId())
+                .buildAndExpand(timeFrameResponse.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(vacation);
+        return ResponseEntity.created(location).body(timeFrameResponse);
     }
 
-//    @PutMapping(value = "/{id}")
-//    public ResponseEntity<Void> update(@PathVariable Long id,
-//                                       @RequestBody VacationUnitRequest dtoRequest) {
-//        timeFrameService.update(id, dtoRequest);
-//        URI location = ServletUriComponentsBuilder
-//                .fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(id)
-//                .toUri();
-//        return ResponseEntity.created(location).build();
-//    }
+    @PutMapping(value = "/{timeFrameId}")
+    public ResponseEntity<Void> update(@PathVariable("timeFrameId") Long timeFrameId,
+                                       @RequestBody TimeFrameStatus timeFrameStatus) {
+        timeFrameService.update(timeFrameId, timeFrameStatus);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(timeFrameId)
+                .toUri();
+        return ResponseEntity.created(location).build();
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

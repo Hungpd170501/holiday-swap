@@ -59,7 +59,7 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
             Date endTime);
 
     @Query(value = """
-            SELECT VU.VACATION_UNIT_ID,
+            SELECT VU.TIME_FRAME_ID,
                    VU.END_TIME,
                    VU.IS_DELETED,
                    VU.START_TIME,
@@ -68,7 +68,7 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
                    VU.USER_ID,
                    VU.ROOM_ID
             FROM TIME_FRAME VU
-                     JOIN "CO-OWNER" O ON VU.PROPERTY_ID = O.PROPERTY_ID AND VU.ROOM_ID = O.ROOM_ID AND VU.USER_ID = O.USER_ID
+                     JOIN CO_OWNER O ON VU.PROPERTY_ID = O.PROPERTY_ID AND VU.ROOM_ID = O.ROOM_ID AND VU.USER_ID = O.USER_ID
             WHERE VU.PROPERTY_ID = :propertyId
                 AND VU.ROOM_ID = :roomId
                 AND VU.IS_DELETED = FALSE
@@ -352,7 +352,7 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
     );
 
     @Query(value = """
-            SELECT VACATION_UNIT_ID,
+            SELECT TIME_FRAME_ID,
                    END_TIME,
                    IS_DELETED,
                    START_TIME,
@@ -360,7 +360,7 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
                    PROPERTY_ID,
                    USER_ID,
                    ROOM_ID
-            FROM "TIME_FRAME" VU
+            FROM TIME_FRAME VU
             WHERE VU.PROPERTY_ID = :propertyId
               AND VU.USER_ID = :userId
               AND VU.ROOM_ID = :roomId

@@ -2,6 +2,9 @@ package com.example.holidayswap.service.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +15,17 @@ import java.util.List;
 import java.util.Set;
 
 public interface ResortService {
-    Page<ResortResponse> gets(String name, Date timeCheckIn, Date timeCheckOut, int numberGuests,
-                              Set<Long> listOfResortAmenity, Set<Long> listOfInRoomAmenity, ResortStatus resortStatus, Pageable pageable);
+    Page<ResortResponse> gets(String name,
+                              Date timeCheckIn,
+                              Date timeCheckOut,
+                              int numberGuests,
+                              Set<Long> listOfResortAmenity,
+                              Set<Long> listOfInRoomAmenity,
+                              ResortStatus resortStatus,
+                              CoOwnerStatus coOwnerStatus,
+                              TimeFrameStatus timeFrameStatus,
+                              AvailableTimeStatus availableTimeStatus,
+                              Pageable pageable);
 
     ResortResponse get(Long id);
 

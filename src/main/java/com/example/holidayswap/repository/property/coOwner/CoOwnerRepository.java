@@ -23,7 +23,6 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     List<CoOwner> findAllByUserIdAndIsDeletedIsFalse(Long userId);
 
     @Query("""
-
             select o from CoOwner o
             where o.id.propertyId = :propertyId
             and o.id.userId = :userId
@@ -58,7 +57,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
                                  START_TIME,
                                  STATUS,
                                  TYPE
-                          FROM "CO-OWNER" O
+                          FROM CO_OWNER O
                           WHERE UPPER(O.ROOM_ID) = UPPER(:roomId)
                             AND O.PROPERTY_ID = :propertyId
                             AND O.USER_ID != :userId
@@ -76,7 +75,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
                                     ELSE O.IS_DELETED = FALSE and O.TYPE = 'DEEDED'
                               END
             """, nativeQuery = true)
-    Optional<CoOwner> checkOverlapsTimeOwnership(@Param("propertyId") Long propertyId,
+    List<CoOwner> checkOverlapsTimeOwnership(@Param("propertyId") Long propertyId,
                                                  @Param("userId") Long userId,
                                                  @Param("roomId") String roomId,
                                                  @Param("startTime") Date startTime,

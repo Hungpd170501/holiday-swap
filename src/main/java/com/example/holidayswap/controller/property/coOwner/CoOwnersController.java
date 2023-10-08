@@ -3,6 +3,7 @@ package com.example.holidayswap.controller.property.coOwner;
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.service.property.coOwner.CoOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,11 +37,29 @@ public class CoOwnersController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestPart CoOwnerId coOwnerId,
-                                    @RequestPart("CoOwner") CoOwnerRequest dtoRequest,
-                                    @RequestPart List<MultipartFile> contractImages
-    ) {
+    public ResponseEntity<CoOwnerResponse> create(@RequestPart("coOwnerId") CoOwnerId coOwnerId,
+                                                  @RequestPart("coOwner") CoOwnerRequest dtoRequest,
+                                                  @RequestPart List<MultipartFile> contractImages) {
         return ResponseEntity.ok(ownershipService.create(coOwnerId, dtoRequest, contractImages));
+    }
 
+    @PutMapping
+    public ResponseEntity<CoOwnerResponse> update(@RequestPart("coOwnerId") CoOwnerId coOwnerId,
+                                                  @RequestPart("coOwnerStatus") CoOwnerStatus coOwnerStatus) {
+        return ResponseEntity.ok(ownershipService.update(coOwnerId, coOwnerStatus));
+    }
+
+    @PutMapping("/status")
+    public ResponseEntity<CoOwnerResponse> updateStatus(
+            @RequestPart("coOwnerId") CoOwnerId coOwnerId,
+            @RequestPart("coOwnerStatus") CoOwnerStatus coOwnerStatus) {
+        return ResponseEntity.ok(ownershipService.update(coOwnerId, coOwnerStatus));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestPart("coOwnerId") CoOwnerId coOwnerId) {
+
+        ownershipService.delete(coOwnerId);
+        return ResponseEntity.noContent().build();
     }
 }

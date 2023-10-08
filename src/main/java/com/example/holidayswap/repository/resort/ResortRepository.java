@@ -1,5 +1,8 @@
 package com.example.holidayswap.repository.resort;
 
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.domain.Page;
@@ -25,25 +28,24 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             inner join r.amenities ra
             inner join Property p on p.resortId = r.id
             inner join p.inRoomAmenities pa
-            inner join CoOwner o on p.propertyTypeId = o.id.propertyId
+            inner join CoOwner o on p.id = o.id.propertyId
             inner join TimeFrame v on v.propertyId = p.id
-            inner join AvailableTime tod on tod.timeFrameId = v.id
+            inner join AvailableTime at on at.timeFrameId = v.id
             where upper(r.resortName) like upper(concat('%', :name, '%'))
-            and r.isDeleted = false
-            and (:resortStatus is null or r.status = :resortStatus)
+            and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
             and p.isDeleted = false
-            and o.isDeleted = false
-            and v.isDeleted = false
-            and tod.isDeleted = false
+            and o.isDeleted = false and (:coOwnerStatus is null or o.status = :coOwnerStatus)
+            and v.isDeleted = false and (:timeFrameStatus is null or v.status = :timeFrameStatus)
+            and at.isDeleted = false and (:availableTimeStatus is null or at.status = :availableTimeStatus)
             and ((cast(:startDate as date ) is null or cast(:endDate as date) is null )
             or (
-             (tod.startTime BETWEEN :startDate AND :endDate)
+             (at.startTime BETWEEN :startDate AND :endDate)
                  OR
-                 (tod.endTime BETWEEN :startDate AND :endDate)
+                 (at.endTime BETWEEN :startDate AND :endDate)
                  OR
-                 (tod.startTime < :startDate AND tod.endTime > :endDate)
+                 (at.startTime < :startDate AND at.endTime > :endDate)
                  OR
-                 (tod.endTime > :startDate AND tod.endTime < :endDate)
+                 (at.endTime > :startDate AND at.endTime < :endDate)
                  ))
             and (p.numberKingBeds * 2
             + p.numberQueenBeds * 2
@@ -64,6 +66,9 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             @Param("listOfResortAmenity") Set<Long> listOfResortAmenity,
             @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
             @Param("resortStatus") ResortStatus resortStatus,
+            @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus,
+            @Param("timeFrameStatus") TimeFrameStatus timeFrameStatus,
+            @Param("availableTimeStatus") AvailableTimeStatus availableTimeStatus,
             Pageable pageable
     );
 

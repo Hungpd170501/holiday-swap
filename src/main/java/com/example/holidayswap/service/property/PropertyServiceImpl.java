@@ -49,7 +49,9 @@ public class PropertyServiceImpl implements PropertyService {
                 findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(
                         resortId,
                         timeCheckIn,
-                        timeCheckOut, numberGuests, propertyStatus,
+                        timeCheckOut,
+                        numberGuests,
+                        propertyStatus,
                         pageable);
 
         var dtoResponse = entities.
@@ -89,6 +91,11 @@ public class PropertyServiceImpl implements PropertyService {
             e.setPropertyImageResponses(propertyImages);
         });
         return dtoResponse;
+    }
+
+    @Override
+    public List<PropertyResponse> getByResortId(Long resortId, Date timeCheckIn, Date timeCheckOut, int numberGuests, PropertyStatus propertyStatus, Pageable pageable) {
+        return null;
     }
 
     @Override

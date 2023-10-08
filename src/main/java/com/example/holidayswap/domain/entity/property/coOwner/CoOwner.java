@@ -17,7 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "co-owner")
+@Table(name = "co_owner")
 public class CoOwner {
     @EmbeddedId
     private CoOwnerId id;

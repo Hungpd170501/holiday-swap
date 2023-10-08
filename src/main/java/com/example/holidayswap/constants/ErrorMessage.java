@@ -18,9 +18,10 @@ public class ErrorMessage {
     public static final String PROFILE_NOT_FOUND = "Profile not found.";
     public static final String PROPERTY_NOT_FOUND = "Property not found.";
     public static final String CONTRACT_IMAGE_NOT_FOUND = "Contract image not found.";
-    public static final String OWNERSHIP_NOT_FOUND = "Contract not found.";
+    public static final String CO_OWNER_NOT_FOUND = "Co-owner not found.";
     public static final String RESORT_NOT_FOUND = "Resort not found.";
-    public static final String VACATION_NOT_FOUND = "Vacation not found.";
+    public static final String TIME_FRAME_NOT_FOUND = "Time fame not found.";
+    public static final String AVAILABLE_TIME_NOT_FOUND = "Available time not found.";
     public static final String PROPERTY_TYPE_NOT_FOUND = "Property type not found.";
     public static final String PROPERTY_VIEW_NOT_FOUND = "Property view not found.";
     public static final String PROPERTY_IMAGE_NOT_FOUND = "Property image not found.";

@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.example.holidayswap.constants.ErrorMessage.OWNERSHIP_NOT_FOUND;
-import static com.example.holidayswap.constants.ErrorMessage.VACATION_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.CO_OWNER_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.TIME_FRAME_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -52,9 +52,9 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
 
     @Override
     public TimeFrameResponse get(Long id) {
-        var vacationFound = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow();
-        var vacationResponse = TimeFrameMapper.INSTANCE.toDtoResponse(vacationFound);
-        return vacationResponse;
+        var timeFameFound = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow();
+        var timeFameResponse = TimeFrameMapper.INSTANCE.toDtoResponse(timeFameFound);
+        return timeFameResponse;
     }
 
     @Override
@@ -70,12 +70,12 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
                         ownershipId.getPropertyId()
                         , ownershipId.getUserId()
                         , ownershipId.getRoomId())
-                .orElseThrow(() -> new EntityNotFoundException(OWNERSHIP_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         //Declare list
-        List<TimeFrame> checkVacationUnit;
+        List<TimeFrame> checktimeFameUnit;
         //Check overlaps with any
 
-        checkVacationUnit = timeFrameRepository.
+        checktimeFameUnit = timeFrameRepository.
                 findOverlapWith(
                         ownershipId.getPropertyId(),
                         ownershipId.getUserId(),
@@ -85,10 +85,10 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
                         TimeFrameStatus.ACCEPTED.toString(),
                         CoOwnerStatus.ACCEPTED.toString()
                 );
-        if (!checkVacationUnit.isEmpty()) {
+        if (!checktimeFameUnit.isEmpty()) {
             if (ownership.getType() == ContractType.DEEDED)
                 throw new DuplicateRecordException("Overlaps ownership type DEEDED");
-            else checkVacationUnit.forEach(e -> {
+            else {
                 var ownershipCheck = coOwnerRepository.
                         checkOverlapsTimeOwnership(
                                 ownershipId.getPropertyId(),
@@ -96,15 +96,14 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
                                 ownershipId.getRoomId(),
                                 ownership.getStartTime(),
                                 ownership.getEndTime());
-                if (ownershipCheck.isPresent())
-                    if (ownershipCheck.get().getType() == ContractType.DEEDED)
-                        throw new DuplicateRecordException("Overlaps ownership type DEEDED");
-                    else throw new DuplicateRecordException("Overlaps ownership type RIGHT TO USE");
-            });
+                if (!ownershipCheck.isEmpty()) {
+                    throw new DuplicateRecordException("Overlaps ownership");
+                }
+            }
         }
 //        Check user only create 1 request of each property
         //kiem tra xem cai request nay da co chua, co roi thi khong dc tao them, chi duoc 1 request duy nhat, tr
-        var checkVacationIsCreated = timeFrameRepository.
+        var checktimeFameIsCreated = timeFrameRepository.
                 findByStartTimeAndEndTimeIsInVacationUnitTime(
                         ownershipId.getPropertyId(),
                         ownershipId.getUserId(),
@@ -113,7 +112,7 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
                         dtoRequest.getEndTime(),
                         TimeFrameStatus.PENDING.toString()
                 );
-        if (checkVacationIsCreated.isPresent())
+        if (checktimeFameIsCreated.isPresent())
             throw new DuplicateRecordException("Only 1 request for 1 person in 1 property");
         //pass all then create
         entity.setPropertyId(ownershipId.getPropertyId());
@@ -125,19 +124,28 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
     }
 
     @Override
-    public TimeFrameResponse update(Long id, TimeFrameRequest vacationRequest) {
-//        var vacationFound = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow();
-//        VacationUnitMapper.INSTANCE.updateEntityFromDTO(vacationRequest, vacationFound);
-//        var vacationCreated = timeFrameRepository.save(vacationFound);
-//        return VacationUnitMapper.INSTANCE.toDtoResponse(vacationCreated);
+    public TimeFrameResponse update(Long id, TimeFrameRequest timeFameRequest) {
+//        var timeFameFound = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow();
+//        timeFameUnitMapper.INSTANCE.updateEntityFromDTO(timeFameRequest, timeFameFound);
+//        var timeFameCreated = timeFrameRepository.save(timeFameFound);
+//        return timeFameUnitMapper.INSTANCE.toDtoResponse(timeFameCreated);
         return null;
     }
 
     @Override
+    public TimeFrameResponse update(Long id, TimeFrameStatus timeFrameStatus) {
+        var timeFrame = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).
+                orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+        timeFrame.setStatus(timeFrameStatus);
+        timeFrameRepository.save(timeFrame);
+        return TimeFrameMapper.INSTANCE.toDtoResponse(timeFrame);
+    }
+
+    @Override
     public void delete(Long id) {
-        var vacationFound = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(VACATION_NOT_FOUND));
-        vacationFound.setDeleted(true);
-        timeFrameRepository.save(vacationFound);
+        var timeFrame = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(
+                () -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+        timeFrame.setDeleted(true);
+        timeFrameRepository.save(timeFrame);
     }
 }

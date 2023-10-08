@@ -2,6 +2,7 @@ package com.example.holidayswap.controller.property.timeFrame;
 
 import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTimeRequest;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import com.example.holidayswap.service.property.timeFame.AvailableTimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,40 +17,40 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/available-time")
+@RequestMapping("api/v1/available-times")
 public class AvailableTimesController {
     private final AvailableTimeService availableTimeService;
 
-    @GetMapping("/vacation-units")
-    public ResponseEntity<Page<AvailableTimeResponse>> getAllByVacationUnitId(
-            @RequestParam(value = "vacationUnitId") Long vacationUnitId,
+    @GetMapping("/time-frames")
+    public ResponseEntity<Page<AvailableTimeResponse>> getAllBytimeFrameId(
+            @RequestParam(value = "timeFrameId") Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = availableTimeService.getAllByVacationUnitId(vacationUnitId, pageable);
+        var dtoResponses = availableTimeService.getAllByVacationUnitId(timeFrameId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/properties")
     public ResponseEntity<Page<AvailableTimeResponse>> getAllByPropertyId(
-            @RequestParam("vacationUnitId") Long vacationUnitId,
+            @RequestParam("timeFrameId") Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = availableTimeService.getAllByPropertyId(vacationUnitId, pageable);
+        var dtoResponses = availableTimeService.getAllByPropertyId(timeFrameId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
     @GetMapping("/resort")
     public ResponseEntity<Page<AvailableTimeResponse>> getAllByResortId(
-            @RequestParam Long vacationUnitId,
+            @RequestParam Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = availableTimeService.getAllByResortId(vacationUnitId, pageable);
+        var dtoResponses = availableTimeService.getAllByResortId(timeFrameId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
@@ -60,11 +61,11 @@ public class AvailableTimesController {
         return ResponseEntity.ok(dtoResponse);
     }
 
-    @PostMapping("/{vacationUnitId}")
+    @PostMapping("/{timeFrameId}")
     public ResponseEntity<AvailableTimeResponse> create(
-            @PathVariable("vacationUnitId") Long vacationUnitId,
+            @PathVariable("timeFrameId") Long timeFrameId,
             @RequestBody AvailableTimeRequest dtoRequest) {
-        var dtoResponse = availableTimeService.create(vacationUnitId, dtoRequest);
+        var dtoResponse = availableTimeService.create(timeFrameId, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -73,14 +74,26 @@ public class AvailableTimesController {
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
-    @PutMapping(value = "/{timeOffDepositId}")
-    public ResponseEntity<Void> update(@PathVariable("timeOffDepositId") Long timeOffDepositId,
+    @PutMapping(value = "/{availableTimeId}")
+    public ResponseEntity<Void> update(@PathVariable("availableTimeId") Long timeFrameId,
                                        @RequestBody AvailableTimeRequest dtoRequest) {
-        availableTimeService.update(timeOffDepositId, dtoRequest);
+        availableTimeService.update(timeFrameId, dtoRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(timeOffDepositId)
+                .buildAndExpand(timeFrameId)
+                .toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    @PutMapping(value = "/{availableTimeId}/status")
+    public ResponseEntity<Void> update(@PathVariable("availableTimeId") Long availableTimeId,
+                                       @RequestBody AvailableTimeStatus availableTimeStatus) {
+        availableTimeService.update(availableTimeId, availableTimeStatus);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(availableTimeId)
                 .toUri();
         return ResponseEntity.created(location).build();
     }
