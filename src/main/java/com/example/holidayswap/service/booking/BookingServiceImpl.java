@@ -4,11 +4,11 @@ import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.BookingDetail;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-import com.example.holidayswap.domain.entity.property.vacation.TimeOffDeposit;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.repository.booking.BookingDetailRepository;
 import com.example.holidayswap.repository.booking.BookingRepository;
-import com.example.holidayswap.repository.property.vacation.TimeOffDepositRepository;
+import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BookingServiceImpl implements IBookingService {
 
-    private final TimeOffDepositRepository timeOffDepositRepository;
+    private final AvailableTimeRepository availableTimeRepository;
 
     private final BookingRepository bookingRepository;
 
@@ -46,28 +46,28 @@ public class BookingServiceImpl implements IBookingService {
         if (tryLock) {
             try {
                 Thread.sleep(3000);
-                // check List timeOffDeposit of this apartment
-                TimeOffDeposit timeDepositeCheck = null;
+                // check List AvailableTime of this apartment
+                AvailableTime timeDepositeCheck = null;
                 Double amount = 0.0;
-                TimeOffDeposit timeDepositeLast;
+                AvailableTime timeDepositeLast;
                 Date intersection_date = bookingRequest.getCheckOutDate();
-                List<TimeOffDeposit> timeOffDeposits = timeOffDepositRepository.findAllByPropertyIdAndRoomIdBetweenDate(bookingRequest.getPropertyId(), bookingRequest.getRoomId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+                List<AvailableTime> AvailableTimes = availableTimeRepository.findAllByPropertyIdAndRoomIdBetweenDate(bookingRequest.getPropertyId(), bookingRequest.getRoomId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
 
-                if (timeOffDeposits.size() == 0) {
+                if (AvailableTimes.size() == 0) {
                     throw new EntityNotFoundException("This apartment is not available in this time");
                 }
-                timeDepositeLast = timeOffDeposits.get(timeOffDeposits.size() - 1);
+                timeDepositeLast = AvailableTimes.get(AvailableTimes.size() - 1);
                 if (timeDepositeLast.getEndTime().before(bookingRequest.getCheckOutDate())) {
                     throw new EntityNotFoundException("This apartment is not available in this time");
                 }
                 if (timeDepositeLast.getStartTime().compareTo(bookingRequest.getCheckOutDate()) == 0) {
-                    timeOffDeposits.remove(timeDepositeLast);
-                    if (timeOffDeposits.size() == 0)
+                    AvailableTimes.remove(timeDepositeLast);
+                    if (AvailableTimes.size() == 0)
                         throw new EntityNotFoundException("This apartment is not available in this time");
                 }
-                if (timeOffDeposits.get(0).getEndTime().compareTo(bookingRequest.getCheckInDate()) == 0) {
-                    timeOffDeposits.remove(0);
-                    if (timeOffDeposits.size() == 0)
+                if (AvailableTimes.get(0).getEndTime().compareTo(bookingRequest.getCheckInDate()) == 0) {
+                    AvailableTimes.remove(0);
+                    if (AvailableTimes.size() == 0)
                         throw new EntityNotFoundException("This apartment is not available in this time");
                 }
                 // TODO: check booking of this apartment
@@ -76,13 +76,13 @@ public class BookingServiceImpl implements IBookingService {
                     throw new EntityNotFoundException("This apartment is not available in this time");
                 }
 
-                for (TimeOffDeposit timeOffDeposit : timeOffDeposits) {
+                for (AvailableTime AvailableTime : AvailableTimes) {
                     if (timeDepositeCheck != null) {
-                        if (timeOffDeposit.getStartTime().compareTo(timeDepositeCheck.getEndTime()) != 0) {
+                        if (AvailableTime.getStartTime().compareTo(timeDepositeCheck.getEndTime()) != 0) {
                             throw new EntityNotFoundException("This apartment is not available in this time");
                         }
                     }
-                    timeDepositeCheck = timeOffDeposit;
+                    timeDepositeCheck = AvailableTime;
                 }
 
 
@@ -99,19 +99,19 @@ public class BookingServiceImpl implements IBookingService {
                 bookingRepository.save(booking);
                 // TODO: createBooking detail
 
-                for (TimeOffDeposit timeOffDeposit : timeOffDeposits) {
+                for (AvailableTime AvailableTime : AvailableTimes) {
 
                     BookingDetail bookingDetail = new BookingDetail();
                     bookingDetail.setBookId(booking.getId());
                     bookingDetail.setPropertyId(bookingRequest.getPropertyId());
                     bookingDetail.setRoomId(bookingRequest.getRoomId());
-                    bookingDetail.setUserId(timeOffDeposit.getVacation().getUserId());
+                    bookingDetail.setUserId(AvailableTime.getTimeFrame().getUserId());
                     bookingDetail.setCheckInDate(bookingRequest.getCheckInDate());
-                    if (timeOffDeposits.size() > 1) {
-                        bookingRequest.setCheckInDate(timeOffDeposit.getEndTime());
-                        intersection_date = timeOffDeposit.getEndTime();
+                    if (AvailableTimes.size() > 1) {
+                        bookingRequest.setCheckInDate(AvailableTime.getEndTime());
+                        intersection_date = AvailableTime.getEndTime();
                     }
-                    if (timeOffDeposit.equals(timeOffDeposits.get(timeOffDeposits.size() - 1))) {
+                    if (AvailableTime.equals(AvailableTimes.get(AvailableTimes.size() - 1))) {
                         intersection_date = bookingRequest.getCheckOutDate();
                     }
                     bookingDetail.setCheckOutDate(intersection_date);
@@ -119,7 +119,7 @@ public class BookingServiceImpl implements IBookingService {
                     LocalDate localDateCheckin = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingDetail.getCheckInDate()));
                     LocalDate localDateCheckout = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingDetail.getCheckOutDate()));
                     long days = ChronoUnit.DAYS.between(localDateCheckin, localDateCheckout);
-                    bookingDetail.setTotalPoint((double) days * timeOffDeposit.getPricePerNight());
+                    bookingDetail.setTotalPoint((double) days * AvailableTime.getPricePerNight());
                     bookingDetail.setNumberOfGuests(4);
                     amount += bookingDetail.getTotalPoint();
                     bookingDetailRepository.save(bookingDetail);
