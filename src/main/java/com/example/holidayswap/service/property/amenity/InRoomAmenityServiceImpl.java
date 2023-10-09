@@ -69,10 +69,10 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
     @Override
     public InRoomAmenityResponse create(InRoomAmenityRequest dtoRequest, MultipartFile inRoomAmenityIcon) {
         if (inRoomAmenityRepository.findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityName()).isPresent())
-            throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY);
+            throw new DuplicateRecordException(DUPLICATE_IN_ROOM_AMENITY);
 
         if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeId()).isEmpty())
-            throw new DataIntegrityViolationException(INROOM_AMENITY_TYPE_DELETED);
+            throw new DataIntegrityViolationException(IN_ROOM_AMENITY_TYPE_DELETED);
         String link = null;
         try {
             link = fileService.uploadFile(inRoomAmenityIcon);
@@ -90,10 +90,10 @@ public class InRoomAmenityServiceImpl implements InRoomAmenityService {
                 orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND));
         var entityFound = inRoomAmenityRepository.findByInRoomAmenityNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityName());
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
-            throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY);
+            throw new DuplicateRecordException(DUPLICATE_IN_ROOM_AMENITY);
         }
         if (inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeId()).isEmpty())
-            throw new DataIntegrityViolationException(INROOM_AMENITY_TYPE_DELETED);
+            throw new DataIntegrityViolationException(IN_ROOM_AMENITY_TYPE_DELETED);
 
         if (inRoomAmenityIcon != null) {
             String link = null;

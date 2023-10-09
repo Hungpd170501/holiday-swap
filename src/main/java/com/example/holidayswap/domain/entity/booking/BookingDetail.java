@@ -1,6 +1,6 @@
 package com.example.holidayswap.domain.entity.booking;
 
-import com.example.holidayswap.domain.entity.property.ownership.Ownership;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,7 +52,7 @@ public class BookingDetail {
             nullable = false,
             insertable = false,
             updatable = false)
-    private Ownership ownership;
+    private CoOwner coOwner;
 
     @Column(name = "check_in_date", nullable = false)
     private Date checkInDate;

@@ -1,7 +1,7 @@
 package com.example.holidayswap.domain.entity.property;
 
 public enum PropertyStatus {
-    WAITING,
-    ACCEPTED,
-    REJECTED
+    ACTIVE,
+    DEACTIVATE,
+    NO_LONGER_IN_BUSINESS
 }
