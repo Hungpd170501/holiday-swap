@@ -1,12 +1,10 @@
 package com.example.holidayswap.repository.property;
 
 import com.example.holidayswap.domain.entity.property.Property;
-import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -28,12 +26,11 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             select distinct p from Property p
             inner join PropertyType pt on p.propertyTypeId = pt.id
             inner join pt.resorts r
-            inner join CoOwner o on p.id = o.id.propertyId
-            inner join TimeFrame v on v.propertyId = p.id
-            inner join AvailableTime tod on tod.timeFrameId = v.id
-            where p.resortId = :resortId
+            inner join  Ownership o on p.propertyTypeId = o.id.propertyId
+            inner join VacationUnit v on v.propertyId = p.id
+            inner join TimeOffDeposit tod on tod.vacationUnitId = v.id
+            where p.resortId = ?1
             and p.isDeleted = false
-            and (:propertyStatus is null  or p.status = :propertyStatus)
             and pt.isDeleted = false
             and r.isDeleted = false
             and o.isDeleted = false
@@ -46,27 +43,24 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             + p.numberFullBeds * 2
             + p.numberMurphyBeds
             + p.numberSofaBeds
-            + p.numberTwinBeds * 2) >= :numberGuests
-            and ((cast(:timeCheckIn as date ) is null or cast(:timeCheckOut as date) is null )
-            or ( (tod.startTime BETWEEN :timeCheckIn AND :timeCheckOut)
+            + p.numberTwinBeds * 2) >= ?4
+            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
+            or ( (tod.startTime BETWEEN ?2 AND ?3)
                  OR
-                 (tod.endTime BETWEEN :timeCheckIn AND :timeCheckOut)
+                 (tod.endTime BETWEEN ?2 AND ?3)
                  OR
-                 (tod.startTime < :timeCheckIn AND tod.endTime > :timeCheckOut)
+                 (tod.startTime < ?2 AND tod.endTime > ?3)
                  OR
-                 (tod.endTime > :timeCheckIn AND tod.endTime < :timeCheckOut)
+                 (tod.endTime > ?2 AND tod.endTime < ?3)
                  )
             )
             """)
-    Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(@Param("resortId") Long resortId,
-                                                                             @Param("timeCheckIn") Date timeCheckIn,
-                                                                             @Param("timeCheckOut") Date timeCheckOut,
-                                                                             @Param("numberGuests") int numberGuests,
-                                                                             @Param("propertyStatus") PropertyStatus propertyStatus,
+    Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(Long resortId,
+                                                                             Date timeCheckIn,
+                                                                             Date timeCheckOut,
+                                                                             int numberGuests,
                                                                              Pageable pageable);
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")
     Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);
-
-    Optional<Property> findPropertyByIdAndIsDeletedIsFalseAndStatus(Long propertyId, PropertyStatus propertyStatus);
 }

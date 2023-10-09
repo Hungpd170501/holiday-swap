@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/prod2
+    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/prod
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
   jpa:

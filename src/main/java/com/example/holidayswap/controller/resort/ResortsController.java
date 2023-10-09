@@ -5,10 +5,6 @@ import com.example.holidayswap.domain.dto.response.resort.ResortImageResponse;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
-import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.service.resort.ResortImageService;
 import com.example.holidayswap.service.resort.ResortService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityService;
@@ -41,20 +37,18 @@ public class ResortsController {
     @GetMapping
     public ResponseEntity<Page<ResortResponse>> gets(
             @RequestParam(defaultValue = "") String nameResort,
-            @RequestParam(value = "timeCheckIn", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckIn,
-            @RequestParam(value = "timeCheckOut", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
+            @RequestParam(value = "timeCheckIn", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckIn,
+            @RequestParam(value = "timeCheckOut", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
             @RequestParam(defaultValue = "0") Integer numberGuests,
             @RequestParam(value = "resortAmenity", required = false) Set<Long> listOfResortAmenity,
             @RequestParam(value = "inRoomAmenity", required = false) Set<Long> listOfInRoomAmenity,
-            @RequestParam(value = "resortStatus", required = false) ResortStatus resortStatus,
-            @RequestParam(value = "coOwnerStatus", required = false) CoOwnerStatus coOwnerStatus,
-            @RequestParam(value = "timeFrameStatus", required = false) TimeFrameStatus timeFrameStatus,
-            @RequestParam(value = "availableTimeStatus", required = false) AvailableTimeStatus availableTimeStatus,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, numberGuests, listOfResortAmenity, listOfInRoomAmenity, resortStatus, coOwnerStatus, timeFrameStatus, availableTimeStatus, pageable));
+        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, numberGuests, listOfResortAmenity, listOfInRoomAmenity, pageable));
     }
 
     @GetMapping("/{resortId}/resort-images")
@@ -85,7 +79,7 @@ public class ResortsController {
 
     @PostMapping
     public ResponseEntity<ResortResponse> create(
-            @RequestPart(name = "resort") ResortRequest resortRequest,
+            @RequestPart ResortRequest resortRequest,
             @RequestPart List<MultipartFile> resortImage
     ) {
         var dtoResponse = resortService.create(resortRequest, resortImage);
@@ -101,18 +95,6 @@ public class ResortsController {
     public ResponseEntity<Void> update(@PathVariable("resortId") Long resortId,
                                        @RequestBody ResortRequest resortRequest) {
         resortService.update(resortId, resortRequest);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(resortId)
-                .toUri();
-        return ResponseEntity.created(location).build();
-    }
-
-    @PutMapping("/{resortId}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable("resortId") Long resortId,
-                                             @RequestBody ResortStatus resortStatus) {
-        resortService.update(resortId, resortStatus);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

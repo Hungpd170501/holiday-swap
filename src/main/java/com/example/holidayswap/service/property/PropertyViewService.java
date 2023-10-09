@@ -1,6 +1,6 @@
 package com.example.holidayswap.service.property;
 
-import com.example.holidayswap.domain.dto.request.property.PropertyViewRequest;
+import com.example.holidayswap.domain.dto.request.property.vacation.PropertyViewRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyViewResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
