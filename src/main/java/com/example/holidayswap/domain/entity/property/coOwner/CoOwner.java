@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.property.coOwner;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.booking.BookingDetail;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,6 +47,10 @@ public class CoOwner {
 
     @OneToMany(mappedBy = "coOwner", fetch = FetchType.LAZY)
     private Collection<TimeFrame> timeFrames;
+
+    @OneToMany(mappedBy = "ownership", fetch = FetchType.LAZY)
+    private Collection<BookingDetail> bookingDetails;
+
 
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

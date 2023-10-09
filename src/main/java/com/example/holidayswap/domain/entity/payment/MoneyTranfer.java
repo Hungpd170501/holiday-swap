@@ -42,6 +42,9 @@ public class MoneyTranfer {
     @Column(name = "payment_date",nullable = false)
     private String paymentDate;
 
+    @Column(name = "totalPoint")
+    private Double totalPoint;
+
     @Column(name = "status",nullable = false)
     private EnumPaymentStatus.StatusMoneyTranfer status;
 

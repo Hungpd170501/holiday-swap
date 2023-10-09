@@ -4,6 +4,11 @@ import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
+import com.example.holidayswap.domain.dto.response.resort.OwnerShipResponseDTO;
+import com.example.holidayswap.domain.entity.property.ownership.ContractStatus;
+import com.example.holidayswap.domain.entity.property.ownership.ContractType;
+import com.example.holidayswap.domain.entity.property.ownership.Ownership;
+import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -115,4 +120,8 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
             String roomId,
             ContractType type,
             CoOwnerStatus status);
+            ContractStatus status);
+
+    @Query(value = "SELECT Distinct o.property_id, o.room_id from ownership o",nativeQuery = true)
+    List<OwnerShipResponseDTO> getAllDistinctOwnerShipWithoutUserId();
 }
