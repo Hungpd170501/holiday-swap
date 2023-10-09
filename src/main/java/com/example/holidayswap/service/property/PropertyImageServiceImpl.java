@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_IMAGE_NOT_FOUND;
-import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_IMAMGE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class PropertyImageServiceImpl implements PropertyImageService {
     @Override
     public PropertyImageResponse get(Long id) {
         return PropertyImageMapper.INSTANCE.toDtoResponse(propertyImageRepository.findByIdAndDeletedIsFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(PROPERTY_IMAMGE_NOT_FOUND)));
+                () -> new EntityNotFoundException(PROPERTY_IMAGE_NOT_FOUND)));
     }
 
     @Override
@@ -53,7 +52,7 @@ public class PropertyImageServiceImpl implements PropertyImageService {
     @Override
     public PropertyImageResponse update(Long id, MultipartFile multipartFile) {
         var entity = propertyImageRepository.findByIdAndDeletedIsFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(PROPERTY_IMAMGE_NOT_FOUND));
+                () -> new EntityNotFoundException(PROPERTY_IMAGE_NOT_FOUND));
         String link;
         try {
             link = fileService.uploadFile(multipartFile);
