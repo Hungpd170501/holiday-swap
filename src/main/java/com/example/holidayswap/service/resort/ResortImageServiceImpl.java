@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-import static com.example.holidayswap.constants.ErrorMessage.RESORT_IMAMGE_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.RESORT_IMAGE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class ResortImageServiceImpl implements ResortImageService {
     @Override
     public ResortImageResponse get(Long id) {
         var entity = resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND));
+                () -> new EntityNotFoundException(RESORT_IMAGE_NOT_FOUND));
         var dtoRespones = ResortImageMapper.INSTANCE.toDtoResponse(entity);
         return dtoRespones;
     }
@@ -57,7 +57,7 @@ public class ResortImageServiceImpl implements ResortImageService {
     @Override
     public ResortImageResponse update(Long id, MultipartFile multipartFile) {
         var entity = resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND));
+                () -> new EntityNotFoundException(RESORT_IMAGE_NOT_FOUND));
         String link;
         try {
             link = fileService.uploadFile(multipartFile);
@@ -73,7 +73,7 @@ public class ResortImageServiceImpl implements ResortImageService {
     @Override
     public void delete(Long id) {
         var entity = (resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(RESORT_IMAMGE_NOT_FOUND)));
+                () -> new EntityNotFoundException(RESORT_IMAGE_NOT_FOUND)));
         entity.setDeleted(true);
         resortImageRepository.save(entity);
     }

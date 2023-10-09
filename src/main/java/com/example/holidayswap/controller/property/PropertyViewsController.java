@@ -1,6 +1,6 @@
 package com.example.holidayswap.controller.property;
 
-import com.example.holidayswap.domain.dto.request.property.vacation.PropertyViewRequest;
+import com.example.holidayswap.domain.dto.request.property.PropertyViewRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyViewResponse;
 import com.example.holidayswap.service.property.PropertyViewService;
 import lombok.RequiredArgsConstructor;

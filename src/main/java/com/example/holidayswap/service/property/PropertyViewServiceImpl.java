@@ -1,6 +1,6 @@
 package com.example.holidayswap.service.property;
 
-import com.example.holidayswap.domain.dto.request.property.vacation.PropertyViewRequest;
+import com.example.holidayswap.domain.dto.request.property.PropertyViewRequest;
 import com.example.holidayswap.domain.dto.response.property.PropertyViewResponse;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
