@@ -4,11 +4,11 @@ import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.BookingDetail;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
+import com.example.holidayswap.domain.entity.property.vacation.TimeOffDeposit;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.repository.booking.BookingDetailRepository;
 import com.example.holidayswap.repository.booking.BookingRepository;
-import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
+import com.example.holidayswap.repository.property.vacation.TimeOffDepositRepository;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BookingServiceImpl implements IBookingService {
 
-    private final AvailableTimeRepository timeOffDepositRepository;
+    private final TimeOffDepositRepository timeOffDepositRepository;
 
     private final BookingRepository bookingRepository;
 
@@ -47,11 +47,11 @@ public class BookingServiceImpl implements IBookingService {
             try {
                 Thread.sleep(3000);
                 // check List timeOffDeposit of this apartment
-                AvailableTime timeDepositeCheck = null;
+                TimeOffDeposit timeDepositeCheck = null;
                 Double amount = 0.0;
-                AvailableTime timeDepositeLast;
+                TimeOffDeposit timeDepositeLast;
                 Date intersection_date = bookingRequest.getCheckOutDate();
-                List<AvailableTime> timeOffDeposits = timeOffDepositRepository.findAllByPropertyIdAndRoomIdBetweenDate(bookingRequest.getPropertyId(), bookingRequest.getRoomId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+                List<TimeOffDeposit> timeOffDeposits = timeOffDepositRepository.findAllByPropertyIdAndRoomIdBetweenDate(bookingRequest.getPropertyId(), bookingRequest.getRoomId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
 
                 if (timeOffDeposits.size() == 0) {
                     throw new EntityNotFoundException("This apartment is not available in this time");
@@ -76,7 +76,7 @@ public class BookingServiceImpl implements IBookingService {
                     throw new EntityNotFoundException("This apartment is not available in this time");
                 }
 
-                for (AvailableTime timeOffDeposit : timeOffDeposits) {
+                for (TimeOffDeposit timeOffDeposit : timeOffDeposits) {
                     if (timeDepositeCheck != null) {
                         if (timeOffDeposit.getStartTime().compareTo(timeDepositeCheck.getEndTime()) != 0) {
                             throw new EntityNotFoundException("This apartment is not available in this time");
@@ -99,13 +99,13 @@ public class BookingServiceImpl implements IBookingService {
                 bookingRepository.save(booking);
                 // TODO: createBooking detail
 
-                for (AvailableTime timeOffDeposit : timeOffDeposits) {
+                for (TimeOffDeposit timeOffDeposit : timeOffDeposits) {
 
                     BookingDetail bookingDetail = new BookingDetail();
                     bookingDetail.setBookId(booking.getId());
                     bookingDetail.setPropertyId(bookingRequest.getPropertyId());
                     bookingDetail.setRoomId(bookingRequest.getRoomId());
-                    bookingDetail.setUserId(timeOffDeposit.getTimeFrame().getUserId());
+                    bookingDetail.setUserId(timeOffDeposit.getVacation().getUserId());
                     bookingDetail.setCheckInDate(bookingRequest.getCheckInDate());
                     if (timeOffDeposits.size() > 1) {
                         bookingRequest.setCheckInDate(timeOffDeposit.getEndTime());

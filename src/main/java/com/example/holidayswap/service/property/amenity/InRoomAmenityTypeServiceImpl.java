@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
-import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_IN_ROOM_AMENITY_TYPE;
+import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_INROOM_AMENITY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.IN_ROOM_AMENITY_TYPE_NOT_FOUND;
 
 @Service
@@ -57,7 +57,7 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
     public InRoomAmenityTypeResponse create(InRoomAmenityTypeRequest dtoRequest) {
         if (inRoomAmenityTypeRepository.
                 findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName()).
-                isPresent()) throw new DuplicateRecordException(DUPLICATE_IN_ROOM_AMENITY_TYPE);
+                isPresent()) throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
         return InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.save(InRoomAmenityTypeMapper.INSTANCE.toEntity(dtoRequest)));
     }
 
@@ -69,7 +69,7 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
         var entityFound = inRoomAmenityTypeRepository.
                 findByInRoomAmenityTypeNameEqualsIgnoreCaseAndIsDeletedFalse(dtoRequest.getInRoomAmenityTypeName());
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
-            throw new DuplicateRecordException(DUPLICATE_IN_ROOM_AMENITY_TYPE);
+            throw new DuplicateRecordException(DUPLICATE_INROOM_AMENITY_TYPE);
         InRoomAmenityTypeMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         return InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.save(entity));
     }

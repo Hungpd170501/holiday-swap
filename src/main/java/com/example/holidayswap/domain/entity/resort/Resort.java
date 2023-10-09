@@ -40,9 +40,6 @@ public class Resort {
     private Location location;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
-    @Column(name = "resort_status")
-    @Enumerated(EnumType.STRING)
-    private ResortStatus status;
     @OneToMany(mappedBy = "resort")
     private List<ResortImage> resortImages;
     @ManyToMany

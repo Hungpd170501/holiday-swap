@@ -1,10 +1,6 @@
 package com.example.holidayswap.repository.resort;
 
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.entity.resort.Resort;
-import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,34 +14,30 @@ import java.util.Set;
 
 @Repository
 public interface ResortRepository extends JpaRepository<Resort, Long> {
-    @Query("select r from Resort r where r.id = :resortId and r.isDeleted = false and r.status = :resortStatus")
-    Optional<Resort> findByIdAndDeletedFalseAndResortStatus(@Param(("resortId")) Long id,
-                                                            @Param(("resortStatus")) ResortStatus resortStatus);
-
     @Query("""
             select DISTINCT r  from Resort r
             inner join r.propertyTypes pt
             inner join r.amenities ra
             inner join Property p on p.resortId = r.id
             inner join p.inRoomAmenities pa
-            inner join CoOwner o on p.id = o.id.propertyId
-            inner join TimeFrame v on v.propertyId = p.id
-            inner join AvailableTime at on at.timeFrameId = v.id
-            where upper(r.resortName) like upper(concat('%', :name, '%'))
-            and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
+            inner join Ownership o on o.id.propertyId = p.id
+            inner join VacationUnit vu on vu.propertyId = p.id
+            inner join TimeOffDeposit tod on tod.vacationUnitId = vu.id
+            where upper(r.resortName) like upper(concat('%', ?1, '%'))
+            and r.isDeleted = false
             and p.isDeleted = false
-            and o.isDeleted = false and (:coOwnerStatus is null or o.status = :coOwnerStatus)
-            and v.isDeleted = false and (:timeFrameStatus is null or v.status = :timeFrameStatus)
-            and at.isDeleted = false and (:availableTimeStatus is null or at.status = :availableTimeStatus)
-            and ((cast(:startDate as date ) is null or cast(:endDate as date) is null )
+            and o.isDeleted = false
+            and vu.isDeleted = false
+            and tod.isDeleted = false
+            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
             or (
-             (at.startTime BETWEEN :startDate AND :endDate)
+             (tod.startTime BETWEEN ?2 AND ?3)
                  OR
-                 (at.endTime BETWEEN :startDate AND :endDate)
+                 (tod.endTime BETWEEN ?2 AND ?3)
                  OR
-                 (at.startTime < :startDate AND at.endTime > :endDate)
+                 (tod.startTime < ?2 AND tod.endTime > ?3)
                  OR
-                 (at.endTime > :startDate AND at.endTime < :endDate)
+                 (tod.endTime > ?2 AND tod.endTime < ?3)
                  ))
             and (p.numberKingBeds * 2
             + p.numberQueenBeds * 2
@@ -54,27 +46,22 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             + p.numberFullBeds * 2
             + p.numberMurphyBeds
             + p.numberSofaBeds
-            + p.numberTwinBeds * 2) >= :numberGuests
-            and ((:#{#listOfResortAmenity == null} = true) or (r.id in :listOfResortAmenity))
-            and ((:#{#listOfInRoomAmenity == null} = true) or (p.id in :listOfInRoomAmenity))
+            + p.numberTwinBeds * 2) >= ?4
+            and ((:#{#listOfResortAmenity == null} = true) or (r.id in ?5))
+            and ((:#{#listOfInRoomAmenity == null} = true) or (p.id in ?6))
             """)
     Page<Resort> findAllByFilter(
-            @Param("name") String name,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate,
-            @Param("numberGuests") int numberGuests,
+            String name,
+            Date startDate,
+            Date endDate,
+            int numberGuests,
             @Param("listOfResortAmenity") Set<Long> listOfResortAmenity,
             @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
-            @Param("resortStatus") ResortStatus resortStatus,
-            @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus,
-            @Param("timeFrameStatus") TimeFrameStatus timeFrameStatus,
-            @Param("availableTimeStatus") AvailableTimeStatus availableTimeStatus,
             Pageable pageable
     );
 
-    @Query("select r from Resort r where r.id = :resortId and r.isDeleted = false")
-    Optional<Resort> findByIdAndDeletedFalse(@Param(("resortId")) Long id);
-
+    @Query("select r from Resort r where r.id = ?1 and r.isDeleted = false")
+    Optional<Resort> findByIdAndDeletedFalse(Long id);
     @Query("select r from Resort r where upper(r.resortName) = upper(?1) and r.isDeleted = false")
     Optional<Resort> findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
 }
