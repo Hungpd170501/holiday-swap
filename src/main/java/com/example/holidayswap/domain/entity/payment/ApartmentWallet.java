@@ -1,6 +1,8 @@
 package com.example.holidayswap.domain.entity.payment;
 
 import com.example.holidayswap.domain.entity.property.Property;
+import com.example.holidayswap.domain.entity.property.ownership.Ownership;
+import com.example.holidayswap.domain.entity.property.ownership.OwnershipId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +21,7 @@ public class ApartmentWallet {
     @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "property_id", nullable = false)
-    private Property property;
+    private Property property;;
     @Column(name = "total_point")
     private Double totalPoint;
     // TODO: update transaction for apartment wallet (retaler wallet -> apartment wallet -> owner wallet)
