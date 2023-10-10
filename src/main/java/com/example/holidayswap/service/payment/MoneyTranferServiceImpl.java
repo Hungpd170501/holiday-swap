@@ -2,8 +2,8 @@ package com.example.holidayswap.service.payment;
 
 import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.entity.auth.User;
-import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
+import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.Point;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.payment.TransactionRepository;
@@ -56,7 +56,7 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
         moneyTranfer.setStatus(status);
         moneyTranfer.setUser(user);
         moneyTranfer.setOrderInfor(topUpWalletDTO.getOrderInfor());
-        moneyTranfer.setTotalPoint(user.getWallet().getTotalPoint());
+        //moneyTranfer.setTotalPoint(user.getWallet().getTotalPoint());
         SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     try {
