@@ -56,7 +56,6 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
         moneyTranfer.setStatus(status);
         moneyTranfer.setUser(user);
         moneyTranfer.setOrderInfor(topUpWalletDTO.getOrderInfor());
-        //moneyTranfer.setTotalPoint(user.getWallet().getTotalPoint());
         SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     try {

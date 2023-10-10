@@ -2535,42 +2535,6 @@ INSERT INTO public.resort_image
 VALUES (71, 1,
         'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/e876d0b0-f389-4f45-8328-440b894b4ce1_resort2.jpg',
         false);
-INSERT INTO public.resort_image
-VALUES (72, 8,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/ee5437aa-944a-4133-a491-b933e9dd32e5_1mc4712000ap9mcan6CAB_R_600_400_R5_D.jpg',
-        false);
-INSERT INTO public.resort_image
-VALUES (73, 9,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/2e63c3dd-4b67-4f4a-ae1e-9d0e6d9ea7e6_1mc4712000ap9mcan6CAB_R_600_400_R5_D.jpg',
-        false);
-INSERT INTO public.resort_image
-VALUES (74, 10,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/436f332f-643b-444d-860a-168f8f21f0a3_1mc4712000ap9mcan6CAB_R_600_400_R5_D.jpg',
-        false);
-INSERT INTO public.resort_image
-VALUES (75, 11,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/48a1da77-362f-4411-807e-f47fc0df827f_1mc4712000ap9mcan6CAB_R_600_400_R5_D.jpg',
-        false);
-INSERT INTO public.resort_image
-VALUES (76, 12,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/2ab0ef50-cab2-4590-b2ab-da1f15e5260f_1mc4712000ap9mcan6CAB_R_600_400_R5_D.jpg',
-        false);
-INSERT INTO public.resort_image
-VALUES (77, 13,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/9c347afc-719e-4ea0-a131-fa0e8363e664_1mc4712000ap9mcan6CAB_R_600_400_R5_D.jpg',
-        false);
-INSERT INTO public.resort_image
-VALUES (78, 14,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/d428db92-6cf8-4dfa-8ffa-7fe72d5842f4_Balcony.png',
-        false);
-INSERT INTO public.resort_image
-VALUES (79, 15,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/a563749b-4ee3-45a3-aba6-26443bc94ee0_Audio%20Equipment.png',
-        false);
-INSERT INTO public.resort_image
-VALUES (80, 16,
-        'https://holiday-swap-file-resouces.s3.ap-southeast-1.amazonaws.com/fcb96080-09f7-4498-a2e3-8cc1fcb9f28b_resort4.jpg',
-        false);
 
 
 --
@@ -2993,46 +2957,6 @@ INSERT INTO public.resorts_amenities
 VALUES (43, 5);
 INSERT INTO public.resorts_amenities
 VALUES (44, 5);
-INSERT INTO public.resorts_amenities
-VALUES (1, 8);
-INSERT INTO public.resorts_amenities
-VALUES (2, 8);
-INSERT INTO public.resorts_amenities
-VALUES (3, 8);
-INSERT INTO public.resorts_amenities
-VALUES (4, 8);
-INSERT INTO public.resorts_amenities
-VALUES (13, 9);
-INSERT INTO public.resorts_amenities
-VALUES (14, 9);
-INSERT INTO public.resorts_amenities
-VALUES (13, 10);
-INSERT INTO public.resorts_amenities
-VALUES (14, 10);
-INSERT INTO public.resorts_amenities
-VALUES (13, 11);
-INSERT INTO public.resorts_amenities
-VALUES (14, 11);
-INSERT INTO public.resorts_amenities
-VALUES (13, 12);
-INSERT INTO public.resorts_amenities
-VALUES (14, 12);
-INSERT INTO public.resorts_amenities
-VALUES (13, 13);
-INSERT INTO public.resorts_amenities
-VALUES (14, 13);
-INSERT INTO public.resorts_amenities
-VALUES (13, 14);
-INSERT INTO public.resorts_amenities
-VALUES (14, 14);
-INSERT INTO public.resorts_amenities
-VALUES (13, 15);
-INSERT INTO public.resorts_amenities
-VALUES (14, 15);
-INSERT INTO public.resorts_amenities
-VALUES (3, 16);
-INSERT INTO public.resorts_amenities
-VALUES (4, 16);
 
 
 --
@@ -3077,46 +3001,6 @@ INSERT INTO public.resorts_property_type_property
 VALUES (18, 2);
 INSERT INTO public.resorts_property_type_property
 VALUES (21, 3);
-INSERT INTO public.resorts_property_type_property
-VALUES (1, 8);
-INSERT INTO public.resorts_property_type_property
-VALUES (8, 8);
-INSERT INTO public.resorts_property_type_property
-VALUES (9, 8);
-INSERT INTO public.resorts_property_type_property
-VALUES (13, 8);
-INSERT INTO public.resorts_property_type_property
-VALUES (24, 9);
-INSERT INTO public.resorts_property_type_property
-VALUES (22, 9);
-INSERT INTO public.resorts_property_type_property
-VALUES (24, 10);
-INSERT INTO public.resorts_property_type_property
-VALUES (22, 10);
-INSERT INTO public.resorts_property_type_property
-VALUES (24, 11);
-INSERT INTO public.resorts_property_type_property
-VALUES (22, 11);
-INSERT INTO public.resorts_property_type_property
-VALUES (24, 12);
-INSERT INTO public.resorts_property_type_property
-VALUES (22, 12);
-INSERT INTO public.resorts_property_type_property
-VALUES (24, 13);
-INSERT INTO public.resorts_property_type_property
-VALUES (22, 13);
-INSERT INTO public.resorts_property_type_property
-VALUES (24, 14);
-INSERT INTO public.resorts_property_type_property
-VALUES (22, 14);
-INSERT INTO public.resorts_property_type_property
-VALUES (24, 15);
-INSERT INTO public.resorts_property_type_property
-VALUES (22, 15);
-INSERT INTO public.resorts_property_type_property
-VALUES (20, 16);
-INSERT INTO public.resorts_property_type_property
-VALUES (21, 16);
 
 
 --
