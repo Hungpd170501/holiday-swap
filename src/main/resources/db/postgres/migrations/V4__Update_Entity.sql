@@ -117,7 +117,7 @@ ALTER TABLE reservation
     ADD available_time_id BIGINT;
 
 ALTER TABLE resort
-    ADD resort_description VARCHAR(255);
+    ADD resort_description VARCHAR;
 
 ALTER TABLE resort
     ADD resort_status VARCHAR(255);
