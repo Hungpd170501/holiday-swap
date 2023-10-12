@@ -38,6 +38,7 @@ public class ErrorMessage {
     public static final String IN_ROOM_AMENITY_TYPE_DELETED = "Resort type amenity has deleted.";
     public static final String DUPLICATE_RESORT_AMENITY_TYPE = "Duplicate resort type amenity.";
     public static final String DUPLICATE_PROPERTY_TYPE = "Duplicate property type amenity.";
+    public static final String DUPLICATE_PROPERTY_VIEW = "Duplicate property view amenity.";
     public static final String INCORRECT_EMAIL_OR_PASSWORD = "Incorrect email or password.";
     public static final String PLAN_NOT_FOUND = "Plan not found.";
     public static final String PLAN_ALREADY_EXISTS = "Plan already exists.";

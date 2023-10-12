@@ -2,6 +2,9 @@ package com.example.holidayswap.service.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
+import com.example.holidayswap.domain.entity.auth.RoleName;
+import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
@@ -15,12 +18,14 @@ import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
+import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.property.PropertyService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -36,29 +41,49 @@ public class ResortServiceImpl implements ResortService {
     private final ResortAmenityRepository resortAmenityRepository;
     private final PropertyTypeRespository propertyTypeRespository;
     private final PropertyService propertyService;
+    private final UserService userService;
 
     @Override
-    public Page<ResortResponse> gets(String name, Date timeCheckIn,
+    public Page<ResortResponse> gets(String name,
+                                     Date timeCheckIn,
                                      Date timeCheckOut,
                                      int numberGuests,
                                      Set<Long> listOfResortAmenity,
                                      Set<Long> listOfInRoomAmenity,
                                      ResortStatus resortStatus,
-                                     CoOwnerStatus coOwnerStatus,
-                                     TimeFrameStatus timeFrameStatus,
-                                     AvailableTimeStatus availableTimeStatus,
                                      Pageable pageable) {
-        Page<Resort> entities = resortRepository.findAllByFilter(name, timeCheckIn, timeCheckOut, numberGuests,
-                listOfResortAmenity,
-                listOfInRoomAmenity,
-                resortStatus,
-                coOwnerStatus,
-                timeFrameStatus,
-                availableTimeStatus,
-                pageable);
+
+        // return par
+        Page<Resort> entities = null;
+        //Get user
+        Optional<User> user = userService.getUser();
+        //If staff, admin search all
+        if (user.isPresent() &&
+            (Objects.equals(user.get().getRole().getName(), RoleName.Staff.toString())
+             || Objects.equals(user.get().getRole().getName(), RoleName.Admin.toString()))) {
+            entities = resortRepository.findAllByFilter(name, listOfResortAmenity, resortStatus, pageable);
+        } else {
+            resortStatus = ResortStatus.ACTIVE;
+            //default get
+            PropertyStatus propertyStatus = PropertyStatus.ACTIVE;
+            CoOwnerStatus coOwnerStatus = CoOwnerStatus.ACCEPTED;
+            TimeFrameStatus timeFrameStatus = TimeFrameStatus.ACCEPTED;
+            AvailableTimeStatus availableTimeStatus = AvailableTimeStatus.OPEN;
+            entities = resortRepository.findAllByFilter(name,
+                    timeCheckIn,
+                    timeCheckOut,
+                    numberGuests,
+                    listOfResortAmenity,
+                    listOfInRoomAmenity,
+                    resortStatus,
+                    propertyStatus,
+                    coOwnerStatus,
+                    timeFrameStatus,
+                    availableTimeStatus,
+                    pageable);
+        }
         var dtoReponses = entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
-            dto.setPropertyResponses(propertyService.getByResortId(e.getId()));
             dto.setResortImages(resortImageService.gets(e.getId()));
             dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
             return dto;
@@ -72,7 +97,6 @@ public class ResortServiceImpl implements ResortService {
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
 
-        dtoResponse.setPropertyResponses(propertyService.getByResortId(id));
         dtoResponse.setResortImages(resortImageService.gets(id));
         dtoResponse.setResortAmenityTypes(resortAmenityTypeService.gets(entity.getId()));
 
@@ -80,6 +104,7 @@ public class ResortServiceImpl implements ResortService {
     }
 
     @Override
+    @Transactional
     public ResortResponse create(ResortRequest resortRequest) {
         if (resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName()).
                 isPresent())
@@ -103,6 +128,7 @@ public class ResortServiceImpl implements ResortService {
     }
 
     @Override
+    @Transactional
     public ResortResponse create(ResortRequest resortRequest, List<MultipartFile> resortImage) {
         var entity = create(resortRequest);
         resortImage.forEach(e -> {
