@@ -60,26 +60,26 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
             throw new DataIntegrityViolationException("Start time must be before end time");
         var timeFrame = timeFrameRepository.
                 findByIdAndIsDeletedIsFalse(timeFrameId).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+        if (timeFrame.getStatus() == TimeFrameStatus.PENDING)
+            throw new DataIntegrityViolationException("TIME-FRAME is not accepted. Please contact to staff.");
         //check is in vacation unit time
         var checkIsInVacationUnitTime = timeFrameRepository.
-                findByStartTimeAndEndTimeIsInVacationUnitTime(
-                        timeFrame.getPropertyId(),
-                        timeFrame.getUserId(),
-                        timeFrame.getRoomId(),
+                countMatchingTimeFrames(
+                        timeFrameId,
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
                         TimeFrameStatus.ACCEPTED.toString()
                 );
-        if (checkIsInVacationUnitTime.isEmpty())
-            throw new DataIntegrityViolationException("Your public time is not in range vacation unit");
-        var checkDuplicateWhichAnyTimeDeposit = availableTimeRepository.findOverlapsWhichAnyTimeDeposit(
+        if (checkIsInVacationUnitTime == 0L)
+            throw new DataIntegrityViolationException("Your select time is not in range TIME-FRAME");
+        var checkDuplicateWhichAny = availableTimeRepository.findOverlapsWhichAnyTimeDeposit(
                 timeFrameId,
                 dtoRequest.getStartTime(),
                 dtoRequest.getEndTime(),
                 AvailableTimeStatus.OPEN
         );
-        if (checkDuplicateWhichAnyTimeDeposit.isPresent())
-            throw new DataIntegrityViolationException("Duplicate with another time off deposit");
+        if (checkDuplicateWhichAny.isPresent())
+            throw new DataIntegrityViolationException("Duplicate with another time. AVAILABLE-TIME");
         var availableTime = AvailableTimeMapper.INSTANCE.toEntity(dtoRequest);
         availableTime.setStatus(AvailableTimeStatus.OPEN);
         availableTime.setTimeFrameId(timeFrameId);

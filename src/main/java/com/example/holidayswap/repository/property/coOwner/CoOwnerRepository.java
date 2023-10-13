@@ -39,7 +39,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
            "and o.id.propertyId = :propertyId " +
            "and o.id.userId = :userId " +
            "and o.isDeleted = false ")
-    Optional<CoOwner> findByPropertyIdAndUserUserIdAndIdRoomId(@Param("propertyId") Long propertyId,
+    Optional<CoOwner> findByPropertyIdAndUserIdAndIdRoomId(@Param("propertyId") Long propertyId,
                                                                @Param("userId") Long userId,
                                                                @Param("roomId") String roomId);
 
@@ -50,32 +50,28 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     List<CoOwner> findByPropertyIdAndIdRoomId(@Param("propertyId") Long propertyId, @Param("roomId") String roomId);
 
     @Query(value = """
-            SELECT PROPERTY_ID,
-                                 ROOM_ID,
-                                 USER_ID,
-                                 END_TIME,
-                                 IS_DELETED,
-                                 START_TIME,
-                                 STATUS,
-                                 TYPE
-                          FROM CO_OWNER O
-                          WHERE UPPER(O.ROOM_ID) = UPPER(:roomId)
-                            AND O.PROPERTY_ID = :propertyId
-                            AND O.USER_ID != :userId
-                            AND O.IS_DELETED = FALSE
-                            AND CASE
-                                    WHEN O.TYPE = 'RIGHT_TO_USE'
-                                        then ((O.START_TIME BETWEEN :startTime AND :endTime)
-                                            OR
-                                             (O.END_TIME BETWEEN :startTime AND :endTime)
-                                            OR
-                                             (O.START_TIME < :startTime AND O.END_TIME > :endTime)
-                                            OR
-                                             (O.END_TIME > :startTime AND O.END_TIME < :endTime)
-                                        )
-                                    ELSE O.IS_DELETED = FALSE and O.TYPE = 'DEEDED'
-                              END
-            """, nativeQuery = true)
+                   SELECT PROPERTY_ID,
+                   ROOM_ID,
+                   USER_ID,
+                   END_TIME,
+                   IS_DELETED,
+                   START_TIME,
+                   STATUS,
+                   TYPE
+            FROM CO_OWNER O
+            WHERE UPPER(O.ROOM_ID) = UPPER(:roomId)
+              AND O.PROPERTY_ID = :propertyId
+              AND O.USER_ID != :userId
+              AND O.IS_DELETED = FALSE
+              AND ((O.START_TIME BETWEEN :startTime AND :endTime)
+                OR
+                   (O.END_TIME BETWEEN :startTime AND :endTime)
+                OR
+                   (O.START_TIME < :startTime AND O.END_TIME > :endTime)
+                OR
+                   (O.END_TIME > :startTime AND O.END_TIME < :endTime)
+                )
+                        """, nativeQuery = true)
     List<CoOwner> checkOverlapsTimeOwnership(@Param("propertyId") Long propertyId,
                                                  @Param("userId") Long userId,
                                                  @Param("roomId") String roomId,

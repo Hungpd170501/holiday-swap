@@ -48,7 +48,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     @Override
     public CoOwnerResponse get(Long propertyId, Long userId, String roomId) {
         var dtoResponse = CoOwnerMapper.INSTANCE.toDtoResponse(
-                coOwnerRepository.findByPropertyIdAndUserUserIdAndIdRoomId(propertyId, userId, roomId).
+                coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(propertyId, userId, roomId).
                         orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND)));
         dtoResponse.setContractImages(contractImageService.gets(
                 dtoResponse.getId().getPropertyId(),
@@ -65,7 +65,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             dtoRequest.setStartTime(null);
             dtoRequest.setEndTime(null);
         } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime())) {
-            throw new DataIntegrityViolationException("Start time must be before end time");
+            throw new DataIntegrityViolationException("START TIME must less than END TIME");
         }
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalseAndStatus(coOwnerId.getPropertyId(), PropertyStatus.ACTIVE).

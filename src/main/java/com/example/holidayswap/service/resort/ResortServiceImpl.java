@@ -146,7 +146,19 @@ public class ResortServiceImpl implements ResortService {
         }
         var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).
                 orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        List<ResortAmenity> resortAmenities = new ArrayList<>();
+        resortRequest.getAmenities().forEach(e -> {
+            resortAmenities.add(resortAmenityRepository.findByIdAndIsDeletedFalse(e).orElseThrow(
+                    () -> new EntityNotFoundException(RESORT_AMENITY_NOT_FOUND)));
+        });
+        List<PropertyType> propertyTypes = new ArrayList<>();
+        resortRequest.getPropertyTypes().forEach(e -> {
+            propertyTypes.add(propertyTypeRespository.findByIdAndIsDeletedFalse(e).orElseThrow(
+                    () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND)));
+        });
         ResortMapper.INSTANCE.updateEntityFromDTO(resortRequest, entity);
+        entity.setAmenities(resortAmenities);
+        entity.setPropertyTypes(propertyTypes);
         Long i = resortRepository.save(entity).getId();
         return get(i);
     }

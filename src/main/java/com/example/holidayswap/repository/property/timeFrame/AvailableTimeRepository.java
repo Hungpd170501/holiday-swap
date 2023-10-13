@@ -57,7 +57,8 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  OR
                  (tod.endTime > ?2 AND tod.endTime < ?3)
                  ))
-            and tod.isDeleted = false and tod.status = ?4""")
+            and tod.isDeleted = false 
+            and (?4 is null or tod.status = ?4)""")
     Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(
             Long timeFrameId,
             Date startTime,

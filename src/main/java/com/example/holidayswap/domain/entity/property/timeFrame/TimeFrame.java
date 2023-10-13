@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,12 +21,10 @@ public class TimeFrame {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "time_frame_id", nullable = false)
     private Long id;
-    @Column(name = "start_time")
+    @Column(name = "week_number")
     @NotNull
-    private Date startTime;
-    @Column(name = "end_time")
-    @NotNull
-    private Date endTime;
+    private int weekNumber;
+
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
     @Column(name = "status")
