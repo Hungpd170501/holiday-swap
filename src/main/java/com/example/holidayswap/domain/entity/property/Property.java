@@ -115,6 +115,6 @@ public class Property {
     private List<InRoomAmenity> inRoomAmenities;
     @OneToMany(mappedBy = "property")
     private List<Booking> bookingList;
-    @OneToMany
+    @OneToMany(mappedBy = "property")
     private List<CoOwner> coOwners;
 }

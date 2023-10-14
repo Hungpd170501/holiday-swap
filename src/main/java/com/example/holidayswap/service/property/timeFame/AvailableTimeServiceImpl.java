@@ -9,6 +9,7 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.timeFrame.AvailableTimeMapper;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.property.timeFrame.TimeFrameRepository;
+import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import static com.example.holidayswap.constants.ErrorMessage.TIME_FRAME_NOT_FOUN
 public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final AvailableTimeRepository availableTimeRepository;
     private final TimeFrameRepository timeFrameRepository;
+    private final AuthUtils authUtils;
 
     @Override
     public Page<AvailableTimeResponse> getAllByVacationUnitId(Long timeFrameId, Pageable pageable) {
@@ -60,6 +62,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
             throw new DataIntegrityViolationException("Start time must be before end time");
         var timeFrame = timeFrameRepository.
                 findByIdAndIsDeletedIsFalse(timeFrameId).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+        authUtils.isBelongToMember(timeFrame.getUserId());
         if (timeFrame.getStatus() == TimeFrameStatus.PENDING)
             throw new DataIntegrityViolationException("TIME-FRAME is not accepted. Please contact to staff.");
         //check is in vacation unit time

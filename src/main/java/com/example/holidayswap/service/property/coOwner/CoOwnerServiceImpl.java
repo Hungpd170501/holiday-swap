@@ -2,6 +2,7 @@ package com.example.holidayswap.service.property.coOwner;
 
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
+import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
@@ -9,11 +10,15 @@ import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.coOwner.CoOwnerMapper;
+import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
+import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,18 +35,34 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final CoOwnerRepository coOwnerRepository;
     private final ContractImageService contractImageService;
     private final TimeFrameService timeFrameService;
+    private final CoOwnerMapper coOwnerMapper;
+    private final ResortRepository resortRepository;
+    private final ResortMapper resortMapper;
 
     @Override
-    public List<CoOwnerResponse> getListByPropertyId(Long propertyId) {
-        var dtoResponse = coOwnerRepository.findAllByPropertyIdAndIsDeletedIsFalse(propertyId).
-                stream().map(CoOwnerMapper.INSTANCE::toDtoResponse).toList();
+    public Page<CoOwnerResponse> getByPropertyId(Long propertyId, Pageable pageable) {
+        var dtoResponse = coOwnerRepository.findAllByPropertyIdAndIsDeletedIsFalse(propertyId, pageable)
+                .map(CoOwnerMapper.INSTANCE::toDtoResponse);
         return dtoResponse;
     }
 
     @Override
-    public List<CoOwnerResponse> getListByUserId(Long userId) {
-        var dtoResponse = coOwnerRepository.findAllByUserIdAndIsDeletedIsFalse(userId).
-                stream().map(CoOwnerMapper.INSTANCE::toDtoResponse).toList();
+    public Page<CoOwnerResponse> getCoOwnerBelongToUser(Long userId, Long propertyId, Pageable pageable) {
+        var dtoResponse = coOwnerRepository.findAllByUserIdAndPropertyIdAndIsDeletedIsFalse(userId, propertyId, pageable).
+                map(coOwnerMapper::toDtoResponse);
+        return dtoResponse;
+    }
+
+    @Override
+    public Page<ResortResponse> getResortUserHaveOwner(Long userId, Pageable pageable) {
+        var dtoResponse = resortRepository.findAllResortHaveUserOwner(userId, CoOwnerStatus.ACCEPTED, pageable).map(resortMapper::toResortResponse);
+        return dtoResponse;
+    }
+
+    @Override
+    public Page<CoOwnerResponse> getByResortId(Long resortId, Pageable pageable) {
+        var dtoResponse = coOwnerRepository.findAllResortIdAndIsDeletedIsFalse(resortId, pageable).
+                map(CoOwnerMapper.INSTANCE::toDtoResponse);
         return dtoResponse;
     }
 

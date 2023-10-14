@@ -3,6 +3,8 @@ package com.example.holidayswap.constants;
 public class ErrorMessage {
     public static final String JWT_TOKEN_INVALID = "JWT token is expired or invalid.";
     public static final String VERIFICATION_TOKEN_INVALID = "Verification token invalid.";
+    public static final String LOGIN_REQUIRED = "Login required.";
+    public static final String DOES_NOT_BELONG_THIS_RESOURCE = "Does not have to the CO-OWNER of this resource.";
     public static final String PASSWORD_RESET_TOKEN_INVALID = "Password reset token is expired or invalid.";
     public static final String TOKEN_EXPIRED = "Token expired.";
     public static final String TOKEN_REVOKED = "Token already used.";

@@ -94,4 +94,16 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
 
     @Query("select r from Resort r where upper(r.resortName) = upper(?1) and r.isDeleted = false")
     Optional<Resort> findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
+
+    @Query(value = """
+            select r from Resort r
+            inner  join r.properties p
+            inner  join  p.coOwners co
+            where co.user.userId = :userId
+            and r.isDeleted = false 
+            and p.isDeleted = false 
+            and co.isDeleted = false 
+            and co.status = :coOwnerStatus
+            """)
+    Page<Resort> findAllResortHaveUserOwner(@Param("userId") Long userId, @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus, Pageable pageable);
 }

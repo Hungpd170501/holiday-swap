@@ -5,6 +5,8 @@ import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,11 +19,17 @@ import java.util.Optional;
 @Repository
 
 public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
-    @Query("select o from CoOwner o where o.property.id = ?1 and o.isDeleted = false")
-    List<CoOwner> findAllByPropertyIdAndIsDeletedIsFalse(Long propertyId);
+    @Query("select o from CoOwner o where o.property.id = :propertyId and o.isDeleted = false")
+    Page<CoOwner> findAllByPropertyIdAndIsDeletedIsFalse(@Param("propertyId") Long propertyId, Pageable pageable);
 
-    @Query("select o from CoOwner o where o.user.userId = ?1 and o.isDeleted = false")
-    List<CoOwner> findAllByUserIdAndIsDeletedIsFalse(Long userId);
+    @Query("select o from CoOwner o where o.user.userId = :userId and o.property.propertyTypeId = :propertyId and o.isDeleted = false")
+    Page<CoOwner> findAllByUserIdAndPropertyIdAndIsDeletedIsFalse(@Param("userId") Long userId, @Param("propertyId") Long propertyId, Pageable pageable);
+
+    @Query("""
+            select o from CoOwner o
+            join o.property p
+            where p.resortId = :resortId and o.isDeleted = false""")
+    Page<CoOwner> findAllResortIdAndIsDeletedIsFalse(@Param("resortId") Long resortId, Pageable pageable);
 
     @Query("""
             select o from CoOwner o
@@ -40,8 +48,8 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
            "and o.id.userId = :userId " +
            "and o.isDeleted = false ")
     Optional<CoOwner> findByPropertyIdAndUserIdAndIdRoomId(@Param("propertyId") Long propertyId,
-                                                               @Param("userId") Long userId,
-                                                               @Param("roomId") String roomId);
+                                                           @Param("userId") Long userId,
+                                                           @Param("roomId") String roomId);
 
     @Query("select o from CoOwner o " +
            "where upper(o.id.roomId) = upper( :roomId)" +
@@ -73,10 +81,10 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
                 )
                         """, nativeQuery = true)
     List<CoOwner> checkOverlapsTimeOwnership(@Param("propertyId") Long propertyId,
-                                                 @Param("userId") Long userId,
-                                                 @Param("roomId") String roomId,
-                                                 @Param("startTime") Date startTime,
-                                                 @Param("endTime") Date endTime
+                                             @Param("userId") Long userId,
+                                             @Param("roomId") String roomId,
+                                             @Param("startTime") Date startTime,
+                                             @Param("endTime") Date endTime
     );
 
     @Query("""
