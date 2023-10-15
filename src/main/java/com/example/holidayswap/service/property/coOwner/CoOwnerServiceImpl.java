@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property.coOwner;
 
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
-import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
@@ -14,7 +13,6 @@ import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
-import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +34,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final ContractImageService contractImageService;
     private final TimeFrameService timeFrameService;
     private final CoOwnerMapper coOwnerMapper;
-    private final ResortRepository resortRepository;
+    //    private final ResortRepository resortRepository;
     private final ResortMapper resortMapper;
 
     @Override
@@ -54,8 +52,8 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     }
 
     @Override
-    public Page<ResortResponse> getResortUserHaveOwner(Long userId, Pageable pageable) {
-        var dtoResponse = resortRepository.findAllResortHaveUserOwner(userId, CoOwnerStatus.ACCEPTED, pageable).map(resortMapper::toResortResponse);
+    public Page<CoOwnerResponse> getCoOwnerByUserId(Long userId, Pageable pageable) {
+        var dtoResponse = coOwnerRepository.findAllByUserIdAndIsDeletedIsFalse(userId, pageable).map(coOwnerMapper::toDtoResponse);
         return dtoResponse;
     }
 

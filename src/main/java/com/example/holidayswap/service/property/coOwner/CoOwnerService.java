@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property.coOwner;
 
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
-import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import org.springframework.data.domain.Page;
@@ -19,7 +18,7 @@ public interface CoOwnerService {
 
     Page<CoOwnerResponse> getCoOwnerBelongToUser(Long userId, Long propertyId, Pageable pageable);
 
-    Page<ResortResponse> getResortUserHaveOwner(Long userId, Pageable pageable);
+    Page<CoOwnerResponse> getCoOwnerByUserId(Long userId, Pageable pageable);
 
     CoOwnerResponse get(Long propertyId, Long userId, String roomId);
 

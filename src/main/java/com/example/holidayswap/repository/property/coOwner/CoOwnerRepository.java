@@ -22,6 +22,9 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     @Query("select o from CoOwner o where o.property.id = :propertyId and o.isDeleted = false")
     Page<CoOwner> findAllByPropertyIdAndIsDeletedIsFalse(@Param("propertyId") Long propertyId, Pageable pageable);
 
+    @Query("select o from CoOwner o where o.user.userId = :userId and o.isDeleted = false")
+    Page<CoOwner> findAllByUserIdAndIsDeletedIsFalse(@Param("userId") Long userId, Pageable pageable);
+
     @Query("select o from CoOwner o where o.user.userId = :userId and o.property.propertyTypeId = :propertyId and o.isDeleted = false")
     Page<CoOwner> findAllByUserIdAndPropertyIdAndIsDeletedIsFalse(@Param("userId") Long userId, @Param("propertyId") Long propertyId, Pageable pageable);
 
