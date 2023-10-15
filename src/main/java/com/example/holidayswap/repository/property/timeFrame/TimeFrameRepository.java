@@ -90,6 +90,21 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
     );
 
     @Query(value = """
+            select tf from TimeFrame tf
+            where tf.propertyId = :propertyId
+            and tf.userId=:userId
+            and tf.roomId =:roomId
+            and tf.weekNumber = :numberWeek
+            and tf.status != 'REJECTED'
+            """)
+    Optional<TimeFrame> findOverlapWithStatusisNotReject(
+            @Param("propertyId") Long propertyId,
+            @Param("userId") Long userId,
+            @Param("roomId") String roomId,
+            @Param("numberWeek") int numberWeek
+    );
+
+    @Query(value = """
             select count(tf)
             from time_frame tf
             where tf.time_frame_id = :timeFrameId

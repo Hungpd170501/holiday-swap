@@ -68,14 +68,13 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
                 .orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         //check user only have 1 timeframe
         var isTimeFrameCreated = timeFrameRepository.
-                findOverlapWith(
+                findOverlapWithStatusisNotReject(
                         ownershipId.getPropertyId(),
                         ownershipId.getUserId(),
                         ownershipId.getRoomId(),
-                        dtoRequest.getWeekNumber(),
-                        null
+                        dtoRequest.getWeekNumber()
                 );
-        if (isTimeFrameCreated.isPresent())
+        if (isTimeFrameCreated.isPresent() && isTimeFrameCreated.get().getStatus() != TimeFrameStatus.REJECTED)
             throw new DuplicateRecordException("User only creates 1 timeframe for 1 property");
         //Declare list
         List<TimeFrame> checkTimeFrame;
@@ -89,24 +88,27 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
         if (!checkTimeFrame.isEmpty()) {
             //DEEDED type: overlaps
             checkTimeFrame.forEach((e) -> {
-                var checkCoOwner = coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(e.getPropertyId(),
-                        e.getUserId(), e.getRoomId());
+                if (e.getStatus() != TimeFrameStatus.REJECTED) {
+                    var checkCoOwner = coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(e.getPropertyId(),
+                            e.getUserId(), e.getRoomId());
 
-                if (checkCoOwner.get().getType() == ContractType.DEEDED)
-                    throw new DuplicateRecordException("CO-OWNER--DEEDED overlaps with other. Overlaps on CO-OWNER");
+                    if (checkCoOwner.get().getType() == ContractType.DEEDED) {
+                        throw new DuplicateRecordException("CO-OWNER--DEEDED overlaps with other. Overlaps on CO-OWNER");
+                    }
                     //RIGHT-TO-USE: overlaps
-                else {
-                    var coOwnersCheck = coOwnerRepository.
-                            checkOverlapsTimeOwnership(
-                                    //id
-                                    ownershipId.getPropertyId(),
-                                    ownershipId.getUserId(),
-                                    ownershipId.getRoomId(),
-                                    //time of co-owner instance
-                                    coOwner.getStartTime(),
-                                    coOwner.getEndTime());
-                    if (!coOwnersCheck.isEmpty()) {
-                        throw new DuplicateRecordException("CO-OWNER--RIGHT-TO-USE overlaps with other. Overlaps on CO-OWNER-TIME");
+                    else {
+                        var coOwnersCheck = coOwnerRepository.
+                                checkOverlapsTimeOwnership(
+                                        //id
+                                        ownershipId.getPropertyId(),
+                                        ownershipId.getUserId(),
+                                        ownershipId.getRoomId(),
+                                        //time of co-owner instance
+                                        coOwner.getStartTime(),
+                                        coOwner.getEndTime());
+                        if (!coOwnersCheck.isEmpty()) {
+                            throw new DuplicateRecordException("CO-OWNER--RIGHT-TO-USE overlaps with other. Overlaps on CO-OWNER-TIME");
+                        }
                     }
                 }
             });
