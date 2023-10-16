@@ -40,11 +40,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     Optional<AvailableTime> findByIdAndDeletedFalse(Long id);
 
     @Query("""
-            select t from AvailableTime t
-            where t.timeFrameId = ?1 and t.isDeleted = false and t.startTime >= ?2 and t.endTime <= ?3""")
-    List<AvailableTime> findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long vacationId, Date startTime, Date endTime);
-
-    @Query("""
             select tod from AvailableTime tod
             where tod.timeFrameId = ?1
             and ((cast(?2 as date ) is null or cast(?3 as date) is null )

@@ -3,8 +3,6 @@ package com.example.holidayswap.repository.property.coOwner;
 import com.example.holidayswap.domain.dto.response.resort.OwnerShipResponseDTO;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
-import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -54,12 +52,6 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
                                                            @Param("userId") Long userId,
                                                            @Param("roomId") String roomId);
 
-    @Query("select o from CoOwner o " +
-           "where upper(o.id.roomId) = upper( :roomId)" +
-           "and o.id.propertyId = :propertyId " +
-           "and o.isDeleted = false ")
-    List<CoOwner> findByPropertyIdAndIdRoomId(@Param("propertyId") Long propertyId, @Param("roomId") String roomId);
-
     @Query(value = """
                    SELECT PROPERTY_ID,
                    ROOM_ID,
@@ -90,40 +82,25 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
                                              @Param("endTime") Date endTime
     );
 
-    @Query("""
-            select o from CoOwner o
-            where o.id.propertyId = ?1
-            and o.id.userId = ?2
-            and o.id.roomId = ?3
-            and o.startTime >= ?4
-            and o.endTime <= ?5
-            and o.type = ?6
-            and o.status = ?7
-            and o.isDeleted = false""")
-    Optional<CoOwner> findByTypeIsRightToUse(
-            Long propertyId,
-            Long userId,
-            String roomId,
-            Date startTime,
-            Date endTime,
-            ContractType type,
-            CoOwnerStatus status);
-
-    @Query("""
-            select o from CoOwner o
-            where o.id.propertyId = ?1
-            and o.id.userId = ?2
-            and o.id.roomId = ?3
-            and o.type = ?4
-            and o.status = ?5
-            and o.isDeleted = false""")
-    Optional<CoOwner> findByTypeIsDeeded(
-            Long propertyId,
-            Long userId,
-            String roomId,
-            ContractType type,
-            CoOwnerStatus status);
-
     @Query(value = "SELECT Distinct o.property_id, o.room_id from co_owner o", nativeQuery = true)
     List<OwnerShipResponseDTO> getAllDistinctOwnerShipWithoutUserId();
+
+    @Query(value = """
+            select property_id, room_id, user_id, end_time, is_deleted, start_time, status, type
+            from co_owner co
+            where co.property_id = :propertyId
+              and co.user_id = :userId
+              and co.room_id = :roomId
+              and ((:coOwnerStatus is null) or (co.status = :coOwnerStatus))
+              and extract(year from date(:startTime)) >= extract(year from date(co.start_time))
+              and extract(year from date(:endTime)) <= extract(year from date(co.end_time))
+            """, nativeQuery = true)
+    Optional<CoOwner> isMatchingCoOwner(
+            @Param("propertyId") Long propertyId,
+            @Param("userId") Long userId,
+            @Param("roomId") String roomId,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime,
+            @Param("coOwnerStatus") String coOwnerStatus
+    );
 }

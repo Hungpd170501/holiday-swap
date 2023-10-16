@@ -68,7 +68,7 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
                 .orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         //check user only have 1 timeframe
         var isTimeFrameCreated = timeFrameRepository.
-                findOverlapWithStatusisNotReject(
+                findOverlapWithStatusIsNotReject(
                         ownershipId.getPropertyId(),
                         ownershipId.getUserId(),
                         ownershipId.getRoomId(),
@@ -88,7 +88,7 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
         if (!checkTimeFrame.isEmpty()) {
             //DEEDED type: overlaps
             checkTimeFrame.forEach((e) -> {
-                if (e.getStatus() != TimeFrameStatus.REJECTED) {
+                if (e.getStatus() != TimeFrameStatus.REJECTED && e.getStatus() == TimeFrameStatus.ACCEPTED) {
                     var checkCoOwner = coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(e.getPropertyId(),
                             e.getUserId(), e.getRoomId());
 

@@ -9,7 +9,6 @@ import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.coOwner.CoOwnerMapper;
-import com.example.holidayswap.domain.mapper.resort.ResortMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
@@ -34,8 +34,6 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final ContractImageService contractImageService;
     private final TimeFrameService timeFrameService;
     private final CoOwnerMapper coOwnerMapper;
-    //    private final ResortRepository resortRepository;
-    private final ResortMapper resortMapper;
 
     @Override
     public Page<CoOwnerResponse> getByPropertyId(Long propertyId, Pageable pageable) {
@@ -83,8 +81,17 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         if (dtoRequest.getType() == ContractType.DEEDED) {
             dtoRequest.setStartTime(null);
             dtoRequest.setEndTime(null);
-        } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime())) {
-            throw new DataIntegrityViolationException("START TIME must less than END TIME");
+        } else {
+            Date currentDate = new Date();
+            //start year must less than end year
+            if (dtoRequest.getStartTime().getYear() >= dtoRequest.getEndTime().getYear()) {
+                throw new DataIntegrityViolationException("START YEAR must less than END YEAR");
+            }
+//            year must equals or greater than year now
+            if (dtoRequest.getStartTime().getYear() < currentDate.getYear() ||
+                dtoRequest.getEndTime().getYear() < currentDate.getYear()) {
+                throw new DataIntegrityViolationException("YEAR INPUT must greater than YEAR NOW");
+            }
         }
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalseAndStatus(coOwnerId.getPropertyId(), PropertyStatus.ACTIVE).
