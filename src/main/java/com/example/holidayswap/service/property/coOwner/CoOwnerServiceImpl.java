@@ -36,30 +36,13 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final CoOwnerMapper coOwnerMapper;
 
     @Override
-    public Page<CoOwnerResponse> getByPropertyId(Long propertyId, Pageable pageable) {
-        var dtoResponse = coOwnerRepository.findAllByPropertyIdAndIsDeletedIsFalse(propertyId, pageable)
-                .map(CoOwnerMapper.INSTANCE::toDtoResponse);
-        return dtoResponse;
-    }
-
-    @Override
-    public Page<CoOwnerResponse> getCoOwnerBelongToUser(Long userId, Long propertyId, Pageable pageable) {
-        var dtoResponse = coOwnerRepository.findAllByUserIdAndPropertyIdAndIsDeletedIsFalse(userId, propertyId, pageable).
+    public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
+        String status = null;
+        if (coOwnerStatus != null) status = coOwnerStatus.toString();
+        var entities = coOwnerRepository.findAllByResortIdPropertyIdAndUserIdAndRoomId(
+                        resortId, propertyId, userId, roomId, status, pageable).
                 map(coOwnerMapper::toDtoResponse);
-        return dtoResponse;
-    }
-
-    @Override
-    public Page<CoOwnerResponse> getCoOwnerByUserId(Long userId, Pageable pageable) {
-        var dtoResponse = coOwnerRepository.findAllByUserIdAndIsDeletedIsFalse(userId, pageable).map(coOwnerMapper::toDtoResponse);
-        return dtoResponse;
-    }
-
-    @Override
-    public Page<CoOwnerResponse> getByResortId(Long resortId, Pageable pageable) {
-        var dtoResponse = coOwnerRepository.findAllResortIdAndIsDeletedIsFalse(resortId, pageable).
-                map(CoOwnerMapper.INSTANCE::toDtoResponse);
-        return dtoResponse;
+        return entities;
     }
 
     @Override

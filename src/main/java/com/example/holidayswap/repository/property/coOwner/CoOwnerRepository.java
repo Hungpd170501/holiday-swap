@@ -17,20 +17,30 @@ import java.util.Optional;
 @Repository
 
 public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
-    @Query("select o from CoOwner o where o.property.id = :propertyId and o.isDeleted = false")
-    Page<CoOwner> findAllByPropertyIdAndIsDeletedIsFalse(@Param("propertyId") Long propertyId, Pageable pageable);
-
-    @Query("select o from CoOwner o where o.user.userId = :userId and o.isDeleted = false")
-    Page<CoOwner> findAllByUserIdAndIsDeletedIsFalse(@Param("userId") Long userId, Pageable pageable);
-
-    @Query("select o from CoOwner o where o.user.userId = :userId and o.property.propertyTypeId = :propertyId and o.isDeleted = false")
-    Page<CoOwner> findAllByUserIdAndPropertyIdAndIsDeletedIsFalse(@Param("userId") Long userId, @Param("propertyId") Long propertyId, Pageable pageable);
-
-    @Query("""
-            select o from CoOwner o
-            join o.property p
-            where p.resortId = :resortId and o.isDeleted = false""")
-    Page<CoOwner> findAllResortIdAndIsDeletedIsFalse(@Param("resortId") Long resortId, Pageable pageable);
+    @Query(value = """
+            select co.property_id,
+                   co.room_id,
+                   co.user_id,
+                   co.end_time,
+                   co.is_deleted,
+                   co.start_time,
+                   co.status,
+                   co.type
+            from co_owner co
+                     join property p on co.property_id = p.property_id
+            where (:resortId is null or p.property_id = :resortId)
+              and (:propertyId is null or co.property_id = :propertyId)
+              and (:userId is null or co.user_id = :userId)
+              and (:roomId is null or co.room_id = :roomId)
+              and (:coOwnerStatus is null or co.status = :coOwnerStatus)
+            """, nativeQuery = true)
+    Page<CoOwner> findAllByResortIdPropertyIdAndUserIdAndRoomId(
+            @Param("resortId") Long resortId,
+            @Param("propertyId") Long propertyId,
+            @Param("userId") Long userId,
+            @Param("roomId") String roomId,
+            @Param("coOwnerStatus") String coOwnerStatus,
+            Pageable pageable);
 
     @Query("""
             select o from CoOwner o

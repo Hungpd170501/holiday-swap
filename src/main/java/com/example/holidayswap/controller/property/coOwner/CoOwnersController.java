@@ -22,44 +22,21 @@ import java.util.List;
 public class CoOwnersController {
     private final CoOwnerService coOwnerService;
 
-    @GetMapping("/resort/{resortId}")
-    public ResponseEntity<Page<CoOwnerResponse>> getByResortId(@RequestParam("resortId") Long resortId,
-                                                               @RequestParam(defaultValue = "0") Integer pageNo,
-                                                               @RequestParam(defaultValue = "10") Integer pageSize,
-                                                               @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(coOwnerService.getByResortId(resortId, pageable));
-    }
-
-    @GetMapping("/properties/{propertyId}")
-    public ResponseEntity<Page<CoOwnerResponse>> getByPropertyId(@RequestParam("propertyId") Long propertyId,
-                                                                 @RequestParam(defaultValue = "0") Integer pageNo,
-                                                                 @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                 @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(coOwnerService.getByPropertyId(propertyId, pageable));
-    }
-
-    @GetMapping("/users/{userId}/properties/{propertyId}")
-    public ResponseEntity<Page<CoOwnerResponse>> getCoOwnerBelongToUser(@PathVariable("userId") Long userId,
-                                                                        @PathVariable("propertyId") Long propertyId,
-                                                                        @RequestParam(defaultValue = "0") Integer pageNo,
-                                                                        @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                        @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(coOwnerService.getCoOwnerBelongToUser(userId, propertyId, pageable));
-    }
-
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<Page<CoOwnerResponse>> getResortUserOwn(@PathVariable("userId") Long userId,
-                                                                 @RequestParam(defaultValue = "0") Integer pageNo,
-                                                                 @RequestParam(defaultValue = "10") Integer pageSize,
-                                                                 @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(coOwnerService.getCoOwnerByUserId(userId, pageable));
-    }
-
     @GetMapping
+    public ResponseEntity<Page<CoOwnerResponse>> get(
+            @RequestParam(required = false) Long resortId,
+            @RequestParam(required = false) Long propertyId,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String roomId,
+            @RequestParam(required = false) CoOwnerStatus coOwnerStatus,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "property_id") String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return ResponseEntity.ok(coOwnerService.gets(resortId, propertyId, userId, roomId, coOwnerStatus, pageable));
+    }
+
+    @GetMapping("/detail")
     public ResponseEntity<CoOwnerResponse> get(
             @RequestParam Long propertyId,
             @RequestParam Long userId,

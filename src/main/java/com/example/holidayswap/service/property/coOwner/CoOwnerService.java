@@ -11,14 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CoOwnerService {
-    //get list
-    Page<CoOwnerResponse> getByResortId(Long resortId, Pageable pageable);
-
-    Page<CoOwnerResponse> getByPropertyId(Long propertyId, Pageable pageable);
-
-    Page<CoOwnerResponse> getCoOwnerBelongToUser(Long userId, Long propertyId, Pageable pageable);
-
-    Page<CoOwnerResponse> getCoOwnerByUserId(Long userId, Pageable pageable);
+    Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable);
 
     CoOwnerResponse get(Long propertyId, Long userId, String roomId);
 
@@ -27,7 +20,6 @@ public interface CoOwnerService {
     CoOwnerResponse create(CoOwnerId coOwnerId, CoOwnerRequest dtoRequest, List<MultipartFile> propertyImages);
 
     CoOwnerResponse update(CoOwnerId coOwnerId, CoOwnerStatus coOwnerStatus);
-//    CoOwnerResponse update(Long propertyId, Long userId, String roomId, CoOwnerRequest dtoRequest);
 
     void delete(CoOwnerId coOwnerId);
 }
