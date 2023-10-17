@@ -63,4 +63,12 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = "select t.* from available_time t JOIN time_frame v on t.time_frame_id = v.time_frame_id where v.property_id = ?1 AND v.room_id = ?2 AND ((?3 BETWEEN t.start_time AND t.end_time) OR ( ?4 BETWEEN t.start_time AND t.end_time)) Order By t.start_time ASC", nativeQuery = true)
     List<AvailableTime> findAllByPropertyIdAndRoomIdBetweenDate(Long propertyId, String roomId, Date startTime, Date endTime);
+
+    @Query(value = """
+                    select av from AvailableTime av
+                    inner join av.timeFrame af
+                    inner join af.coOwner co
+                    where co.id.roomId = :roomId
+            """)
+    List<AvailableTime> findAllByRoomId(@Param("roomId") String roomId);
 }
