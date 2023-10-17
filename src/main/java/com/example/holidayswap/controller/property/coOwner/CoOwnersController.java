@@ -51,18 +51,12 @@ public class CoOwnersController {
         return ResponseEntity.ok(coOwnerService.create(coOwnerId, dtoRequest, contractImages));
     }
 
-//    @PutMapping
-//    public ResponseEntity<CoOwnerResponse> update(@RequestPart("coOwnerId") CoOwnerId coOwnerId,
-//                                                  @RequestPart("coOwnerStatus") CoOwnerStatus coOwnerStatus) {
-//        return ResponseEntity.ok(coOwnerService.update(coOwnerId, coOwnerStatus));
-//    }
-
     @PutMapping("/status")
     public ResponseEntity<CoOwnerResponse> updateStatus(
             @RequestParam("propertyId") Long propertyId,
             @RequestParam("userId") Long userId,
             @RequestParam("roomId") String roomId,
-            @RequestBody CoOwnerStatus coOwnerStatus) {
+            @RequestParam("coOwnerStatus") CoOwnerStatus coOwnerStatus) {
         CoOwnerId coOwnerId = new CoOwnerId(propertyId, userId, roomId);
         return ResponseEntity.ok(coOwnerService.update(coOwnerId, coOwnerStatus));
     }

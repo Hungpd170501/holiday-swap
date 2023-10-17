@@ -16,25 +16,16 @@ import org.springframework.web.bind.annotation.*;
 public class TimeFramesController {
     private final TimeFrameService timeFrameService;
 
-    @GetMapping("/properties")
+    @GetMapping("/co-owners")
     public ResponseEntity<Page<TimeFrameResponse>> getAllByPropertyId(
             @RequestParam Long propertyId,
+            @RequestParam Long userId,
+            @RequestParam String roomId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = timeFrameService.getAllByPropertyId(propertyId, pageable);
-        return ResponseEntity.ok(dtoResponses);
-    }
-
-    @GetMapping("/resorts")
-    public ResponseEntity<Page<TimeFrameResponse>> getAllByResortId(
-            @RequestParam Long resortId,
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = timeFrameService.getAllByResortId(resortId, pageable);
+        var dtoResponses = timeFrameService.getAllByCoOwner(propertyId, userId, roomId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 

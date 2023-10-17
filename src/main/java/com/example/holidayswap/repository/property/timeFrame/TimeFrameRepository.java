@@ -2,6 +2,7 @@ package com.example.holidayswap.repository.property.timeFrame;
 
 import com.example.holidayswap.domain.dto.response.property.Room;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,21 +16,23 @@ import java.util.Optional;
 
 @Repository
 public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
-    @Query("select v from TimeFrame v where v.coOwner.property.id = ?1 and v.isDeleted = false ")
-    Page<TimeFrame> findAllByPropertyId(Long propertyId, Pageable pageable);
-
     @Query("""
             select v from TimeFrame v
-            join v.coOwner o
-            join o.property p
-            join p.propertyType pT
-            join pT.resorts s
-            where s.id = ?1
-            and v.isDeleted = false""")
-    Page<TimeFrame> findAllByResortId(Long resortId, Pageable pageable);
+            where v.coOwner.property.id = :propertyId
+            and v.coOwner.user.userId = :userId
+            and v.coOwner.id.roomId = :roomId
+            and v.isDeleted = false """)
+    Page<TimeFrame> findAllByPropertyIdAAndUserIdAndRoomId(
+            @Param("propertyId") Long propertyId,
+            @Param("userId") Long userId,
+            @Param("roomId") String roomId,
+            Pageable pageable);
 
-    @Query("select v from TimeFrame v where v.id = ?1 and v.isDeleted = false")
-    Optional<TimeFrame> findByIdAndIsDeletedIsFalse(Long id);
+    @Query("select v from TimeFrame v where v.id = :id and v.status = :status and  v.isDeleted = false")
+    Optional<TimeFrame> findByIdAnAndStatusAndIsDeletedIsFalse(@Param("id") Long id, @Param("status") TimeFrameStatus timeFrameStatus);
+
+    @Query("select v from TimeFrame v where v.id = :id and  v.isDeleted = false")
+    Optional<TimeFrame> findByIdAndIsDeletedIsFalse(@Param("id") Long id);
 
     @Query(value = """
             select tf from TimeFrame tf

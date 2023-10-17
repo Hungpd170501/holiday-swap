@@ -29,18 +29,8 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
     private final CoOwnerRepository coOwnerRepository;
 
     @Override
-    public Page<TimeFrameResponse> getAllByPropertyId(Long propertyId, Pageable pageable) {
-        var dtoResponses = timeFrameRepository.findAllByPropertyId(propertyId, pageable)
-                .map((e) -> {
-                    var dto = TimeFrameMapper.INSTANCE.toDtoResponse(e);
-                    return dto;
-                });
-        return dtoResponses;
-    }
-
-    @Override
-    public Page<TimeFrameResponse> getAllByResortId(Long resortId, Pageable pageable) {
-        var dtoResponses = timeFrameRepository.findAllByResortId(resortId, pageable)
+    public Page<TimeFrameResponse> getAllByCoOwner(Long propertyId, Long userId, String roomId, Pageable pageable) {
+        var dtoResponses = timeFrameRepository.findAllByPropertyIdAAndUserIdAndRoomId(propertyId, userId, roomId, pageable)
                 .map((e) -> {
                     var dto = TimeFrameMapper.INSTANCE.toDtoResponse(e);
                     return dto;
@@ -120,15 +110,6 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
         entity.setStatus(TimeFrameStatus.PENDING);
         var created = timeFrameRepository.save(entity);
         return TimeFrameMapper.INSTANCE.toDtoResponse(created);
-    }
-
-    @Override
-    public TimeFrameResponse update(Long id, TimeFrameRequest timeFameRequest) {
-//        var timeFameFound = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow();
-//        timeFameUnitMapper.INSTANCE.updateEntityFromDTO(timeFameRequest, timeFameFound);
-//        var timeFameCreated = timeFrameRepository.save(timeFameFound);
-//        return timeFameUnitMapper.INSTANCE.toDtoResponse(timeFameCreated);
-        return null;
     }
 
     @Override
