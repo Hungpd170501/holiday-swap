@@ -20,11 +20,10 @@ public class RoomsController {
     private final RoomService roomService;
 
     @GetMapping
-    public ResponseEntity<Page<Room>> gets(@RequestParam(value = "checkIn", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkIn,
-                                           @RequestParam(value = "checkOut", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkOut,
+    public ResponseEntity<Page<Room>> gets(@RequestParam(value = "checkIn") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkIn,
+                                           @RequestParam(value = "checkOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkOut,
                                            @RequestParam(name = "min") double min,
                                            @RequestParam(name = "max") double max,
-
                                            @RequestParam(defaultValue = "0") Integer pageNo,
                                            @RequestParam(defaultValue = "10") Integer pageSize,
                                            @RequestParam(defaultValue = "roomId") String sortBy) {
