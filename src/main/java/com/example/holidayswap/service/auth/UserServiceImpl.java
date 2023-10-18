@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.holidayswap.constants.ErrorMessage.PROFILE_NOT_FOUND;
 import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
@@ -43,6 +44,18 @@ public class UserServiceImpl implements UserService {
             }
         }
         throw new EntityNotFoundException(PROFILE_NOT_FOUND);
+    }
+
+    @Override
+    public Optional<User> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof User user) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

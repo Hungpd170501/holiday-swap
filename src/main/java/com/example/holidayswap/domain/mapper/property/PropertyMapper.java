@@ -18,9 +18,12 @@ public interface PropertyMapper {
     @Mapping(target = "inRoomAmenities", ignore = true)
     Property toEntity(PropertyRegisterRequest dtoRequest);
 
+    @Mapping(target = "inRoomAmenities", ignore = true)
     Property toEntity(PropertyUpdateRequest dtoRequest);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "resortId", ignore = true)
+    @Mapping(source = "inRoomAmenities", target = "inRoomAmenities", ignore = true)
     void updateEntityFromDTO(PropertyUpdateRequest dto, @MappingTarget Property entity);
 
     @Mapping(target = "id", ignore = true)
