@@ -3,6 +3,8 @@ package com.example.holidayswap.constants;
 public class ErrorMessage {
     public static final String JWT_TOKEN_INVALID = "JWT token is expired or invalid.";
     public static final String VERIFICATION_TOKEN_INVALID = "Verification token invalid.";
+    public static final String LOGIN_REQUIRED = "Login required.";
+    public static final String DOES_NOT_BELONG_THIS_RESOURCE = "Does not have to the CO-OWNER of this resource.";
     public static final String PASSWORD_RESET_TOKEN_INVALID = "Password reset token is expired or invalid.";
     public static final String TOKEN_EXPIRED = "Token expired.";
     public static final String TOKEN_REVOKED = "Token already used.";
@@ -38,6 +40,7 @@ public class ErrorMessage {
     public static final String IN_ROOM_AMENITY_TYPE_DELETED = "Resort type amenity has deleted.";
     public static final String DUPLICATE_RESORT_AMENITY_TYPE = "Duplicate resort type amenity.";
     public static final String DUPLICATE_PROPERTY_TYPE = "Duplicate property type amenity.";
+    public static final String DUPLICATE_PROPERTY_VIEW = "Duplicate property view amenity.";
     public static final String INCORRECT_EMAIL_OR_PASSWORD = "Incorrect email or password.";
     public static final String PLAN_NOT_FOUND = "Plan not found.";
     public static final String PLAN_ALREADY_EXISTS = "Plan already exists.";

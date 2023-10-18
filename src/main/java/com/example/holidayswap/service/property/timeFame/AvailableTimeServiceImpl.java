@@ -2,26 +2,32 @@ package com.example.holidayswap.service.property.timeFame;
 
 import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTimeRequest;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.timeFrame.AvailableTimeMapper;
+import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.property.timeFrame.TimeFrameRepository;
+import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import static com.example.holidayswap.constants.ErrorMessage.AVAILABLE_TIME_NOT_FOUND;
-import static com.example.holidayswap.constants.ErrorMessage.TIME_FRAME_NOT_FOUND;
+import java.util.Date;
+
+import static com.example.holidayswap.constants.ErrorMessage.*;
 
 @Service
 @RequiredArgsConstructor
 public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final AvailableTimeRepository availableTimeRepository;
     private final TimeFrameRepository timeFrameRepository;
+    private final AuthUtils authUtils;
+    private final CoOwnerRepository coOwnerRepository;
 
     @Override
     public Page<AvailableTimeResponse> getAllByVacationUnitId(Long timeFrameId, Pageable pageable) {
@@ -56,30 +62,41 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
 
     @Override
     public AvailableTimeResponse create(Long timeFrameId, AvailableTimeRequest dtoRequest) {
+        Date currentDate = new Date();
+        if (dtoRequest.getStartTime().before(currentDate) || dtoRequest.getEndTime().before(currentDate))
+            throw new DataIntegrityViolationException("PUBLIC DATE can not before DATE NOW.");
         if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
+
             throw new DataIntegrityViolationException("Start time must be before end time");
         var timeFrame = timeFrameRepository.
                 findByIdAndIsDeletedIsFalse(timeFrameId).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
-        //check is in vacation unit time
-        var checkIsInVacationUnitTime = timeFrameRepository.
-                findByStartTimeAndEndTimeIsInVacationUnitTime(
-                        timeFrame.getPropertyId(),
-                        timeFrame.getUserId(),
-                        timeFrame.getRoomId(),
+        authUtils.isBelongToMember(timeFrame.getUserId());
+        if (timeFrame.getStatus() == TimeFrameStatus.PENDING)
+            throw new DataIntegrityViolationException("TIME-FRAME is not accepted. Please contact to staff.");
+        //check is in Time-frame
+        var isInTimeFrame = timeFrameRepository.
+                isMatchingTimeFrames(
+                        timeFrameId,
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
-                        TimeFrameStatus.ACCEPTED.toString()
-                );
-        if (checkIsInVacationUnitTime.isEmpty())
-            throw new DataIntegrityViolationException("Your public time is not in range vacation unit");
-        var checkDuplicateWhichAnyTimeDeposit = availableTimeRepository.findOverlapsWhichAnyTimeDeposit(
+                        TimeFrameStatus.ACCEPTED.name()
+                ).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+        var isInCoOwnerTime = coOwnerRepository.isMatchingCoOwner(
+                isInTimeFrame.getPropertyId(),
+                isInTimeFrame.getUserId(),
+                isInTimeFrame.getRoomId(),
+                dtoRequest.getStartTime(),
+                dtoRequest.getEndTime(),
+                CoOwnerStatus.ACCEPTED.name()
+        ).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        var checkDuplicateWhichAny = availableTimeRepository.findOverlapsWhichAnyTimeDeposit(
                 timeFrameId,
                 dtoRequest.getStartTime(),
                 dtoRequest.getEndTime(),
                 AvailableTimeStatus.OPEN
         );
-        if (checkDuplicateWhichAnyTimeDeposit.isPresent())
-            throw new DataIntegrityViolationException("Duplicate with another time off deposit");
+        if (checkDuplicateWhichAny.isPresent())
+            throw new DataIntegrityViolationException("Duplicate with another time. AVAILABLE-TIME");
         var availableTime = AvailableTimeMapper.INSTANCE.toEntity(dtoRequest);
         availableTime.setStatus(AvailableTimeStatus.OPEN);
         availableTime.setTimeFrameId(timeFrameId);
