@@ -58,12 +58,25 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
                  )
             )
             """)
-    Page<Property> findAllByResortIdAndIsDeleteIsFalseIncludeCheckInCheckOut(@Param("resortId") Long resortId,
-                                                                             @Param("timeCheckIn") Date timeCheckIn,
-                                                                             @Param("timeCheckOut") Date timeCheckOut,
-                                                                             @Param("numberGuests") int numberGuests,
-                                                                             @Param("propertyStatus") PropertyStatus propertyStatus,
-                                                                             Pageable pageable);
+    Page<Property> findAllByFilter(@Param("resortId") Long resortId,
+                                   @Param("timeCheckIn") Date timeCheckIn,
+                                   @Param("timeCheckOut") Date timeCheckOut,
+                                   @Param("numberGuests") int numberGuests,
+                                   @Param("propertyStatus") PropertyStatus propertyStatus,
+                                   Pageable pageable);
+
+    //get all for staff
+    @Query(value = """
+            select distinct p from Property p
+            inner join PropertyType pt on p.propertyTypeId = pt.id
+            inner join pt.resorts r
+            where p.resortId = :resortId
+            and p.isDeleted = false
+            and (:propertyStatus is null  or p.status = :propertyStatus)
+            """)
+    Page<Property> findAllByFilter(@Param("resortId") Long resortId,
+                                   @Param("propertyStatus") PropertyStatus propertyStatus,
+                                   Pageable pageable);
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")
     Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);

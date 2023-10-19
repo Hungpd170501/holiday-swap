@@ -10,15 +10,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TimeFrameService {
-    Page<TimeFrameResponse> getAllByPropertyId(Long propertyId, Pageable pageable);
-
-    Page<TimeFrameResponse> getAllByResortId(Long resortId, Pageable pageable);
+    Page<TimeFrameResponse> getAllByCoOwner(Long propertyId, Long userId, String roomId, Pageable pageable);
 
     TimeFrameResponse get(Long id);
 
     TimeFrameResponse create(CoOwnerId ownershipId, TimeFrameRequest dtoRequest);
-
-    TimeFrameResponse update(Long id, TimeFrameRequest dtoRequest);
 
     TimeFrameResponse update(Long id, TimeFrameStatus timeFrameStatus);
 

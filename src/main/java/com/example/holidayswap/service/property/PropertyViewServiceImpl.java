@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
-import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_PROPERTY_TYPE;
-import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_TYPE_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_PROPERTY_VIEW;
+import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_VIEW_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class PropertyViewServiceImpl implements PropertyViewService {
     @Override
     public PropertyViewResponse get(Long id) {
         var entity = propertyViewRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+                () -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
         var dtoRespone = PropertyViewMapper.INSTANCE.toDtoResponse(entity);
         return dtoRespone;
     }
@@ -42,7 +42,7 @@ public class PropertyViewServiceImpl implements PropertyViewService {
         if (propertyViewRepository.
                 findByPropertyViewNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getPropertyViewName()).
                 isPresent())
-            throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
+            throw new DuplicateRecordException(DUPLICATE_PROPERTY_VIEW);
         var entity = PropertyViewMapper.INSTANCE.toEntity(dtoRequest);
         var created = propertyViewRepository.save(entity);
         var dtoResponse = PropertyViewMapper.INSTANCE.toDtoResponse(created);
@@ -55,10 +55,10 @@ public class PropertyViewServiceImpl implements PropertyViewService {
                 findByPropertyViewNameEqualsIgnoreCaseAndIsDeletedIsFalse(dtoRequest.getPropertyViewName());
 
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id))
-            throw new DuplicateRecordException(DUPLICATE_PROPERTY_TYPE);
+            throw new DuplicateRecordException(DUPLICATE_PROPERTY_VIEW);
 
         var entity = propertyViewRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+                () -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
         PropertyViewMapper.INSTANCE.updateEntityFromDTO(dtoRequest, entity);
         var updated = propertyViewRepository.save(entity);
         var dtoResponse = PropertyViewMapper.INSTANCE.toDtoResponse(updated);
@@ -69,7 +69,7 @@ public class PropertyViewServiceImpl implements PropertyViewService {
     public void delete(Long id) {
         var entity = propertyViewRepository.
                 findByIdAndIsDeletedIsFalse(id).orElseThrow(
-                        () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+                        () -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
         entity.setDeleted(true);
         propertyViewRepository.save(entity);
     }

@@ -4,7 +4,6 @@ import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.BookingDetail;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -41,7 +40,6 @@ public class CoOwner {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "coOwner", fetch = FetchType.LAZY)
     private Collection<ContractImage> contractImages;
 

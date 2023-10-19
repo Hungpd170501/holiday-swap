@@ -22,7 +22,7 @@ public class AvailableTimesController {
     private final AvailableTimeService availableTimeService;
 
     @GetMapping("/time-frames")
-    public ResponseEntity<Page<AvailableTimeResponse>> getAllBytimeFrameId(
+    public ResponseEntity<Page<AvailableTimeResponse>> getAllByTimeFrameId(
             @RequestParam(value = "timeFrameId") Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
@@ -43,14 +43,14 @@ public class AvailableTimesController {
         return ResponseEntity.ok(dtoResponses);
     }
 
-    @GetMapping("/resort")
-    public ResponseEntity<Page<AvailableTimeResponse>> getAllByResortId(
-            @RequestParam Long timeFrameId,
+    @GetMapping("/user/resort/properties")
+    public ResponseEntity<Page<AvailableTimeResponse>> getAllViaPropertyId(
+            @RequestParam("timeFrameId") Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponses = availableTimeService.getAllByResortId(timeFrameId, pageable);
+        var dtoResponses = availableTimeService.getAllByPropertyId(timeFrameId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 

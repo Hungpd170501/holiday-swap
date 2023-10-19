@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.coOwner.CoOwnerMapper;
@@ -14,10 +15,13 @@ import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
@@ -30,25 +34,20 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final CoOwnerRepository coOwnerRepository;
     private final ContractImageService contractImageService;
     private final TimeFrameService timeFrameService;
-
     @Override
-    public List<CoOwnerResponse> getListByPropertyId(Long propertyId) {
-        var dtoResponse = coOwnerRepository.findAllByPropertyIdAndIsDeletedIsFalse(propertyId).
-                stream().map(CoOwnerMapper.INSTANCE::toDtoResponse).toList();
-        return dtoResponse;
-    }
-
-    @Override
-    public List<CoOwnerResponse> getListByUserId(Long userId) {
-        var dtoResponse = coOwnerRepository.findAllByUserIdAndIsDeletedIsFalse(userId).
-                stream().map(CoOwnerMapper.INSTANCE::toDtoResponse).toList();
-        return dtoResponse;
+    public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
+        String status = null;
+        if (coOwnerStatus != null) status = coOwnerStatus.toString();
+        var entities = coOwnerRepository.findAllByResortIdPropertyIdAndUserIdAndRoomId(
+                        resortId, propertyId, userId, roomId, status, pageable).
+                map(CoOwnerMapper.INSTANCE::toDtoResponse);
+        return entities;
     }
 
     @Override
     public CoOwnerResponse get(Long propertyId, Long userId, String roomId) {
         var dtoResponse = CoOwnerMapper.INSTANCE.toDtoResponse(
-                coOwnerRepository.findByPropertyIdAndUserUserIdAndIdRoomId(propertyId, userId, roomId).
+                coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(propertyId, userId, roomId).
                         orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND)));
         dtoResponse.setContractImages(contractImageService.gets(
                 dtoResponse.getId().getPropertyId(),
@@ -64,8 +63,17 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         if (dtoRequest.getType() == ContractType.DEEDED) {
             dtoRequest.setStartTime(null);
             dtoRequest.setEndTime(null);
-        } else if (dtoRequest.getStartTime().after(dtoRequest.getEndTime())) {
-            throw new DataIntegrityViolationException("Start time must be before end time");
+        } else {
+            Date currentDate = new Date();
+            //start year must less than end year
+            if (dtoRequest.getStartTime().getYear() >= dtoRequest.getEndTime().getYear()) {
+                throw new DataIntegrityViolationException("START YEAR must less than END YEAR");
+            }
+//            year must equals or greater than year now
+            if (dtoRequest.getStartTime().getYear() < currentDate.getYear() ||
+                dtoRequest.getEndTime().getYear() < currentDate.getYear()) {
+                throw new DataIntegrityViolationException("YEAR INPUT must greater than YEAR NOW");
+            }
         }
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalseAndStatus(coOwnerId.getPropertyId(), PropertyStatus.ACTIVE).
@@ -96,12 +104,35 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         return dtoResponse;
     }
 
-    //Accept the register of Owner
+    /*Accept or reject the register of Owner
+    from PENDING to ACCEPTED
+    or PENDING to REJECTED
+    can change ACCEPTED|REJECTED to another
+    delete can perform
+    exp: R
+     */
     @Override
+    @Transactional
     public CoOwnerResponse update(CoOwnerId coOwnerId, CoOwnerStatus coOwnerStatus) {
+        TimeFrameStatus timeFrameStatus;
+        if (coOwnerStatus.equals(CoOwnerStatus.ACCEPTED)) timeFrameStatus = TimeFrameStatus.ACCEPTED;
+        else if (coOwnerStatus.equals(CoOwnerStatus.REJECTED)) timeFrameStatus = TimeFrameStatus.REJECTED;
+        else if (coOwnerStatus.equals(CoOwnerStatus.PENDING))
+            throw new DataIntegrityViolationException("Can not perform this action. Can not change status to PENDING");
+        else {
+            timeFrameStatus = null;
+        }
+//        else timeFrameStatus = TimeFrameStatus.PENDING;
         var entity = coOwnerRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).
                 orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        if (!entity.getStatus().equals(CoOwnerStatus.PENDING))
+            throw new DataIntegrityViolationException("Only change from PENDING TO ANOTHER");
         entity.setStatus(coOwnerStatus);
+        entity.getTimeFrames().forEach(e -> {
+            if (e.getStatus() == TimeFrameStatus.PENDING) {
+                timeFrameService.update(e.getId(), timeFrameStatus);
+            }
+        });
         var updated = coOwnerRepository.save(entity);
         return CoOwnerMapper.INSTANCE.toDtoResponse(updated);
     }
