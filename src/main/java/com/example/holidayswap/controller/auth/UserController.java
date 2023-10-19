@@ -2,17 +2,19 @@ package com.example.holidayswap.controller.auth;
 
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
+import com.example.holidayswap.domain.entity.auth.UserStatus;
 import com.example.holidayswap.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/user")
+@RequestMapping("api/v1/users")
 public class UserController {
     private final UserService userService;
 
@@ -30,14 +32,18 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public List<UserProfileResponse> findAllByEmailNamePhoneWithPagination(
+    public Page<UserProfileResponse> findAllByEmailNamePhoneWithPagination(
             @RequestParam(name = "email", defaultValue = "") String email,
-            @RequestParam(name = "name", defaultValue = "") String name,
+            @RequestParam(name = "username", defaultValue = "") String name,
             @RequestParam(name = "phone", defaultValue = "") String phone,
+            @RequestParam(name = "status", defaultValue = "") Set<UserStatus> statusSet,
+            @RequestParam(name = "roleIds", defaultValue = "") Set<Long> roleIds,
             @RequestParam(name = "limit", defaultValue = "20") Integer limit,
-            @RequestParam(name = "offset", defaultValue = "0") Integer offset
+            @RequestParam(name = "offset", defaultValue = "0") Integer offset,
+            @RequestParam(defaultValue = "id") String sortProps,
+            @RequestParam(defaultValue = "asc") String sortDirection
     ) {
-        return userService.findAllByEmailNamePhoneWithPagination(email, name, phone, limit, offset);
+        return userService.findAllByEmailNamePhoneStatusRoleWithPagination(email, name, phone, statusSet, roleIds, limit, offset, sortProps, sortDirection);
     }
 
     @DeleteMapping("/{userId}")
@@ -49,6 +55,15 @@ public class UserController {
     @PostMapping
     public ResponseEntity<Void> registerUser(@RequestBody UserRequest userRequest) {
         userService.createUser(userRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            description = "Update user status(ACTIVE, BLOCKED, PENDING)"
+    )
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<Void> updateUserStatus(@PathVariable("userId") Long userId, @RequestBody UserStatus status) {
+        userService.updateUserStatus(userId, status);
         return ResponseEntity.noContent().build();
     }
 }
