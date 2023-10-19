@@ -77,7 +77,12 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
     );
 
     @Query(value = """
-            select distinct new com.example.holidayswap.domain.dto.response.property.Room (tf.roomId)
+            select distinct new com.example.holidayswap.domain.dto.response.property.Room (tf.roomId,
+            min(at.pricePerNight),
+             max(at.pricePerNight),
+             :checkIn,
+             :checkOut
+             )
             from TimeFrame tf
                  inner join tf.availableTimes at
                  where tf.isDeleted = false
@@ -86,6 +91,7 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
                  and at.endTime <= :checkOut
                  and at.pricePerNight > :min
                  and at.pricePerNight < :max
+            group by tf.roomId
             """)
     Page<Room> findHavingAvailableTime(
             @Param("checkIn") Date checkIn,
