@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.dto.response.auth;
 
 import com.example.holidayswap.domain.entity.auth.Gender;
 import com.example.holidayswap.domain.entity.auth.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -20,4 +21,6 @@ public class UserProfileResponse {
     @JsonProperty("phone_verified")
     private boolean phoneVerified;
     private UserStatus status;
+    @JsonIgnoreProperties({"status"})
+    private RoleResponse role;
 }
