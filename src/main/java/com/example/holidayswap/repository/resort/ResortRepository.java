@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.resort;
 
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
@@ -33,7 +34,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             inner join AvailableTime at on at.timeFrameId = v.id
             where upper(r.resortName) like upper(concat('%', :name, '%'))
             and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
-            and p.isDeleted = false
+            and p.isDeleted = false and (:propertyStatus is null or p.status = :propertyStatus)
             and o.isDeleted = false and (:coOwnerStatus is null or o.status = :coOwnerStatus)
             and v.isDeleted = false and (:timeFrameStatus is null or v.status = :timeFrameStatus)
             and at.isDeleted = false and (:availableTimeStatus is null or at.status = :availableTimeStatus)
@@ -66,9 +67,25 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             @Param("listOfResortAmenity") Set<Long> listOfResortAmenity,
             @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
             @Param("resortStatus") ResortStatus resortStatus,
+            @Param("propertyStatus") PropertyStatus propertyStatus,
             @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus,
             @Param("timeFrameStatus") TimeFrameStatus timeFrameStatus,
             @Param("availableTimeStatus") AvailableTimeStatus availableTimeStatus,
+            Pageable pageable
+    );
+
+    @Query("""
+            select DISTINCT r  from Resort r
+            inner join r.propertyTypes pt
+            inner join r.amenities ra
+            where upper(r.resortName) like upper(concat('%', :name, '%'))
+            and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
+            and ((:#{#listOfResortAmenity == null} = true) or (r.id in :listOfResortAmenity))
+            """)
+    Page<Resort> findAllByFilter(
+            @Param("name") String name,
+            @Param("listOfResortAmenity") Set<Long> listOfResortAmenity,
+            @Param("resortStatus") ResortStatus resortStatus,
             Pageable pageable
     );
 
@@ -78,5 +95,15 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
     @Query("select r from Resort r where upper(r.resortName) = upper(?1) and r.isDeleted = false")
     Optional<Resort> findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
 
-
+    @Query(value = """
+            select r from Resort r
+            inner  join r.properties p
+            inner  join  p.coOwners co
+            where co.user.userId = :userId
+            and r.isDeleted = false 
+            and p.isDeleted = false 
+            and co.isDeleted = false 
+            and co.status = :coOwnerStatus
+            """)
+    Page<Resort> findAllResortHaveUserOwner(@Param("userId") Long userId, @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus, Pageable pageable);
 }

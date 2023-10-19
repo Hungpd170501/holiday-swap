@@ -40,11 +40,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     Optional<AvailableTime> findByIdAndDeletedFalse(Long id);
 
     @Query("""
-            select t from AvailableTime t
-            where t.timeFrameId = ?1 and t.isDeleted = false and t.startTime >= ?2 and t.endTime <= ?3""")
-    List<AvailableTime> findAllByVacationIdAndAndDeletedFalseAndStartTimeGreaterThanEqualAndEndTimeLessThanEqual(Long vacationId, Date startTime, Date endTime);
-
-    @Query("""
             select tod from AvailableTime tod
             where tod.timeFrameId = ?1
             and ((cast(?2 as date ) is null or cast(?3 as date) is null )
@@ -57,7 +52,8 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  OR
                  (tod.endTime > ?2 AND tod.endTime < ?3)
                  ))
-            and tod.isDeleted = false and tod.status = ?4""")
+            and tod.isDeleted = false 
+            and (?4 is null or tod.status = ?4)""")
     Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(
             Long timeFrameId,
             Date startTime,
@@ -67,4 +63,12 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = "select t.* from available_time t JOIN time_frame v on t.time_frame_id = v.time_frame_id where v.property_id = ?1 AND v.room_id = ?2 AND ((?3 BETWEEN t.start_time AND t.end_time) OR ( ?4 BETWEEN t.start_time AND t.end_time)) Order By t.start_time ASC", nativeQuery = true)
     List<AvailableTime> findAllByPropertyIdAndRoomIdBetweenDate(Long propertyId, String roomId, Date startTime, Date endTime);
+
+    @Query(value = """
+                    select av from AvailableTime av
+                    inner join av.timeFrame af
+                    inner join af.coOwner co
+                    where co.id.roomId = :roomId
+            """)
+    List<AvailableTime> findAllByRoomId(@Param("roomId") String roomId);
 }
