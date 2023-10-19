@@ -54,7 +54,6 @@ public class BookingServiceImpl implements IBookingService {
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
         if (tryLock) {
             try {
-                Thread.sleep(3000);
                 // check List AvailableTime of this apartment
                 AvailableTime timeDepositeCheck = null;
                 Double amount = 0.0;
@@ -65,20 +64,20 @@ public class BookingServiceImpl implements IBookingService {
                 if (AvailableTimes.size() == 0) {
                     throw new EntityNotFoundException("This apartment is not available in this time");
                 }
-                timeDepositeLast = AvailableTimes.get(AvailableTimes.size() - 1);
-                if (timeDepositeLast.getEndTime().before(bookingRequest.getCheckOutDate())) {
-                    throw new EntityNotFoundException("This apartment is not available in this time");
-                }
-                if (timeDepositeLast.getStartTime().compareTo(bookingRequest.getCheckOutDate()) == 0) {
-                    AvailableTimes.remove(timeDepositeLast);
-                    if (AvailableTimes.size() == 0)
-                        throw new EntityNotFoundException("This apartment is not available in this time");
-                }
-                if (AvailableTimes.get(0).getEndTime().compareTo(bookingRequest.getCheckInDate()) == 0) {
-                    AvailableTimes.remove(0);
-                    if (AvailableTimes.size() == 0)
-                        throw new EntityNotFoundException("This apartment is not available in this time");
-                }
+//                timeDepositeLast = AvailableTimes.get(AvailableTimes.size() - 1);
+//                if (timeDepositeLast.getEndTime().before(bookingRequest.getCheckOutDate())) {
+//                    throw new EntityNotFoundException("This apartment is not available in this time");
+//                }
+//                if (timeDepositeLast.getStartTime().compareTo(bookingRequest.getCheckOutDate()) == 0) {
+//                    AvailableTimes.remove(timeDepositeLast);
+//                    if (AvailableTimes.size() == 0)
+//                        throw new EntityNotFoundException("This apartment is not available in this time");
+//                }
+//                if (AvailableTimes.get(0).getEndTime().compareTo(bookingRequest.getCheckInDate()) == 0) {
+//                    AvailableTimes.remove(0);
+//                    if (AvailableTimes.size() == 0)
+//                        throw new EntityNotFoundException("This apartment is not available in this time");
+//                }
                 // TODO: check booking of this apartment
                 checkBookingOverlap = bookingRepository.checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getRoomId(), bookingRequest.getPropertyId());
                 if (!checkBookingOverlap.isEmpty()) {
