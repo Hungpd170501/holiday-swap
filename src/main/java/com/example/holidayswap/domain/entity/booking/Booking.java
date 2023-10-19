@@ -43,6 +43,9 @@ public class Booking {
             updatable = false)
     private User user;
 
+    @Column(name = "price", nullable = false)
+    private Double price;
+
     @Column(name = "check_in_date", nullable = false)
     private Date checkInDate;
 

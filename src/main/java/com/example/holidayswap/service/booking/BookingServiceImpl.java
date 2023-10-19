@@ -1,24 +1,31 @@
 package com.example.holidayswap.service.booking;
 
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
+import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
+import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.BookingDetail;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.repository.booking.BookingDetailRepository;
 import com.example.holidayswap.repository.booking.BookingRepository;
+import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
+import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
 import org.redisson.api.RLock;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +42,8 @@ public class BookingServiceImpl implements IBookingService {
     private final ITransferPointService transferPointService;
 
     private final BookingDetailRepository bookingDetailRepository;
+
+    private final PropertyRepository propertyRepository;
 
 
     @Override
@@ -95,6 +104,7 @@ public class BookingServiceImpl implements IBookingService {
                 booking.setPropertyId(bookingRequest.getPropertyId());
                 booking.setUserId(bookingRequest.getUserId());
                 booking.setStatus(EnumBookingStatus.BookingStatus.PENDING);
+                booking.setPrice(0D);
 
                 bookingRepository.save(booking);
                 // TODO: createBooking detail
@@ -120,10 +130,12 @@ public class BookingServiceImpl implements IBookingService {
                     LocalDate localDateCheckout = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingDetail.getCheckOutDate()));
                     long days = ChronoUnit.DAYS.between(localDateCheckin, localDateCheckout);
                     bookingDetail.setTotalPoint((double) days * AvailableTime.getPricePerNight());
+                    booking.setPrice(booking.getPrice() + bookingDetail.getTotalPoint());
                     bookingDetail.setNumberOfGuests(4);
                     amount += bookingDetail.getTotalPoint();
                     bookingDetailRepository.save(bookingDetail);
                 }
+
 
                 //TODO trừ point trong ví
 
@@ -139,5 +151,22 @@ public class BookingServiceImpl implements IBookingService {
             }
         }
         return EnumBookingStatus.BookingStatus.SUCCESS;
+    }
+
+    @Override
+    public List<HistoryBookingResponse> historyBookingUserLogin() {
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        User user = (User) principal;
+        List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
+        List<Booking> bookingList = bookingRepository.findAll();
+        List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
+        if (userBooking.size() > 0) {
+            for (Booking booking : userBooking){
+                Property property = propertyRepository.findById(booking.getPropertyId()).get();
+                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(),booking.getCheckInDate(),booking.getCheckOutDate(),"check",booking.getRoomId(),property.getResort().getResortName(),booking.getStatus().name(),booking.getPrice()));
+            }
+        }
+        return historyBookingResponses;
     }
 }

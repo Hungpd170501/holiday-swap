@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.auth.UserMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
+import com.example.holidayswap.service.payment.IWalletService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+
+    private final IWalletService walletService;
 
     @Override
     public UserProfileResponse getUserById(Long userId) {
@@ -66,5 +69,6 @@ public class UserServiceImpl implements UserService {
         var user = userMapper.toUserEntity(userRequest);
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
         userRepository.save(user);
+        walletService.CreateWallet(user.getUserId());
     }
 }
