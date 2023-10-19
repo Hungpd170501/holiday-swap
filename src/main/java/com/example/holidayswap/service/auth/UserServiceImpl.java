@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static com.example.holidayswap.constants.ErrorMessage.PROFILE_NOT_FOUND;
@@ -47,6 +48,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof User user) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public void deleteUser(Long userId) {
         userRepository.findById(userId)
                 .ifPresentOrElse(
@@ -57,10 +70,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserProfileResponse> findAllByEmailNamePhoneStatusRoleWithPagination(String email, String name, String phone, Set<UserStatus> statusSet, Set<Long> roleIds,Integer limit, Integer offset, String sortProps, String sortDirection) {
+    public Page<UserProfileResponse> findAllByEmailNamePhoneStatusRoleWithPagination(String email, String name, String phone, Set<UserStatus> statusSet, Set<Long> roleIds, Integer limit, Integer offset, String sortProps, String sortDirection) {
         return userRepository.findAllByEmailNamePhoneStatusRoleWithPagination(
                         email, StringUtils.stripAccents(name), phone, statusSet, roleIds,
-                        PageRequest.of(offset, limit, Sort.by(Sort.Direction.fromString(sortDirection),sortProps)))
+                        PageRequest.of(offset, limit, Sort.by(Sort.Direction.fromString(sortDirection), sortProps)))
                 .map(UserMapper.INSTANCE::toUserProfileResponse);
     }
 
