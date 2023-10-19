@@ -12,4 +12,7 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT b.* From booking b join co_owner o on b.property_id = o.property_id and b.room_id = o.room_id where (b.check_in_date BETWEEN ?1 AND ?2) AND(b.check_out_date BETWEEN ?1 AND ?2) AND b.room_id = ?3 AND b.property_id =?4", nativeQuery = true)
     List<Booking> checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(Date checkInDate, Date checkOutDate, String roomId, Long propertyId);
+
+    @Query("select b from Booking b where b.userId = ?1")
+    List<Booking> findAllByUserId(Long userId);
 }
