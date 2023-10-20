@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -18,15 +20,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> getUserByEmailEquals(String email);
 
     @Query("""
-            SELECT u FROM User u WHERE 
+            SELECT u FROM User u
+            INNER JOIN Role r
+            ON u.role.roleId = r.roleId
+            WHERE
             (:email = '' OR u.email LIKE %:email%)
             AND (:name = '' OR unaccent(u.username) LIKE unaccent(concat('%', :name, '%')))
             AND (:phone = '' OR u.phone LIKE %:phone%)
+            AND ((:#{#statusSet.empty} = true) OR u.status IN :statusSet)
+            AND ((:#{#roleIds.empty} = true) OR u.role.roleId IN :roleIds)
             """)
         //    CREATE EXTENSION unaccent; in postgresql
-    Page<User> findAllByEmailNamePhoneWithPagination(
-            String email, String name, String phone, Pageable pageable);
-
+    Page<User> findAllByEmailNamePhoneStatusRoleWithPagination(
+            String email, String name, String phone, Set<UserStatus> statusSet, Set<Long> roleIds, Pageable pageable);
     Optional<User> getUserByEmailEqualsAndStatusEquals(String email, UserStatus status);
 
     boolean existsByUsername(String username);

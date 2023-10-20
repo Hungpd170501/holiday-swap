@@ -45,10 +45,13 @@ public class RoleServiceImpl implements RoleService {
     @CachePut(value = "role", key = "#roleId")
     public RoleResponse updateRole(Long roleId, RoleRequest roleRequest) {
         return roleRepository.findById(roleId).map(role -> {
-            role.setName(roleRequest.getName());
             roleRepository.findByNameEquals(roleRequest.getName()).ifPresent(r -> {
-                throw new DataIntegrityViolationException(ROLE_ALREADY_EXISTS);
+                if(!r.getRoleId().equals(roleId)){
+                    throw new DataIntegrityViolationException(ROLE_ALREADY_EXISTS);
+                }
             });
+            role.setName(roleRequest.getName());
+            role.setStatus(roleRequest.isStatus());
             return RoleMapper.INSTANCE.toRoleResponse(roleRepository.save(role));
         }).orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
     }
