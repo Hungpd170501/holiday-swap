@@ -56,8 +56,8 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             + p.numberMurphyBeds
             + p.numberSofaBeds
             + p.numberTwinBeds * 2) >= :numberGuests
-            and ((:#{#listOfResortAmenity == null} = true) or (r.id in :listOfResortAmenity))
-            and ((:#{#listOfInRoomAmenity == null} = true) or (p.id in :listOfInRoomAmenity))
+            and ((:#{#listOfResortAmenity == null} = true) or (ra.id in :listOfResortAmenity))
+            and ((:#{#listOfInRoomAmenity == null} = true) or (pa.id in :listOfInRoomAmenity))
             """)
     Page<Resort> findAllByFilter(
             @Param("name") String name,
