@@ -1,13 +1,12 @@
 package com.example.holidayswap.domain.dto.response.property;
 
-import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -15,11 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomResponse {
-    CoOwnerResponse coOwner;
-    private double min;
-    private double max;
-    private Date startDate;
-    private Date endDate;
+    CoOwnerId coOwnerId;
+    private double pricePerNight;
     private PropertyResponse property;
     private List<AvailableTimeResponse> availableTimes;
 }

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -22,17 +23,20 @@ public class RoomServiceImpl implements RoomService {
     private final AvailableTimeService availableTimeService;
 
     @Override
-    public Page<RoomResponse> gets(Date checkIn, Date checkOut, double min, double max, Pageable pageable) {
-        var dto = coOwnerRepository.findHavingAvailableTime(checkIn, checkOut, min, max, pageable);
+    public Page<RoomResponse> gets(Date checkIn, Date checkOut, double min, double max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
+        var dto = coOwnerRepository.findHavingAvailableTime(checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
 
-        var response = dto.map(RoomMapper.INSTANCE::toDtoResponse);
+        var response = dto.map(e -> {
+            var mapperE = RoomMapper.INSTANCE.toDtoResponse(e);
+            var avalabletimes = availableTimeService.getAllByCoOwnerId(e.getCoOwner().getId());
+            mapperE.setAvailableTimes(avalabletimes);
+            return mapperE;
+        });
         response.forEach(e -> {
             var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getProperty().getId());
             var propertyImages = propertyImageService.gets(e.getProperty().getId());
             e.getProperty().setPropertyImage(propertyImages);
             e.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
-            var avalabletimes = availableTimeService.getAllByCoOwnerId(e.getCoOwner().getId());
-            e.setAvailableTimes(avalabletimes);
         });
         return response;
     }

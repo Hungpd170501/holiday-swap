@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,11 +26,14 @@ public class RoomsController {
                                                    @RequestParam(value = "checkOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkOut,
                                                    @RequestParam(name = "min") double min,
                                                    @RequestParam(name = "max") double max,
+                                                   @RequestParam(name = "listOfInRoomAmenity", required = false) Set<Long> listOfInRoomAmenity,
+                                                   @RequestParam(name = "listOfPropertyView", required = false) Set<Long> listOfPropertyView,
+                                                   @RequestParam(name = "listOfPropertyType", required = false) Set<Long> listOfPropertyType,
                                                    @RequestParam(defaultValue = "0") Integer pageNo,
                                                    @RequestParam(defaultValue = "10") Integer pageSize,
-                                                   @RequestParam(defaultValue = "roomId") String sortBy) {
+                                                   @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponse = roomService.gets(checkIn, checkOut, min, max, pageable);
+        var dtoResponse = roomService.gets(checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
         return ResponseEntity.ok(dtoResponse);
     }
 

@@ -69,11 +69,15 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = """
                     select at from AvailableTime at
-                    inner join at.timeFrame af
-                    inner join af.coOwner co
+                    inner join at.timeFrame tf
+                    inner join tf.coOwner co
+                    inner join co.property p
                     where co.id.propertyId = :propertyId
                     and co.id.userId =  :userId
                     and co.id.roomId = :roomId
+                    and co.status = 'ACCEPTED'
+                    and co.property.status = 'ACTIVE'
+                    and tf.status = 'ACCEPTED'
             """)
     List<AvailableTime> findAllByCoOwnerId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
 }

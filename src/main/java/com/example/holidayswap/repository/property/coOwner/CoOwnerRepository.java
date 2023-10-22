@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 
@@ -82,14 +83,27 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     Optional<CoOwner> isMatchingCoOwner(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("startTime") Date startTime, @Param("endTime") Date endTime, @Param("coOwnerStatus") String coOwnerStatus);
 
     @Query(value = """
-            select new com.example.holidayswap.domain.dto.response.property.RoomDTO (
+            select distinct new com.example.holidayswap.domain.dto.response.property.RoomDTO (
+            co.id,
             co,
+            at.pricePerNight,
             p
             )
             from CoOwner co
-                 inner join co.property p on co.id.propertyId = p.id
-                 inner join  co.timeFrames tf on tf.propertyId = co.id.propertyId and tf.userId= co.id.userId and tf.roomId = co.id.roomId
-                 inner join tf.availableTimes at on at.timeFrameId = tf.id
+                 inner join co.property p
+                 inner join  co.timeFrames tf
+                 inner join tf.availableTimes at
+                 inner join p.inRoomAmenities ira
+                 inner join p.propertyType pt
+                 inner join p.propertyView pv
+                 where (at.pricePerNight >= :min and at.pricePerNight <= :max)
+                 and (date(at.startTime) >= date(:checkIn) and date(at.endTime) <= date(:checkOut))
+                 and co.status = 'ACCEPTED'
+                 and co.property.status = 'ACTIVE'
+                 and tf.status = 'ACCEPTED'
+               and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
+               and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
+               and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
             """)
-    Page<RoomDTO> findHavingAvailableTime(@Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") double min, @Param("max") double max, Pageable pageable);
+    Page<RoomDTO> findHavingAvailableTime(@Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") double min, @Param("max") double max, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
 }
