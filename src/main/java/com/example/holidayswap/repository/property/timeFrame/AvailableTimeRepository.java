@@ -54,12 +54,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  ))
             and tod.isDeleted = false 
             and (?4 is null or tod.status = ?4)""")
-    Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(
-            Long timeFrameId,
-            Date startTime,
-            Date endTime,
-            AvailableTimeStatus timeOffDepositStatus
-    );
+    Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(Long timeFrameId, Date startTime, Date endTime, AvailableTimeStatus timeOffDepositStatus);
 
     @Query(value = "select t.* from available_time t JOIN time_frame v on t.time_frame_id = v.time_frame_id where v.property_id = ?1 AND v.room_id = ?2 AND ((?3 BETWEEN t.start_time AND t.end_time) OR ( ?4 BETWEEN t.start_time AND t.end_time)) Order By t.start_time ASC", nativeQuery = true)
     List<AvailableTime> findAllByPropertyIdAndRoomIdBetweenDate(Long propertyId, String roomId, Date startTime, Date endTime);
@@ -71,4 +66,18 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     where co.id.roomId = :roomId
             """)
     List<AvailableTime> findAllByRoomId(@Param("roomId") String roomId);
+
+    @Query(value = """
+                    select at from AvailableTime at
+                    inner join at.timeFrame tf
+                    inner join tf.coOwner co
+                    inner join co.property p
+                    where co.id.propertyId = :propertyId
+                    and co.id.userId =  :userId
+                    and co.id.roomId = :roomId
+                    and co.status = 'ACCEPTED'
+                    and co.property.status = 'ACTIVE'
+                    and tf.status = 'ACCEPTED'
+            """)
+    List<AvailableTime> findAllByCoOwnerId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
 }
