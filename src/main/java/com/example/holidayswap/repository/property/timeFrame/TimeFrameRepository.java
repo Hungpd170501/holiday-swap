@@ -1,6 +1,6 @@
 package com.example.holidayswap.repository.property.timeFrame;
 
-import com.example.holidayswap.domain.dto.response.property.RoomDTO;
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import org.springframework.data.domain.Page;
@@ -79,7 +79,7 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
 
 
     @Query(value = """
-            select distinct new com.example.holidayswap.domain.dto.response.property.RoomDTO (
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
             tf.roomId)
             from TimeFrame tf
                  inner join tf.availableTimes at
@@ -87,5 +87,5 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
                  and at.isDeleted = false
                  and tf.roomId = :roomId
             """)
-    Optional<RoomDTO> findRoomByRoomId(@Param("roomId") String roomId);
+    Optional<ApartmentForRentDTO> findRoomByRoomId(@Param("roomId") String roomId);
 }

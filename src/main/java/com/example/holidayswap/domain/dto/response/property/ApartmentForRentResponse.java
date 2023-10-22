@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomResponse {
+public class ApartmentForRentResponse {
     CoOwnerId coOwnerId;
     private double pricePerNight;
     private PropertyResponse property;

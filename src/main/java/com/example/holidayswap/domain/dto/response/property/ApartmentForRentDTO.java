@@ -13,14 +13,14 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RoomDTO {
+public class ApartmentForRentDTO {
     CoOwnerId coOwnerId;
     CoOwner coOwner;
     private double pricePerNight;
     private Property property;
     private List<AvailableTime> availableTimes;
 
-    public RoomDTO(CoOwnerId coOwnerId, CoOwner coOwner, double pricePerNight, Property property) {
+    public ApartmentForRentDTO(CoOwnerId coOwnerId, CoOwner coOwner, double pricePerNight, Property property) {
         this.coOwnerId = coOwnerId;
         this.coOwner = coOwner;
         this.pricePerNight = pricePerNight;

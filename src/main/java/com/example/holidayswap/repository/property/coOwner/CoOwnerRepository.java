@@ -1,6 +1,6 @@
 package com.example.holidayswap.repository.property.coOwner;
 
-import com.example.holidayswap.domain.dto.response.property.RoomDTO;
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
 import com.example.holidayswap.domain.dto.response.resort.OwnerShipResponseDTO;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
@@ -83,7 +83,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     Optional<CoOwner> isMatchingCoOwner(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("startTime") Date startTime, @Param("endTime") Date endTime, @Param("coOwnerStatus") String coOwnerStatus);
 
     @Query(value = """
-            select distinct new com.example.holidayswap.domain.dto.response.property.RoomDTO (
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
             co.id,
             co,
             at.pricePerNight,
@@ -105,5 +105,26 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
                and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
             """)
-    Page<RoomDTO> findHavingAvailableTime(@Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") double min, @Param("max") double max, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
+    Page<ApartmentForRentDTO> findApartmentForRent(@Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") double min, @Param("max") double max, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            co.id,
+            co,
+            at.pricePerNight,
+            p
+            )
+            from CoOwner co
+                 inner join co.property p
+                 inner join  co.timeFrames tf
+                 inner join tf.availableTimes at
+                 where
+                 co.status = 'ACCEPTED'
+                 and co.property.status = 'ACTIVE'
+                 and tf.status = 'ACCEPTED'
+                 and co.id.propertyId = :propertyId
+                 and co.id.userId = :userId
+                 and co.id.roomId = :roomId
+            """)
+    Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
 }
