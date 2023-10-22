@@ -25,13 +25,13 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     List<Property> findAllByResortIdAndIsDeleteIsFalse(Long resortId);
 
     @Query(value = """
-            select distinct p from Property p
+            select p from Property p
             inner join PropertyType pt on p.propertyTypeId = pt.id
             inner join pt.resorts r
             inner join CoOwner o on p.id = o.id.propertyId
             inner join TimeFrame v on v.propertyId = p.id
             inner join AvailableTime tod on tod.timeFrameId = v.id
-            where p.resortId = :resortId
+            where (:resortId is null or p.resortId = :resortId)
             and p.isDeleted = false
             and (:propertyStatus is null  or p.status = :propertyStatus)
             and pt.isDeleted = false
@@ -70,7 +70,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             select distinct p from Property p
             inner join PropertyType pt on p.propertyTypeId = pt.id
             inner join pt.resorts r
-            where p.resortId = :resortId
+            where (:resortId is null or p.resortId = :resortId)
             and p.isDeleted = false
             and (:propertyStatus is null  or p.status = :propertyStatus)
             """)

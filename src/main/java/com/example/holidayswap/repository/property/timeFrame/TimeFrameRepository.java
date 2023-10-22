@@ -1,6 +1,6 @@
 package com.example.holidayswap.repository.property.timeFrame;
 
-import com.example.holidayswap.domain.dto.response.property.Room;
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import org.springframework.data.domain.Page;
@@ -76,32 +76,16 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
             @Param("timeFrameStatus") String timeFrameStatus
     );
 
-    @Query(value = """
-            select distinct new com.example.holidayswap.domain.dto.response.property.Room (tf.roomId)
-            from TimeFrame tf
-                 inner join tf.availableTimes at
-                 where tf.isDeleted = false
-                 and at.isDeleted = false
-                 and at.startTime >= :checkIn
-                 and at.endTime <= :checkOut
-                 and at.pricePerNight > :min
-                 and at.pricePerNight < :max
-            """)
-    Page<Room> findHavingAvailableTime(
-            @Param("checkIn") Date checkIn,
-            @Param("checkOut") Date checkOut,
-            @Param("min") double min,
-            @Param("max") double max,
-            Pageable pageable
-    );
+
 
     @Query(value = """
-            select distinct new com.example.holidayswap.domain.dto.response.property.Room (tf.roomId)
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            tf.roomId)
             from TimeFrame tf
                  inner join tf.availableTimes at
                  where tf.isDeleted = false
                  and at.isDeleted = false
                  and tf.roomId = :roomId
             """)
-    Optional<Room> findRoomByRoomId(@Param("roomId") String roomId);
+    Optional<ApartmentForRentDTO> findRoomByRoomId(@Param("roomId") String roomId);
 }
