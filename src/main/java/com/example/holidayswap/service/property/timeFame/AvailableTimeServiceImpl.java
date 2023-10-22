@@ -2,6 +2,7 @@ package com.example.holidayswap.service.property.timeFame;
 
 import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTimeRequest;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -28,6 +31,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final TimeFrameRepository timeFrameRepository;
     private final AuthUtils authUtils;
     private final CoOwnerRepository coOwnerRepository;
+    private final AvailableTimeMapper availableTimeMapper;
 
     @Override
     public Page<AvailableTimeResponse> getAllByVacationUnitId(Long timeFrameId, Pageable pageable) {
@@ -50,6 +54,14 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
                 findAllByResortIdAndDeletedFalse(resortId, pageable);
         Page<AvailableTimeResponse> availableTimePageResponse = availableTimePage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
         return availableTimePageResponse;
+    }
+
+    @Override
+    public List<AvailableTimeResponse> getAllByCoOwnerId(CoOwnerId coOwnerId) {
+        var availableTimeList = availableTimeRepository.
+                findAllByCoOwnerId(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId());
+        List<AvailableTimeResponse> responses = availableTimeList.stream().map(availableTimeMapper::toDtoResponse).collect(Collectors.toList());
+        return responses;
     }
 
     @Override

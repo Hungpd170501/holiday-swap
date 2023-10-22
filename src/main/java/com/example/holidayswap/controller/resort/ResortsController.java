@@ -15,14 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -38,17 +36,13 @@ public class ResortsController {
     @GetMapping
     public ResponseEntity<Page<ResortResponse>> gets(
             @RequestParam(value = "nameResort", defaultValue = "") String nameResort,
-            @RequestParam(value = "timeCheckIn", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckIn,
-            @RequestParam(value = "timeCheckOut", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date timeCheckOut,
-            @RequestParam(value = "numberGuests", defaultValue = "0") Integer numberGuests,
             @RequestParam(value = "resortAmenity", required = false) Set<Long> listOfResortAmenity,
-            @RequestParam(value = "inRoomAmenity", required = false) Set<Long> listOfInRoomAmenity,
             @RequestParam(value = "resortStatus", required = false) ResortStatus resortStatus,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(resortService.gets(nameResort, timeCheckIn, timeCheckOut, numberGuests, listOfResortAmenity, listOfInRoomAmenity, resortStatus, pageable));
+        return ResponseEntity.ok(resortService.gets(nameResort, listOfResortAmenity, resortStatus, pageable));
     }
 
     @GetMapping("/{resortId}/resort-images")
