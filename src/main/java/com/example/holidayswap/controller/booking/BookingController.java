@@ -27,4 +27,16 @@ public class BookingController {
         var historyBookingDetail = bookingService.historyBookingDetail(bookingId);
         return historyBookingDetail != null ? ResponseEntity.ok(historyBookingDetail) : ResponseEntity.badRequest().body("Not Found");
     }
+
+    @GetMapping("/ownerhistorybooking")
+    public ResponseEntity<?> getOwnerHistoryBooking(){
+        var historyBooking = bookingService.historyBookingOwnerLogin();
+        return historyBooking != null ? ResponseEntity.ok(historyBooking) : ResponseEntity.badRequest().body("Empty");
+    }
+
+    @GetMapping("/ownerhistorybooking/{bookingId}")
+    public ResponseEntity<?> getOwnerHistoryBookingDetail(@PathVariable Long bookingId){
+        var historyBookingDetail = bookingService.historyBookingDetailOwner(bookingId);
+        return historyBookingDetail != null ? ResponseEntity.ok(historyBookingDetail) : ResponseEntity.badRequest().body("Not Found");
+    }
 }

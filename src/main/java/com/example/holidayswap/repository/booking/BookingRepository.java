@@ -15,4 +15,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking b where b.userId = ?1")
     List<Booking> findAllByUserId(Long userId);
+
+    @Query(value = "SELECT b.* FROM booking_detail bd join booking b on b.book_id = bd.book_id where bd.user_id = ?1", nativeQuery = true)
+    List<Booking> findAllByOwnerLogin(Long userId);
 }

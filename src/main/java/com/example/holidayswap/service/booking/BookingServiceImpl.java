@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.request.booking.UserOfBookingRequest;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
+import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.BookingDetail;
@@ -154,7 +155,6 @@ public class BookingServiceImpl implements IBookingService {
         Object principal = authentication.getPrincipal();
         User user = (User) principal;
         List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
-        List<Booking> bookingList = bookingRepository.findAll();
         List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
         if (userBooking.size() > 0) {
             for (Booking booking : userBooking){
@@ -180,6 +180,47 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setOwnerEmail(booking.getBookingDetail().get(0).getCoOwner().getUser().getEmail());
         historyBookingDetailResponse.setStatus(booking.getStatus().name());
         historyBookingDetailResponse.setPropertyName(booking.getProperty().getPropertyName());
+        historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
+
+        return historyBookingDetailResponse;
+    }
+
+    @Override
+    public List<HistoryBookingResponse> historyBookingOwnerLogin() {
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        User user = (User) principal;
+
+        List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
+        var bookingList = bookingRepository.findAllByOwnerLogin(user.getUserId());
+        if (bookingList.size() > 0) {
+            for (Booking booking : bookingList){
+                Property property = propertyRepository.findById(booking.getPropertyId()).get();
+                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(),booking.getCheckInDate(),booking.getCheckOutDate(),"check",booking.getRoomId(),property.getResort().getResortName(),booking.getStatus().name(),booking.getPrice()));
+            }
+        }
+        return historyBookingResponses;
+    }
+
+    @Override
+    public HistoryDetailBookingOwnerResponse historyBookingDetailOwner(Long bookingId) {
+        var booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+        var listUserOfBookingEntity = userOfBookingRepository.findAllByBookingId(bookingId);
+
+        Double commission = booking.getPrice() * 0.1;
+
+        var historyBookingDetailResponse = new HistoryDetailBookingOwnerResponse();
+        historyBookingDetailResponse.setResortName(booking.getProperty().getResort().getResortName());
+        historyBookingDetailResponse.setDateCheckIn(booking.getCheckInDate());
+        historyBookingDetailResponse.setDateCheckOut(booking.getCheckOutDate());
+        historyBookingDetailResponse.setRoomId(booking.getRoomId());
+        historyBookingDetailResponse.setPrice(booking.getPrice());
+        historyBookingDetailResponse.setNumberOfGuest(booking.getBookingDetail().get(0).getNumberOfGuests());
+        historyBookingDetailResponse.setMemberBookingEmail(booking.getUser().getEmail());
+        historyBookingDetailResponse.setStatus(booking.getStatus().name());
+        historyBookingDetailResponse.setPropertyName(booking.getProperty().getPropertyName());
+        historyBookingDetailResponse.setCommission(commission);
+        historyBookingDetailResponse.setTotal(booking.getPrice() - commission);
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
 
         return historyBookingDetailResponse;
