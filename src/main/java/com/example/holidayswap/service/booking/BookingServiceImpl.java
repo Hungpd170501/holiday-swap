@@ -1,6 +1,8 @@
 package com.example.holidayswap.service.booking;
 
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
+import com.example.holidayswap.domain.dto.request.booking.UserOfBookingRequest;
+import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
@@ -11,12 +13,14 @@ import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.repository.booking.BookingDetailRepository;
 import com.example.holidayswap.repository.booking.BookingRepository;
+import com.example.holidayswap.repository.booking.UserOfBookingRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -45,6 +49,10 @@ public class BookingServiceImpl implements IBookingService {
 
     private final PropertyRepository propertyRepository;
 
+    private final IUserOfBookingService userOfBookingService;
+
+    private final UserOfBookingRepository userOfBookingRepository;
+
 
     @Override
     @Transactional
@@ -64,21 +72,7 @@ public class BookingServiceImpl implements IBookingService {
                 if (AvailableTimes.size() == 0) {
                     throw new EntityNotFoundException("This apartment is not available in this time");
                 }
-//                timeDepositeLast = AvailableTimes.get(AvailableTimes.size() - 1);
-//                if (timeDepositeLast.getEndTime().before(bookingRequest.getCheckOutDate())) {
-//                    throw new EntityNotFoundException("This apartment is not available in this time");
-//                }
-//                if (timeDepositeLast.getStartTime().compareTo(bookingRequest.getCheckOutDate()) == 0) {
-//                    AvailableTimes.remove(timeDepositeLast);
-//                    if (AvailableTimes.size() == 0)
-//                        throw new EntityNotFoundException("This apartment is not available in this time");
-//                }
-//                if (AvailableTimes.get(0).getEndTime().compareTo(bookingRequest.getCheckInDate()) == 0) {
-//                    AvailableTimes.remove(0);
-//                    if (AvailableTimes.size() == 0)
-//                        throw new EntityNotFoundException("This apartment is not available in this time");
-//                }
-                // TODO: check booking of this apartment
+//                 TODO: check booking of this apartment
                 checkBookingOverlap = bookingRepository.checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getRoomId(), bookingRequest.getPropertyId());
                 if (!checkBookingOverlap.isEmpty()) {
                     throw new EntityNotFoundException("This apartment is not available in this time");
@@ -106,6 +100,8 @@ public class BookingServiceImpl implements IBookingService {
                 booking.setPrice(0D);
 
                 bookingRepository.save(booking);
+
+                userOfBookingService.saveUserOfBooking(booking.getId(),bookingRequest.getUserOfBookingRequests());
                 // TODO: createBooking detail
 
                 for (AvailableTime AvailableTime : AvailableTimes) {
@@ -130,7 +126,7 @@ public class BookingServiceImpl implements IBookingService {
                     long days = ChronoUnit.DAYS.between(localDateCheckin, localDateCheckout);
                     bookingDetail.setTotalPoint((double) days * AvailableTime.getPricePerNight());
                     booking.setPrice(booking.getPrice() + bookingDetail.getTotalPoint());
-                    bookingDetail.setNumberOfGuests(4);
+                    bookingDetail.setNumberOfGuests(bookingRequest.getUserOfBookingRequests().size());
                     amount += bookingDetail.getTotalPoint();
                     bookingDetailRepository.save(bookingDetail);
                 }
@@ -167,5 +163,25 @@ public class BookingServiceImpl implements IBookingService {
             }
         }
         return historyBookingResponses;
+    }
+
+    @Override
+    public HistoryBookingDetailResponse historyBookingDetail(Long bookingId) {
+        var booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+        var listUserOfBookingEntity = userOfBookingRepository.findAllByBookingId(bookingId);
+
+        var historyBookingDetailResponse = new HistoryBookingDetailResponse();
+        historyBookingDetailResponse.setResortName(booking.getProperty().getResort().getResortName());
+        historyBookingDetailResponse.setDateCheckIn(booking.getCheckInDate());
+        historyBookingDetailResponse.setDateCheckOut(booking.getCheckOutDate());
+        historyBookingDetailResponse.setRoomId(booking.getRoomId());
+        historyBookingDetailResponse.setPrice(booking.getPrice());
+        historyBookingDetailResponse.setNumberOfGuest(booking.getBookingDetail().get(0).getNumberOfGuests());
+        historyBookingDetailResponse.setOwnerEmail(booking.getBookingDetail().get(0).getCoOwner().getUser().getEmail());
+        historyBookingDetailResponse.setStatus(booking.getStatus().name());
+        historyBookingDetailResponse.setPropertyName(booking.getProperty().getPropertyName());
+        historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
+
+        return historyBookingDetailResponse;
     }
 }
