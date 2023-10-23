@@ -27,6 +27,6 @@ public class PropertyResponse {
     private Long resortId;
     private PropertyTypeResponse propertyType;
     private PropertyViewResponse propertyView;
-    private List<InRoomAmenityTypeResponse> inRoomAmenityTypeResponses;
-    private List<PropertyImageResponse> propertyImageResponses;
+    private List<InRoomAmenityTypeResponse> inRoomAmenityType;
+    private List<PropertyImageResponse> propertyImage;
 }
