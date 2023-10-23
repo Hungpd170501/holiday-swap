@@ -24,7 +24,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                                                             @Param(("resortStatus")) ResortStatus resortStatus);
 
     @Query("""
-            select DISTINCT r  from Resort r
+            select  r  from Resort r
             inner join r.propertyTypes pt
             inner join r.amenities ra
             inner join Property p on p.resortId = r.id
@@ -56,8 +56,9 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             + p.numberMurphyBeds
             + p.numberSofaBeds
             + p.numberTwinBeds * 2) >= :numberGuests
-            and ((:#{#listOfResortAmenity == null} = true) or (r.id in :listOfResortAmenity))
-            and ((:#{#listOfInRoomAmenity == null} = true) or (p.id in :listOfInRoomAmenity))
+            and ((:#{#listOfResortAmenity == null} = true) or (ra.id in :listOfResortAmenity))
+            and ((:#{#listOfInRoomAmenity == null} = true) or (pa.id in :listOfInRoomAmenity))
+            group by r.id, at.id
             """)
     Page<Resort> findAllByFilter(
             @Param("name") String name,
@@ -80,7 +81,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             inner join r.amenities ra
             where upper(r.resortName) like upper(concat('%', :name, '%'))
             and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
-            and ((:#{#listOfResortAmenity == null} = true) or (r.id in :listOfResortAmenity))
+            and ((:#{#listOfResortAmenity == null} = true) or (ra.id in :listOfResortAmenity))
             """)
     Page<Resort> findAllByFilter(
             @Param("name") String name,

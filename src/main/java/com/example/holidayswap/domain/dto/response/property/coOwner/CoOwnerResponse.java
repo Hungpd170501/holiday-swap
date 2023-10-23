@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.dto.response.property.coOwner;
 
+import com.example.holidayswap.domain.dto.response.property.timeFrame.TimeFrameResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
@@ -17,4 +18,5 @@ public class CoOwnerResponse {
     private CoOwnerStatus status;
     private boolean isDeleted;
     private List<ContractImageResponse> contractImages;
+    private List<TimeFrameResponse> timeFrames;
 }
