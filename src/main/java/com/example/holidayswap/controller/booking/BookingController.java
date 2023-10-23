@@ -21,4 +21,10 @@ public class BookingController {
         var historyBooking = bookingService.historyBookingUserLogin();
         return historyBooking != null ? ResponseEntity.ok(historyBooking) : ResponseEntity.badRequest().body("Empty");
     }
+
+    @GetMapping("/historybooking/{bookingId}")
+    public ResponseEntity<?> getHistoryBookingDetail(@PathVariable Long bookingId){
+        var historyBookingDetail = bookingService.historyBookingDetail(bookingId);
+        return historyBookingDetail != null ? ResponseEntity.ok(historyBookingDetail) : ResponseEntity.badRequest().body("Not Found");
+    }
 }

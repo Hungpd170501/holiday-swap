@@ -14,7 +14,9 @@ import com.example.holidayswap.domain.mapper.auth.UserMapper;
 import com.example.holidayswap.repository.auth.TokenRepository;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.service.EmailService;
+import com.example.holidayswap.service.payment.IWalletService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +39,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    private IWalletService walletService;
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
     @Value("${application.security.jwt.access-token.expiration}")
@@ -70,6 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setStatus(UserStatus.PENDING);
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
+        walletService.CreateWallet(user.getUserId());
         try {
             emailService.sendRegistrationReceipt(user.getEmail(), user.getUsername());
             var token = tokenRepository.save(Token

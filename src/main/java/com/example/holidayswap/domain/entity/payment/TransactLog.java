@@ -37,5 +37,4 @@ public class TransactLog {
 
     private long amountPoint;
     private String createdOn;
-    private Double commission;
 }
