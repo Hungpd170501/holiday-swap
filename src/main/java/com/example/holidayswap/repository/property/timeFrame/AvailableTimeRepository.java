@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.property.timeFrame;
 
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Long> {
@@ -80,4 +82,46 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     and tf.status = 'ACCEPTED'
             """)
     List<AvailableTime> findAllByCoOwnerId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            p, at
+            )
+            from AvailableTime at
+                 inner join at.timeFrame tf
+                 inner join tf.coOwner co
+                 inner join co.property p
+                 inner join co.user u
+                 inner join p.inRoomAmenities ira
+                 inner join p.propertyType pt
+                 inner join p.propertyView pv
+                 where (at.pricePerNight >= :min and at.pricePerNight <= :max)
+                 and (date(at.startTime) >= date(:checkIn) and date(at.endTime) <= date(:checkOut))
+                 and co.status = 'ACCEPTED'
+                 and co.property.status = 'ACTIVE'
+                 and tf.status = 'ACCEPTED'
+               and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
+               and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
+               and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
+            """)
+    Page<ApartmentForRentDTO> findApartmentForRent(@Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") double min, @Param("max") double max, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+                    p, at
+            )
+                 from AvailableTime at
+                 inner join at.timeFrame tf
+                 inner join tf.coOwner co
+                 inner join co.property p
+                 inner join co.user u
+                 where
+                 co.status = 'ACCEPTED'
+                 and co.property.status = 'ACTIVE'
+                 and tf.status = 'ACCEPTED'
+                 and co.id.propertyId = :propertyId
+                 and co.id.userId = :userId
+                 and co.id.roomId = :roomId
+            """)
+    Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
 }
