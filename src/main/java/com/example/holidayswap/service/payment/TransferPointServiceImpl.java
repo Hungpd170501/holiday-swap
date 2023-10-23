@@ -100,8 +100,8 @@ public class TransferPointServiceImpl implements ITransferPointService {
                     throw new BankException(detail);
                 }
 
-                Double commission = amount * 0.1;
-                toWallet.setTotalPoint((toWallet.getTotalPoint() + amount - commission));
+//                Double commission = amount * 0.1;
+                toWallet.setTotalPoint((toWallet.getTotalPoint() + amount ));
                 currentDate = Helper.getCurrentDate();
                 TransactLog transactLog = new TransactLog();
                 transactLog.setAmountPoint(amount);
@@ -110,14 +110,14 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 transactLog.setWalletTo(toWallet);
                 transactLog.setToTotalPoint(toWallet.getTotalPoint());
                 transactLog.setFromTotalPoint(fromWallet.getTotalPoint());
-                transactLog.setCommission(commission);
-                adminWallet.setTotalPoint(adminWallet.getTotalPoint() + commission);
+//                transactLog.setCommission(commission);
+//                adminWallet.setTotalPoint(adminWallet.getTotalPoint() + commission);
 
-                adminWalletRepository.save(adminWallet);
+//                adminWalletRepository.save(adminWallet);
                 walletRepository.save(fromWallet);
                 walletRepository.save(toWallet);
                 transactLogRepository.save(transactLog);
-                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), commission);
+                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
             } finally {
                 fairLock.unlock();
             }

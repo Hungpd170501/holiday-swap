@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.booking;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.property.Property;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "booking")
@@ -43,6 +45,9 @@ public class Booking {
             updatable = false)
     private User user;
 
+    @Column(name = "price", nullable = false)
+    private Double price;
+
     @Column(name = "check_in_date", nullable = false)
     private Date checkInDate;
 
@@ -51,6 +56,9 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     private List<BookingDetail> bookingDetail;
+
+    @OneToMany(mappedBy = "booking")
+    private Set<UserOfBooking> userOfBookings;
 
     @Column(name = "status", nullable = false)
     private EnumBookingStatus.BookingStatus status;
