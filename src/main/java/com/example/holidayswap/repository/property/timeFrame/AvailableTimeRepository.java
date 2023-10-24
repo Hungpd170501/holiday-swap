@@ -111,8 +111,18 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
                and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
+               and (p.numberKingBeds * 2
+               + p.numberQueenBeds * 2
+               + p. numberSingleBeds
+               + p.numberDoubleBeds * 2
+               + p.numberTwinBeds * 2
+               + p.numberFullBeds * 2
+               + p.numberMurphyBeds * 2
+               + p.numberSofaBeds * 2) >= :guest
+               and p.numberBedsRoom >= :numberBedsRoom
+               and p.numberBathRoom >= :numberBathRoom
             """)
-    Page<ApartmentForRentDTO> findApartmentForRent(@Param("resortId") Long resortId, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
+    Page<ApartmentForRentDTO> findApartmentForRent(@Param("resortId") Long resortId, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
 
     @Query(value = """
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
