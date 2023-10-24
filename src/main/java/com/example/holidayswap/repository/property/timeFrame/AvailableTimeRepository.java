@@ -1,8 +1,10 @@
 package com.example.holidayswap.repository.property.timeFrame;
 
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,10 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 
 @Repository
 public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Long> {
@@ -119,9 +120,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  co.status = 'ACCEPTED'
                  and co.property.status = 'ACTIVE'
                  and tf.status = 'ACCEPTED'
-                 and co.id.propertyId = :propertyId
-                 and co.id.userId = :userId
-                 and co.id.roomId = :roomId
+                 and at.id = :availableId
             """)
-    Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
+    Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("availableId") Long availableId);
 }

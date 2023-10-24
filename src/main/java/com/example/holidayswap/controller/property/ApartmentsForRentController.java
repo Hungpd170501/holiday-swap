@@ -1,9 +1,8 @@
 package com.example.holidayswap.controller.property;
 
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
-import com.example.holidayswap.service.property.ApartmentForRentService;
-import lombok.RequiredArgsConstructor;
+import java.util.Date;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-import java.util.Set;
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
+import com.example.holidayswap.service.property.ApartmentForRentService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,9 +42,8 @@ public class ApartmentsForRentController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<ApartmentForRentResponse> get(@RequestParam("proeprtyId") Long proeprtyId, @RequestParam("userId") Long userId, @RequestParam("roomId") String roomId) {
-        CoOwnerId coOwnerId = new CoOwnerId(proeprtyId, userId, roomId);
-        var dtoResponse = roomService.get(coOwnerId);
+    public ResponseEntity<ApartmentForRentResponse> get(@RequestParam("availableId") Long availableId) {
+        var dtoResponse = roomService.get(availableId);
         return ResponseEntity.ok(dtoResponse);
     }
 }
