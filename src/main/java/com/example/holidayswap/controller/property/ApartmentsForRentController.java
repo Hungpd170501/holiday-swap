@@ -27,14 +27,16 @@ public class ApartmentsForRentController {
             @RequestParam(value = "checkOut", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkOut,
             @RequestParam(name = "min", required = false) Long min,
             @RequestParam(name = "max", required = false) Long max,
-                                                               @RequestParam(name = "listOfInRoomAmenity", required = false) Set<Long> listOfInRoomAmenity,
-                                                               @RequestParam(name = "listOfPropertyView", required = false) Set<Long> listOfPropertyView,
-                                                               @RequestParam(name = "listOfPropertyType", required = false) Set<Long> listOfPropertyType,
-                                                               @RequestParam(defaultValue = "0") Integer pageNo,
-                                                               @RequestParam(defaultValue = "10") Integer pageSize,
-                                                               @RequestParam(defaultValue = "id") String sortBy) {
+            @RequestParam(name = "guest", defaultValue = "1") int guest,
+            @RequestParam(name = "numberBedsRoom", defaultValue = "1") int numberBedsRoom,
+            @RequestParam(name = "numberBathRoom", defaultValue = "1") int numberBathRoom,
+            @RequestParam(name = "listOfInRoomAmenity", required = false) Set<Long> listOfInRoomAmenity,
+            @RequestParam(name = "listOfPropertyView", required = false) Set<Long> listOfPropertyView,
+            @RequestParam(name = "listOfPropertyType", required = false) Set<Long> listOfPropertyType,
+            @RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponse = roomService.gets(resortId, checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
+        var dtoResponse = roomService.gets(resortId, checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
         return ResponseEntity.ok(dtoResponse);
     }
 
