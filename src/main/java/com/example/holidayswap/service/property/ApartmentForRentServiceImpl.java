@@ -1,13 +1,10 @@
 package com.example.holidayswap.service.property;
 
 import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
-import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
-import com.example.holidayswap.service.property.timeFame.AvailableTimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,16 +18,13 @@ import java.util.Set;
 public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final InRoomAmenityTypeServiceImpl inRoomAmenityTypeService;
     private final PropertyImageServiceImpl propertyImageService;
-    private final CoOwnerRepository coOwnerRepository;
-    private final AvailableTimeService availableTimeService;
-    private final ApartmentForRentMapper roomMapper;
     private final AvailableTimeRepository availableTimeRepository;
 
     @Override
-    public Page<ApartmentForRentResponse> gets(Date checkIn, Date checkOut, double min, double max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
-        var dto = availableTimeRepository.findApartmentForRent(checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
+    public Page<ApartmentForRentResponse> gets(Long resortId, Date checkIn, Date checkOut, Long min, Long max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
+        var dto = availableTimeRepository.findApartmentForRent(resortId, checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
 
-        var response = dto.map(roomMapper::toDtoResponse);
+        var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
         response.forEach(e -> {
             var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getProperty().getId());
             var propertyImages = propertyImageService.gets(e.getProperty().getId());
@@ -41,9 +35,9 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     }
 
     @Override
-    public ApartmentForRentResponse get(CoOwnerId coOwnerId) {
-        var dto = availableTimeRepository.findApartmentForRentByCoOwnerId(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).orElseThrow(() -> new EntityNotFoundException("No property for rent found."));
-        var response = roomMapper.toDtoResponse(dto);
+    public ApartmentForRentResponse get(Long availableId) {
+        var dto = availableTimeRepository.findApartmentForRentByCoOwnerId(availableId).orElseThrow(() -> new EntityNotFoundException("No property for rent found."));
+        var response = ApartmentForRentMapper.INSTANCE.toDtoResponse(dto);
         {
             var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(response.getProperty().getId());
             var propertyImages = propertyImageService.gets(response.getProperty().getId());
