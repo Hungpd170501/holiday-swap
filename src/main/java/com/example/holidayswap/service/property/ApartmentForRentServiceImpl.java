@@ -21,8 +21,8 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final AvailableTimeRepository availableTimeRepository;
 
     @Override
-    public Page<ApartmentForRentResponse> gets(Long resortId, Date checkIn, Date checkOut, Long min, Long max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
-        var dto = availableTimeRepository.findApartmentForRent(resortId, checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
+    public Page<ApartmentForRentResponse> gets(Long resortId, Date checkIn, Date checkOut, Long min, Long max, int guest, int numberBedsRoom, int numberBathRoom, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
+        var dto = availableTimeRepository.findApartmentForRent(resortId, checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
 
         var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
         response.forEach(e -> {
