@@ -103,9 +103,11 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  and ((cast(:checkIn as date ) is null)or  (date(at.startTime) >= date(:checkIn))
                  and ((cast(:checkOut as date) is null)or date(at.endTime) <= date(:checkOut)))
                  and co.status = 'ACCEPTED'
-                 and co.property.status = 'ACTIVE'
                  and tf.status = 'ACCEPTED'
+                 and at.status = 'OPEN'
+                 and p.status = 'ACTIVE'
                  and r.status = 'ACTIVE'
+                 and u.status = 'ACTIVE'
                and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
                and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
@@ -125,9 +127,11 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  where
                  at.id = :availableId
                  and co.status = 'ACCEPTED'
-                 and co.property.status = 'ACTIVE'
                  and tf.status = 'ACCEPTED'
+                 and at.status = 'OPEN'
+                 and p.status = 'ACTIVE'
                  and r.status = 'ACTIVE'
+                 and u.status = 'ACTIVE'
             """)
     Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("availableId") Long availableId);
 }
