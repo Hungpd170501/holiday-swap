@@ -1,19 +1,17 @@
 package com.example.holidayswap.service.property;
 
-import java.util.Date;
-import java.util.Set;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +21,8 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final AvailableTimeRepository availableTimeRepository;
 
     @Override
-    public Page<ApartmentForRentResponse> gets(Date checkIn, Date checkOut, double min, double max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
-        var dto = availableTimeRepository.findApartmentForRent(checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
+    public Page<ApartmentForRentResponse> gets(Long resortId, Date checkIn, Date checkOut, Long min, Long max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
+        var dto = availableTimeRepository.findApartmentForRent(resortId, checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
 
         var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
         response.forEach(e -> {

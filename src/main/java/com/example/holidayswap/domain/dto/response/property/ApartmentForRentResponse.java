@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.dto.response.property;
 
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
+import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ApartmentForRentResponse {
     private PropertyResponse property;
+    private ResortResponse resort;
     private AvailableTimeResponse availableTime;
 }
