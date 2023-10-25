@@ -11,7 +11,9 @@ import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.number.NumberFormatAnnotationFormatterFactory;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
@@ -48,6 +50,7 @@ public class WebConfig implements WebMvcConfigurer {
                 false, new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")));
         builder.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
+        converters.add(new ByteArrayHttpMessageConverter());
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
     }
 }
