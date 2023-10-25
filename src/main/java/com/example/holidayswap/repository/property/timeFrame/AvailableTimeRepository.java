@@ -85,6 +85,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = """
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            co.id,
             p, r, u, at
             )
             from AvailableTime at
@@ -126,6 +127,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = """
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            co.id,
                     p, r, u, at
             )
                  from AvailableTime at
