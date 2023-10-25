@@ -91,6 +91,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  inner join at.timeFrame tf
                  inner join tf.coOwner co
                  inner join co.property p
+                 inner join p.resort r
                  inner join co.user u
                  inner join p.inRoomAmenities ira
                  inner join p.propertyType pt
@@ -103,8 +104,9 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
                and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
+               AND (:locationName = '' OR unaccent(upper(r.locationFormattedName)) LIKE %:locationName%)
             """)
-    Page<ApartmentForRentDTO> findApartmentForRent(@Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") double min, @Param("max") double max, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
+    Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") double min, @Param("max") double max, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
 
     @Query(value = """
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (

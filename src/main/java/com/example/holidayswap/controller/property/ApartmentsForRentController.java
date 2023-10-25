@@ -25,7 +25,8 @@ public class ApartmentsForRentController {
     private final ApartmentForRentService roomService;
 
     @GetMapping
-    public ResponseEntity<Page<ApartmentForRentResponse>> gets(@RequestParam(value = "checkIn") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkIn,
+    public ResponseEntity<Page<ApartmentForRentResponse>> gets(@RequestParam(value = "locationName", defaultValue = "") String locationName,
+                                                               @RequestParam(value = "checkIn") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkIn,
                                                                @RequestParam(value = "checkOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkOut,
                                                                @RequestParam(name = "min") double min,
                                                                @RequestParam(name = "max") double max,
@@ -34,9 +35,10 @@ public class ApartmentsForRentController {
                                                                @RequestParam(name = "listOfPropertyType", required = false) Set<Long> listOfPropertyType,
                                                                @RequestParam(defaultValue = "0") Integer pageNo,
                                                                @RequestParam(defaultValue = "10") Integer pageSize,
-                                                               @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponse = roomService.gets(checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
+                                                               @RequestParam(defaultValue = "id") String sortBy,
+                                                               @RequestParam(defaultValue = "asc") String sortDirection) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        var dtoResponse = roomService.gets(locationName, checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
         return ResponseEntity.ok(dtoResponse);
     }
 

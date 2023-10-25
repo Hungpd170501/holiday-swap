@@ -9,6 +9,7 @@ import com.example.holidayswap.repository.property.timeFrame.AvailableTimeReposi
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
 import com.example.holidayswap.service.property.timeFame.AvailableTimeService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,8 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final AvailableTimeRepository availableTimeRepository;
 
     @Override
-    public Page<ApartmentForRentResponse> gets(Date checkIn, Date checkOut, double min, double max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
-        var dto = availableTimeRepository.findApartmentForRent(checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
+    public Page<ApartmentForRentResponse> gets(String locationName, Date checkIn, Date checkOut, double min, double max, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
+        var dto = availableTimeRepository.findApartmentForRent(StringUtils.stripAccents(locationName).toUpperCase(), checkIn, checkOut, min, max, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
 
         var response = dto.map(roomMapper::toDtoResponse);
         response.forEach(e -> {

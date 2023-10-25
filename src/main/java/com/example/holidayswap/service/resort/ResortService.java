@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ResortService {
-    Page<ResortResponse> gets(String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable);
+    Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable);
 
     ResortResponse get(Long id);
 
