@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserProfileResponse> findAllByEmailNamePhoneStatusRoleWithPagination(String email, String name, String phone, Set<UserStatus> statusSet, Set<Long> roleIds, Integer limit, Integer offset, String sortProps, String sortDirection) {
         return userRepository.findAllByEmailNamePhoneStatusRoleWithPagination(
-                        email, StringUtils.stripAccents(name), phone, statusSet, roleIds,
+                        email, StringUtils.stripAccents(name).toUpperCase(), phone, statusSet, roleIds,
                         PageRequest.of(offset, limit, Sort.by(Sort.Direction.fromString(sortDirection), sortProps)))
                 .map(UserMapper.INSTANCE::toUserProfileResponse);
     }

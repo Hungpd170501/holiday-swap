@@ -22,6 +22,7 @@ public class ApartmentsForRentController {
 
     @GetMapping
     public ResponseEntity<Page<ApartmentForRentResponse>> gets(
+            @RequestParam(value = "locationName", defaultValue = "") String locationName,
             @RequestParam(value = "resortId", required = false) Long resortId,
             @RequestParam(value = "checkIn", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkIn,
             @RequestParam(value = "checkOut", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date checkOut,
@@ -34,9 +35,10 @@ public class ApartmentsForRentController {
             @RequestParam(name = "listOfPropertyView", required = false) Set<Long> listOfPropertyView,
             @RequestParam(name = "listOfPropertyType", required = false) Set<Long> listOfPropertyType,
             @RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        var dtoResponse = roomService.gets(resortId, checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+            Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        var dtoResponse = roomService.gets(locationName, resortId, checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
         return ResponseEntity.ok(dtoResponse);
     }
 

@@ -82,8 +82,10 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             where upper(r.resortName) like upper(concat('%', :name, '%'))
             and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
             and ((:#{#listOfResortAmenity == null} = true) or (ra.id in :listOfResortAmenity))
+            AND (:locationName = '' OR unaccent(upper(r.locationFormattedName)) LIKE %:locationName%)
             """)
     Page<Resort> findAllByFilter(
+            @Param("locationName") String locationName,
             @Param("name") String name,
             @Param("listOfResortAmenity") Set<Long> listOfResortAmenity,
             @Param("resortStatus") ResortStatus resortStatus,
