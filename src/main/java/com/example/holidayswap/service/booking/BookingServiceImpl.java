@@ -18,10 +18,11 @@ import com.example.holidayswap.repository.booking.UserOfBookingRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
+import com.example.holidayswap.service.firebase.INotificationUserService;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -54,10 +55,12 @@ public class BookingServiceImpl implements IBookingService {
 
     private final UserOfBookingRepository userOfBookingRepository;
 
+    private final INotificationUserService notificationUserService;
+
 
     @Override
     @Transactional
-    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException {
+    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, FirebaseMessagingException {
         List<Booking> checkBookingOverlap;
         RLock fairLock = RedissonLockUtils.getFairLock("booking-" + bookingRequest.getPropertyId() + "-" + bookingRequest.getRoomId());
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
@@ -130,6 +133,8 @@ public class BookingServiceImpl implements IBookingService {
                     bookingDetail.setNumberOfGuests(bookingRequest.getUserOfBookingRequests().size());
                     amount += bookingDetail.getTotalPoint();
                     bookingDetailRepository.save(bookingDetail);
+                    notificationUserService.CreateNotificationByUserId(bookingDetail.getUserId(),"Booking Apartment",bookingDetail.getRoomId() +" book from" + bookingDetail.getCheckInDate() + " to "+ bookingDetail.getCheckOutDate() ,"ownerhistorybookingdetail/" + bookingDetail.getId());
+
                 }
 
 
@@ -140,6 +145,7 @@ public class BookingServiceImpl implements IBookingService {
 
                 booking.setStatus(EnumBookingStatus.BookingStatus.SUCCESS);
                 bookingRepository.save(booking);
+                notificationUserService.CreateNotificationByUserId(bookingRequest.getUserId(),"Booking Success","Pay for Booking" + booking.getId(),"bookingdetail/" + booking.getId());
 
                 return EnumBookingStatus.BookingStatus.SUCCESS;
             } finally {

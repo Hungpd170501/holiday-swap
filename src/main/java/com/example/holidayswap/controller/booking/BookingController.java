@@ -3,6 +3,7 @@ package com.example.holidayswap.controller.booking;
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.service.booking.IBookingService;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
     private final IBookingService bookingService;
     @PostMapping("/create")
-    public ResponseEntity<EnumBookingStatus.BookingStatus> createBooking(@RequestBody BookingRequest bookingRequest) throws InterruptedException {
+    public ResponseEntity<EnumBookingStatus.BookingStatus> createBooking(@RequestBody BookingRequest bookingRequest) throws InterruptedException, FirebaseMessagingException {
         return ResponseEntity.ok(bookingService.createBooking(bookingRequest));
     }
     @GetMapping("/historybooking")
