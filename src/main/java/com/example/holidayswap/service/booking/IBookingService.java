@@ -6,11 +6,12 @@ import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailR
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.google.firebase.messaging.FirebaseMessagingException;
 
 import java.util.List;
 
 public interface IBookingService {
-    EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException;
+    EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, FirebaseMessagingException;
 
     List<HistoryBookingResponse> historyBookingUserLogin();
 
