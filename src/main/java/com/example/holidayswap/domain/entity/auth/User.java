@@ -3,6 +3,7 @@ package com.example.holidayswap.domain.entity.auth;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
 import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
+import com.example.holidayswap.domain.entity.notification.Notification;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.Wallet;
 import com.example.holidayswap.domain.entity.subscription.Subscription;
@@ -120,6 +121,11 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user")
     private List<Booking> bookingList;
+
+    @OneToMany(mappedBy = "user",
+            orphanRemoval = true
+    )
+    private List<Notification> notifications;
 
 
     @Override
