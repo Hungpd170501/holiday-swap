@@ -21,7 +21,7 @@ public class NotificationController {
     private final PushNotificationService pushNotificationService;
     private final AuthUtils authUtils;
 
-    @GetMapping
+    @GetMapping("/current-user")
     public ResponseEntity<List<NotificationResponse>> getAllNotifications() {
         return ResponseEntity.ok(pushNotificationService.GetAllNotificationsByCurrentUser());
     }

@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
 public interface NotificationMapper {
     NotificationMapper INSTANCE = Mappers.getMapper(NotificationMapper.class);
 
-    @Mapping(source = "userId", target = "user", ignore = true)
+    @Mapping(source = "toUserId", target = "user", ignore = true)
     Notification toNotification(NotificationRequest notificationRequest);
 
     NotificationResponse toNotificationResponse(Notification notification);
