@@ -5,11 +5,13 @@ import com.example.holidayswap.domain.entity.payment.Wallet;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.payment.WalletRepository;
 import com.example.holidayswap.service.BankException;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@AllArgsConstructor
 public class WalletServiceImpl implements IWalletService {
 
     @Autowired
@@ -22,7 +24,6 @@ public class WalletServiceImpl implements IWalletService {
     public boolean TopUpWallet(Long userId, int amount) {
         Wallet userWallet = walletRepository.findByUser(userRepository.findById(userId).orElse(null));
         if (userWallet == null) userWallet = CreateWallet(userId);
-        if (userWallet == null) throw new BankException("Wallet not found");
 
         userWallet.setTotalPoint(userWallet.getTotalPoint() + amount);
         walletRepository.save(userWallet);
