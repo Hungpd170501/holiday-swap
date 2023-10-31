@@ -101,8 +101,11 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  ((:resortId is null) or (r.id = :resortId))
                  and ((:min is null) or ( at.pricePerNight >= cast(:min as double))
                  and ((:max is null) or at.pricePerNight <= cast(:max as double)))
-                 and ((cast(:checkIn as date ) is null)or  (date(at.startTime) >= date(:checkIn))
-                 and ((cast(:checkOut as date) is null)or date(at.endTime) <= date(:checkOut)))
+                 and (
+                    ((cast(:checkIn as date ) is null) and (cast(:checkOut as date) is null))
+                        or ((date(:checkOut) between date(at.startTime) and date(at.endTime))
+                        and (date(:checkIn)) between date(at.startTime) and date(at.endTime))
+                     )
                  and co.status = 'ACCEPTED'
                  and tf.status = 'ACCEPTED'
                  and at.status = 'OPEN'
