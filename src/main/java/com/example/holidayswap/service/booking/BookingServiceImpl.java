@@ -21,7 +21,6 @@ import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.firebase.INotificationUserService;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
@@ -60,7 +59,7 @@ public class BookingServiceImpl implements IBookingService {
 
     @Override
     @Transactional
-    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, FirebaseMessagingException {
+    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException {
         List<Booking> checkBookingOverlap;
         RLock fairLock = RedissonLockUtils.getFairLock("booking-" + bookingRequest.getPropertyId() + "-" + bookingRequest.getRoomId());
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
