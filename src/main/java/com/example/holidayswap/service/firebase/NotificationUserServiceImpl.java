@@ -4,7 +4,6 @@ import com.example.holidayswap.domain.dto.response.firebase.NotificationMessage;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.notification.NotificationUser;
 import com.example.holidayswap.repository.firebaseNotification.NotificationUserRepository;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class NotificationUserServiceImpl implements INotificationUserService{
 
     @Override
     @Transactional
-    public void CreateNotificationByUserId(Long userId,String title,String content, String link) throws FirebaseMessagingException {
+    public void CreateNotificationByUserId(Long userId,String title,String content, String link) {
 
         NotificationUser notificationUser = new NotificationUser();
         notificationUser.setUserId(userId);

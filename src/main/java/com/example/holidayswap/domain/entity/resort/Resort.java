@@ -1,10 +1,9 @@
 package com.example.holidayswap.domain.entity.resort;
 
-import com.example.holidayswap.domain.entity.address.Location;
+import com.example.holidayswap.domain.entity.address.District;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,16 +27,6 @@ public class Resort {
     private String resortName;
     @Column(name = "resort_description")
     private String resortDescription;
-    @Column(name = "location_id")
-    private Long locationId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinColumn(name = "location_id",
-            referencedColumnName = "location_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-    private Location location;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
     @Column(name = "resort_status")
@@ -60,4 +49,21 @@ public class Resort {
     @OneToMany(mappedBy = "resort")
     private List<Property> properties;
 
+    @Column(length = 450, name = "address_line")
+    private String addressLine;
+    @Column(name = "location_formatted_name")
+    private String locationFormattedName;
+    @Column(name = "location_description")
+    private String locationDescription;
+    @Column(name = "location_code", length = 35)
+    private String locationCode;
+    @Column(name = "postal_code", length = 35)
+    private String postalCode;
+    @Column
+    private Float latitude;
+    @Column
+    private Float longitude;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "district")
+    private District district;
 }

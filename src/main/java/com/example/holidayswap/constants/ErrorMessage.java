@@ -45,5 +45,6 @@ public class ErrorMessage {
     public static final String PLAN_NOT_FOUND = "Plan not found.";
     public static final String PLAN_ALREADY_EXISTS = "Plan already exists.";
     public static final String SUBSCRIPTION_NOT_FOUND = "Subscription not found.";
+    public static final String NOTIFICATION_NOT_FOUND = "Notification not found.";
     public static final String SERVICE_UNAVAILABLE = "Oops! Something went wrong. Please try again later or contact our support team for assistance.";
 }

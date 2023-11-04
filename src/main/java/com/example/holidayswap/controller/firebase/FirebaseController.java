@@ -5,7 +5,6 @@ import com.example.holidayswap.domain.entity.notification.NotificationUser;
 import com.example.holidayswap.service.firebase.IFirebaseMessagingService;
 import com.example.holidayswap.service.firebase.INotificationFirebaseService;
 import com.example.holidayswap.service.firebase.INotificationUserService;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class FirebaseController {
     private final INotificationUserService notificationUserService;
 
     @PostMapping("/send")
-    public String sendNotificationByToken(@RequestBody NotificationMessage notificationMessage) throws FirebaseMessagingException {
+    public String sendNotificationByToken(@RequestBody NotificationMessage notificationMessage)  {
         return firebaseMessagingService.sendNotificationByToken(notificationMessage);
     }
 

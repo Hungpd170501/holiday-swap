@@ -22,6 +22,7 @@ import com.example.holidayswap.service.firebase.INotificationUserService;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -160,6 +161,7 @@ public class BookingServiceImpl implements IBookingService {
         Object principal = authentication.getPrincipal();
         User user = (User) principal;
         List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
+        List<Booking> bookingList = bookingRepository.findAll();
         List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
         if (userBooking.size() > 0) {
             for (Booking booking : userBooking){
