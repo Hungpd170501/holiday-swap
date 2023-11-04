@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.property.timeFrame;
 
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Long> {
@@ -80,4 +82,72 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     and tf.status = 'ACCEPTED'
             """)
     List<AvailableTime> findAllByCoOwnerId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            co.id,
+            p, r, u, at
+            )
+            from AvailableTime at
+                 inner join at.timeFrame tf
+                 inner join tf.coOwner co
+                 inner join co.property p
+                 inner join p.resort r
+                 inner join co.user u
+                 inner join p.inRoomAmenities ira
+                 inner join p.propertyType pt
+                 inner join p.propertyView pv
+                 where
+                 ((:resortId is null) or (r.id = :resortId))
+                 and ((:min is null) or ( at.pricePerNight >= cast(:min as double))
+                 and ((:max is null) or at.pricePerNight <= cast(:max as double)))
+                 and (
+                    ((cast(:checkIn as date ) is null) and (cast(:checkOut as date) is null))
+                        or ((date(:checkOut) between date(at.startTime) and date(at.endTime))
+                        and (date(:checkIn)) between date(at.startTime) and date(at.endTime))
+                     )
+                 and co.status = 'ACCEPTED'
+                 and tf.status = 'ACCEPTED'
+                 and at.status = 'OPEN'
+                 and p.status = 'ACTIVE'
+                 and r.status = 'ACTIVE'
+                 and u.status = 'ACTIVE'
+               and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
+               and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
+               and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
+               and (p.numberKingBeds * 2
+               + p.numberQueenBeds * 2
+               + p. numberSingleBeds
+               + p.numberDoubleBeds * 2
+               + p.numberTwinBeds * 2
+               + p.numberFullBeds * 2
+               + p.numberMurphyBeds * 2
+               + p.numberSofaBeds * 2) >= :guest
+               and p.numberBedsRoom >= :numberBedsRoom
+               and p.numberBathRoom >= :numberBathRoom
+               AND (:locationName = '' OR unaccent(upper(r.locationFormattedName)) LIKE %:locationName%)
+            """)
+    Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName, @Param("resortId") Long resortId, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            co.id,
+                    p, r, u, at
+            )
+                 from AvailableTime at
+                 inner join at.timeFrame tf
+                 inner join tf.coOwner co
+                 inner join co.property p
+                 inner join p.resort r
+                 inner join co.user u
+                 where
+                 at.id = :availableId
+                 and co.status = 'ACCEPTED'
+                 and tf.status = 'ACCEPTED'
+                 and at.status = 'OPEN'
+                 and p.status = 'ACTIVE'
+                 and r.status = 'ACTIVE'
+                 and u.status = 'ACTIVE'
+            """)
+    Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("availableId") Long availableId);
 }

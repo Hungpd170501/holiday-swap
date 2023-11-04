@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
+import com.example.holidayswap.service.address.LocationService;
 import com.example.holidayswap.service.resort.ResortImageService;
 import com.example.holidayswap.service.resort.ResortService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityService;
@@ -28,13 +29,14 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/resorts")
 public class ResortsController {
-    final private ResortService resortService;
-    final private ResortImageService resortImageService;
-    final private ResortAmenityTypeService resortAmenityTypeService;
-    final private ResortAmenityService resortAmenityService;
+    private final ResortService resortService;
+    private final ResortImageService resortImageService;
+    private final ResortAmenityTypeService resortAmenityTypeService;
+    private final ResortAmenityService resortAmenityService;
 
     @GetMapping
     public ResponseEntity<Page<ResortResponse>> gets(
+            @RequestParam(value = "locationName", defaultValue = "") String locationName,
             @RequestParam(value = "nameResort", defaultValue = "") String nameResort,
             @RequestParam(value = "resortAmenity", required = false) Set<Long> listOfResortAmenity,
             @RequestParam(value = "resortStatus", required = false) ResortStatus resortStatus,
@@ -42,7 +44,7 @@ public class ResortsController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        return ResponseEntity.ok(resortService.gets(nameResort, listOfResortAmenity, resortStatus, pageable));
+        return ResponseEntity.ok(resortService.gets(locationName, nameResort, listOfResortAmenity, resortStatus, pageable));
     }
 
     @GetMapping("/{resortId}/resort-images")

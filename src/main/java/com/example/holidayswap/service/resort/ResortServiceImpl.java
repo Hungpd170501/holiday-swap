@@ -8,12 +8,21 @@ import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
+import com.example.holidayswap.domain.mapper.address.CountryMapper;
+import com.example.holidayswap.domain.mapper.address.DistrictMapper;
+import com.example.holidayswap.domain.mapper.address.LocationMapper;
+import com.example.holidayswap.domain.mapper.address.StateOrProvinceMapper;
 import com.example.holidayswap.domain.mapper.resort.ResortMapper;
+import com.example.holidayswap.repository.address.CountryRepository;
+import com.example.holidayswap.repository.address.DistrictRepository;
+import com.example.holidayswap.repository.address.StateOrProvinceRepository;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
+import com.example.holidayswap.service.address.LocationService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,18 +44,18 @@ public class ResortServiceImpl implements ResortService {
     private final ResortAmenityTypeService resortAmenityTypeService;
     private final ResortAmenityRepository resortAmenityRepository;
     private final PropertyTypeRespository propertyTypeRespository;
+    private final LocationService locationService;
 
     @Override
-    public Page<ResortResponse> gets(String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
+    public Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
         Page<Resort> entities = null;
-        entities = resortRepository.findAllByFilter(name, listOfResortAmenity, resortStatus, pageable);
-        var dtoReponses = entities.map(e -> {
+        entities = resortRepository.findAllByFilter(StringUtils.stripAccents(locationName).toUpperCase(), name, listOfResortAmenity, resortStatus, pageable);
+        return entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
             dto.setResortImages(resortImageService.gets(e.getId()));
             dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
             return dto;
         });
-        return dtoReponses;
     }
 
     @Override
@@ -59,7 +68,9 @@ public class ResortServiceImpl implements ResortService {
 
         return dtoResponse;
     }
-
+    private final DistrictRepository districtRepository;
+    private final StateOrProvinceRepository stateOrProvinceRepository;
+    private final CountryRepository countryRepository;
     @Override
     @Transactional
     public ResortResponse create(ResortRequest resortRequest) {
@@ -77,17 +88,31 @@ public class ResortServiceImpl implements ResortService {
         });
         entity.setAmenities(resortAmenities);
         entity.setPropertyTypes(propertyTypes);
-        Long id = resortRepository.save(entity).getId();
-        return get(id);
+        LocationMapper.INSTANCE.updateLocation(entity, LocationMapper.INSTANCE.toResort(resortRequest.getLocation()));
+        districtRepository.findByCodeEquals(resortRequest.getLocation().getDistrict().getCode())
+                .ifPresentOrElse(
+                        entity::setDistrict,
+                        () -> entity.setDistrict(DistrictMapper.INSTANCE.toDistrict(resortRequest.getLocation().getDistrict())));
+        stateOrProvinceRepository.findByCodeEquals(resortRequest.getLocation().getStateOrProvince().getCode())
+                .ifPresentOrElse(
+                        entity.getDistrict()::setStateProvince,
+                        () -> entity.getDistrict()
+                                .setStateProvince(
+                                        StateOrProvinceMapper.INSTANCE.toStateOrProvince(resortRequest.getLocation().getStateOrProvince())));
+        countryRepository.findByCodeEquals(resortRequest.getLocation().getCountry().getCode())
+                .ifPresentOrElse(
+                        entity.getDistrict().getStateProvince()::setCountry,
+                        () -> entity.getDistrict().getStateProvince()
+                                .setCountry(CountryMapper.INSTANCE.toCountry(resortRequest.getLocation().getCountry()))
+                );
+        return ResortMapper.INSTANCE.toResortResponse(resortRepository.save(entity));
     }
 
     @Override
     @Transactional
     public ResortResponse create(ResortRequest resortRequest, List<MultipartFile> resortImage) {
         var entity = create(resortRequest);
-        resortImage.forEach(e -> {
-            resortImageService.create(entity.getId(), e);
-        });
+        resortImage.forEach(e -> resortImageService.create(entity.getId(), e));
         return get(entity.getId());
     }
 

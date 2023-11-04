@@ -1,29 +1,23 @@
 package com.example.holidayswap.domain.dto.response.property;
 
+import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.Property;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
+import com.example.holidayswap.domain.entity.resort.Resort;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ApartmentForRentDTO {
-    CoOwnerId coOwnerId;
-    CoOwner coOwner;
-    private double pricePerNight;
+    private CoOwnerId coOwnerId;
     private Property property;
-    private List<AvailableTime> availableTimes;
-
-    public ApartmentForRentDTO(CoOwnerId coOwnerId, CoOwner coOwner, double pricePerNight, Property property) {
-        this.coOwnerId = coOwnerId;
-        this.coOwner = coOwner;
-        this.pricePerNight = pricePerNight;
-        this.property = property;
-    }
+    private Resort resort;
+    private User user;
+    private AvailableTime availableTime;
 }

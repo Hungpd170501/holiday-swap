@@ -1,15 +1,14 @@
-package com.example.holidayswap.domain.entity.chat;
+package com.example.holidayswap.domain.entity.notification;
 
+import com.example.holidayswap.domain.entity.auth.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Data
 @NoArgsConstructor
@@ -31,9 +30,19 @@ public class Notification {
     @Column
     private String content;
 
+    @Column
+    private String href;
+
     @CreationTimestamp
-    private ZonedDateTime createdOn;
+    private LocalDateTime createdOn;
 
     @Column
-    private Integer status;
+    private Boolean isRead;
+
+    @Column
+    private Boolean isDeleted;
+
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
 }

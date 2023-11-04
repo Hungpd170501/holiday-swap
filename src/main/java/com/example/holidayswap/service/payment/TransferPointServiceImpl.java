@@ -102,7 +102,6 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 transactLog.setWalletTo(toWallet);
                 transactLog.setToTotalPoint(toWallet.getTotalPoint());
                 transactLog.setFromTotalPoint(fromWallet.getTotalPoint());
-
                 walletRepository.save(fromWallet);
                 walletRepository.save(toWallet);
                 transactLogRepository.save(transactLog);
