@@ -17,6 +17,6 @@ public class HistoryDetailBookingOwnerResponse {
     private String status;
     private List<UserOfBooking> userOfBooking;
     private Double price;
-    private Double commission;
+    private String commission;
     private Double total;
 }
