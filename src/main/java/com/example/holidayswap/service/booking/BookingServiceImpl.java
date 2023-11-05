@@ -10,10 +10,8 @@ import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
-import com.example.holidayswap.repository.booking.BookingDetailRepository;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.booking.UserOfBookingRepository;
-import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.payment.ITransferPointService;
@@ -28,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -96,8 +93,7 @@ public class BookingServiceImpl implements IBookingService {
 
                 //TODO trừ point trong ví
 
-                transferPointService.payBooking(bookingRequest.getUserId(), booking.getId(), booking.getPrice());
-                booking = bookingRepository.findById(booking.getId()).get();
+                transferPointService.payBooking(booking);
                 //create notification for user booking
                 notificationRequestForUserBooking.setSubject("Booking Success");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());

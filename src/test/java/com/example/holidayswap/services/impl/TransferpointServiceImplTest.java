@@ -1,7 +1,6 @@
 package com.example.holidayswap.services.impl;
 
 import com.example.holidayswap.domain.entity.payment.Wallet;
-import com.example.holidayswap.repository.booking.BookingDetailRepository;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.payment.AdminWalletRepository;
 import com.example.holidayswap.repository.payment.AllLogRepository;
@@ -29,7 +28,6 @@ public class TransferpointServiceImplTest {
     ILoggingService loggingService;
     TransactLogRepository transactLogRepository;
     BookingRepository bookingRepository;
-    BookingDetailRepository bookingDetailRepository;
     WalletRepository walletRepository;
     UserService userService;
     AllLogRepository allLogRepository;
@@ -44,13 +42,12 @@ public class TransferpointServiceImplTest {
         loggingService = mock(ILoggingService.class);
         transactLogRepository = mock(TransactLogRepository.class);
         bookingRepository = mock(BookingRepository.class);
-        bookingDetailRepository = mock(BookingDetailRepository.class);
         walletRepository = mock(WalletRepository.class);
         userService = mock(UserService.class);
         allLogRepository = mock(AllLogRepository.class);
         adminWalletRepository = mock(AdminWalletRepository.class);
         transactionBookingRefundOwnerService = mock(ITransactionBookingRefundOwnerService.class);
-        tra = new TransferPointServiceImpl(walletService, allLogPayBookingService, loggingService, transactLogRepository, bookingRepository, bookingDetailRepository, walletRepository, userService, allLogRepository, adminWalletRepository, transactionBookingRefundOwnerService);
+        tra = new TransferPointServiceImpl(walletService, allLogPayBookingService, loggingService, transactLogRepository, walletRepository, userService, allLogRepository, adminWalletRepository, transactionBookingRefundOwnerService);
     }
 
     @Test
