@@ -122,6 +122,9 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
     @OneToMany(mappedBy = "user")
     private List<Booking> bookingList;
 
+    @OneToMany(mappedBy = "userOwner")
+    private List<Booking> ownerBookingList;
+
     @OneToMany(mappedBy = "user",
             orphanRemoval = true
     )

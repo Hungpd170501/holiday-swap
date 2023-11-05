@@ -13,20 +13,15 @@ import com.example.holidayswap.service.payment.*;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.redisson.RedissonReadLock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.redisson.api.RLock;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TransferpointServiceImplTest {
     IWalletService walletService;
@@ -61,23 +56,22 @@ public class TransferpointServiceImplTest {
     @Test
     void transferPoint_ShouldthrowError_WhenWalletNotFound() throws InterruptedException {
         RLock fairLock = mock(RLock.class);
-        Object o = new Object();
-        Wallet walletFrom = null;
-        Wallet WalletTo = null;
+        Wallet walletFrom = new Wallet();
+        walletFrom.setId(1L);
         Long userIdFrom = 1L;
         Long userIdTo = 2L;
-        when(RedissonLockUtils.getFairLock(anyString())).thenReturn((RLock) o);
-        when(fairLock.tryLock(10, 10, TimeUnit.SECONDS)).thenReturn(true);
+        try(MockedStatic<RedissonLockUtils> redissonLockUtilsMockedStatic = Mockito.mockStatic(RedissonLockUtils.class)) {
+            redissonLockUtilsMockedStatic.when(() -> RedissonLockUtils.getFairLock("wallet-" + walletFrom.getId())).thenReturn(fairLock);
+            when(fairLock.tryLock(10, 10, TimeUnit.SECONDS)).thenReturn(true);
 
-        when(walletService.GetWalletByUserId(1L)).thenReturn(walletFrom);
-        when(walletService.GetWalletByUserId(2L)).thenReturn(WalletTo);
-        when(fairLock.tryLock(10, 10, TimeUnit.SECONDS)).thenReturn(true);
+            when(walletService.GetWalletByUserId(1L)).thenReturn(walletFrom);
+            when(walletService.GetWalletByUserId(2L)).thenReturn(null);
+            BankException actualException = assertThrows(BankException.class, () -> {
+                tra.transferPoint(userIdFrom, userIdTo, 100);
+            });
+            assertEquals("Account not found", actualException.getMessage());
+        }
 
-        when(walletService.GetWalletByUserId(1L)).thenReturn(walletFrom);
-        when(walletService.GetWalletByUserId(2L)).thenReturn(WalletTo);
-        BankException actualException = assertThrows(BankException.class, () -> {
-            tra.transferPoint(userIdFrom,userIdTo,100);
-        });
-        assertEquals("Account not found", actualException.getMessage());
-    }
+        }
+
 }

@@ -7,8 +7,7 @@ import java.util.List;
 
 @Data
 public class BookingRequest {
-    private Long propertyId;
-    private String roomId;
+    private Long availableTimeId;
     private Long userId;
     private Date checkInDate;
     private Date checkOutDate;
