@@ -1,13 +1,19 @@
 package com.example.holidayswap.service.auth;
 
+import com.amazonaws.AmazonServiceException;
+import com.example.holidayswap.domain.dto.request.auth.UserProfileUpdateRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
+import com.example.holidayswap.domain.dto.request.auth.UserUpdateRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.auth.UserStatus;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.auth.UserMapper;
+import com.example.holidayswap.repository.auth.RoleRepository;
 import com.example.holidayswap.repository.auth.UserRepository;
+import com.example.holidayswap.service.FileService;
 import com.example.holidayswap.service.payment.IWalletService;
+import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -18,17 +24,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.example.holidayswap.constants.ErrorMessage.PROFILE_NOT_FOUND;
-import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileService fileService;
+    private final RoleRepository roleRepository;
+    private final AuthUtils authUtils;
 
     private final IWalletService walletService;
 
@@ -81,9 +90,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createUser(UserRequest userRequest) {
+    public void createUser(UserRequest userRequest) throws IOException {
+        var role = roleRepository.findById(userRequest.getRoleId())
+                .orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
         var user = UserMapper.INSTANCE.toUserEntity(userRequest);
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
+        if (userRequest.getAvatar() != null) {
+            user.setAvatar(fileService.uploadFile(userRequest.getAvatar()));
+        }
+        user.setRole(role);
         userRepository.save(user);
         walletService.CreateWallet(user.getUserId());
     }
@@ -96,5 +111,39 @@ public class UserServiceImpl implements UserService {
         }, () -> {
             throw new EntityNotFoundException(USER_NOT_FOUND);
         });
+    }
+
+    @Override
+    public void updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
+        var role = roleRepository.findById(userUpdateRequest.getRoleId())
+                .orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
+        userRepository.findById(userId).ifPresentOrElse(user -> {
+            UserMapper.INSTANCE.toUserEntity(user, userUpdateRequest);
+            if (userUpdateRequest.getAvatar() != null) {
+                try {
+                    user.setAvatar(fileService.uploadFile(userUpdateRequest.getAvatar()));
+                } catch (IOException e) {
+                    throw new AmazonServiceException("Error while uploading avatar");
+                }
+            }
+            user.setRole(role);
+            userRepository.save(user);
+        }, () -> {
+            throw new EntityNotFoundException(USER_NOT_FOUND);
+        });
+    }
+
+    @Override
+    public void updateUserProfile(UserProfileUpdateRequest userProfileUpdateRequest) {
+        var user = authUtils.getAuthenticatedUser();
+        UserMapper.INSTANCE.toUserEntity(user, userProfileUpdateRequest);
+        if (userProfileUpdateRequest.getAvatar() != null) {
+            try {
+                user.setAvatar(fileService.uploadFile(userProfileUpdateRequest.getAvatar()));
+            } catch (IOException e) {
+                throw new AmazonServiceException("Error while uploading avatar");
+            }
+        }
+        userRepository.save(user);
     }
 }

@@ -41,8 +41,8 @@ public class WalletServiceImpl implements IWalletService {
             wallet.setUser(user);
             wallet.setTotalPoint(0D);
             wallet.setStatus(true);
-            walletRepository.save(wallet);
             user.setWallet(wallet);
+            walletRepository.save(wallet);
             return wallet;
         }
         return userWallet;

@@ -1,15 +1,19 @@
 package com.example.holidayswap.controller.auth;
 
+import com.example.holidayswap.domain.dto.request.auth.UserProfileUpdateRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
+import com.example.holidayswap.domain.dto.request.auth.UserUpdateRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.entity.auth.UserStatus;
 import com.example.holidayswap.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Set;
 
 @RestController
@@ -52,8 +56,8 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
-    public ResponseEntity<Void> registerUser(@RequestBody UserRequest userRequest) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> registerUser(@ModelAttribute UserRequest userRequest) throws IOException {
         userService.createUser(userRequest);
         return ResponseEntity.noContent().build();
     }
@@ -64,6 +68,18 @@ public class UserController {
     @PutMapping("/{userId}/status")
     public ResponseEntity<Void> updateUserStatus(@PathVariable("userId") Long userId, @RequestBody UserStatus status) {
         userService.updateUserStatus(userId, status);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateUser(@PathVariable("userId") Long userId, @ModelAttribute UserUpdateRequest userUpdateRequest) throws IOException {
+        userService.updateUser(userId, userUpdateRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateUserProfile(@ModelAttribute UserProfileUpdateRequest userUpdateRequest){
+        userService.updateUserProfile(userUpdateRequest);
         return ResponseEntity.noContent().build();
     }
 }
