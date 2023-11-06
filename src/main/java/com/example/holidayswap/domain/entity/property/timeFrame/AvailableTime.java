@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.property.timeFrame;
 
+import com.example.holidayswap.domain.entity.booking.Booking;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -48,4 +50,7 @@ public class  AvailableTime {
             insertable = false,
             updatable = false)
     private TimeFrame timeFrame;
+
+    @OneToMany(mappedBy = "availableTime")
+    private List<Booking> bookings;
 }

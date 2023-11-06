@@ -2,6 +2,7 @@ package com.example.holidayswap.service.payment;
 
 import com.example.holidayswap.domain.dto.response.payment.TransactionTranferPointResponse;
 import com.example.holidayswap.domain.dto.response.payment.TransferResponse;
+import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.payment.AllLog;
 
 import java.util.List;
@@ -12,5 +13,5 @@ public interface ITransferPointService {
     List<TransactionTranferPointResponse> getTransactionTranferPointByUserId(Long userId);
 
     List<TransactionTranferPointResponse> convertAllLogToTransactionTranferPointResponse(List<AllLog> allLogs, Long userId);
-    TransferResponse payBooking(long userId, long bookingId, Double amount) throws InterruptedException;
+    TransferResponse payBooking(Booking booking) throws InterruptedException;
 }

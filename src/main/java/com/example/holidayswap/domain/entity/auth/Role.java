@@ -38,7 +38,7 @@ public class Role {
     private LocalDateTime createdOn;
 
     @OneToMany(mappedBy = "role",
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            cascade = {CascadeType.MERGE, CascadeType.REMOVE},
             orphanRemoval = true
     )
     private List<User> users;

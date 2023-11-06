@@ -113,8 +113,8 @@ public class Property {
             joinColumns = @JoinColumn(name = "property_id"),
             inverseJoinColumns = @JoinColumn(name = "in_room_amenity_id"))
     private List<InRoomAmenity> inRoomAmenities;
-    @OneToMany(mappedBy = "property")
-    private List<Booking> bookingList;
+//    @OneToMany(mappedBy = "property")
+//    private List<Booking> bookingList;
     @OneToMany(mappedBy = "property")
     private List<CoOwner> coOwners;
 }

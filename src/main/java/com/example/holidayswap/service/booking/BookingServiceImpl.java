@@ -1,26 +1,22 @@
 package com.example.holidayswap.service.booking;
 
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
-import com.example.holidayswap.domain.dto.request.booking.UserOfBookingRequest;
+import com.example.holidayswap.domain.dto.request.notification.NotificationRequest;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
+import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
-import com.example.holidayswap.domain.entity.booking.BookingDetail;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
-import com.example.holidayswap.repository.booking.BookingDetailRepository;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.booking.UserOfBookingRepository;
-import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
-import com.example.holidayswap.repository.resort.ResortRepository;
+import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -30,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -38,114 +33,83 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 
 public class BookingServiceImpl implements IBookingService {
-
     private final AvailableTimeRepository availableTimeRepository;
-
     private final BookingRepository bookingRepository;
-
     private final ITransferPointService transferPointService;
-
-    private final BookingDetailRepository bookingDetailRepository;
-
-    private final PropertyRepository propertyRepository;
-
     private final IUserOfBookingService userOfBookingService;
-
     private final UserOfBookingRepository userOfBookingRepository;
+    private final PushNotificationService pushNotificationService;
 
 
     @Override
     @Transactional
     public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException {
+
+        if (bookingRequest.getCheckInDate().compareTo(bookingRequest.getCheckOutDate()) >= 0)
+            throw new EntityNotFoundException("Check in date must be before check out date");
+
         List<Booking> checkBookingOverlap;
-        RLock fairLock = RedissonLockUtils.getFairLock("booking-" + bookingRequest.getPropertyId() + "-" + bookingRequest.getRoomId());
+        var notificationRequestForOwner = new NotificationRequest();
+        var notificationRequestForUserBooking = new NotificationRequest();
+        LocalDate localDateCheckin;
+        LocalDate localDateCheckout;
+        long days;
+        RLock fairLock = RedissonLockUtils.getFairLock("booking-" + bookingRequest.getAvailableTimeId());
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
         if (tryLock) {
             try {
                 // check List AvailableTime of this apartment
-                AvailableTime timeDepositeCheck = null;
-                Double amount = 0.0;
-                AvailableTime timeDepositeLast;
-                Date intersection_date = bookingRequest.getCheckOutDate();
-                List<AvailableTime> AvailableTimes = availableTimeRepository.findAllByPropertyIdAndRoomIdBetweenDate(bookingRequest.getPropertyId(), bookingRequest.getRoomId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+//                Double amount = 0.0;
+//                Date intersection_date = bookingRequest.getCheckOutDate();
+                AvailableTime availableTime = availableTimeRepository.findAvailableTimeByIdAndStartTimeAndEndTime(bookingRequest.getAvailableTimeId(),bookingRequest.getCheckInDate(),bookingRequest.getCheckOutDate()).orElseThrow(() -> new EntityNotFoundException("This availableTime not available in this time"));
 
-                if (AvailableTimes.size() == 0) {
-                    throw new EntityNotFoundException("This apartment is not available in this time");
-                }
 //                 TODO: check booking of this apartment
-                checkBookingOverlap = bookingRepository.checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getRoomId(), bookingRequest.getPropertyId());
-                if (!checkBookingOverlap.isEmpty()) {
-                    throw new EntityNotFoundException("This apartment is not available in this time");
-                }
+                checkBookingOverlap = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(bookingRequest.getAvailableTimeId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
 
-                for (AvailableTime AvailableTime : AvailableTimes) {
-                    if (timeDepositeCheck != null) {
-                        if (AvailableTime.getStartTime().compareTo(timeDepositeCheck.getEndTime()) != 0) {
-                            throw new EntityNotFoundException("This apartment is not available in this time");
-                        }
-                    }
-                    timeDepositeCheck = AvailableTime;
-                }
+                if (!checkBookingOverlap.isEmpty())
+                    throw new EntityNotFoundException("This apartment is not available in this time");
 
 
                 // TODO: create booking
+                localDateCheckin = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingRequest.getCheckInDate()));
+                localDateCheckout = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingRequest.getCheckOutDate()));
+                days = ChronoUnit.DAYS.between(localDateCheckin, localDateCheckout);
 
                 Booking booking = new Booking();
                 booking.setCheckInDate(bookingRequest.getCheckInDate());
                 booking.setCheckOutDate(bookingRequest.getCheckOutDate());
-                booking.setRoomId(bookingRequest.getRoomId());
-                booking.setPropertyId(bookingRequest.getPropertyId());
-                booking.setUserId(bookingRequest.getUserId());
-                booking.setStatus(EnumBookingStatus.BookingStatus.PENDING);
-                booking.setPrice(0D);
-
+                booking.setUserBookingId(bookingRequest.getUserId());
+                booking.setOwnerId(availableTime.getTimeFrame().getCoOwner().getId().getUserId());
+                booking.setAvailableTimeId(bookingRequest.getAvailableTimeId());
+                booking.setAvailableTime(availableTime);
+                booking.setTotalDays(days);
+                booking.setPrice(days * availableTime.getPricePerNight());
+                booking.setCommission(10D);
+                booking.setActualPrice(booking.getPrice() - booking.getPrice() * booking.getCommission() / 100);
+                booking.setStatus(EnumBookingStatus.BookingStatus.SUCCESS);
                 bookingRepository.save(booking);
-
-                userOfBookingService.saveUserOfBooking(booking.getId(),bookingRequest.getUserOfBookingRequests());
-                // TODO: createBooking detail
-
-                for (AvailableTime AvailableTime : AvailableTimes) {
-
-                    BookingDetail bookingDetail = new BookingDetail();
-                    bookingDetail.setBookId(booking.getId());
-                    bookingDetail.setPropertyId(bookingRequest.getPropertyId());
-                    bookingDetail.setRoomId(bookingRequest.getRoomId());
-                    bookingDetail.setUserId(AvailableTime.getTimeFrame().getUserId());
-                    bookingDetail.setCheckInDate(bookingRequest.getCheckInDate());
-                    if (AvailableTimes.size() > 1) {
-                        bookingRequest.setCheckInDate(AvailableTime.getEndTime());
-                        intersection_date = AvailableTime.getEndTime();
-                    }
-                    if (AvailableTime.equals(AvailableTimes.get(AvailableTimes.size() - 1))) {
-                        intersection_date = bookingRequest.getCheckOutDate();
-                    }
-                    bookingDetail.setCheckOutDate(intersection_date);
-
-                    LocalDate localDateCheckin = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingDetail.getCheckInDate()));
-                    LocalDate localDateCheckout = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingDetail.getCheckOutDate()));
-                    long days = ChronoUnit.DAYS.between(localDateCheckin, localDateCheckout);
-                    bookingDetail.setTotalPoint((double) days * AvailableTime.getPricePerNight());
-                    booking.setPrice(booking.getPrice() + bookingDetail.getTotalPoint());
-                    bookingDetail.setNumberOfGuests(bookingRequest.getUserOfBookingRequests().size());
-                    amount += bookingDetail.getTotalPoint();
-                    bookingDetailRepository.save(bookingDetail);
-                }
+                userOfBookingService.saveUserOfBooking(booking.getId(), bookingRequest.getUserOfBookingRequests());
 
 
                 //TODO trừ point trong ví
 
-
-                transferPointService.payBooking(bookingRequest.getUserId(), booking.getId(), amount);
-
-                booking.setStatus(EnumBookingStatus.BookingStatus.SUCCESS);
-                bookingRepository.save(booking);
-
+                transferPointService.payBooking(booking);
+                //create notification for user booking
+                notificationRequestForUserBooking.setSubject("Booking Success");
+                notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
+                notificationRequestForUserBooking.setToUserId(bookingRequest.getUserId());
+                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                //create notification for owner
+                notificationRequestForOwner.setSubject("Booking Apartment + " + booking.getActualPrice() + " point");
+                notificationRequestForOwner.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
+                notificationRequestForOwner.setToUserId(booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getUserId());
+                pushNotificationService.CreateNotification(notificationRequestForOwner);
                 return EnumBookingStatus.BookingStatus.SUCCESS;
             } finally {
                 fairLock.unlock();
             }
         }
-        return EnumBookingStatus.BookingStatus.SUCCESS;
+        return EnumBookingStatus.BookingStatus.FAILED;
     }
 
     @Override
@@ -154,12 +118,10 @@ public class BookingServiceImpl implements IBookingService {
         Object principal = authentication.getPrincipal();
         User user = (User) principal;
         List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
-        List<Booking> bookingList = bookingRepository.findAll();
         List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
         if (userBooking.size() > 0) {
-            for (Booking booking : userBooking){
-                Property property = propertyRepository.findById(booking.getPropertyId()).get();
-                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(),booking.getCheckInDate(),booking.getCheckOutDate(),"check",booking.getRoomId(),property.getResort().getResortName(),booking.getStatus().name(),booking.getPrice()));
+            for (Booking booking : userBooking) {
+                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getPrice()));
             }
         }
         return historyBookingResponses;
@@ -171,15 +133,53 @@ public class BookingServiceImpl implements IBookingService {
         var listUserOfBookingEntity = userOfBookingRepository.findAllByBookingId(bookingId);
 
         var historyBookingDetailResponse = new HistoryBookingDetailResponse();
-        historyBookingDetailResponse.setResortName(booking.getProperty().getResort().getResortName());
+        historyBookingDetailResponse.setResortName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName());
         historyBookingDetailResponse.setDateCheckIn(booking.getCheckInDate());
         historyBookingDetailResponse.setDateCheckOut(booking.getCheckOutDate());
-        historyBookingDetailResponse.setRoomId(booking.getRoomId());
+        historyBookingDetailResponse.setRoomId(booking.getAvailableTime().getTimeFrame().getRoomId());
         historyBookingDetailResponse.setPrice(booking.getPrice());
-        historyBookingDetailResponse.setNumberOfGuest(booking.getBookingDetail().get(0).getNumberOfGuests());
-        historyBookingDetailResponse.setOwnerEmail(booking.getBookingDetail().get(0).getCoOwner().getUser().getEmail());
+        historyBookingDetailResponse.setNumberOfGuest(booking.getUserOfBookings().size());
+        historyBookingDetailResponse.setOwnerEmail(booking.getAvailableTime().getTimeFrame().getCoOwner().getUser().getEmail());
         historyBookingDetailResponse.setStatus(booking.getStatus().name());
-        historyBookingDetailResponse.setPropertyName(booking.getProperty().getPropertyName());
+        historyBookingDetailResponse.setPropertyName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
+        historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
+
+        return historyBookingDetailResponse;
+    }
+
+    @Override
+    public List<HistoryBookingResponse> historyBookingOwnerLogin() {
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        User user = (User) principal;
+
+        List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
+        var bookingList = bookingRepository.findAllByOwnerLogin(user.getUserId());
+        if (bookingList.size() > 0) {
+            for (Booking booking : bookingList) {
+                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getActualPrice()));
+            }
+        }
+        return historyBookingResponses;
+    }
+
+    @Override
+    public HistoryDetailBookingOwnerResponse historyBookingDetailOwner(Long bookingId) {
+        var booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+        var listUserOfBookingEntity = userOfBookingRepository.findAllByBookingId(bookingId);
+
+        var historyBookingDetailResponse = new HistoryDetailBookingOwnerResponse();
+        historyBookingDetailResponse.setResortName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName());
+        historyBookingDetailResponse.setDateCheckIn(booking.getCheckInDate());
+        historyBookingDetailResponse.setDateCheckOut(booking.getCheckOutDate());
+        historyBookingDetailResponse.setRoomId(booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId());
+        historyBookingDetailResponse.setPrice(booking.getPrice());
+        historyBookingDetailResponse.setNumberOfGuest(booking.getUserOfBookings().size());
+        historyBookingDetailResponse.setMemberBookingEmail(booking.getUser().getEmail());
+        historyBookingDetailResponse.setStatus(booking.getStatus().name());
+        historyBookingDetailResponse.setPropertyName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
+        historyBookingDetailResponse.setCommission(booking.getCommission() + "%");
+        historyBookingDetailResponse.setTotal(booking.getActualPrice());
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
 
         return historyBookingDetailResponse;

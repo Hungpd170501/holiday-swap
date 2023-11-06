@@ -9,6 +9,7 @@ import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.notification.NotificationRepository;
 import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     private final NotificationRepository notificationRepository;
     private final AuthUtils authUtils;
     private final UserRepository userRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public List<NotificationResponse> GetAllNotificationsByCurrentUser() {
@@ -87,5 +90,11 @@ public class PushNotificationServiceImpl implements PushNotificationService {
                     notificationRepository.save(notification);
                 }
         );
+    }
+
+    @Override
+    public void CreateNotification(NotificationRequest notificationRequest) {
+        var notification = SendNotificationToUser(notificationRequest);
+        messagingTemplate.convertAndSend("/topic/notification-" + notificationRequest.getToUserId(), notification);
     }
 }

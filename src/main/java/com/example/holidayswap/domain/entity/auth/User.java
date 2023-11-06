@@ -95,7 +95,7 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id", referencedColumnName = "wallet_id")
     private Wallet wallet;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "role_id")
     private Role role;
 
@@ -121,6 +121,9 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user")
     private List<Booking> bookingList;
+
+    @OneToMany(mappedBy = "userOwner")
+    private List<Booking> ownerBookingList;
 
     @OneToMany(mappedBy = "user",
             orphanRemoval = true

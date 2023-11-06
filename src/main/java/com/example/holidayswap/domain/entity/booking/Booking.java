@@ -3,6 +3,7 @@ package com.example.holidayswap.domain.entity.booking;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.property.Property;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,25 +26,33 @@ public class Booking {
     @Column(name = "book_id")
     private Long id;
 
-    @Column(name = "property_id", nullable = false)
-    private Long propertyId;
+    @Column(name = "available_time_id", nullable = false)
+    private Long availableTimeId;
     @ManyToOne
-    @JoinColumn(name = "property_id", referencedColumnName = "property_id", nullable = false,
+    @JoinColumn(name = "available_time_id", referencedColumnName = "available_time_id", nullable = false,
             insertable = false,
             updatable = false)
-    private Property property;
+    private AvailableTime availableTime;
 
-    @Column(name = "room_id", nullable = false)
-    private String roomId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_booking_id", nullable = false)
+    private Long userBookingId;
+
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
+
+    @Column(name = "total_days", nullable = false)
+    private Long totalDays;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false,
+    @JoinColumn(name = "user_booking_id", referencedColumnName = "user_id", nullable = false,
             insertable = false,
             updatable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id", referencedColumnName = "user_id", nullable = false, insertable = false, updatable = false)
+    private User userOwner;
 
     @Column(name = "price", nullable = false)
     private Double price;
@@ -54,8 +63,14 @@ public class Booking {
     @Column(name = "check_out_date", nullable = false)
     private Date checkOutDate;
 
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    private List<BookingDetail> bookingDetail;
+    @Column(name = "commission", nullable = false)
+    private Double commission;
+
+    @Column (name = "actual_price", nullable = false)
+    private Double actualPrice;
+
+//    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+//    private List<BookingDetail> bookingDetail;
 
     @OneToMany(mappedBy = "booking")
     private Set<UserOfBooking> userOfBookings;

@@ -17,4 +17,6 @@ public interface PushNotificationService {
     void DeleteNotificationByNotificationId(Long notificationId);
 
     void DeleteAllNotificationsByCurrentUser();
+
+    void CreateNotification(NotificationRequest notificationRequest);
 }

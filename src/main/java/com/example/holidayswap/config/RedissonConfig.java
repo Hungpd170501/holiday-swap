@@ -20,6 +20,7 @@ public class RedissonConfig {
     @Value("${redis.port}")
     private String port;
 
+
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();

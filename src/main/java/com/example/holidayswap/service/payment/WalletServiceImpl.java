@@ -19,6 +19,8 @@ public class WalletServiceImpl implements IWalletService {
     @Autowired
     private UserRepository userRepository;
 
+//    private final INotificationUserService notificationUserService;
+
     @Override
     @Transactional
     public boolean TopUpWallet(Long userId, int amount) {
@@ -26,7 +28,14 @@ public class WalletServiceImpl implements IWalletService {
         if (userWallet == null) userWallet = CreateWallet(userId);
 
         userWallet.setTotalPoint(userWallet.getTotalPoint() + amount);
+
         walletRepository.save(userWallet);
+
+//        try {
+//            notificationUserService.CreateNotificationByUserId(userId,"Deposit from VN Pay","+ " + amount,"/wallet");
+//        } catch (FirebaseMessagingException e) {
+//            throw new RuntimeException(e);
+//        }
         return true;
     }
 
@@ -41,8 +50,8 @@ public class WalletServiceImpl implements IWalletService {
             wallet.setUser(user);
             wallet.setTotalPoint(0D);
             wallet.setStatus(true);
-            walletRepository.save(wallet);
             user.setWallet(wallet);
+            walletRepository.save(wallet);
             return wallet;
         }
         return userWallet;
