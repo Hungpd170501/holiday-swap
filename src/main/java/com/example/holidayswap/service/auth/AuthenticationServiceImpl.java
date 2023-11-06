@@ -11,6 +11,7 @@ import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.exception.VerificationException;
 import com.example.holidayswap.domain.mapper.auth.UserMapper;
+import com.example.holidayswap.repository.auth.RoleRepository;
 import com.example.holidayswap.repository.auth.TokenRepository;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.service.EmailService;
@@ -35,6 +36,7 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final RoleRepository roleRepository;
     private final EmailService emailService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
@@ -50,6 +52,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public AuthenticationServiceImpl(UserRepository userRepository,
                                      TokenRepository tokenRepository,
+                                     RoleRepository roleRepository,
                                      EmailService emailService,
                                      JwtService jwtService,
                                      PasswordEncoder passwordEncoder,
@@ -57,6 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                      AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
+        this.roleRepository = roleRepository;
         this.emailService = emailService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
@@ -65,7 +69,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void register(RegisterRequest request) {
-
+        var role = roleRepository.findById(request.getRole().getRoleId())
+                .orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
         userRepository.getUserByEmailEquals(request.getEmail())
                 .ifPresent(user -> {
                     throw new DataIntegrityViolationException(EMAIL_HAS_ALREADY_BEEN_TAKEN);
@@ -73,6 +78,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = UserMapper.INSTANCE.toUserEntity(request);
         user.setStatus(UserStatus.PENDING);
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRole(role);
         userRepository.save(user);
         walletService.CreateWallet(user.getUserId());
         try {
