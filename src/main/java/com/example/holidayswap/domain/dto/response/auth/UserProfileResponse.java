@@ -18,9 +18,11 @@ public class UserProfileResponse {
     private Long userId;
     private String email;
     private String username;
+    private String fullName;
     private Gender gender;
     private LocalDate dob;
     private String phone;
+    private String avatar;
     @JsonProperty("email_verified")
     private boolean emailVerified;
     @JsonProperty("phone_verified")

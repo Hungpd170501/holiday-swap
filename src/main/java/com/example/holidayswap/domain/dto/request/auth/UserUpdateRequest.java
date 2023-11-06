@@ -8,15 +8,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 
 @Data
-public class UserRequest {
+public class UserUpdateRequest {
     private MultipartFile avatar;
     private String email;
-    private String password;
-    private String username;
     private String fullName;
     private Gender gender;
     private LocalDate dob;
     private String phone;
+    private boolean emailVerified;
+    private boolean phoneVerified;
     private UserStatus status;
     private Long roleId;
 }
