@@ -1,8 +1,10 @@
 package com.example.holidayswap.repository.property.timeFrame;
 
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,10 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 
 @Repository
 public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Long> {
@@ -100,6 +101,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  inner join p.inRoomAmenities ira
                  inner join p.propertyType pt
                  inner join p.propertyView pv
+                 left join  at.bookings bk
                  where
                  ((:resortId is null) or (r.id = :resortId))
                  and ((:min is null) or ( at.pricePerNight >= cast(:min as double))
@@ -129,8 +131,24 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and p.numberBedsRoom >= :numberBedsRoom
                and p.numberBathRoom >= :numberBathRoom
                AND (:locationName = '' OR unaccent(upper(r.locationFormattedName)) LIKE %:locationName%)
+               and (:userId is null or co.id.userId  != :userId)
+               and (
+                   (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
+                   >
+                   (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk where bk.availableTimeId = at.id)
+                   or bk.id is null
+               )
             """)
-    Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName, @Param("resortId") Long resortId, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, Pageable pageable);
+    Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
+                                                   @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,
+                                                   @Param("checkOut") Date checkOut, @Param("min") Long min,
+                                                   @Param("max") Long max, @Param("guest") int guest,
+                                                   @Param("numberBedsRoom") int numberBedsRoom,
+                                                   @Param("numberBathRoom") int numberBathRoom,
+                                                   @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
+                                                   @Param("listOfPropertyView") Set<Long> listOfPropertyView,
+                                                   @Param("listOfPropertyType") Set<Long> listOfPropertyType,
+                                                   @Param("userId") Long userId, Pageable pageable);
 
     @Query(value = """
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
