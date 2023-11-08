@@ -6,7 +6,6 @@ import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
-import com.example.holidayswap.service.address.LocationService;
 import com.example.holidayswap.service.resort.ResortImageService;
 import com.example.holidayswap.service.resort.ResortService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityService;
@@ -41,9 +40,9 @@ public class ResortsController {
             @RequestParam(value = "resortAmenity", required = false) Set<Long> listOfResortAmenity,
             @RequestParam(value = "resortStatus", required = false) ResortStatus resortStatus,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         return ResponseEntity.ok(resortService.gets(locationName, nameResort, listOfResortAmenity, resortStatus, pageable));
     }
 

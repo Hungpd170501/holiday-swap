@@ -1,9 +1,9 @@
 package com.example.holidayswap.domain.entity.property;
 
 
-import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
+import com.example.holidayswap.domain.entity.property.rating.Rating;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -117,4 +117,6 @@ public class Property {
 //    private List<Booking> bookingList;
     @OneToMany(mappedBy = "property")
     private List<CoOwner> coOwners;
+    @OneToMany(mappedBy = "property")
+    private List<Rating> ratings;
 }

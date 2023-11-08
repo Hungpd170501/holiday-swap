@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -26,4 +27,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "from Booking b where b.availableTimeId = ?1 and b.status = ?2")
     List<TimeHasBooked> findAllByAvailableTimeIdAndStatus(Long availableTimeId,
                                                           EnumBookingStatus.BookingStatus bookingStatus);
+
+    @Query("select " +
+            "CASE WHEN count(b) > 0 THEN TRUE ELSE FALSE END" +
+            " from Booking b inner join b.availableTime at inner join at.timeFrame tf inner join tf" +
+            ".coOwner co" +
+            " where b.userBookingId = :userId and co.property.id = :propertyId")
+    boolean IsUserBooKed(
+            @Param("propertyId") Long propertyId, @Param("userId") Long userId
+    );
 }

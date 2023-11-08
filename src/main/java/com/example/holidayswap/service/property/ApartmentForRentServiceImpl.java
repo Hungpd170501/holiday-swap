@@ -1,13 +1,5 @@
 package com.example.holidayswap.service.property;
 
-import java.util.Date;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
 import com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
@@ -15,12 +7,19 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
 import com.example.holidayswap.domain.mapper.property.ResortApartmentForRentMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
+import com.example.holidayswap.repository.property.rate.RatingRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
 import com.example.holidayswap.utils.AuthUtils;
-
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +31,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final ResortRepository resortRepository;
     private final ResortApartmentForRentMapper resortApartmentForRentMapper;
     private final AuthUtils authUtils;
+    private final RatingRepository ratingRepository;
 
     @Override
     public Page<ApartmentForRentResponse> gets(String locationName, Long resortId, Date checkIn, Date checkOut, Long min, Long max, int guest, int numberBedsRoom, int numberBathRoom, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
@@ -44,9 +44,10 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
         var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
         response.forEach(e -> {
 //            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getProperty().getId());
+//            e.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
             var propertyImages = propertyImageService.gets(e.getProperty().getId());
             e.getProperty().setPropertyImage(propertyImages);
-//            e.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
+            e.getProperty().setRating(ratingRepository.calculateRating(e.getProperty().getId()));
         });
         return response;
     }
@@ -75,6 +76,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
             var propertyImages = propertyImageService.gets(response.getProperty().getId());
             response.getProperty().setPropertyImage(propertyImages);
             response.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
+            response.getProperty().setRating(ratingRepository.calculateRating(dto.getProperty().getId()));
         }
         return response;
     }

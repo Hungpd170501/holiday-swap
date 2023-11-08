@@ -14,6 +14,7 @@ import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
 import com.example.holidayswap.repository.property.PropertyViewRepository;
 import com.example.holidayswap.repository.property.amenity.InRoomAmenityRepository;
+import com.example.holidayswap.repository.property.rate.RatingRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
@@ -43,6 +44,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyTypeRespository propertyTypeRespository;
     private final ResortRepository resortRepository;
     private final UserService userService;
+    private final RatingRepository ratingRepository;
 
     @Override
     public Page<PropertyResponse> gets(Long resortId, PropertyStatus propertyStatus, Pageable pageable) {
@@ -50,10 +52,11 @@ public class PropertyServiceImpl implements PropertyService {
         entities = propertyRepository.findAllByFilter(resortId, propertyStatus, pageable);
         var dtoResponse = entities.map(propertyMapper::toDtoResponse);
         dtoResponse.forEach(e -> {
-            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getId());
             var propertyImages = propertyImageService.gets(e.getId());
             e.setPropertyImage(propertyImages);
-            e.setInRoomAmenityType(inRoomAmenityTypeResponses);
+//            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getId());
+//            e.setInRoomAmenityType(inRoomAmenityTypeResponses);
+            e.setRating(ratingRepository.calculateRating(e.getId()));
         });
         return dtoResponse;
     }
