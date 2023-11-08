@@ -1,6 +1,8 @@
 package com.example.holidayswap.repository.booking;
 
+import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.Booking;
+import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,4 +21,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "SELECT b.* FROM booking b where b.owner_id= ?1", nativeQuery = true)
     List<Booking> findAllByOwnerLogin(Long userId);
+
+    @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
+            "from Booking b where b.availableTimeId = ?1 and b.status = ?2")
+    List<TimeHasBooked> findAllByAvailableTimeIdAndStatus(Long availableTimeId,
+                                                          EnumBookingStatus.BookingStatus bookingStatus);
 }
