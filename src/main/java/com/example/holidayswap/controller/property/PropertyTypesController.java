@@ -24,9 +24,9 @@ public class PropertyTypesController {
     public ResponseEntity<Page<PropertyTypeResponse>> gets(
             @RequestParam(defaultValue = "") String searchName,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var inRoomAmenityTypeResponses = propertyTypeService.gets(searchName, pageable);
         return ResponseEntity.ok(inRoomAmenityTypeResponses);
     }

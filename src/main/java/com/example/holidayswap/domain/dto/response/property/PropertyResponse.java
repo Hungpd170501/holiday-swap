@@ -29,4 +29,5 @@ public class PropertyResponse {
     private PropertyViewResponse propertyView;
     private List<InRoomAmenityTypeResponse> inRoomAmenityType;
     private List<PropertyImageResponse> propertyImage;
+    private Double rating;
 }

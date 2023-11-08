@@ -25,9 +25,9 @@ public class AvailableTimesController {
     public ResponseEntity<Page<AvailableTimeResponse>> getAllByTimeFrameId(
             @RequestParam(value = "timeFrameId") Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var dtoResponses = availableTimeService.getAllByVacationUnitId(timeFrameId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
@@ -36,9 +36,9 @@ public class AvailableTimesController {
     public ResponseEntity<Page<AvailableTimeResponse>> getAllByPropertyId(
             @RequestParam("timeFrameId") Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var dtoResponses = availableTimeService.getAllByPropertyId(timeFrameId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
@@ -47,9 +47,9 @@ public class AvailableTimesController {
     public ResponseEntity<Page<AvailableTimeResponse>> getAllViaPropertyId(
             @RequestParam("timeFrameId") Long timeFrameId,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var dtoResponses = availableTimeService.getAllByPropertyId(timeFrameId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
