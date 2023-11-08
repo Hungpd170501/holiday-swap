@@ -22,9 +22,9 @@ public class TimeFramesController {
             @RequestParam Long userId,
             @RequestParam String roomId,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var dtoResponses = timeFrameService.getAllByCoOwner(propertyId, userId, roomId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
