@@ -34,32 +34,25 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final CoOwnerRepository coOwnerRepository;
     private final ContractImageService contractImageService;
     private final TimeFrameService timeFrameService;
+
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
         String status = null;
         if (coOwnerStatus != null) status = coOwnerStatus.toString();
-        var entities = coOwnerRepository.findAllByResortIdPropertyIdAndUserIdAndRoomId(
-                        resortId, propertyId, userId, roomId, status, pageable).
-                map(CoOwnerMapper.INSTANCE::toDtoResponse);
+        var entities = coOwnerRepository.findAllByResortIdPropertyIdAndUserIdAndRoomId(resortId, propertyId, userId, roomId, status, pageable).map(CoOwnerMapper.INSTANCE::toDtoResponse);
         return entities;
     }
 
     @Override
     public CoOwnerResponse get(Long propertyId, Long userId, String roomId) {
-        var dtoResponse = CoOwnerMapper.INSTANCE.toDtoResponse(
-                coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(propertyId, userId, roomId).
-                        orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND)));
-        dtoResponse.setContractImages(contractImageService.gets(
-                dtoResponse.getId().getPropertyId(),
-                dtoResponse.getId().getUserId(),
-                dtoResponse.getId().getRoomId()));
+        var dtoResponse = CoOwnerMapper.INSTANCE.toDtoResponse(coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(propertyId, userId, roomId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND)));
+        dtoResponse.setContractImages(contractImageService.gets(dtoResponse.getId().getPropertyId(), dtoResponse.getId().getUserId(), dtoResponse.getId().getRoomId()));
         return dtoResponse;
     }
 
     @Override
     @Transactional
-    public CoOwnerResponse create(CoOwnerId coOwnerId,
-                                  CoOwnerRequest dtoRequest) {
+    public CoOwnerResponse create(CoOwnerId coOwnerId, CoOwnerRequest dtoRequest) {
         if (dtoRequest.getType() == ContractType.DEEDED) {
             dtoRequest.setStartTime(null);
             dtoRequest.setEndTime(null);
@@ -70,16 +63,13 @@ public class CoOwnerServiceImpl implements CoOwnerService {
                 throw new DataIntegrityViolationException("START YEAR must less than END YEAR");
             }
 //            year must equals or greater than year now
-            if (dtoRequest.getStartTime().getYear() < currentDate.getYear() ||
-                dtoRequest.getEndTime().getYear() < currentDate.getYear()) {
+            if (dtoRequest.getEndTime().getYear() < currentDate.getYear()) {
                 throw new DataIntegrityViolationException("YEAR INPUT must greater than YEAR NOW");
             }
         }
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
-        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalseAndStatus(coOwnerId.getPropertyId(), PropertyStatus.ACTIVE).
-                orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
-        var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(
-                () -> new EntityNotFoundException(USER_NOT_FOUND));
+        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalseAndStatus(coOwnerId.getPropertyId(), PropertyStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
         entity.setId(coOwnerId);
         entity.setProperty(property);
         entity.setUser(user);
@@ -93,9 +83,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
 
     @Override
     @Transactional
-    public CoOwnerResponse create(CoOwnerId coOwnerId,
-                                  CoOwnerRequest dtoRequest,
-                                  List<MultipartFile> contractImages) {
+    public CoOwnerResponse create(CoOwnerId coOwnerId, CoOwnerRequest dtoRequest, List<MultipartFile> contractImages) {
         var dtoResponse = create(coOwnerId, dtoRequest);
         contractImages.forEach(e -> {
             //ContractImageRequest id = new ContractImageRequest();
@@ -123,8 +111,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             timeFrameStatus = null;
         }
 //        else timeFrameStatus = TimeFrameStatus.PENDING;
-        var entity = coOwnerRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).
-                orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        var entity = coOwnerRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         if (!entity.getStatus().equals(CoOwnerStatus.PENDING))
             throw new DataIntegrityViolationException("Only change from PENDING TO ANOTHER");
         entity.setStatus(coOwnerStatus);
@@ -139,10 +126,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
 
     @Override
     public void delete(CoOwnerId coOwnerId) {
-        var entity = coOwnerRepository.
-                findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(
-                        coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).
-                orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        var entity = coOwnerRepository.findAllByPropertyIdAndUserIdAndRoomIdAndIsDeleteIsFalse(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId()).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         entity.setDeleted(true);
         coOwnerRepository.save(entity);
     }
