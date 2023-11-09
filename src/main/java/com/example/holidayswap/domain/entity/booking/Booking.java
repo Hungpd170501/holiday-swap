@@ -69,6 +69,9 @@ public class Booking {
     @Column (name = "actual_price", nullable = false)
     private Double actualPrice;
 
+    @Column(name = "date_booking", nullable = false)
+    private String dateBooking;
+
 //    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
 //    private List<BookingDetail> bookingDetail;
 
