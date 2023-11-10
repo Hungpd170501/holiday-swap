@@ -74,6 +74,8 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         entity.setProperty(property);
         entity.setUser(user);
         entity.setStatus(CoOwnerStatus.PENDING);
+        Date currentDate = new Date();
+        entity.setCreateDate(currentDate);
         var created = coOwnerRepository.save(entity);
         dtoRequest.getTimeFrames().forEach(e -> {
             timeFrameService.create(coOwnerId, e);

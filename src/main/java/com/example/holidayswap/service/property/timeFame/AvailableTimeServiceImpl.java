@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,11 +76,12 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     @Override
     public AvailableTimeResponse create(Long timeFrameId, AvailableTimeRequest dtoRequest) {
         Date currentDate = new Date();
-        if (dtoRequest.getStartTime().before(currentDate) || dtoRequest.getEndTime().before(currentDate))
-            throw new DataIntegrityViolationException("PUBLIC DATE can not before DATE NOW.");
         if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
-
             throw new DataIntegrityViolationException("Start time must be before end time");
+        if (dtoRequest.getStartTime().before(currentDate) || dtoRequest.getEndTime().before(currentDate)) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            throw new DataIntegrityViolationException("Date can not before " + formatter.format(currentDate));
+        }
         var timeFrame = timeFrameRepository.
                 findByIdAndIsDeletedIsFalse(timeFrameId).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
         authUtils.isBelongToMember(timeFrame.getUserId());
@@ -92,7 +94,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
                         dtoRequest.getStartTime(),
                         dtoRequest.getEndTime(),
                         TimeFrameStatus.ACCEPTED.name()
-                ).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+                ).orElseThrow(() -> new EntityNotFoundException("Date input is not in range of timeframe"));
         var isInCoOwnerTime = coOwnerRepository.isMatchingCoOwner(
                 isInTimeFrame.getPropertyId(),
                 isInTimeFrame.getUserId(),
