@@ -1,5 +1,6 @@
 package com.example.holidayswap.service.reportdashboard;
 
+import com.example.holidayswap.domain.dto.response.reportdashboard.TotalBookingInWeek;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.payment.TransactionRepository;
@@ -7,9 +8,16 @@ import com.example.holidayswap.utils.Helper;
 import lombok.AllArgsConstructor;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import org.joda.time.DateTimeConstants;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @AllArgsConstructor
 public class ReportDashBoardServiceImpl implements IReportDashBoardService{
@@ -126,5 +134,55 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService{
             totalCommissionMonth += item.getCommission();
         }
         return totalCommissionMonth;
+    }
+
+    @Override
+    public TotalBookingInWeek totalBookingInWeek(Date mondayDate,String type) {
+        LocalDate now = new LocalDate();
+        LocalDate sunday;
+        LocalDate monday = new LocalDate(mondayDate);
+        String day;
+        Long count;
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDate localDateParseFromString;
+        if(!type.equals("back") && !type.equals("next") && !type.equals("current")){
+            throw new RuntimeException("Type must be 'back' or 'next'");
+        }
+
+        if(type.equals("current") || mondayDate== null){
+           monday = now.withDayOfWeek(DateTimeConstants.MONDAY);
+           sunday = now.withDayOfWeek(DateTimeConstants.SUNDAY);
+        }else if(type.equals("back")){
+            monday = monday.minusWeeks(1);
+            sunday = monday.plusDays(6);
+        }else {
+            monday = monday.plusWeeks(1);
+            sunday = monday.plusDays(6);
+        }
+        String mondayWithOutTime = Helper.convertDateToString(monday.toDate());
+        String sundayWithOutTime = Helper.convertDateToString(sunday.toDate());
+        var listBookingWeek= bookingRepository.findAllByDateBookingBetween(mondayWithOutTime, sundayWithOutTime);
+        Map<String, Long> totalBookingsByDay = new HashMap<>();
+        for (var item: listBookingWeek) {
+            localDateParseFromString = LocalDate.parse(item.getDateBooking(), formatter);
+            day =localDateParseFromString.dayOfWeek().getAsText();
+            if (totalBookingsByDay.get(day) == null) {
+                totalBookingsByDay.put(day, 1L);
+            }else {
+                count =totalBookingsByDay.get(day);
+                totalBookingsByDay.put(day, ++count);
+            }
+        }
+        TotalBookingInWeek totalBookingInWeek = new TotalBookingInWeek();
+        totalBookingInWeek.setTotalBookingInMonday(totalBookingsByDay.get("Monday") == null ? 0 : totalBookingsByDay.get("Monday"));
+        totalBookingInWeek.setTotalBookingInTuesday(totalBookingsByDay.get("Tuesday") == null ? 0 : totalBookingsByDay.get("Tuesday"));
+        totalBookingInWeek.setTotalBookingInWednesday(totalBookingsByDay.get("Wednesday") == null ? 0 : totalBookingsByDay.get("Wednesday"));
+        totalBookingInWeek.setTotalBookingInThursday(totalBookingsByDay.get("Thursday") == null ? 0 : totalBookingsByDay.get("Thursday"));
+        totalBookingInWeek.setTotalBookingInFriday(totalBookingsByDay.get("Friday") == null ? 0 : totalBookingsByDay.get("Friday"));
+        totalBookingInWeek.setTotalBookingInSaturday(totalBookingsByDay.get("Saturday") == null ? 0 : totalBookingsByDay.get("Saturday"));
+        totalBookingInWeek.setTotalBookingInSunday(totalBookingsByDay.get("Sunday") == null ? 0 : totalBookingsByDay.get("Sunday"));
+        totalBookingInWeek.setMondayDate(monday.toDate());
+
+        return totalBookingInWeek;
     }
 }
