@@ -7,12 +7,12 @@ import java.util.Date;
 
 @Data
 public class TotalBookingInWeek {
-    private Long totalBookingInMonday;
-    private Long totalBookingInTuesday;
-    private Long totalBookingInWednesday;
-    private Long totalBookingInThursday;
-    private Long totalBookingInFriday;
-    private Long totalBookingInSaturday;
-    private Long totalBookingInSunday;
+    private Double totalBookingInMonday;
+    private Double totalBookingInTuesday;
+    private Double totalBookingInWednesday;
+    private Double totalBookingInThursday;
+    private Double totalBookingInFriday;
+    private Double totalBookingInSaturday;
+    private Double totalBookingInSunday;
     private Date mondayDate;
 }

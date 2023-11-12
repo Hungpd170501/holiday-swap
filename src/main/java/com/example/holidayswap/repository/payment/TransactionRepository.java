@@ -16,4 +16,5 @@ public interface TransactionRepository extends JpaRepository<MoneyTranfer, Long>
     List<MoneyTranfer> findAllByPaymentDateContainingAndStatus(String paymentDate, EnumPaymentStatus.StatusMoneyTranfer status);
 
     List<MoneyTranfer> findAllByPaymentDateBetween(String startDate, String endDate);
+    List<MoneyTranfer> findAllByPaymentDateBetweenAndStatus(String startDate, String endDate,EnumPaymentStatus.StatusMoneyTranfer status);
 }
