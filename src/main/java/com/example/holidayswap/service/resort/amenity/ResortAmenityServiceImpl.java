@@ -87,8 +87,8 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
         }
         var entity = ResortAmenityMapper.INSTANCE.toEntity(dtoRequest);
         entity.setResortAmenityLinkIcon(link);
-        var created = resortAmenityRepository.save(entity);
-        var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(created);
+        resortAmenityRepository.save(entity);
+        var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(entity);
         return dtoResponse;
     }
 
@@ -114,8 +114,8 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
             }
             entity.setResortAmenityLinkIcon(link);
         }
-        var updated = resortAmenityRepository.save(entity);
-        var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(updated);
+         resortAmenityRepository.save(entity);
+        var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(entity);
         return dtoResponse;
     }
 
