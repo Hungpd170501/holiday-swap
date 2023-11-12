@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.entity.resort.Resort;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "resort_amenity", schema = "public")
 public class ResortAmenity {
     @Id

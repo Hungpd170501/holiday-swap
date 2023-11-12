@@ -2,8 +2,7 @@ package com.example.holidayswap.domain.entity.resort.amentity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
@@ -11,6 +10,9 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "resort_amenity_type", schema = "public")
 public class ResortAmenityType {
     @Id
