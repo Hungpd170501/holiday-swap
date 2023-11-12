@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.payment.TransactionRepository;
 import com.example.holidayswap.utils.Helper;
+import com.google.rpc.Help;
 import lombok.AllArgsConstructor;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
@@ -173,16 +174,7 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService {
                 totalBookingsByDay.put(day, ++count);
             }
         }
-        TotalBookingInWeek totalBookingInWeek = new TotalBookingInWeek();
-        totalBookingInWeek.setTotalBookingInMonday(totalBookingsByDay.get("Monday") == null ? 0 : totalBookingsByDay.get("Monday"));
-        totalBookingInWeek.setTotalBookingInTuesday(totalBookingsByDay.get("Tuesday") == null ? 0 : totalBookingsByDay.get("Tuesday"));
-        totalBookingInWeek.setTotalBookingInWednesday(totalBookingsByDay.get("Wednesday") == null ? 0 : totalBookingsByDay.get("Wednesday"));
-        totalBookingInWeek.setTotalBookingInThursday(totalBookingsByDay.get("Thursday") == null ? 0 : totalBookingsByDay.get("Thursday"));
-        totalBookingInWeek.setTotalBookingInFriday(totalBookingsByDay.get("Friday") == null ? 0 : totalBookingsByDay.get("Friday"));
-        totalBookingInWeek.setTotalBookingInSaturday(totalBookingsByDay.get("Saturday") == null ? 0 : totalBookingsByDay.get("Saturday"));
-        totalBookingInWeek.setTotalBookingInSunday(totalBookingsByDay.get("Sunday") == null ? 0 : totalBookingsByDay.get("Sunday"));
-        totalBookingInWeek.setMondayDate(monday.toDate());
-
+        TotalBookingInWeek totalBookingInWeek = Helper.convertMaptoTotalBookingInWeek(totalBookingsByDay,monday);
         return totalBookingInWeek;
     }
 
@@ -221,20 +213,8 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService {
                 totalBookingsByMonth.put(month,++count);
             }
         }
-        TotalBookingInYear totalBookingInYear = new TotalBookingInYear();
-        totalBookingInYear.setTotalBookingInJanuary(totalBookingsByMonth.get("January") == null ? 0 : totalBookingsByMonth.get("January"));
-        totalBookingInYear.setTotalBookingInFebruary(totalBookingsByMonth.get("February") ==null? 0 :totalBookingsByMonth.get("February"));
-        totalBookingInYear.setTotalBookingInMarch(totalBookingsByMonth.get("March") ==null? 0 :totalBookingsByMonth.get("March"));
-        totalBookingInYear.setTotalBookingInApril(totalBookingsByMonth.get("April") ==null? 0 :totalBookingsByMonth.get("April"));
-        totalBookingInYear.setTotalBookingInMay(totalBookingsByMonth.get("May") ==null? 0 :totalBookingsByMonth.get("May"));
-        totalBookingInYear.setTotalBookingInJune(totalBookingsByMonth.get("June") ==null? 0 :totalBookingsByMonth.get("June"));
-        totalBookingInYear.setTotalBookingInJuly(totalBookingsByMonth.get("July") ==null? 0 :totalBookingsByMonth.get("July"));
-        totalBookingInYear.setTotalBookingInAugust(totalBookingsByMonth.get("August") ==null? 0 :totalBookingsByMonth.get("August"));
-        totalBookingInYear.setTotalBookingInSeptember(totalBookingsByMonth.get("September") ==null? 0 :totalBookingsByMonth.get("September"));
-        totalBookingInYear.setTotalBookingInOctober(totalBookingsByMonth.get("October") ==null? 0 :totalBookingsByMonth.get("October"));
-        totalBookingInYear.setTotalBookingInNovember(totalBookingsByMonth.get("November") ==null? 0 :totalBookingsByMonth.get("November"));
-        totalBookingInYear.setTotalBookingInDecember(totalBookingsByMonth.get("December") ==null? 0 :totalBookingsByMonth.get("December"));
-        totalBookingInYear.setYear(year);
+        TotalBookingInYear totalBookingInYear = Helper.convertMaptoTotalBookingInYear(totalBookingsByMonth,year);
+
         return totalBookingInYear;
     }
 
@@ -275,15 +255,8 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService {
                 totalBookingsByDay.put(day, total);
             }
         }
-        TotalBookingInWeek totalBookingInWeek = new TotalBookingInWeek();
-        totalBookingInWeek.setTotalBookingInMonday(totalBookingsByDay.get("Monday") == null ? 0 : totalBookingsByDay.get("Monday"));
-        totalBookingInWeek.setTotalBookingInTuesday(totalBookingsByDay.get("Tuesday") == null ? 0 : totalBookingsByDay.get("Tuesday"));
-        totalBookingInWeek.setTotalBookingInWednesday(totalBookingsByDay.get("Wednesday") == null ? 0 : totalBookingsByDay.get("Wednesday"));
-        totalBookingInWeek.setTotalBookingInThursday(totalBookingsByDay.get("Thursday") == null ? 0 : totalBookingsByDay.get("Thursday"));
-        totalBookingInWeek.setTotalBookingInFriday(totalBookingsByDay.get("Friday") == null ? 0 : totalBookingsByDay.get("Friday"));
-        totalBookingInWeek.setTotalBookingInSaturday(totalBookingsByDay.get("Saturday") == null ? 0 : totalBookingsByDay.get("Saturday"));
-        totalBookingInWeek.setTotalBookingInSunday(totalBookingsByDay.get("Sunday") == null ? 0 : totalBookingsByDay.get("Sunday"));
-        totalBookingInWeek.setMondayDate(monday.toDate());
+        TotalBookingInWeek totalBookingInWeek = Helper.convertMaptoTotalBookingInWeek(totalBookingsByDay,monday);
+
 
         return totalBookingInWeek;
     }
@@ -322,20 +295,8 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService {
                 totalBookingsByMonth.put(month, total);
             }
         }
-        TotalBookingInYear totalBookingInYear = new TotalBookingInYear();
-        totalBookingInYear.setTotalBookingInJanuary(totalBookingsByMonth.get("January") == null ? 0 : totalBookingsByMonth.get("January"));
-        totalBookingInYear.setTotalBookingInFebruary(totalBookingsByMonth.get("February") ==null? 0 :totalBookingsByMonth.get("February"));
-        totalBookingInYear.setTotalBookingInMarch(totalBookingsByMonth.get("March") ==null? 0 :totalBookingsByMonth.get("March"));
-        totalBookingInYear.setTotalBookingInApril(totalBookingsByMonth.get("April") ==null? 0 :totalBookingsByMonth.get("April"));
-        totalBookingInYear.setTotalBookingInMay(totalBookingsByMonth.get("May") ==null? 0 :totalBookingsByMonth.get("May"));
-        totalBookingInYear.setTotalBookingInJune(totalBookingsByMonth.get("June") ==null? 0 :totalBookingsByMonth.get("June"));
-        totalBookingInYear.setTotalBookingInJuly(totalBookingsByMonth.get("July") ==null? 0 :totalBookingsByMonth.get("July"));
-        totalBookingInYear.setTotalBookingInAugust(totalBookingsByMonth.get("August") ==null? 0 :totalBookingsByMonth.get("August"));
-        totalBookingInYear.setTotalBookingInSeptember(totalBookingsByMonth.get("September") ==null? 0 :totalBookingsByMonth.get("September"));
-        totalBookingInYear.setTotalBookingInOctober(totalBookingsByMonth.get("October") ==null? 0 :totalBookingsByMonth.get("October"));
-        totalBookingInYear.setTotalBookingInNovember(totalBookingsByMonth.get("November") ==null? 0 :totalBookingsByMonth.get("November"));
-        totalBookingInYear.setTotalBookingInDecember(totalBookingsByMonth.get("December") ==null? 0 :totalBookingsByMonth.get("December"));
-        totalBookingInYear.setYear(year);
+        TotalBookingInYear totalBookingInYear = Helper.convertMaptoTotalBookingInYear(totalBookingsByMonth,year);
+
         return totalBookingInYear;
     }
 
@@ -376,15 +337,8 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService {
                 totalPointByDay.put(day, total);
             }
         }
-        TotalBookingInWeek totalMoneyInWeek = new TotalBookingInWeek();
-        totalMoneyInWeek.setTotalBookingInMonday(totalPointByDay.get("Monday") == null ? 0 : totalPointByDay.get("Monday"));
-        totalMoneyInWeek.setTotalBookingInTuesday(totalPointByDay.get("Tuesday") == null ? 0 : totalPointByDay.get("Tuesday"));
-        totalMoneyInWeek.setTotalBookingInWednesday(totalPointByDay.get("Wednesday") == null ? 0 : totalPointByDay.get("Wednesday"));
-        totalMoneyInWeek.setTotalBookingInThursday(totalPointByDay.get("Thursday") == null ? 0 : totalPointByDay.get("Thursday"));
-        totalMoneyInWeek.setTotalBookingInFriday(totalPointByDay.get("Friday") == null ? 0 : totalPointByDay.get("Friday"));
-        totalMoneyInWeek.setTotalBookingInSaturday(totalPointByDay.get("Saturday") == null ? 0 : totalPointByDay.get("Saturday"));
-        totalMoneyInWeek.setTotalBookingInSunday(totalPointByDay.get("Sunday") == null ? 0 : totalPointByDay.get("Sunday"));
-        totalMoneyInWeek.setMondayDate(monday.toDate());
+        TotalBookingInWeek totalMoneyInWeek = Helper.convertMaptoTotalBookingInWeek(totalPointByDay,monday);
+
         return totalMoneyInWeek;
     }
 
@@ -422,20 +376,7 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService {
                 totalBookingsByMonth.put(month, total);
             }
         }
-        TotalBookingInYear totalBookingInYear = new TotalBookingInYear();
-        totalBookingInYear.setTotalBookingInJanuary(totalBookingsByMonth.get("January") == null ? 0 : totalBookingsByMonth.get("January"));
-        totalBookingInYear.setTotalBookingInFebruary(totalBookingsByMonth.get("February") ==null? 0 :totalBookingsByMonth.get("February"));
-        totalBookingInYear.setTotalBookingInMarch(totalBookingsByMonth.get("March") ==null? 0 :totalBookingsByMonth.get("March"));
-        totalBookingInYear.setTotalBookingInApril(totalBookingsByMonth.get("April") ==null? 0 :totalBookingsByMonth.get("April"));
-        totalBookingInYear.setTotalBookingInMay(totalBookingsByMonth.get("May") ==null? 0 :totalBookingsByMonth.get("May"));
-        totalBookingInYear.setTotalBookingInJune(totalBookingsByMonth.get("June") ==null? 0 :totalBookingsByMonth.get("June"));
-        totalBookingInYear.setTotalBookingInJuly(totalBookingsByMonth.get("July") ==null? 0 :totalBookingsByMonth.get("July"));
-        totalBookingInYear.setTotalBookingInAugust(totalBookingsByMonth.get("August") ==null? 0 :totalBookingsByMonth.get("August"));
-        totalBookingInYear.setTotalBookingInSeptember(totalBookingsByMonth.get("September") ==null? 0 :totalBookingsByMonth.get("September"));
-        totalBookingInYear.setTotalBookingInOctober(totalBookingsByMonth.get("October") ==null? 0 :totalBookingsByMonth.get("October"));
-        totalBookingInYear.setTotalBookingInNovember(totalBookingsByMonth.get("November") ==null? 0 :totalBookingsByMonth.get("November"));
-        totalBookingInYear.setTotalBookingInDecember(totalBookingsByMonth.get("December") ==null? 0 :totalBookingsByMonth.get("December"));
-        totalBookingInYear.setYear(year);
+        TotalBookingInYear totalBookingInYear = Helper.convertMaptoTotalBookingInYear(totalBookingsByMonth,year);
         return totalBookingInYear;
     }
 }
