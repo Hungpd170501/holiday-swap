@@ -1,12 +1,16 @@
 package com.example.holidayswap.controller.reportdashboard;
 
+import com.example.holidayswap.domain.dto.request.reportdashboard.ReportTotalBookingWeekRequest;
+import com.example.holidayswap.domain.dto.request.reportdashboard.ReportTotalBookingYearRequest;
+import com.example.holidayswap.domain.dto.response.reportdashboard.TotalBookingInWeek;
 import com.example.holidayswap.service.reportdashboard.IReportDashBoardService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.joda.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.ZoneId;
 import java.util.Date;
 
 @RestController()
@@ -15,45 +19,72 @@ import java.util.Date;
 public class ReportDashBoardController {
     private final IReportDashBoardService reportDashBoardService;
 
-    @GetMapping("/deposit/today")
-    public Double pointDepositToDay() {
-        return reportDashBoardService.pointDepositToDay();
-    }
-    @GetMapping("/deposit/thisweek")
-    public Double pointDepositWeek() {
-        return reportDashBoardService.pointDepositWeek();
-    }
-    @GetMapping("/deposit/thismonth")
-    public Double pointDepositMonth() {
-        return reportDashBoardService.pointDepositMonth();
-    }
-    @GetMapping("/deposit/date")
-    public Double pointDepositDate(@RequestParam Date date){
-        return reportDashBoardService.pointDepositDate(date);
-    }
-    @GetMapping("/deposit/monthandyear")
-    public Double pointDepositeInMonthAndYear(@RequestParam Date date){
-        return reportDashBoardService.pointDepositeInMonthAndYear(date);
-    }
-    @GetMapping("/commission/today")
-    public Double commissionOfBookingToDay() {
-        return reportDashBoardService.commissionOfBookingToDay();
-    }
-    @GetMapping("/commission/thisweek")
-    public Double commissionOfBookingWeek() {
-        return reportDashBoardService.commissionOfBookingWeek();
-    }
-    @GetMapping("/commission/thismonth")
-    public Double commissionOfBookingMonth() {
-        return reportDashBoardService.commissionOfBookingMonth();
-    }
-    @GetMapping("/commission/date")
-    public Double commissionOfBookingDate(@RequestParam Date date){
-        return reportDashBoardService.commissionOfBookingDate(date);
-    }
-    @GetMapping("/commission/monthandyear")
-    public Double commissionOfBookingInMonthAndYear(@RequestParam Date date){
-        return reportDashBoardService.commissionOfBookingInMonthAndYear(date);
+//    @GetMapping("/deposit/today")
+//    public Double pointDepositToDay() {
+//        return reportDashBoardService.pointDepositToDay();
+//    }
+//    @GetMapping("/deposit/thisweek")
+//    public Double pointDepositWeek() {
+//        return reportDashBoardService.pointDepositWeek();
+//    }
+//    @GetMapping("/deposit/thismonth")
+//    public Double pointDepositMonth() {
+//        return reportDashBoardService.pointDepositMonth();
+//    }
+//    @GetMapping("/deposit/date")
+//    public Double pointDepositDate(@RequestParam Date date){
+//        return reportDashBoardService.pointDepositDate(date);
+//    }
+//    @GetMapping("/deposit/monthandyear")
+//    public Double pointDepositeInMonthAndYear(@RequestParam Date date){
+//        return reportDashBoardService.pointDepositeInMonthAndYear(date);
+//    }
+//    @GetMapping("/commission/today")
+//    public Double commissionOfBookingToDay() {
+//        return reportDashBoardService.commissionOfBookingToDay();
+//    }
+//    @GetMapping("/commission/thisweek")
+//    public Double commissionOfBookingWeek() {
+//        return reportDashBoardService.commissionOfBookingWeek();
+//    }
+//    @GetMapping("/commission/thismonth")
+//    public Double commissionOfBookingMonth() {
+//        return reportDashBoardService.commissionOfBookingMonth();
+//    }
+//    @GetMapping("/commission/date")
+//    public Double commissionOfBookingDate(@RequestParam Date date){
+//        return reportDashBoardService.commissionOfBookingDate(date);
+//    }
+//    @GetMapping("/commission/monthandyear")
+//    public Double commissionOfBookingInMonthAndYear(@RequestParam Date date){
+//        return reportDashBoardService.commissionOfBookingInMonthAndYear(date);
+//    }
+
+    @PostMapping("/totalbooking/week")
+    public ResponseEntity<?> totalBookingInWeek(@RequestBody ReportTotalBookingWeekRequest reportTotalBookingWeekRequest){
+        return ResponseEntity.ok(reportDashBoardService.totalBookingInWeek(reportTotalBookingWeekRequest.getMonday(),reportTotalBookingWeekRequest.getType()));
     }
 
+    @PostMapping("/totalbooking/year")
+    public ResponseEntity<?> totalBookingInYear(@RequestBody ReportTotalBookingYearRequest reportTotalBookingYearRequest){
+        return ResponseEntity.ok(reportDashBoardService.totalBookingInYear(reportTotalBookingYearRequest.getYear(),reportTotalBookingYearRequest.getType()));
+    }
+
+    @PostMapping("/totalcommission/week")
+    public ResponseEntity<?> totalCommissionInWeek(@RequestBody ReportTotalBookingWeekRequest reportTotalBookingWeekRequest){
+        return ResponseEntity.ok(reportDashBoardService.totalComissionInWeek(reportTotalBookingWeekRequest.getMonday(),reportTotalBookingWeekRequest.getType()));
+    }
+    @PostMapping("/totalcommission/year")
+    public ResponseEntity<?> totalCommissionInYear(@RequestBody ReportTotalBookingYearRequest reportTotalBookingYearRequest){
+        return ResponseEntity.ok(reportDashBoardService.totalComissionInYear(reportTotalBookingYearRequest.getYear(),reportTotalBookingYearRequest.getType()));
+    }
+
+    @PostMapping("/totalpoint/week")
+    public ResponseEntity<?> totalPointInWeek(@RequestBody ReportTotalBookingWeekRequest reportTotalBookingWeekRequest){
+        return ResponseEntity.ok(reportDashBoardService.totalPointInWeek(reportTotalBookingWeekRequest.getMonday(),reportTotalBookingWeekRequest.getType()));
+    }
+    @PostMapping("/totalpoint/year")
+    public ResponseEntity<?> totalPointInYear(@RequestBody ReportTotalBookingYearRequest reportTotalBookingYearRequest){
+        return ResponseEntity.ok(reportDashBoardService.totalPointInYear(reportTotalBookingYearRequest.getYear(),reportTotalBookingYearRequest.getType()));
+    }
 }

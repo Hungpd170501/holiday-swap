@@ -40,4 +40,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean IsUserBooKed(
             @Param("propertyId") Long propertyId, @Param("userId") Long userId
     );
+
 }
