@@ -53,7 +53,7 @@ public class ResortServiceImpl implements ResortService {
         return entities.map(e -> {
             var dto = ResortMapper.INSTANCE.toResortResponse(e);
             dto.setResortImages(resortImageService.gets(e.getId()));
-            dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
+//            dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
             return dto;
         });
     }
