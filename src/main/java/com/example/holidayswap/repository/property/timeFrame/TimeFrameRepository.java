@@ -1,6 +1,5 @@
 package com.example.holidayswap.repository.property.timeFrame;
 
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import org.springframework.data.domain.Page;
@@ -75,17 +74,4 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
             @Param("endTime") Date endTime,
             @Param("timeFrameStatus") String timeFrameStatus
     );
-
-
-
-    @Query(value = """
-            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
-            tf.roomId)
-            from TimeFrame tf
-                 inner join tf.availableTimes at
-                 where tf.isDeleted = false
-                 and at.isDeleted = false
-                 and tf.roomId = :roomId
-            """)
-    Optional<ApartmentForRentDTO> findRoomByRoomId(@Param("roomId") String roomId);
 }

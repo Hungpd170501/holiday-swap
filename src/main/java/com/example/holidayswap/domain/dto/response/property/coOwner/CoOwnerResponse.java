@@ -19,4 +19,5 @@ public class CoOwnerResponse {
     private boolean isDeleted;
     private List<ContractImageResponse> contractImages;
     private List<TimeFrameResponse> timeFrames;
+    private Date createDate;
 }
