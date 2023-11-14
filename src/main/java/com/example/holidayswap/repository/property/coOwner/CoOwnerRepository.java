@@ -25,9 +25,10 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
                    co.is_deleted,
                    co.start_time,
                    co.status,
-                   co.type
+                   co.type,
+                   co.create_date
             from co_owner co
-                     join property p on co.property_id = p.property_id
+                    inner join property p on co.property_id = p.property_id
             where (:resortId is null or p.property_id = :resortId)
               and (:propertyId is null or co.property_id = :propertyId)
               and (:userId is null or co.user_id = :userId)
