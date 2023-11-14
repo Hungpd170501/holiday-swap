@@ -36,9 +36,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "CASE WHEN count(b) > 0 THEN TRUE ELSE FALSE END" +
             " from Booking b inner join b.availableTime at inner join at.timeFrame tf inner join tf" +
             ".coOwner co" +
-            " where b.userBookingId = :userId and co.property.id = :propertyId")
+            " where b.userBookingId = :userId and at.id = :availableTimeId")
     boolean IsUserBooKed(
-            @Param("propertyId") Long propertyId, @Param("userId") Long userId
+            @Param("availableTimeId") Long availableTimeId, @Param("userId") Long userId
     );
 
 }
