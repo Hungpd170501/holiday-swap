@@ -1,8 +1,6 @@
 package com.example.holidayswap.domain.entity.booking;
 
 import com.example.holidayswap.domain.entity.auth.User;
-import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
-import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -66,7 +63,7 @@ public class Booking {
     @Column(name = "commission", nullable = false)
     private Double commission;
 
-    @Column (name = "actual_price", nullable = false)
+    @Column(name = "actual_price", nullable = false)
     private Double actualPrice;
 
     @Column(name = "date_booking", nullable = false)

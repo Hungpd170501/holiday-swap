@@ -254,6 +254,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             validUserEmailVerificationTokens.forEach(t -> t.setStatus(TokenStatus.REVOKED));
             tokenRepository.saveAll(validUserEmailVerificationTokens);
         });
+        if (user.getStatus().equals(UserStatus.PENDING)) {
+            user.setStatus(UserStatus.ACTIVE);
+        }
         user.setEmailVerified(true);
         userRepository.save(user);
     }
