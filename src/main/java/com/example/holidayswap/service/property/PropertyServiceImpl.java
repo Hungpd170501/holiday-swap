@@ -14,7 +14,7 @@ import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
 import com.example.holidayswap.repository.property.PropertyViewRepository;
 import com.example.holidayswap.repository.property.amenity.InRoomAmenityRepository;
-import com.example.holidayswap.repository.property.rate.RatingRepository;
+import com.example.holidayswap.repository.property.rating.RatingRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
@@ -56,7 +56,7 @@ public class PropertyServiceImpl implements PropertyService {
             e.setPropertyImage(propertyImages);
 //            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getId());
 //            e.setInRoomAmenityType(inRoomAmenityTypeResponses);
-            e.setRating(ratingRepository.calculateRating(e.getId()));
+//            e.setRating(ratingRepository.calculateRating(e.getId()));
         });
         return dtoResponse;
     }
