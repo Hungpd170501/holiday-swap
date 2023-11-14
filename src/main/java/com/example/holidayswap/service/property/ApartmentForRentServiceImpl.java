@@ -7,7 +7,7 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
 import com.example.holidayswap.domain.mapper.property.ResortApartmentForRentMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
-import com.example.holidayswap.repository.property.rate.RatingRepository;
+import com.example.holidayswap.repository.property.rating.RatingRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
@@ -47,7 +47,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
 //            e.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
             var propertyImages = propertyImageService.gets(e.getProperty().getId());
             e.getProperty().setPropertyImage(propertyImages);
-            e.getProperty().setRating(ratingRepository.calculateRating(e.getProperty().getId()));
+            e.getProperty().setRating(ratingRepository.calculateRating(e.getProperty().getId(), e.getCoOwnerId().getRoomId()));
         });
         return response;
     }
@@ -76,7 +76,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
             var propertyImages = propertyImageService.gets(response.getProperty().getId());
             response.getProperty().setPropertyImage(propertyImages);
             response.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
-            response.getProperty().setRating(ratingRepository.calculateRating(dto.getProperty().getId()));
+            response.getProperty().setRating(ratingRepository.calculateRating(dto.getProperty().getId(), dto.getCoOwnerId().getRoomId()));
         }
         return response;
     }
