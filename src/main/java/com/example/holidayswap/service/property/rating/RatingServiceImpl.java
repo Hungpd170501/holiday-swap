@@ -84,7 +84,7 @@ public class RatingServiceImpl implements RatingService {
         isDoneTraveled(availableTimeId, userId);
         var id = new RatingId(availableTimeId, userId);
         var e = ratingMapper.toEntity(ratingRequest);
-        e.setId(id);
+//        e.setId(id);
         e.setAvailableTime(availableTimeRepository.findById(availableTimeId).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND)));
         e.setUser(userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND)));
         e.setCreateDate(new Date());
@@ -93,15 +93,22 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public void update(Long availableTimeId, Long userId, RatingRequest ratingRequest) {
-        isBooked(availableTimeId, userId);
-        isDoneTraveled(availableTimeId, userId);
-        var id = new RatingId(availableTimeId, userId);
-        var e = ratingMapper.toEntity(ratingRequest);
-        e.setId(id);
-        e.setAvailableTime(availableTimeRepository.findById(availableTimeId).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND)));
-        e.setUser(userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND)));
-        e.setUpdateDate(new Date());
-        ratingRepository.save(e);
+//        isBooked(availableTimeId, userId);
+//        isDoneTraveled(availableTimeId, userId);
+//        var id = new RatingId(availableTimeId, userId);
+//        var e = ratingMapper.toEntity(ratingRequest);
+//        var checkRating = ratingRepository.findByBooking(bookingRepository.findById(ratingRequest.getBookingId()).get());
+//        if (checkRating != null) {
+//            throw new AccessDeniedException("Already rated");
+//        }
+////        e.setId(id);
+//
+//        e.setAvailableTime(availableTimeRepository.findById(availableTimeId).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND)));
+//        e.setUser(userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND)));
+//        e.setUpdateDate(new Date());
+//        var booking = bookingRepository.findById(ratingRequest.getBookingId()).get();
+//        e.setBooking(booking);
+//        ratingRepository.save(e);
     }
 
     @Override

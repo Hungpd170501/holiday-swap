@@ -123,7 +123,8 @@ public class BookingServiceImpl implements IBookingService {
         List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
         if (userBooking.size() > 0) {
             for (Booking booking : userBooking) {
-                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getPrice()));
+                boolean isRating = booking.getRating() != null ? false : true;
+                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getPrice(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink(), isRating,booking.getAvailableTimeId()));
             }
         }
         return historyBookingResponses;
@@ -133,8 +134,8 @@ public class BookingServiceImpl implements IBookingService {
     public HistoryBookingDetailResponse historyBookingDetail(Long bookingId) {
         var booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
         var listUserOfBookingEntity = userOfBookingRepository.findAllByBookingId(bookingId);
-
         var historyBookingDetailResponse = new HistoryBookingDetailResponse();
+
         historyBookingDetailResponse.setResortName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName());
         historyBookingDetailResponse.setDateCheckIn(booking.getCheckInDate());
         historyBookingDetailResponse.setDateCheckOut(booking.getCheckOutDate());
@@ -145,6 +146,9 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setStatus(booking.getStatus().name());
         historyBookingDetailResponse.setPropertyName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
+        historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
+        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink());
+        historyBookingDetailResponse.setRating(booking.getRating() != null ? false : true);
 
         return historyBookingDetailResponse;
     }
@@ -159,7 +163,7 @@ public class BookingServiceImpl implements IBookingService {
         var bookingList = bookingRepository.findAllByOwnerLogin(user.getUserId());
         if (bookingList.size() > 0) {
             for (Booking booking : bookingList) {
-                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getActualPrice()));
+                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getActualPrice(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink(), booking.getRating() != null ? true : false,booking.getAvailableTimeId()));
             }
         }
         return historyBookingResponses;
@@ -169,8 +173,8 @@ public class BookingServiceImpl implements IBookingService {
     public HistoryDetailBookingOwnerResponse historyBookingDetailOwner(Long bookingId) {
         var booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
         var listUserOfBookingEntity = userOfBookingRepository.findAllByBookingId(bookingId);
-
         var historyBookingDetailResponse = new HistoryDetailBookingOwnerResponse();
+
         historyBookingDetailResponse.setResortName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName());
         historyBookingDetailResponse.setDateCheckIn(booking.getCheckInDate());
         historyBookingDetailResponse.setDateCheckOut(booking.getCheckOutDate());
@@ -183,6 +187,9 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setCommission(booking.getCommission() + "%");
         historyBookingDetailResponse.setTotal(booking.getActualPrice());
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
+        historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
+        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink());
+        historyBookingDetailResponse.setRating(booking.getRating() != null ? true : false);
 
         return historyBookingDetailResponse;
     }

@@ -115,6 +115,8 @@ public class Property {
 //    @OneToMany(mappedBy = "property")
 //    private List<Booking> bookingList;
     @OneToMany(mappedBy = "property")
+    private List<PropertyImage> propertyImages;
+    @OneToMany(mappedBy = "property")
     private List<CoOwner> coOwners;
 
 }
