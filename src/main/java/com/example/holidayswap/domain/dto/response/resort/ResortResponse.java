@@ -2,7 +2,7 @@ package com.example.holidayswap.domain.dto.response.resort;
 
 import com.example.holidayswap.domain.dto.response.property.PropertyTypeResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
-import com.example.holidayswap.domain.entity.address.District;
+import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import lombok.Data;
 
 import java.util.List;
@@ -12,6 +12,7 @@ public class ResortResponse {
     private Long id;
     private String resortName;
     private String resortDescription;
+    private ResortStatus status;
     private boolean isDeleted;
     private List<ResortImageResponse> resortImages;
     private List<PropertyTypeResponse> propertyTypes;
