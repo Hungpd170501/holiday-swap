@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
@@ -36,4 +38,6 @@ public class Rating {
     private double rating;
     @Enumerated(EnumType.STRING)
     private RatingType ratingType;
+    private Date createDate;
+    private Date updateDate;
 }

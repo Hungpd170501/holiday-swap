@@ -1,0 +1,5 @@
+ALTER TABLE rating
+    ADD create_date TIMESTAMP WITHOUT TIME ZONE;
+
+ALTER TABLE rating
+    ADD update_date TIMESTAMP WITHOUT TIME ZONE;
