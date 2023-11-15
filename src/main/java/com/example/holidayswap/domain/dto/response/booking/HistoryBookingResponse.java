@@ -16,4 +16,7 @@ public class HistoryBookingResponse {
     private String resortName;
     private String status;
     private Double price;
+    private String propertyImage;
+    private boolean isRating;
+    private Long availableTimeId;
 }
