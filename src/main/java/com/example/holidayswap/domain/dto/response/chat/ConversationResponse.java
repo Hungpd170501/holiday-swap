@@ -11,6 +11,7 @@ import java.util.List;
 public class ConversationResponse {
     private Long conversationId;
     private LocalDateTime creationDate;
+    private String conversationName;
     private List<ConversationParticipantResponse> participants;
     private MessageResponse message;
 }
