@@ -97,6 +97,7 @@ application:
       secret-key: ${JWT_SECRET}
       expiration: ${JWT_EXPIRATION:2592000000} #30 days
       access-token:
-        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000} #30 minutes
+#        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:1800000} #30 minutes
+        expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:5400000} #120 minutes
       refresh-token:
         expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:1296000000} #15 days

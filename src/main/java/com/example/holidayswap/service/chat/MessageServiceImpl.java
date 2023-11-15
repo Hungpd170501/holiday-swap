@@ -34,7 +34,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageResponse createMessage(MessageRequest messageRequest, String conversationId) throws IOException {
-        if(messageRequest.getText().isBlank() || messageRequest.getImage() == null) {
+        if(messageRequest.getText().isBlank() && messageRequest.getImage() == null) {
             throw new DataIntegrityViolationException( "Message cannot be null");
         }
         Message message = messageMapper.toMessage(messageRequest);

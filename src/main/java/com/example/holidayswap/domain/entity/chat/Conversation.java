@@ -25,6 +25,9 @@ public class Conversation extends BaseEntityAudit {
     )
     private Long conversationId;
 
+    @Column
+    private String conversationName;
+
     @OneToMany(mappedBy = "conversation")
     private List<ConversationParticipant> participants = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package com.example.holidayswap.service.chat;
 
+import com.example.holidayswap.domain.dto.request.chat.ConversationRequest;
 import com.example.holidayswap.domain.dto.response.chat.ConversationParticipantResponse;
 import com.example.holidayswap.domain.dto.response.chat.ConversationResponse;
 import com.example.holidayswap.domain.entity.chat.Conversation;
@@ -39,6 +40,10 @@ public class ConversationServiceImpl implements ConversationService{
             var latestMessage = messageRepository.findLatestMessageByConversation(conversation.getConversationId());
             return ConversationResponse.builder()
                     .conversationId(conversation.getConversationId())
+                    .creationDate(conversation.getCreatedOn())
+                    .participants(conversation.getParticipants().stream()
+                            .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
+                            .toList())
                     .message(latestMessage.map(messageMapper::toMessageResponse).orElse(null))
                     .build();
         }).toList();
@@ -46,10 +51,12 @@ public class ConversationServiceImpl implements ConversationService{
 
     @Override
     @Transactional
-    public void createConversation(List<Long> userIds) {
-        Conversation conversation = new Conversation();
+    public void createConversation(ConversationRequest conversationRequest) {
+        Conversation conversation = Conversation.builder()
+                .conversationName(conversationRequest.getConversationName())
+                .build();
         conversationRepository.save(conversation);
-        for (Long userId : userIds) {
+        for (Long userId : conversationRequest.getUserIds()) {
             var user = userRepository.findById(userId).orElseThrow( () -> new EntityNotFoundException(USER_NOT_FOUND));
             ConversationParticipant participant = new ConversationParticipant();
             ConversationParticipantPK participantPK = new ConversationParticipantPK();
