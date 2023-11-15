@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MessageRepository extends JpaRepository<Message, Long> {
+public interface     MessageRepository extends JpaRepository<Message, Long> {
     @Query("""
             SELECT m FROM Message m
             WHERE m.conversation.conversationId = :conversationId

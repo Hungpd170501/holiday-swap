@@ -1,5 +1,6 @@
 package com.example.holidayswap.controller.chat;
 
+import com.example.holidayswap.domain.dto.request.chat.ConversationRequest;
 import com.example.holidayswap.domain.dto.response.chat.ConversationParticipantResponse;
 import com.example.holidayswap.domain.dto.response.chat.ConversationResponse;
 import com.example.holidayswap.service.chat.ConversationService;
@@ -20,8 +21,8 @@ public class ConversationController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Void> createConversation(@RequestBody List<Long> userIds) {
-        conversationService.createConversation(userIds);
+    public ResponseEntity<Void> createConversation(@RequestBody ConversationRequest conversationRequest) {
+        conversationService.createConversation(conversationRequest);
         return ResponseEntity.noContent().build();
     }
 
