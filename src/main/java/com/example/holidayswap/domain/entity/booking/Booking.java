@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.booking;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.property.rating.Rating;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -77,4 +78,7 @@ public class Booking {
 
     @Column(name = "status", nullable = false)
     private EnumBookingStatus.BookingStatus status;
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Rating rating;
 }

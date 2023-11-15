@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.entity.property.rating;
 
 import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -20,8 +21,10 @@ import java.util.Date;
 @NoArgsConstructor
 @Table(name = "rating", schema = "public")
 public class Rating {
-    @EmbeddedId
-    private RatingId id;
+    @Id
+    @Column(name = "rating_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -40,4 +43,9 @@ public class Rating {
     private RatingType ratingType;
     private Date createDate;
     private Date updateDate;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "rating_id")
+    private Booking booking;
 }

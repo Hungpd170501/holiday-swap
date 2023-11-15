@@ -19,4 +19,7 @@ public class HistoryDetailBookingOwnerResponse {
     private Double price;
     private String commission;
     private Double total;
+    private Long availableTimeId;
+    private String propertyImage;
+    private boolean isRating;
 }

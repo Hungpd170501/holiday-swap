@@ -1,5 +1,6 @@
 package com.example.holidayswap.repository.property.rating;
 
+import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.property.rating.Rating;
 import com.example.holidayswap.domain.entity.property.rating.RatingId;
 import org.springframework.data.domain.Page;
@@ -26,4 +27,6 @@ public interface RatingRepository extends JpaRepository<Rating, RatingId> {
 
     @Query("select r from Rating r where r.availableTime.id = :availableTimeId and r.user.userId = :userId ")
     Optional<Rating> findByAvailableTimeIdAndUserId(@Param("availableTimeId") Long availableTimeId, @Param("userId") Long userId);
+
+    Rating findByBooking(Booking booking);
 }
