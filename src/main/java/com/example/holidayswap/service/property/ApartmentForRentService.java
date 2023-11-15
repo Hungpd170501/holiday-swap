@@ -1,13 +1,12 @@
 package com.example.holidayswap.service.property;
 
-import java.util.Date;
-import java.util.Set;
-
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
+import com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
-import com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentResponse;
+import java.util.Date;
+import java.util.Set;
 
 public interface ApartmentForRentService {
     Page<ApartmentForRentResponse> gets(String locationName, Long resortId, Date checkIn, Date checkOut, Long min, Long max,
@@ -20,4 +19,6 @@ public interface ApartmentForRentService {
                                                     Set<Long> listOfPropertyType, Pageable pageable);
 
     ApartmentForRentResponse get(Long availableId);
+
+    Page<ApartmentForRentResponse> getByUserId(Long userId, Pageable pageable);
 }
