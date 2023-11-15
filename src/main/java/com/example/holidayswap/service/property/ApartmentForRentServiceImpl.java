@@ -80,4 +80,11 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
         }
         return response;
     }
+
+    @Override
+    public Page<ApartmentForRentResponse> getByUserId(Long userId, Pageable pageable) {
+        var dto = availableTimeRepository.findApartmentForRentByUserId(userId, pageable);
+        var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
+        return response;
+    }
 }

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 import static com.example.holidayswap.constants.ErrorMessage.AVAILABLE_TIME_NOT_FOUND;
 import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
 
@@ -79,22 +81,26 @@ public class RatingServiceImpl implements RatingService {
     @Override
     public void create(Long availableTimeId, Long userId, RatingRequest ratingRequest) {
         isBooked(availableTimeId, userId);
+        isDoneTraveled(availableTimeId, userId);
         var id = new RatingId(availableTimeId, userId);
         var e = ratingMapper.toEntity(ratingRequest);
         e.setId(id);
         e.setAvailableTime(availableTimeRepository.findById(availableTimeId).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND)));
         e.setUser(userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND)));
+        e.setCreateDate(new Date());
         ratingRepository.save(e);
     }
 
     @Override
     public void update(Long availableTimeId, Long userId, RatingRequest ratingRequest) {
         isBooked(availableTimeId, userId);
+        isDoneTraveled(availableTimeId, userId);
         var id = new RatingId(availableTimeId, userId);
         var e = ratingMapper.toEntity(ratingRequest);
         e.setId(id);
         e.setAvailableTime(availableTimeRepository.findById(availableTimeId).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND)));
         e.setUser(userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND)));
+        e.setUpdateDate(new Date());
         ratingRepository.save(e);
     }
 
@@ -108,6 +114,13 @@ public class RatingServiceImpl implements RatingService {
         var bool = bookingRepository.IsUserBooKed(availableTimeId, userId);
         if (!bool) {
             throw new AccessDeniedException("User is not booked" + " at this property to action rating.");
+        }
+    }
+
+    public void isDoneTraveled(Long availableTimeId, Long userId) {
+        var bool = bookingRepository.isDoneTraveled(availableTimeId, userId, new Date());
+        if (!bool) {
+            throw new AccessDeniedException("User is not done Traveled" + " at this property to action rating.");
         }
     }
 }

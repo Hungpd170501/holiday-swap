@@ -1,8 +1,9 @@
 package com.example.holidayswap.controller.property;
 
-import java.util.Date;
-import java.util.Set;
-
+import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
+import com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentResponse;
+import com.example.holidayswap.service.property.ApartmentForRentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,11 +12,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
-import com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentResponse;
-import com.example.holidayswap.service.property.ApartmentForRentService;
-
-import lombok.RequiredArgsConstructor;
+import java.util.Date;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -71,6 +69,17 @@ public class ApartmentsForRentController {
     @GetMapping("/{availableId}")
     public ResponseEntity<ApartmentForRentResponse> get(@PathVariable("availableId") Long availableId) {
         var dtoResponse = roomService.get(availableId);
+        return ResponseEntity.ok(dtoResponse);
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<Page<ApartmentForRentResponse>> getByUserId(@PathVariable("userId") Long userId,
+                                                                      @RequestParam(defaultValue = "0") Integer pageNo,
+                                                                      @RequestParam(defaultValue = "10") Integer pageSize,
+                                                                      @RequestParam(defaultValue = "id") String sortBy,
+                                                                      @RequestParam(defaultValue = "asc") String sortDirection) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        var dtoResponse = roomService.getByUserId(userId, pageable);
         return ResponseEntity.ok(dtoResponse);
     }
 }
