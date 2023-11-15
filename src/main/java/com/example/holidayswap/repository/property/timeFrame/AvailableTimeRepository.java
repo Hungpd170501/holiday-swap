@@ -171,4 +171,24 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  and u.status = 'ACTIVE'
             """)
     Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("availableId") Long availableId);
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+            co.id,
+            p, r, u, at
+            )
+            from AvailableTime at
+                 inner join at.timeFrame tf
+                 inner join tf.coOwner co
+                 inner join co.property p
+                 inner join p.resort r
+                 inner join co.user u
+                 inner join p.inRoomAmenities ira
+                 inner join p.propertyType pt
+                 inner join p.propertyView pv
+                 left join  at.bookings bk
+                 where
+               co.id.userId  = :userId
+            """)
+    Page<ApartmentForRentDTO> findApartmentForRentByUserId(@Param("userId") Long userId, Pageable pageable);
 }
