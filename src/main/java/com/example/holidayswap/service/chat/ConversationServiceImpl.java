@@ -41,6 +41,7 @@ public class ConversationServiceImpl implements ConversationService{
             return ConversationResponse.builder()
                     .conversationId(conversation.getConversationId())
                     .creationDate(conversation.getCreatedOn())
+                    .conversationName(conversation.getConversationName())
                     .participants(conversation.getParticipants().stream()
                             .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
                             .toList())
