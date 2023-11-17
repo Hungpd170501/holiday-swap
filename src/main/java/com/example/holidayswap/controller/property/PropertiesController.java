@@ -34,13 +34,17 @@ public class PropertiesController {
     private final PropertyImageService propertyImageService;
 
     @GetMapping
-    public ResponseEntity<Page<PropertyResponse>> gets(@RequestParam(value = "resortId", required = false) Long resortId,
-                                                       @RequestParam(value = "status", required = false) PropertyStatus propertyStatus,
-                                                       @RequestParam(defaultValue = "0") Integer pageNo,
-                                                       @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "asc") String sortDirection,
-                                                       @RequestParam(defaultValue = "id") String sortBy) {
+    public ResponseEntity<Page<PropertyResponse>> gets(
+            @RequestParam(value = "resortId", required = false) Long[] resortId,
+            @RequestParam(value = "propertyName", defaultValue = "") String propertyName,
+            @RequestParam(value = "status", required = false) PropertyStatus[] propertyStatus,
+            @RequestParam(value = "isDeleted", required = false) boolean[] isDeleted,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        var properties = propertyService.gets(resortId, propertyStatus, pageable);
+        var properties = propertyService.gets(resortId, propertyName, propertyStatus, isDeleted, pageable);
         return ResponseEntity.ok(properties);
     }
 
