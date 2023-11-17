@@ -68,8 +68,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     //get all for staff
     @Query(value = """
             select distinct p from Property p
-            inner join PropertyType pt on p.propertyTypeId = pt.id
-            inner join pt.resorts r
+                     
             where upper(p.propertyName) like upper(concat('%', :propertyName, '%'))
             and ((:#{#resortId == null} = true) or (p.resortId in :resortId))
             and ((:#{#isDeleted == null} = true) or (p.isDeleted in :isDeleted))
