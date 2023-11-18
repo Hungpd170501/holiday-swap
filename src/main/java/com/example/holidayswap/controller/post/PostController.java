@@ -12,7 +12,7 @@ public class PostController {
     private final IPostService postService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createPost(String content) {
+    public ResponseEntity<?> createPost(@RequestBody String content) {
         postService.createPost(content);
        return ResponseEntity.ok("Post created");
     }
