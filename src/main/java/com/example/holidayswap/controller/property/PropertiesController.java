@@ -38,13 +38,13 @@ public class PropertiesController {
             @RequestParam(value = "resortId", required = false) Long[] resortId,
             @RequestParam(value = "propertyName", defaultValue = "") String propertyName,
             @RequestParam(value = "status", required = false, defaultValue = "ACTIVE, DEACTIVATE, NO_LONGER_IN_BUSINESS") PropertyStatus[] propertyStatus,
-            @RequestParam(value = "isDeleted", required = false, defaultValue = "true,false") boolean[] isDeleted,
+
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        var properties = propertyService.gets(resortId, propertyName, propertyStatus, isDeleted, pageable);
+        var properties = propertyService.gets(resortId, propertyName, propertyStatus, pageable);
         return ResponseEntity.ok(properties);
     }
 

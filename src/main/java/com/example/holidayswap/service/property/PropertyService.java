@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface PropertyService {
     Page<PropertyResponse> gets(Long[] resortId, String propertyName, PropertyStatus[] propertyStatus,
-                                boolean[] isDeleted,
+
                                 Pageable pageable);
 
     PropertyResponse get(Long id);

@@ -48,9 +48,9 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public Page<PropertyResponse> gets(Long[] resortId, String propertyName, PropertyStatus[] propertyStatus,
-                                       boolean[] isDeleted, Pageable pageable) {
+                                       Pageable pageable) {
         Page<Property> entities = null;
-        entities = propertyRepository.findAllByFilter(resortId, propertyName, propertyStatus, isDeleted, pageable);
+        entities = propertyRepository.findAllByFilter(resortId, propertyName, propertyStatus, pageable);
         var dtoResponse = entities.map(propertyMapper::toDtoResponse);
         dtoResponse.forEach(e -> {
             var propertyImages = propertyImageService.gets(e.getId());
