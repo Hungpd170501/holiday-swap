@@ -5,8 +5,12 @@ import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
 import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
 import com.example.holidayswap.domain.entity.notification.Notification;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
+import com.example.holidayswap.domain.entity.payment.TransactLog;
 import com.example.holidayswap.domain.entity.payment.Wallet;
+import com.example.holidayswap.domain.entity.post.Post;
+import com.example.holidayswap.domain.entity.post.UserReactionPost;
 import com.example.holidayswap.domain.entity.subscription.Subscription;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -89,6 +93,7 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
     @Column(nullable = false)
     private UserStatus status;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Set<MoneyTranfer> moneyTranfers;
 
@@ -98,7 +103,7 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "role_id")
     private Role role;
-
+@JsonIgnore
     @OneToMany(mappedBy = "user",
             orphanRemoval = true
     )
@@ -110,21 +115,32 @@ public class User extends BaseEntityAudit implements UserDetails, Serializable {
             inverseJoinColumns = @JoinColumn(name = "blocked_user_id"))
     private List<User> userBlockedList;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<UserReactionPost> userReactionPosts;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "user",
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )
     private List<Token> tokens;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private Set<Post> posts;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<ConversationParticipant> conversationParticipants;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Booking> bookingList;
-
+@JsonIgnore
     @OneToMany(mappedBy = "userOwner")
     private List<Booking> ownerBookingList;
-
+@JsonIgnore
     @OneToMany(mappedBy = "user",
             orphanRemoval = true
     )

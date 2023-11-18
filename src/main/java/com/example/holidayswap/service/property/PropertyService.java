@@ -11,7 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface PropertyService {
-    Page<PropertyResponse> gets(Long resortId, PropertyStatus propertyStatus, Pageable pageable);
+    Page<PropertyResponse> gets(Long[] resortId, String propertyName, PropertyStatus[] propertyStatus,
+
+                                Pageable pageable);
 
     PropertyResponse get(Long id);
 
