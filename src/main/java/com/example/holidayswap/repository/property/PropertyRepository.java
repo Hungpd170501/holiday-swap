@@ -67,17 +67,17 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     //get all for staff
     @Query(value = """
-            select distinct p from Property p
-            inner join PropertyType pt on p.propertyTypeId = pt.id
-            inner join pt.resorts r
-            where (:resortId is null or p.resortId = :resortId)
-            and p.isDeleted = false
-            and (:propertyStatus is null  or p.status = :propertyStatus)
+            select distinct p from Property p         
+            where upper(p.propertyName) like upper(concat('%', :propertyName, '%'))
+            and p.isDeleted = false 
+            and ((:#{#resortId == null} = true) or (p.resortId in :resortId))
+            and ((:#{#propertyStatus == null} = true) or (p.status in :propertyStatus))
             """)
-    Page<Property> findAllByFilter(@Param("resortId") Long resortId,
-                                   @Param("propertyStatus") PropertyStatus propertyStatus,
-                                   Pageable pageable);
+    Page<Property> findAllByFilter(@Param("resortId") Long[] resortId,
+                                   @Param("propertyName") String propertyName,
+                                   @Param("propertyStatus") PropertyStatus[] propertyStatus,
 
+                                   Pageable pageable);
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")
     Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);
 
