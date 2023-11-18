@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.dto.response.property;
 
 import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityTypeResponse;
+import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import lombok.Data;
 
@@ -25,6 +26,7 @@ public class PropertyResponse {
     private Boolean isDeleted;
     private PropertyStatus status;
     private Long resortId;
+    private ResortResponse resort;
     private PropertyTypeResponse propertyType;
     private PropertyViewResponse propertyView;
     private List<InRoomAmenityTypeResponse> inRoomAmenityType;
