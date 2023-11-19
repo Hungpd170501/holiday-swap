@@ -1,6 +1,7 @@
 package com.example.holidayswap.service.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortUpdateRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.Resort;
@@ -29,10 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -117,16 +115,31 @@ public class ResortServiceImpl implements ResortService {
     }
 
     @Override
-    public ResortResponse update(Long id, ResortRequest resortRequest) {
+    public ResortResponse update(Long id, ResortUpdateRequest resortRequest,List<MultipartFile> resortImage) {
         var entityFound = resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         }
+
         var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         List<ResortAmenity> resortAmenities = new ArrayList<>();
         resortRequest.getAmenities().forEach(e -> {
             resortAmenities.add(resortAmenityRepository.findByIdAndIsDeletedFalse(e).orElseThrow(() -> new EntityNotFoundException(RESORT_AMENITY_NOT_FOUND)));
         });
+
+        entity.getResortImages().forEach(e -> {
+                resortImageService.delete(e.getId());
+        });
+
+        for (PropertyType propertyType : entity.getPropertyTypes() ){
+            propertyType.getResorts().remove(entity);
+            propertyTypeRespository.save(propertyType);
+        }
+
+        resortImageService.setImageToResort(entity.getId(), resortRequest.getOldImages());
+        if(resortImage != null){
+            resortImage.forEach(e -> resortImageService.update(entity.getId(), e));
+        }
         List<PropertyType> propertyTypes = new ArrayList<>();
         resortRequest.getPropertyTypes().forEach(e -> {
             propertyTypes.add(propertyTypeRespository.findByIdAndIsDeletedFalse(e).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND)));

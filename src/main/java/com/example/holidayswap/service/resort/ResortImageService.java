@@ -15,5 +15,7 @@ public interface ResortImageService {
 
     ResortImageResponse update(Long Id, MultipartFile multipartFile);
 
+    void setImageToResort(Long resortId, List<String> linkImages);
+
     void delete(Long id);
 }

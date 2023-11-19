@@ -21,4 +21,6 @@ public interface PropertyTypeRespository extends JpaRepository<PropertyType, Lon
 
     @Query("select p from PropertyType p where upper(p.propertyTypeName) = upper(?1) and p.isDeleted = false")
     Optional<PropertyType> findByPropertyTypeNameEqualsIgnoreCaseAndDeletedIsFalse(String name);
+
+
 }

@@ -71,6 +71,17 @@ public class ResortImageServiceImpl implements ResortImageService {
     }
 
     @Override
+    public void setImageToResort(Long resortId, List<String> linkImages) {
+
+        linkImages.forEach(link -> {
+            var entity = new ResortImageRequest();
+            entity.setResortId(resortId);
+            entity.setLink(link);
+            resortImageRepository.save(ResortImageMapper.INSTANCE.toEntity(entity));
+        });
+    }
+
+    @Override
     public void delete(Long id) {
         var entity = (resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
                 () -> new EntityNotFoundException(RESORT_IMAGE_NOT_FOUND)));

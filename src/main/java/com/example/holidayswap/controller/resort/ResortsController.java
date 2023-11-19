@@ -1,6 +1,7 @@
 package com.example.holidayswap.controller.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortUpdateRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortImageResponse;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
@@ -88,8 +89,9 @@ public class ResortsController {
 
     @PutMapping("/{resortId}")
     public ResponseEntity<Void> update(@PathVariable("resortId") Long resortId,
-                                       @RequestBody ResortRequest resortRequest) {
-        resortService.update(resortId, resortRequest);
+                                       @RequestBody ResortUpdateRequest resortRequest,
+                                       @RequestPart List<MultipartFile> resortImage) {
+        resortService.update(resortId, resortRequest,resortImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")

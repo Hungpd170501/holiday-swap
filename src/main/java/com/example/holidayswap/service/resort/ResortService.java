@@ -1,6 +1,7 @@
 package com.example.holidayswap.service.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortUpdateRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public interface ResortService {
 
     ResortResponse create(ResortRequest resortRequest, List<MultipartFile> resortImage);
 
-    ResortResponse update(Long id, ResortRequest resortRequest);
+    ResortResponse update(Long id, ResortUpdateRequest resortRequest,List<MultipartFile> resortImage);
 
     ResortResponse update(Long id, ResortStatus resortStatus);
 
