@@ -15,4 +15,6 @@ public interface ResortImageRepository extends JpaRepository<ResortImage, Long> 
 
     @Query("select r from ResortImage r where r.id = ?1 and r.isDeleted = false ")
     Optional<ResortImage> findByIdAndDeletedFalse(Long resortId);
+//    @Query("select r from ResortImage r where r.id = ?1 ")
+//    Optional<ResortImage> findById(Long resortId);
 }

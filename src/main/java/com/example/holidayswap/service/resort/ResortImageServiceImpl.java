@@ -83,9 +83,9 @@ public class ResortImageServiceImpl implements ResortImageService {
 
     @Override
     public void delete(Long id) {
-        var entity = (resortImageRepository.findByIdAndDeletedFalse(id).orElseThrow(
+        var entity = (resortImageRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(RESORT_IMAGE_NOT_FOUND)));
-        entity.setDeleted(true);
-        resortImageRepository.save(entity);
+//        entity.setDeleted(true);
+        resortImageRepository.delete(entity);
     }
 }

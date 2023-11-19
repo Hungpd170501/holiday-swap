@@ -30,7 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -138,17 +141,18 @@ public class ResortServiceImpl implements ResortService {
 
         resortImageService.setImageToResort(entity.getId(), resortRequest.getOldImages());
         if(resortImage != null){
-            resortImage.forEach(e -> resortImageService.update(entity.getId(), e));
+            resortImage.forEach(e -> resortImageService.create(entity.getId(), e));
         }
         List<PropertyType> propertyTypes = new ArrayList<>();
         resortRequest.getPropertyTypes().forEach(e -> {
             propertyTypes.add(propertyTypeRespository.findByIdAndIsDeletedFalse(e).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND)));
         });
         ResortMapper.INSTANCE.updateEntityFromDTO(resortRequest, entity);
+        entity.setResortImages(null);
         entity.setAmenities(resortAmenities);
         entity.setPropertyTypes(propertyTypes);
-        Long i = resortRepository.save(entity).getId();
-        return get(i);
+        resortRepository.save(entity);
+        return null;
     }
 
     @Override
