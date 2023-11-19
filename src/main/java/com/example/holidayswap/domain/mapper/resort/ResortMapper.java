@@ -1,6 +1,7 @@
 package com.example.holidayswap.domain.mapper.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortUpdateRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import org.mapstruct.Mapper;
@@ -22,4 +23,9 @@ public interface ResortMapper {
     @Mapping(target = "amenities", source = "propertyTypes", ignore = true)
     @Mapping(target = "propertyTypes", source = "propertyTypes", ignore = true)
     void updateEntityFromDTO(ResortRequest dto, @MappingTarget Resort entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "amenities", source = "propertyTypes", ignore = true)
+    @Mapping(target = "propertyTypes", source = "propertyTypes", ignore = true)
+    void updateEntityFromDTO(ResortUpdateRequest dto, @MappingTarget Resort entity);
 }
