@@ -73,21 +73,25 @@ public class PostServiceImpl implements IPostService{
     }
 
     @Override
-    public List<PostResponse> getAllPosts() {
+    public List<PostResponse> getAllPosts(Long userId) {
         var post = postRepository.findAll();
         List<PostResponse> postResponse = new ArrayList<>();
-        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        User user = (User) principal;
+        UserReactionPost userReactPost = null;
+
+
 
         if(post != null){
             for (Post p: post) {
+
                 var userPostId = new UserReactionPostId();
-                userPostId.setPostId(p.getId());
-                userPostId.setUserId(user.getUserId());
+                if(userId != null){
+                    userPostId.setPostId(p.getId());
+                    userPostId.setUserId(userId);
+                    userReactPost = userReactPostRepository.findByUserReactionPostId(userPostId);
+
+                }
                 var userLike = userReactPostRepository.findAllByPostAndLike(p);
                 var userDislike = userReactPostRepository.findAllByPostAndDislike(p);
-                var userReactPost = userReactPostRepository.findByUserReactionPostId(userPostId);
 
 
                 PostResponse postResponse1 = new PostResponse();
@@ -105,6 +109,35 @@ public class PostServiceImpl implements IPostService{
             }
         }
         return postResponse;
+    }
+
+    @Override
+    public PostResponse getPost(Long postId,Long userId ) {
+        var post = postRepository.findById(postId).orElse(null);
+        var userPostId = new UserReactionPostId();
+        UserReactionPost userReactPost = null;
+        if(userId != null){
+            userPostId.setPostId(postId);
+            userPostId.setUserId(userId);
+            userReactPost = userReactPostRepository.findByUserReactionPostId(userPostId);
+
+        }
+        if(post != null){
+            var userLike = userReactPostRepository.findAllByPostAndLike(post);
+            var userDislike = userReactPostRepository.findAllByPostAndDislike(post);
+            PostResponse postResponse = new PostResponse();
+            postResponse.setContent(post.getContent());
+            postResponse.setDatePosted(post.getDatePosted());
+            postResponse.setId(post.getId());
+            postResponse.setUserName(post.getUser().getUsername());
+            postResponse.setAvatar(post.getUser().getAvatar());
+            postResponse.setLiked(userReactPost == null ? false : userReactPost.isLike());
+            postResponse.setDisliked(userReactPost == null ? false : userReactPost.isDislike());
+            postResponse.setLikes(userLike.size());
+            postResponse.setDislikes(userDislike.size());
+            return postResponse;
+        }
+        return null;
     }
 
 
