@@ -188,7 +188,7 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setTotal(booking.getActualPrice());
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
-        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink());
+        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
         historyBookingDetailResponse.setRating(booking.getRating() != null ? true : false);
 
         return historyBookingDetailResponse;
