@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,6 +36,12 @@ public class PropertyViewsController {
     public ResponseEntity<PropertyViewResponse> get(
             @PathVariable("id") Long id) {
         var dtoResponse = propertyViewService.get(id);
+        return ResponseEntity.ok(dtoResponse);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<PropertyViewResponse>> get() {
+        var dtoResponse = propertyViewService.gets();
         return ResponseEntity.ok(dtoResponse);
     }
 

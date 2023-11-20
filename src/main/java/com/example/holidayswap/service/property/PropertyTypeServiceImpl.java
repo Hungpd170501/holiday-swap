@@ -11,7 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_PROPERTY_TYPE;
 import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_TYPE_NOT_FOUND;
@@ -20,11 +22,19 @@ import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_TYPE_NOT_F
 @RequiredArgsConstructor
 public class PropertyTypeServiceImpl implements PropertyTypeService {
     private final PropertyTypeRespository propertyTypeRepository;
+    private final PropertyTypeMapper propertyTypeMapper;
 
     @Override
     public Page<PropertyTypeResponse> gets(String name, Pageable pageable) {
         var entities = propertyTypeRepository.findAllByPropertyTypeNameContainingIgnoreCaseAndDeletedIsFalse(name, pageable);
         var dtoResponse = entities.map(PropertyTypeMapper.INSTANCE::toDtoResponse);
+        return dtoResponse;
+    }
+
+    @Override
+    public List<PropertyTypeResponse> gets() {
+        var entity = propertyTypeRepository.findAll();
+        var dtoResponse = entity.stream().map(propertyTypeMapper::toDtoResponse).collect(Collectors.toList());
         return dtoResponse;
     }
 

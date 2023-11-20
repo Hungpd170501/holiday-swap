@@ -46,6 +46,17 @@ public class InRoomAmenityTypeServiceImpl implements InRoomAmenityTypeService {
     }
 
     @Override
+    public List<InRoomAmenityTypeResponse> gets() {
+        var dto = inRoomAmenityTypeRepository.findAll().stream().map(
+                InRoomAmenityTypeMapper.INSTANCE::toDtoResponse).toList();
+        dto.forEach(e -> {
+            var inRoomAmenity = inRoomAmenityService.getByInRoomAmenityType(e.getId());
+            e.setInRoomAmenities(inRoomAmenity);
+        });
+        return dto;
+    }
+
+    @Override
     public InRoomAmenityTypeResponse get(Long id) {
         var dto = InRoomAmenityTypeMapper.INSTANCE.toDtoResponse(inRoomAmenityTypeRepository.findByInRoomAmenityTypeIdAndIsDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_TYPE_NOT_FOUND)));

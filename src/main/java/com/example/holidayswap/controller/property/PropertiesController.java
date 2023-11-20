@@ -78,8 +78,9 @@ public class PropertiesController {
     }
 
     @PutMapping("/{propertyId}")
-    public ResponseEntity<Void> update(@PathVariable("propertyId") Long propertyId, @RequestBody PropertyUpdateRequest propertyUpdateRequest) {
-        propertyService.update(propertyId, propertyUpdateRequest);
+    public ResponseEntity<Void> update(@PathVariable("propertyId") Long propertyId, @RequestPart PropertyUpdateRequest propertyUpdateRequest
+            , @RequestPart List<MultipartFile> propertyImages) {
+        propertyService.update(propertyId, propertyUpdateRequest, propertyImages);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(propertyId).toUri();
         return ResponseEntity.created(location).build();
     }

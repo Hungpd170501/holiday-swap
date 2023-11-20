@@ -121,7 +121,7 @@ public class PropertyServiceImpl implements PropertyService {
     update
      */
     @Override
-    public PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest) {
+    public PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages) {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         if (dtoRequest.getNumberKingBeds() == 0 && dtoRequest.getNumberQueenBeds() == 0 && dtoRequest.getNumberSingleBeds() == 0 && dtoRequest.getNumberDoubleBeds() == 0 && dtoRequest.getNumberTwinBeds() == 0 && dtoRequest.getNumberFullBeds() == 0 && dtoRequest.getNumberSofaBeds() == 0 && dtoRequest.getNumberMurphyBeds() == 0)
             throw new DataIntegrityViolationException("Property must have 1 number bed.");
@@ -134,6 +134,12 @@ public class PropertyServiceImpl implements PropertyService {
             amenities.add(inRoomAmenityRepository.findByIdAndIsDeletedIsFalse(e).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND)));
         });
         property.setInRoomAmenities(amenities);
+        //Delete image
+        dtoRequest.getListImageDelete().forEach(propertyImageService::delete);
+        //Create image
+        propertyImages.forEach(e -> {
+            propertyImageService.create(id, e);
+        });
         propertyRepository.save(property);
         return PropertyMapper.INSTANCE.toDtoResponse(property);
     }
