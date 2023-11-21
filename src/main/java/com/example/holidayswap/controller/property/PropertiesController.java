@@ -79,7 +79,7 @@ public class PropertiesController {
 
     @PutMapping("/{propertyId}")
     public ResponseEntity<Void> update(@PathVariable("propertyId") Long propertyId, @RequestPart PropertyUpdateRequest propertyUpdateRequest
-            , @RequestPart List<MultipartFile> propertyImages) {
+            , @RequestPart(required = false) List<MultipartFile> propertyImages) {
         propertyService.update(propertyId, propertyUpdateRequest, propertyImages);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(propertyId).toUri();
         return ResponseEntity.created(location).build();

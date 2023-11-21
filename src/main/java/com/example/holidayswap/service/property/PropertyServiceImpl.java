@@ -137,6 +137,7 @@ public class PropertyServiceImpl implements PropertyService {
         //Delete image
         dtoRequest.getListImageDelete().forEach(propertyImageService::delete);
         //Create image
+        if (propertyImages != null)
         propertyImages.forEach(e -> {
             propertyImageService.create(id, e);
         });
