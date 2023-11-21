@@ -23,7 +23,7 @@ public interface PropertyService {
 
     PropertyResponse create(PropertyRegisterRequest dtoRequest);
 
-    PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest);
+    PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages);
 
     PropertyResponse update(Long id, PropertyStatus propertyStatus);
 
