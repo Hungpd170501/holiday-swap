@@ -87,6 +87,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     @Transactional
     public CoOwnerResponse create(CoOwnerId coOwnerId, CoOwnerRequest dtoRequest, List<MultipartFile> contractImages) {
         var dtoResponse = create(coOwnerId, dtoRequest);
+        contractImageService.deleteAll(coOwnerId);
         contractImages.forEach(e -> {
             //ContractImageRequest id = new ContractImageRequest();
             contractImageService.create(coOwnerId, e);
