@@ -121,7 +121,7 @@ public class PropertyServiceImpl implements PropertyService {
     update
      */
     @Override
-    public PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages) {
+    public PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest) {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         if (dtoRequest.getNumberKingBeds() == 0 && dtoRequest.getNumberQueenBeds() == 0 && dtoRequest.getNumberSingleBeds() == 0 && dtoRequest.getNumberDoubleBeds() == 0 && dtoRequest.getNumberTwinBeds() == 0 && dtoRequest.getNumberFullBeds() == 0 && dtoRequest.getNumberSofaBeds() == 0 && dtoRequest.getNumberMurphyBeds() == 0)
             throw new DataIntegrityViolationException("Property must have 1 number bed.");

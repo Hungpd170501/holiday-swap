@@ -124,7 +124,17 @@ public class BookingServiceImpl implements IBookingService {
         if (userBooking.size() > 0) {
             for (Booking booking : userBooking) {
                 boolean isRating = booking.getRating() != null ? false : true;
-                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getPrice(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink(), isRating,booking.getAvailableTimeId()));
+                historyBookingResponses.add(
+                        new HistoryBookingResponse(
+                                booking.getId(),
+                                booking.getCheckInDate(),
+                                booking.getCheckOutDate(),
+                                "check",
+                                booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(),
+                                booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
+                                booking.getStatus().name(), booking.getPrice(),
+                                booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
+                                isRating,booking.getAvailableTimeId()));
             }
         }
         return historyBookingResponses;
