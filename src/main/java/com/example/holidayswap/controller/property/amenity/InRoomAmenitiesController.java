@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,46 +23,32 @@ public class InRoomAmenitiesController {
     final private InRoomAmenityService inRoomAmenityService;
 
     @GetMapping
-    public ResponseEntity<Page<InRoomAmenityResponse>> gets(
-            @RequestParam(defaultValue = "") String name,
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection
-    ) {
+    public ResponseEntity<Page<InRoomAmenityResponse>> gets(@RequestParam(defaultValue = "") String name, @RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "asc") String sortDirection) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         return ResponseEntity.ok(inRoomAmenityService.gets(name, pageable));
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<List<InRoomAmenityResponse>> getList() {
+        return ResponseEntity.ok(inRoomAmenityService.gets());
+    }
+
     @GetMapping("/{inRoomAmenityId}")
-    public ResponseEntity<InRoomAmenityResponse> get(
-            @PathVariable("inRoomAmenityId") Long inRoomAmenityId) {
+    public ResponseEntity<InRoomAmenityResponse> get(@PathVariable("inRoomAmenityId") Long inRoomAmenityId) {
         return ResponseEntity.ok(inRoomAmenityService.get(inRoomAmenityId));
     }
 
     @PostMapping
-    public ResponseEntity<InRoomAmenityResponse> create(
-            @RequestPart(name = "inRoomAmenity") InRoomAmenityRequest dtoRequest,
-            @RequestPart(name = "inRoomAmenityIcon") MultipartFile inRoomAmenityIcon) {
+    public ResponseEntity<InRoomAmenityResponse> create(@RequestPart(name = "inRoomAmenity") InRoomAmenityRequest dtoRequest, @RequestPart(name = "inRoomAmenityIcon") MultipartFile inRoomAmenityIcon) {
         var dtoResponse = inRoomAmenityService.create(dtoRequest, inRoomAmenityIcon);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(dtoResponse.getId())
-                .toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dtoResponse.getId()).toUri();
         return ResponseEntity.created(location).body(dtoResponse);
     }
 
     @PutMapping("/{inRoomAmenityId}")
-    public ResponseEntity<InRoomAmenityResponse> update(@PathVariable("inRoomAmenityId") Long inRoomAmenityId,
-                                                        @RequestPart(name = "inRoomAmenity") InRoomAmenityRequest inRoomAmentity,
-                                                        @RequestPart(name = "inRoomAmenityIcon", required = false) MultipartFile inRoomAmenityIcon) {
+    public ResponseEntity<InRoomAmenityResponse> update(@PathVariable("inRoomAmenityId") Long inRoomAmenityId, @RequestPart(name = "inRoomAmenity") InRoomAmenityRequest inRoomAmentity, @RequestPart(name = "inRoomAmenityIcon", required = false) MultipartFile inRoomAmenityIcon) {
         var dtoResponse = inRoomAmenityService.update(inRoomAmenityId, inRoomAmentity, inRoomAmenityIcon);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(inRoomAmenityId)
-                .toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(inRoomAmenityId).toUri();
         return ResponseEntity.created(location).body(dtoResponse);
     }
 

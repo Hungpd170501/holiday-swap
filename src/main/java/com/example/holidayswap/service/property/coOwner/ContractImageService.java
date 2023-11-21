@@ -16,4 +16,6 @@ public interface ContractImageService {
     ContractImageResponse update(Long id, MultipartFile multipartFile);
 
     void delete(Long id);
+
+    void deleteAll(CoOwnerId dtoRequest);
 }

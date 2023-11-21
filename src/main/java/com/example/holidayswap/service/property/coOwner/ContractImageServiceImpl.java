@@ -67,4 +67,10 @@ public class ContractImageServiceImpl implements ContractImageService {
         contractImage.setIsDeleted(true);
         contractImageRepository.save(contractImage);
     }
+
+    @Override
+    public void deleteAll(CoOwnerId id) {
+        contractImageRepository.deleteByPropertyIdAndRoomIdAndUserId(id.getPropertyId(), id.getRoomId(),
+                id.getUserId());
+    }
 }

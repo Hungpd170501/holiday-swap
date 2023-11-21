@@ -16,6 +16,10 @@ public interface InRoomAmenityService {
 
     List<InRoomAmenityResponse> gets(Long propertyId);
 
+    List<InRoomAmenityResponse> getByInRoomAmenityType(Long InRoomAmenityTypeId);
+
+    List<InRoomAmenityResponse> gets();
+
     List<InRoomAmenityResponse> gets(Long propertyId, Long inRoomAmenityTypeId);
 
 
