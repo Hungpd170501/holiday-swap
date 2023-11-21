@@ -13,6 +13,8 @@ public interface InRoomAmenityTypeService {
 
     List<InRoomAmenityTypeResponse> gets(Long propertyId);
 
+    List<InRoomAmenityTypeResponse> gets();
+
     InRoomAmenityTypeResponse get(Long id);
 
     InRoomAmenityTypeResponse create(InRoomAmenityTypeRequest dtoRequest);

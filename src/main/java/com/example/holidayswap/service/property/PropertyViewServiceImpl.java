@@ -11,7 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.DUPLICATE_PROPERTY_VIEW;
 import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_VIEW_NOT_FOUND;
@@ -20,6 +22,7 @@ import static com.example.holidayswap.constants.ErrorMessage.PROPERTY_VIEW_NOT_F
 @RequiredArgsConstructor
 public class PropertyViewServiceImpl implements PropertyViewService {
     private final PropertyViewRepository propertyViewRepository;
+    private final PropertyViewMapper propertyViewMapper;
 
     @Override
     public Page<PropertyViewResponse> gets(String name, Pageable pageable) {
@@ -27,6 +30,13 @@ public class PropertyViewServiceImpl implements PropertyViewService {
                 findAllByPropertyViewNameContainingIgnoreCaseAndIsDeletedIsFalse(name, pageable);
         var dtoReponses = entities.map(PropertyViewMapper.INSTANCE::toDtoResponse);
         return dtoReponses;
+    }
+
+    @Override
+    public List<PropertyViewResponse> gets() {
+        var entity = propertyViewRepository.findAll();
+        var dtoRespone = entity.stream().map(propertyViewMapper::toDtoResponse).collect(Collectors.toList());
+        return dtoRespone;
     }
 
     @Override

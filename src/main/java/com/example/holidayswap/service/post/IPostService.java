@@ -9,5 +9,7 @@ public interface IPostService {
 
     void createPost(String content);
 
-    List<PostResponse> getAllPosts();
+    List<PostResponse> getAllPosts(Long userId);
+
+    PostResponse getPost(Long postId,Long userId);
 }

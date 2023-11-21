@@ -12,7 +12,7 @@ public class PostController {
     private final IPostService postService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createPost(String content) {
+    public ResponseEntity<?> createPost(@RequestBody String content) {
         postService.createPost(content);
        return ResponseEntity.ok("Post created");
     }
@@ -23,7 +23,11 @@ public class PostController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+    public ResponseEntity<?> getPosts(@RequestParam(required = false) Long userId) {
+        return ResponseEntity.ok(postService.getAllPosts(userId));
+    }
+    @GetMapping("/get/{postId}")
+    public ResponseEntity<?> getPost(@PathVariable Long postId, @RequestParam(required = false) Long userId) {
+        return ResponseEntity.ok(postService.getPost(postId, userId));
     }
 }
