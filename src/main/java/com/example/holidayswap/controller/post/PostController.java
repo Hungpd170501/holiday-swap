@@ -1,5 +1,6 @@
 package com.example.holidayswap.controller.post;
 
+import com.example.holidayswap.domain.dto.request.post.PostRequest;
 import com.example.holidayswap.service.post.IPostService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,8 @@ public class PostController {
     private final IPostService postService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createPost(@RequestBody String content) {
-        postService.createPost(content);
+    public ResponseEntity<?> createPost(@RequestBody PostRequest request) {
+        postService.createPost(request.getContent(), request.getTitle());
        return ResponseEntity.ok("Post created");
     }
     @PutMapping("/react")

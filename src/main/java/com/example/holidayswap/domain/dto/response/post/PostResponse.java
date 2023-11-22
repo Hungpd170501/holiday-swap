@@ -16,6 +16,7 @@ public class PostResponse {
     private Date datePosted;
     private String userName;
     private String avatar;
+    private String title;
     private int likes;
     private int dislikes;
     private boolean isLiked;

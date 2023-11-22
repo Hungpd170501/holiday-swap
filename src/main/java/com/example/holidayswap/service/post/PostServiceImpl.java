@@ -60,13 +60,14 @@ public class PostServiceImpl implements IPostService{
     }
 
     @Override
-    public void createPost(String content) {
+    public void createPost(String content, String title) {
         Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
         User user = (User) principal;
         Post post = new Post();
         post.setContent(content);
         post.setUser(user);
+        post.setTitle(title);
         post.setUserId(user.getUserId());
         post.setDatePosted(new java.util.Date());
         postRepository.save(post);
@@ -95,6 +96,7 @@ public class PostServiceImpl implements IPostService{
 
 
                 PostResponse postResponse1 = new PostResponse();
+                postResponse1.setTitle(p.getTitle());
                 postResponse1.setContent(p.getContent());
                 postResponse1.setDatePosted(p.getDatePosted());
                 postResponse1.setId(p.getId());
