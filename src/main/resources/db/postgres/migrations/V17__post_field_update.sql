@@ -1,0 +1,8 @@
+ALTER TABLE post
+    ADD title VARCHAR(255);
+
+ALTER TABLE post
+    ALTER COLUMN title SET NOT NULL;
+
+ALTER TABLE post
+    ALTER COLUMN content TYPE VARCHAR(255) USING (content::VARCHAR(255));
