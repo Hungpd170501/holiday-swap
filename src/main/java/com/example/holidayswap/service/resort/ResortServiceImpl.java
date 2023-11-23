@@ -123,6 +123,8 @@ public class ResortServiceImpl implements ResortService {
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         }
+        if(resortRequest.getOldImages().size() == 0 && resortImage.size() == 0)
+            throw new EntityNotFoundException("Resort image is required");
 
         var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         List<ResortAmenity> resortAmenities = new ArrayList<>();

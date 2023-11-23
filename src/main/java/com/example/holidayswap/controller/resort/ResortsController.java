@@ -90,7 +90,7 @@ public class ResortsController {
     @PutMapping("/{resortId}")
     public ResponseEntity<Void> update(@PathVariable("resortId") Long resortId,
                                        @RequestPart ResortUpdateRequest resortRequest,
-                                       @RequestPart List<MultipartFile> resortImage) {
+                                       @RequestPart(required = false) List<MultipartFile> resortImage) {
         resortService.update(resortId, resortRequest,resortImage);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
