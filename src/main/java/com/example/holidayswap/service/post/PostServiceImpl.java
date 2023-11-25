@@ -129,6 +129,7 @@ public class PostServiceImpl implements IPostService{
             var userDislike = userReactPostRepository.findAllByPostAndDislike(post);
             PostResponse postResponse = new PostResponse();
             postResponse.setContent(post.getContent());
+            postResponse.setTitle(post.getTitle());
             postResponse.setDatePosted(post.getDatePosted());
             postResponse.setId(post.getId());
             postResponse.setUserName(post.getUser().getUsername());
