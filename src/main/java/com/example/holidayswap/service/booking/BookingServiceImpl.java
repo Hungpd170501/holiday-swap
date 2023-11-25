@@ -123,7 +123,7 @@ public class BookingServiceImpl implements IBookingService {
         List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
         if (userBooking.size() > 0) {
             for (Booking booking : userBooking) {
-                boolean isRating = booking.getRating() != null ? false : true;
+//                boolean isRating = booking.getRating() != null ? false : true;
                 historyBookingResponses.add(
                         new HistoryBookingResponse(
                                 booking.getId(),
@@ -134,7 +134,8 @@ public class BookingServiceImpl implements IBookingService {
                                 booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
                                 booking.getStatus().name(), booking.getPrice(),
                                 booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
-                                isRating,booking.getAvailableTimeId()));
+//                                isRating,
+                                booking.getAvailableTimeId()));
             }
         }
         return historyBookingResponses;
@@ -158,7 +159,7 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
         historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink());
-        historyBookingDetailResponse.setRating(booking.getRating() != null ? false : true);
+//        historyBookingDetailResponse.setRating(booking.getRating() != null ? false : true);
 
         return historyBookingDetailResponse;
     }
@@ -173,8 +174,17 @@ public class BookingServiceImpl implements IBookingService {
         var bookingList = bookingRepository.findAllByOwnerLogin(user.getUserId());
         if (bookingList.size() > 0) {
             for (Booking booking : bookingList) {
-                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(), booking.getCheckInDate(), booking.getCheckOutDate(), "check", booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(), booking.getStatus().name(), booking.getActualPrice(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink(), booking.getRating() != null ? true : false,booking.getAvailableTimeId()));
+                historyBookingResponses.add(new HistoryBookingResponse(booking.getId(),
+                        booking.getCheckInDate(),
+                        booking.getCheckOutDate(), "check",
+                        booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(),
+                        booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
+                        booking.getStatus().name(), booking.getActualPrice(),
+                        booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink(),
+//                        booking.getRating() != null ? true : false,
+                        booking.getAvailableTimeId()));
             }
+
         }
         return historyBookingResponses;
     }
@@ -199,7 +209,7 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
         historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
-        historyBookingDetailResponse.setRating(booking.getRating() != null ? true : false);
+//        historyBookingDetailResponse.setRating(booking.getRating() != null ? true : false);
 
         return historyBookingDetailResponse;
     }

@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Data
 public class RatingResponse {
-    private Long id;
+    private RatingId id;
     private UserRatingResponse user;
     private String comment;
     private Double rating;

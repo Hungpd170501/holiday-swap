@@ -10,11 +10,11 @@ public interface RatingService {
 
     Double getRatingOfProperty(Long propertyId, String roomId);
 
-    RatingResponse getRatingByPropertyIdAndUserId(Long availableTimeId, Long userId);
+    RatingResponse getRatingByBookingId(Long bookingId);
 
-    void create(Long propertyId, Long userId, RatingRequest ratingRequest);
+    void create(Long bookingId, Long userId, RatingRequest ratingRequest);
 
-    void update(Long propertyId, Long userId, RatingRequest ratingRequest);
+    void update(Long bookingId, Long userId, RatingRequest ratingRequest);
 
-    void deleteRatingById(Long propertyId, Long userId);
+    void deleteRatingById(Long bookingId, Long userId);
 }
