@@ -32,6 +32,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<TimeHasBooked> findAllByAvailableTimeIdAndStatus(Long availableTimeId,
                                                           EnumBookingStatus.BookingStatus bookingStatus);
 
+    @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
+            "from Booking b inner join b.availableTime at inner join  at.timeFrame tf" +
+            " where tf.id = ?1  and b.status = ?2 and tf.isDeleted = false ")
+    List<TimeHasBooked> findAllByTimeFrameIdAndStatus(Long timeFrameId,
+                                                          EnumBookingStatus.BookingStatus bookingStatus);
+
     @Query("select " +
             "CASE WHEN count(b) > 0 THEN TRUE ELSE FALSE END" +
             " from Booking b inner join b.availableTime at inner join at.timeFrame tf inner join tf" +

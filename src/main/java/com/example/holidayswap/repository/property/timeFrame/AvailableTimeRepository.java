@@ -20,6 +20,9 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     @Query("select t from AvailableTime t where t.timeFrameId = ?1 and t.isDeleted = false")
     Page<AvailableTime> findAllByVacationUnitIdAndDeletedIsFalse(Long vacationId, Pageable pageable);
 
+    @Query("select a from AvailableTime a where a.timeFrameId = ?1 and a.isDeleted = false")
+    List<AvailableTime> findAllByTimeFrameIdAndIsDeletedIsFalse(Long timeFrameId);
+
     @Query("""
             select t from AvailableTime t
             join t.timeFrame v
