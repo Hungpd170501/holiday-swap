@@ -7,10 +7,10 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
 import com.example.holidayswap.domain.mapper.property.ResortApartmentForRentMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
-import com.example.holidayswap.repository.property.rating.RatingRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
+import com.example.holidayswap.service.property.rating.RatingServiceImpl;
 import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final ResortRepository resortRepository;
     private final ResortApartmentForRentMapper resortApartmentForRentMapper;
     private final AuthUtils authUtils;
-    private final RatingRepository ratingRepository;
+    private final RatingServiceImpl ratingService;
 
     @Override
     public Page<ApartmentForRentResponse> gets(String locationName, Long resortId, Date checkIn, Date checkOut, Long min, Long max, int guest, int numberBedsRoom, int numberBathRoom, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
@@ -47,7 +47,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
 //            e.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
             var propertyImages = propertyImageService.gets(e.getProperty().getId());
             e.getProperty().setPropertyImage(propertyImages);
-            e.getProperty().setRating(ratingRepository.calculateRating(e.getProperty().getId(), e.getCoOwnerId().getRoomId()));
+            e.getProperty().setRating(ratingService.getRatingOfProperty(e.getProperty().getId(), e.getCoOwnerId().getRoomId()));
         });
         return response;
     }
@@ -76,7 +76,8 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
             var propertyImages = propertyImageService.gets(response.getProperty().getId());
             response.getProperty().setPropertyImage(propertyImages);
             response.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
-            response.getProperty().setRating(ratingRepository.calculateRating(dto.getProperty().getId(), dto.getCoOwnerId().getRoomId()));
+//            response.getProperty().setRating(ratingRepository.calculateRating(dto.getProperty().getId(), dto.getCoOwnerId().getRoomId()));
+            response.getProperty().setRating(ratingService.getRatingOfProperty(response.getProperty().getId(), response.getCoOwnerId().getRoomId()));
         }
         return response;
     }

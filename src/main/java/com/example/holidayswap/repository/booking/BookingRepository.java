@@ -48,12 +48,32 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     );
 
     @Query("select " +
-            "CASE WHEN :now > b.checkOutDate THEN TRUE ELSE FALSE END" +
+            "CASE WHEN date(:now) > date(b.checkOutDate) THEN TRUE ELSE FALSE END" +
             " from Booking b inner join b.availableTime at inner join at.timeFrame tf inner join tf" +
             ".coOwner co" +
-            " where b.userBookingId = :userId and at.id = :availableTimeId")
+            " where b.id = :bookingId")
     boolean isDoneTraveled(
-            @Param("availableTimeId") Long availableTimeId, @Param("userId") Long userId, @Param("now") Date now
+            @Param("bookingId") Long bookingId, @Param("now") Date now
     );
 
+    @Query(value = """
+            select
+                                    	case
+                                    		when :now < ((b.check_out_date + interval '7 days') ) then true
+                                    		else false
+                                    	end
+                                    from
+                                    	booking b
+                                    inner join available_time av on
+                                    	b.available_time_id = av.available_time_id
+                                    inner join time_frame tf on
+                                    	tf.time_frame_id = av.time_frame_id
+                                    inner join co_owner co on
+                                    	co.property_id = tf.property_id
+                                    	and co.room_id = tf.room_id
+                                    	and co.user_id = tf.user_id
+                                    where
+                                    	b.book_id = :bookingId
+             """, nativeQuery = true)
+    boolean isOutDateRating(@Param("bookingId") Long bookingId, @Param("now") Date now);
 }

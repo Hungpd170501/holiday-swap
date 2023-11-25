@@ -18,8 +18,8 @@ import java.io.Serializable;
 public class RatingId implements Serializable {
     private static final long serialVersionUID = -4184519122503267383L;
     @NotNull
-    @Column(name = "available_time_id", nullable = false)
-    private Long availableTimeId;
+    @Column(name = "book_id", nullable = false)
+    private Long bookId;
     @NotNull
     @Column(name = "user_id", nullable = false)
     private Long userId;

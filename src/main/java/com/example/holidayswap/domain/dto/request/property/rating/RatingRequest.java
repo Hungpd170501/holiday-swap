@@ -8,5 +8,5 @@ public class RatingRequest {
     private String comment;
     private double rating;
     private RatingType ratingType;
-    private Long bookingId;
+//    private Long bookingId;
 }
