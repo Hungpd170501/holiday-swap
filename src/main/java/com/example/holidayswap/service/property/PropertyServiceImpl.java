@@ -137,18 +137,18 @@ public class PropertyServiceImpl implements PropertyService {
         });
         property.setInRoomAmenities(amenities);
 
-        Map<Long,String> listOldImage = new HashMap<>();
-        dtoRequest.getListImageOld().forEach(e -> {
-            listOldImage.put(e,"image");
-        });
-        propertyImageService.gets(id).forEach(e -> {
-            if (!listOldImage.containsKey(e.getId())){
-                propertyImageService.delete(e.getId());
-            }
-        });
+//        Map<Long,String> listOldImage = new HashMap<>();
+//        dtoRequest.getListImageOld().forEach(e -> {
+//            listOldImage.put(e,"image");
+//        });
+//        propertyImageService.gets(id).forEach(e -> {
+//            if (!listOldImage.containsKey(e.getId())){
+//                propertyImageService.delete(e.getId());
+//            }
+//        });
 
         //Delete image
-//        dtoRequest.getListImageDelete().forEach(propertyImageService::delete);
+        dtoRequest.getListImageDelete().forEach(propertyImageService::delete);
         //Create image
         if (propertyImages != null){
             propertyImages.forEach(e -> {
