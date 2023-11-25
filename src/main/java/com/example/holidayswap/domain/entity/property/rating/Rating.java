@@ -2,7 +2,6 @@ package com.example.holidayswap.domain.entity.property.rating;
 
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
@@ -21,19 +20,18 @@ import java.util.Date;
 @NoArgsConstructor
 @Table(name = "rating", schema = "public")
 public class Rating {
-    @Id
-    @Column(name = "rating_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+//    @Column(name = "rating_id", nullable = false)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private RatingId id;
     @MapsId("userId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @MapsId("availableTimeId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "available_time_id", nullable = false)
-    private AvailableTime availableTime;
+    @MapsId("book_id")
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "book_id", nullable = false)
+    private Booking booking;
     private String comment;
     @NotNull
     @PositiveOrZero
@@ -44,8 +42,5 @@ public class Rating {
     private Date createDate;
     private Date updateDate;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "rating_id")
-    private Booking booking;
+
 }

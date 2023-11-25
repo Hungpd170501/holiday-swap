@@ -26,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
@@ -134,6 +136,17 @@ public class PropertyServiceImpl implements PropertyService {
             amenities.add(inRoomAmenityRepository.findByIdAndIsDeletedIsFalse(e).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND)));
         });
         property.setInRoomAmenities(amenities);
+
+//        Map<Long,String> listOldImage = new HashMap<>();
+//        dtoRequest.getListImageOld().forEach(e -> {
+//            listOldImage.put(e,"image");
+//        });
+//        propertyImageService.gets(id).forEach(e -> {
+//            if (!listOldImage.containsKey(e.getId())){
+//                propertyImageService.delete(e.getId());
+//            }
+//        });
+
         //Delete image
         dtoRequest.getListImageDelete().forEach(propertyImageService::delete);
         //Create image

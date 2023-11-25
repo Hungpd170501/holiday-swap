@@ -1,7 +1,6 @@
 package com.example.holidayswap.domain.entity.post;
 
 import com.example.holidayswap.domain.entity.auth.User;
-import com.example.holidayswap.domain.entity.payment.Wallet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,7 +28,7 @@ public class Post {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "text")
     private String content;
 
     @Column(name = "datePosted", nullable = false)
