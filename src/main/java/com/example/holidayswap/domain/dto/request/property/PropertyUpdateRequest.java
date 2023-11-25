@@ -22,5 +22,6 @@ public class PropertyUpdateRequest {
     private Long propertyTypeId;
     private Long propertyViewId;
     private List<Long> inRoomAmenities;
-    private List<Long> listImageDelete;
+//    private List<Long> listImageDelete;
+    private List<Long> listImageOld;
 }
