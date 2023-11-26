@@ -98,6 +98,7 @@ public class UserServiceImpl implements UserService {
         if (userRequest.getAvatar() != null) {
             user.setAvatar(fileService.uploadFile(userRequest.getAvatar()));
         }
+        user.setStatus(UserStatus.ACTIVE);
         user.setRole(role);
         userRepository.save(user);
         walletService.CreateWallet(user.getUserId());
