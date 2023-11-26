@@ -50,6 +50,7 @@ public class BookingServiceImpl implements IBookingService {
             throw new EntityNotFoundException("Check in date must be before check out date");
 
         List<Booking> checkBookingOverlap;
+        Booking checkBooking;
         var notificationRequestForOwner = new NotificationRequest();
         var notificationRequestForUserBooking = new NotificationRequest();
         LocalDate localDateCheckin;
@@ -66,8 +67,9 @@ public class BookingServiceImpl implements IBookingService {
 
 //                 TODO: check booking of this apartment
                 checkBookingOverlap = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(bookingRequest.getAvailableTimeId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+                checkBooking = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getAvailableTimeId());
 
-                if (!checkBookingOverlap.isEmpty())
+                if (!checkBookingOverlap.isEmpty() || checkBooking != null)
                     throw new EntityNotFoundException("This apartment is not available in this time");
 
 
