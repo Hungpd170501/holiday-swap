@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             ON u.role.roleId = r.roleId
             WHERE
             (:email = '' OR u.email LIKE %:email%)
-            AND (:name = '' OR unaccent(upper(r.name)) LIKE %:name%)
+            AND (:name = '' OR unaccent(upper(u.username)) LIKE %:name%)
             AND (:phone = '' OR u.phone LIKE %:phone%)
             AND ((:#{#statusSet.empty} = true) OR u.status IN :statusSet)
             AND ((:#{#roleIds.empty} = true) OR u.role.roleId IN :roleIds)

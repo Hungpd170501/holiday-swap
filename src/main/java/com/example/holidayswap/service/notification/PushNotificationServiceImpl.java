@@ -26,7 +26,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     @Override
     public List<NotificationResponse> GetAllNotificationsByCurrentUser() {
         var user = authUtils.getAuthenticatedUser();
-        return notificationRepository.findAllByIsDeletedEqualsAndUserEquals(false, user).stream()
+        return notificationRepository.findAllByIsDeletedEqualsAndUserEqualsOrderByCreatedOnDesc(false, user).stream()
                 .map(NotificationMapper.INSTANCE::toNotificationResponse)
                 .toList();
     }
@@ -60,7 +60,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     @Override
     public void MarkAllNotificationsAsReadByCurrentUser() {
         var user = authUtils.getAuthenticatedUser();
-        notificationRepository.findAllByIsDeletedEqualsAndUserEquals(false, user).forEach(
+        notificationRepository.findAllByIsDeletedEqualsAndUserEqualsOrderByCreatedOnDesc(false, user).forEach(
                 notification -> {
                     notification.setIsRead(true);
                     notificationRepository.save(notification);
@@ -84,7 +84,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     @Override
     public void DeleteAllNotificationsByCurrentUser() {
         var user = authUtils.getAuthenticatedUser();
-        notificationRepository.findAllByIsDeletedEqualsAndUserEquals(false, user).forEach(
+        notificationRepository.findAllByIsDeletedEqualsAndUserEqualsOrderByCreatedOnDesc(false, user).forEach(
                 notification -> {
                     notification.setIsDeleted(true);
                     notificationRepository.save(notification);
