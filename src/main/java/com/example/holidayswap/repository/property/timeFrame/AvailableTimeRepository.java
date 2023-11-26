@@ -2,7 +2,6 @@ package com.example.holidayswap.repository.property.timeFrame;
 
 import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,22 +48,18 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     @Query(value = "SELECT * FROM available_time t WHERE t.available_time_id = ?1 AND t.is_deleted = false AND (?2 BETWEEN t.start_time AND t.end_time) AND ( ?3 BETWEEN t.start_time AND t.end_time) ", nativeQuery = true)
     Optional<AvailableTime> findAvailableTimeByIdAndStartTimeAndEndTime(Long timeFrameId,Date startTime, Date endTime);
 
-    @Query("""
-            select tod from AvailableTime tod
-            where tod.timeFrameId = ?1
-            and ((cast(?2 as date ) is null or cast(?3 as date) is null )
-                 or (
-                 (tod.startTime BETWEEN ?2 AND ?3)
-                 OR
-                 (tod.endTime BETWEEN ?2 AND ?3)
-                 OR
-                 (tod.startTime < ?2 AND tod.endTime > ?3)
-                 OR
-                 (tod.endTime > ?2 AND tod.endTime < ?3)
-                 ))
-            and tod.isDeleted = false 
-            and (?4 is null or tod.status = ?4)""")
-    Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(Long timeFrameId, Date startTime, Date endTime, AvailableTimeStatus timeOffDepositStatus);
+    @Query(value = """
+            select tod.available_time_id, tod.start_time, tod.end_time, tod.price_per_night, tod.is_deleted, status,
+                                                      tod.time_frame_id from available_time  tod
+                        where tod.time_frame_id = :time_frame_id
+                        and (date(tod.start_time), date(tod.end_time)) overlaps (date(:start_time), date(:end_time))
+                        and tod.is_deleted  = false
+                        and (:status is null or tod.status = :status)""", nativeQuery = true)
+    Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(
+            @Param("time_frame_id") Long timeFrameId,
+            @Param("start_time") Date startTime,
+            @Param("end_time") Date endTime,
+            @Param("status") String timeOffDepositStatus);
 
     @Query(value = "select t.* from available_time t JOIN time_frame v on t.time_frame_id = v.time_frame_id where v.property_id = ?1 AND v.room_id = ?2 AND ((?3 BETWEEN t.start_time AND t.end_time) OR ( ?4 BETWEEN t.start_time AND t.end_time)) Order By t.start_time ASC", nativeQuery = true)
     List<AvailableTime> findAllByPropertyIdAndRoomIdBetweenDate(Long propertyId, String roomId, Date startTime, Date endTime);
