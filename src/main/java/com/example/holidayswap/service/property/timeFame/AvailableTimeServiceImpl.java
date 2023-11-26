@@ -107,7 +107,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
                 timeFrameId,
                 dtoRequest.getStartTime(),
                 dtoRequest.getEndTime(),
-                AvailableTimeStatus.OPEN
+                AvailableTimeStatus.OPEN.name()
         );
         if (checkDuplicateWhichAny.isPresent())
             throw new DataIntegrityViolationException("Duplicate with another time. AVAILABLE-TIME");
