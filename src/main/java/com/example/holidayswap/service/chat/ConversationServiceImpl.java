@@ -18,13 +18,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-public class ConversationServiceImpl implements ConversationService{
+public class ConversationServiceImpl implements ConversationService {
 
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
@@ -47,6 +48,10 @@ public class ConversationServiceImpl implements ConversationService{
                             .toList())
                     .message(latestMessage.map(messageMapper::toMessageResponse).orElse(null))
                     .build();
+        }).sorted((o1, o2) -> {
+            LocalDateTime date1 = o1.getMessage() != null ? o1.getMessage().getCreatedOn() : o1.getCreationDate();
+            LocalDateTime date2 = o2.getMessage() != null ? o2.getMessage().getCreatedOn() : o2.getCreationDate();
+            return date2.compareTo(date1);
         }).toList();
     }
 
@@ -58,7 +63,7 @@ public class ConversationServiceImpl implements ConversationService{
                 .build();
         conversationRepository.save(conversation);
         for (Long userId : conversationRequest.getUserIds()) {
-            var user = userRepository.findById(userId).orElseThrow( () -> new EntityNotFoundException(USER_NOT_FOUND));
+            var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
             ConversationParticipant participant = new ConversationParticipant();
             ConversationParticipantPK participantPK = new ConversationParticipantPK();
             participantPK.setConversationId(conversation.getConversationId());
