@@ -36,7 +36,7 @@ public class ApartmentsForRentController {
             @RequestParam(name = "listOfPropertyView", required = false) Set<Long> listOfPropertyView,
             @RequestParam(name = "listOfPropertyType", required = false) Set<Long> listOfPropertyType,
             @RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "startTime") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
             Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var dtoResponse = roomService.gets(locationName, resortId, checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, pageable);
@@ -58,7 +58,7 @@ public class ApartmentsForRentController {
             @RequestParam(name = "listOfPropertyView", required = false) Set<Long> listOfPropertyView,
             @RequestParam(name = "listOfPropertyType", required = false) Set<Long> listOfPropertyType,
             @RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "startTime") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var dtoResponse = roomService.getsResort(locationName, checkIn, checkOut, min, max, guest, numberBedsRoom,
