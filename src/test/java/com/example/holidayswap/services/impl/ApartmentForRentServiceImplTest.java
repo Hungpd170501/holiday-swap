@@ -12,6 +12,7 @@ import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.ApartmentForRentServiceImpl;
 import com.example.holidayswap.service.property.PropertyImageServiceImpl;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
+import com.example.holidayswap.service.property.rating.RatingServiceImpl;
 import com.example.holidayswap.utils.AuthUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class ApartmentForRentServiceImplTest {
     ResortRepository resortRepository;
     ResortApartmentForRentMapper resortApartmentForRentMapper;
     AuthUtils authUtils;
-    RatingRepository ratingRepository;
+    RatingServiceImpl ratingRepository;
 
     @BeforeEach
     void beforeEach(){
@@ -44,7 +45,7 @@ public class ApartmentForRentServiceImplTest {
         resortRepository = mock(ResortRepository.class);
         resortApartmentForRentMapper = mock(ResortApartmentForRentMapper.class);
         authUtils = mock(AuthUtils.class);
-        ratingRepository = mock(RatingRepository.class);
+        ratingRepository = mock(RatingServiceImpl.class);
         apartmentForRentServiceImplUnderTest = new ApartmentForRentServiceImpl(inRoomAmenityTypeServiceImplUnderTest, propertyImageServiceImplUnderTest, availableTimeRepository, bookingRepository, resortRepository, resortApartmentForRentMapper, authUtils, ratingRepository);
     }
 
