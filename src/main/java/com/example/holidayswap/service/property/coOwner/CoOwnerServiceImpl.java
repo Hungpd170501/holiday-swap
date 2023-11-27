@@ -13,6 +13,7 @@ import com.example.holidayswap.domain.mapper.property.coOwner.CoOwnerMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
+import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final CoOwnerRepository coOwnerRepository;
     private final ContractImageService contractImageService;
     private final TimeFrameService timeFrameService;
+    private final UserService userService;
 
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
@@ -126,6 +128,11 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             }
         });
         var updated = coOwnerRepository.save(entity);
+        //user to membeship
+        if (coOwnerStatus.equals(CoOwnerStatus.ACCEPTED)) {
+            userService.upgradeUserToMember(coOwnerId.getUserId());
+        }
+
         return CoOwnerMapper.INSTANCE.toDtoResponse(updated);
     }
 
