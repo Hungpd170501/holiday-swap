@@ -23,9 +23,9 @@ public interface PropertyService {
 
     PropertyResponse create(PropertyRegisterRequest dtoRequest);
 
-    PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages);
+    void update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages);
 
-    PropertyResponse update(Long id, PropertyStatus propertyStatus);
+    void update(Long id, PropertyStatus propertyStatus);
 
     void delete(Long id);
 

@@ -118,7 +118,7 @@ public class ResortServiceImpl implements ResortService {
     }
 
     @Override
-    public ResortResponse update(Long id, ResortUpdateRequest resortRequest,List<MultipartFile> resortImage) {
+    public void update(Long id, ResortUpdateRequest resortRequest, List<MultipartFile> resortImage) {
         var entityFound = resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
@@ -158,15 +158,13 @@ public class ResortServiceImpl implements ResortService {
         entity.setAmenities(resortAmenities);
         entity.setPropertyTypes(propertyTypes);
         resortRepository.save(entity);
-        return null;
     }
 
     @Override
-    public ResortResponse update(Long id, ResortStatus resortStatus) {
+    public void update(Long id, ResortStatus resortStatus) {
         var entity = resortRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         entity.setStatus(resortStatus);
         Long i = resortRepository.save(entity).getId();
-        return get(i);
     }
 
     @Override
