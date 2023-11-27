@@ -1,9 +1,11 @@
 package com.example.holidayswap.domain.dto.response.property.timeFrame;
 
+import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class AvailableTimeResponse {
@@ -14,5 +16,5 @@ public class AvailableTimeResponse {
     private boolean isDeleted;
     private AvailableTimeStatus status;
     private Long timeFrameId;
-
+    private List<TimeHasBooked> timeHasBooked;
 }

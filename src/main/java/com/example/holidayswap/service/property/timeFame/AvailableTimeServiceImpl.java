@@ -2,6 +2,7 @@ package com.example.holidayswap.service.property.timeFame;
 
 import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTimeRequest;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
+import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
@@ -9,6 +10,7 @@ import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.timeFrame.AvailableTimeMapper;
+import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.property.timeFrame.TimeFrameRepository;
@@ -33,6 +35,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final AuthUtils authUtils;
     private final CoOwnerRepository coOwnerRepository;
     private final AvailableTimeMapper availableTimeMapper;
+    private final BookingRepository bookingRepository;
 
     @Override
     public Page<AvailableTimeResponse> getAllByVacationUnitId(Long timeFrameId, Pageable pageable) {
@@ -70,6 +73,8 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         var availableTimeFound = availableTimeRepository.findByIdAndDeletedFalse(id).
                 orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
         var availableTimeResponse = AvailableTimeMapper.INSTANCE.toDtoResponse(availableTimeFound);
+        availableTimeResponse.setTimeHasBooked(bookingRepository.findAllByTimeFrameIdAndStatus(id,
+                EnumBookingStatus.BookingStatus.SUCCESS));
         return availableTimeResponse;
     }
 
