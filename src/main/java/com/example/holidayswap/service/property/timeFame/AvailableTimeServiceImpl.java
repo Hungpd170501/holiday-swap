@@ -116,6 +116,10 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         );
         if (checkDuplicateWhichAny.isPresent())
             throw new DataIntegrityViolationException("Duplicate with another time. AVAILABLE-TIME");
+        //check if have any booking on its time.
+        var checkIsHaveAnyBookingYet = bookingRepository.checkTimeFrameIsHaveAnyBookingYetInTheTimeYet(dtoRequest.getStartTime(), dtoRequest.getEndTime(), timeFrameId);
+        if (!checkIsHaveAnyBookingYet.isEmpty())
+            throw new DataIntegrityViolationException("This time have a booking already, Please create in another date");
         var availableTime = AvailableTimeMapper.INSTANCE.toEntity(dtoRequest);
         availableTime.setStatus(AvailableTimeStatus.OPEN);
         availableTime.setTimeFrameId(timeFrameId);

@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.dto.request.auth.UserProfileUpdateRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserUpdateRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
+import com.example.holidayswap.domain.entity.auth.RoleName;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.auth.UserStatus;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -43,8 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfileResponse getUserById(Long userId) {
-        return userRepository.getUserByUserIdEquals(userId).map(UserMapper.INSTANCE::toUserProfileResponse)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        return userRepository.getUserByUserIdEquals(userId).map(UserMapper.INSTANCE::toUserProfileResponse).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
     }
 
     @Override
@@ -73,26 +73,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) {
-        userRepository.findById(userId)
-                .ifPresentOrElse(
-                        userRepository::delete,
-                        () -> {
-                            throw new EntityNotFoundException(USER_NOT_FOUND);
-                        });
+        userRepository.findById(userId).ifPresentOrElse(userRepository::delete, () -> {
+            throw new EntityNotFoundException(USER_NOT_FOUND);
+        });
     }
 
     @Override
     public Page<UserProfileResponse> findAllByEmailNamePhoneStatusRoleWithPagination(String email, String name, String phone, Set<UserStatus> statusSet, Set<Long> roleIds, Integer limit, Integer offset, String sortProps, String sortDirection) {
-        return userRepository.findAllByEmailNamePhoneStatusRoleWithPagination(
-                        email, StringUtils.stripAccents(name).toUpperCase(), phone, statusSet, roleIds,
-                        PageRequest.of(offset, limit, Sort.by(Sort.Direction.fromString(sortDirection), sortProps)))
-                .map(UserMapper.INSTANCE::toUserProfileResponse);
+        return userRepository.findAllByEmailNamePhoneStatusRoleWithPagination(email, StringUtils.stripAccents(name).toUpperCase(), phone, statusSet, roleIds, PageRequest.of(offset, limit, Sort.by(Sort.Direction.fromString(sortDirection), sortProps))).map(UserMapper.INSTANCE::toUserProfileResponse);
     }
 
     @Override
     public void createUser(UserRequest userRequest) throws IOException {
-        var role = roleRepository.findById(userRequest.getRoleId())
-                .orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
+        var role = roleRepository.findById(userRequest.getRoleId()).orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
         var user = UserMapper.INSTANCE.toUserEntity(userRequest);
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
         if (userRequest.getAvatar() != null) {
@@ -116,8 +109,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
-        var role = roleRepository.findById(userUpdateRequest.getRoleId())
-                .orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
+        var role = roleRepository.findById(userUpdateRequest.getRoleId()).orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
         userRepository.findById(userId).ifPresentOrElse(user -> {
             UserMapper.INSTANCE.toUserEntity(user, userUpdateRequest);
             if (userUpdateRequest.getAvatar() != null) {
@@ -145,6 +137,15 @@ public class UserServiceImpl implements UserService {
                 throw new AmazonServiceException("Error while uploading avatar");
             }
         }
+        userRepository.save(user);
+    }
+
+    @Override
+    public void upgradeUserToMember(Long userId) {
+        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Not Found user to upgrade to membership!."));
+        Long roleMemberShip = (long) RoleName.Membership.ordinal();
+        var role = roleRepository.findById(roleMemberShip).orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
+        user.setRole(role);
         userRepository.save(user);
     }
 }
