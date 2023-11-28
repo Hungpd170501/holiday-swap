@@ -161,7 +161,7 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setPropertyName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
-        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink());
+        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
 //        historyBookingDetailResponse.setRating(booking.getRating() != null ? false : true);
 
         return historyBookingDetailResponse;
@@ -183,7 +183,7 @@ public class BookingServiceImpl implements IBookingService {
                         booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(),
                         booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
                         booking.getStatus().name(), booking.getActualPrice(),
-                        booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink(),
+                        booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
 //                        booking.getRating() != null ? true : false,
                         booking.getAvailableTimeId()));
             }
