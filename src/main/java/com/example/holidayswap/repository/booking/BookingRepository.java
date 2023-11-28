@@ -17,10 +17,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 //    List<Booking> checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(Date checkInDate, Date checkOutDate, String roomId, Long propertyId);
 @Query(value = """
         SELECT* FROM booking b 
-        WHERE ((?2 > check_in_date 
-        AND ?2 < check_out_date) OR (?3 > check_in_date 
-        AND ?3 < check_out_date) 
-        OR(?2 < check_in_date AND ?3 > check_out_date )) 
+        WHERE ((?2 > check_in_date AND ?2 < check_out_date)
+        OR (?3 > check_in_date AND ?3 < check_out_date) 
+        OR(?2 < check_in_date AND ?3 > check_out_date )
+        OR(?2 < check_in_date AND ?3 > check_out_date )
+        ) 
         and available_time_id = ?1""", nativeQuery = true)
     List<Booking> checkBookingIsAvailableByCheckinDateAndCheckoutDate(Long availableTimeId, Date checkInDate, Date checkOutDate);
 
