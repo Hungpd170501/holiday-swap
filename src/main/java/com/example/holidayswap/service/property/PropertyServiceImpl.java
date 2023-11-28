@@ -26,9 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
@@ -123,7 +121,7 @@ public class PropertyServiceImpl implements PropertyService {
     update
      */
     @Override
-    public PropertyResponse update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages) {
+    public void update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages) {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         if (dtoRequest.getNumberKingBeds() == 0 && dtoRequest.getNumberQueenBeds() == 0 && dtoRequest.getNumberSingleBeds() == 0 && dtoRequest.getNumberDoubleBeds() == 0 && dtoRequest.getNumberTwinBeds() == 0 && dtoRequest.getNumberFullBeds() == 0 && dtoRequest.getNumberSofaBeds() == 0 && dtoRequest.getNumberMurphyBeds() == 0)
             throw new DataIntegrityViolationException("Property must have 1 number bed.");
@@ -156,16 +154,14 @@ public class PropertyServiceImpl implements PropertyService {
             });
         }
         propertyRepository.save(property);
-        return PropertyMapper.INSTANCE.toDtoResponse(property);
     }
 
     //update status
     @Override
-    public PropertyResponse update(Long id, PropertyStatus propertyStatus) {
+    public void update(Long id, PropertyStatus propertyStatus) {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         property.setStatus(propertyStatus);
         propertyRepository.save(property);
-        return PropertyMapper.INSTANCE.toDtoResponse(property);
     }
 
     @Override

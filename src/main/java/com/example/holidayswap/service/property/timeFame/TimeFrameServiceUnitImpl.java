@@ -38,20 +38,23 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
 
     @Override
     public Page<TimeFrameResponse> getAllByCoOwner(Long propertyId, Long userId, String roomId, Pageable pageable) {
-        var dtoResponses = timeFrameRepository.findAllByPropertyIdAAndUserIdAndRoomId(propertyId, userId, roomId, pageable)
-                .map((e) -> {
-                    var dto = TimeFrameMapper.INSTANCE.toDtoResponse(e);
-                    return dto;
-                });
+        var dtoResponses = timeFrameRepository.findAllByPropertyIdAAndUserIdAndRoomId(propertyId, userId, roomId, pageable).map((e) -> {
+            var dto = TimeFrameMapper.INSTANCE.toDtoResponse(e);
+            return dto;
+        });
         return dtoResponses;
     }
 
     @Override
     public TimeFrameResponse get(Long id) {
-        var timeFameFound = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow();
+        var timeFameFound =
+                timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(
+                        "Time Frame not found!."));
         var timeFameResponse = TimeFrameMapper.INSTANCE.toDtoResponse(timeFameFound);
         timeFameResponse.setAvailableTimes(availableTimeRepository.findAllByTimeFrameIdAndIsDeletedIsFalse(timeFameFound.getId()).stream().map(availableTimeMapper::toDtoResponse).collect(Collectors.toList()));
-        timeFameResponse.setTimeHasBooked(bookingRepository.findAllByTimeFrameIdAndStatus(timeFameFound.getId(), EnumBookingStatus.BookingStatus.SUCCESS));
+        timeFameResponse.getAvailableTimes().forEach((e) -> {
+            e.setTimeHasBooked(bookingRepository.findAllByTimeFrameIdAndStatus(timeFameFound.getId(), EnumBookingStatus.BookingStatus.SUCCESS));
+        });
         return timeFameResponse;
     }
 
@@ -61,51 +64,31 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
         var entity = TimeFrameMapper.INSTANCE.toEntity(dtoRequest);
         //Check begin time and end time is format
         //find ownership hold
-        var coOwner = coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(
-                        ownershipId.getPropertyId()
-                        , ownershipId.getUserId()
-                        , ownershipId.getRoomId())
-                .orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        var coOwner = coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(ownershipId.getPropertyId(), ownershipId.getUserId(), ownershipId.getRoomId()).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         //check user only have 1 timeframe
-        var isTimeFrameCreated = timeFrameRepository.
-                findOverlapWithStatusIsNotReject(
-                        ownershipId.getPropertyId(),
-                        ownershipId.getUserId(),
-                        ownershipId.getRoomId(),
-                        dtoRequest.getWeekNumber()
-                );
+        var isTimeFrameCreated = timeFrameRepository.findOverlapWithStatusIsNotReject(ownershipId.getPropertyId(), ownershipId.getUserId(), ownershipId.getRoomId(), dtoRequest.getWeekNumber());
         if (isTimeFrameCreated.isPresent() && isTimeFrameCreated.get().getStatus() != TimeFrameStatus.REJECTED)
             throw new DuplicateRecordException("User only creates 1 timeframe for 1 property");
         //Declare list
         List<TimeFrame> checkTimeFrame;
         //Check overlaps with any, only have 1 timeframe in 1 time
-        checkTimeFrame = timeFrameRepository.
-                findOverlapWith(
-                        ownershipId.getPropertyId(),
-                        ownershipId.getRoomId(),
-                        dtoRequest.getWeekNumber()
-                );
+        checkTimeFrame = timeFrameRepository.findOverlapWith(ownershipId.getPropertyId(), ownershipId.getRoomId(), dtoRequest.getWeekNumber());
         if (!checkTimeFrame.isEmpty()) {
             //DEEDED type: overlaps
             checkTimeFrame.forEach((e) -> {
                 if (e.getStatus() != TimeFrameStatus.REJECTED && e.getStatus() == TimeFrameStatus.ACCEPTED) {
-                    var checkCoOwner = coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(e.getPropertyId(),
-                            e.getUserId(), e.getRoomId());
+                    var checkCoOwner = coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(e.getPropertyId(), e.getUserId(), e.getRoomId());
 
                     if (checkCoOwner.get().getType() == ContractType.DEEDED) {
                         throw new DuplicateRecordException("CO-OWNER--DEEDED overlaps with other. Overlaps on CO-OWNER");
                     }
                     //RIGHT-TO-USE: overlaps
                     else {
-                        var coOwnersCheck = coOwnerRepository.
-                                checkOverlapsTimeOwnership(
-                                        //id
-                                        ownershipId.getPropertyId(),
-                                        ownershipId.getUserId(),
-                                        ownershipId.getRoomId(),
-                                        //time of co-owner instance
-                                        coOwner.getStartTime(),
-                                        coOwner.getEndTime());
+                        var coOwnersCheck = coOwnerRepository.checkOverlapsTimeOwnership(
+                                //id
+                                ownershipId.getPropertyId(), ownershipId.getUserId(), ownershipId.getRoomId(),
+                                //time of co-owner instance
+                                coOwner.getStartTime(), coOwner.getEndTime());
                         if (!coOwnersCheck.isEmpty()) {
                             throw new DuplicateRecordException("CO-OWNER--RIGHT-TO-USE overlaps with other. Overlaps on CO-OWNER-TIME");
                         }
@@ -124,8 +107,7 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
 
     @Override
     public TimeFrameResponse update(Long id, TimeFrameStatus timeFrameStatus) {
-        var timeFrame = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).
-                orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+        var timeFrame = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
         timeFrame.setStatus(timeFrameStatus);
         timeFrameRepository.save(timeFrame);
         return TimeFrameMapper.INSTANCE.toDtoResponse(timeFrame);
@@ -133,8 +115,7 @@ public class TimeFrameServiceUnitImpl implements TimeFrameService {
 
     @Override
     public void delete(Long id) {
-        var timeFrame = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(
-                () -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
+        var timeFrame = timeFrameRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
         timeFrame.setDeleted(true);
         timeFrameRepository.save(timeFrame);
     }

@@ -77,8 +77,8 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public void create(Long bookingId, Long userId, RatingRequest ratingRequest) {
-        isOutOfDateToRating(bookingId);
-        isDoneTraveled(bookingId);
+//        isOutOfDateToRating(bookingId);
+//        isDoneTraveled(bookingId);
         var id = new RatingId(bookingId, userId);
         var e = ratingMapper.toEntity(ratingRequest);
         e.setId(id);
@@ -95,8 +95,8 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public void update(Long bookingId, Long userId, RatingRequest ratingRequest) {
-        isOutOfDateToRating(bookingId);
-        isDoneTraveled(bookingId);
+//        isOutOfDateToRating(bookingId);
+//        isDoneTraveled(bookingId);
         var booking =
                 bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not " +
                         "found"));

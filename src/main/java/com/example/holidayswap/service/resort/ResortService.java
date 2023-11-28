@@ -20,9 +20,9 @@ public interface ResortService {
 
     ResortResponse create(ResortRequest resortRequest, List<MultipartFile> resortImage);
 
-    ResortResponse update(Long id, ResortUpdateRequest resortRequest,List<MultipartFile> resortImage);
+    void update(Long id, ResortUpdateRequest resortRequest, List<MultipartFile> resortImage);
 
-    ResortResponse update(Long id, ResortStatus resortStatus);
+    void update(Long id, ResortStatus resortStatus);
 
     void delete(Long id);
 }
