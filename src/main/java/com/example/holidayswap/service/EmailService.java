@@ -70,7 +70,7 @@ public class EmailService {
                 .builder()
                 .to(email)
                 .subject("HolidaySwap - Your register co-owner in apartment is now accepted")
-                .template("registration-receipt")
+                .template("register-coowner-success")
                 .attributes(attribute).build());
     }
 
