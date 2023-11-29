@@ -13,9 +13,11 @@ import com.example.holidayswap.domain.mapper.property.coOwner.CoOwnerMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
+import com.example.holidayswap.service.EmailService;
 import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.util.List;
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CoOwnerServiceImpl implements CoOwnerService {
     private final UserRepository userRepository;
@@ -36,6 +39,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final ContractImageService contractImageService;
     private final TimeFrameService timeFrameService;
     private final UserService userService;
+    private final EmailService emailService;
 
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
@@ -131,6 +135,13 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         //user to membeship
         if (coOwnerStatus.equals(CoOwnerStatus.ACCEPTED)) {
             userService.upgradeUserToMember(coOwnerId.getUserId());
+            var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found to accept co-Owner in apartment!."));
+            //send mail
+            try {
+                emailService.sendNotificationRegisterCoOwnerSuccessEmail(user.getEmail(), user.getUsername());
+            } catch (Exception e) {
+                log.error("Error sending verification email", e);
+            }
         }
 
         return CoOwnerMapper.INSTANCE.toDtoResponse(updated);
