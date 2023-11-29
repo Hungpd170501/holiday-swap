@@ -18,12 +18,14 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     Optional<Conversation> findByUserIdEqualsAndConversationIdEquals(@Param("userId") Long userId, @Param("conversationId") Long conversationId);
 
     @Query("""
-        SELECT c FROM Conversation c JOIN c.participants p
-        WHERE c.conversationName IS NULL
-        AND p.leftChat = false
+        SELECT c FROM Conversation c
+        INNER JOIN c.participants p
+        ON c.conversationId = p.conversationParticipantId.conversationId
+        WHERE (c.conversationName IS NULL OR c.conversationName = '')
         AND p.conversationParticipantId.userId IN (:currentUserId, :userId)
-        GROUP BY c
-        HAVING COUNT(DISTINCT p) = 2
+        AND p.leftChat = false
+        GROUP BY c.conversationId
+        HAVING COUNT(DISTINCT p.conversationParticipantId.userId) = 2
     """)
     Optional<Conversation> findConversationByUserIds(Long currentUserId, Long userId);
 }
