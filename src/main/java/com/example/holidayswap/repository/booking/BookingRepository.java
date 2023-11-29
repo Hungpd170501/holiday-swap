@@ -17,10 +17,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 //    List<Booking> checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(Date checkInDate, Date checkOutDate, String roomId, Long propertyId);
 @Query(value = """
         SELECT* FROM booking b 
-        WHERE ((?2 > check_in_date 
-        AND ?2 < check_out_date) OR (?3 > check_in_date 
-        AND ?3 < check_out_date) 
-        OR(?2 < check_in_date AND ?3 > check_out_date )) 
+        WHERE ((?2 > check_in_date AND ?2 < check_out_date)
+        OR (?3 > check_in_date AND ?3 < check_out_date) 
+        OR(?2 < check_in_date AND ?3 > check_out_date )
+        OR(?2 < check_in_date AND ?3 > check_out_date )
+        ) 
         and available_time_id = ?1""", nativeQuery = true)
     List<Booking> checkBookingIsAvailableByCheckinDateAndCheckoutDate(Long availableTimeId, Date checkInDate, Date checkOutDate);
 
@@ -84,4 +85,34 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                     	b.book_id = :bookingId
              """, nativeQuery = true)
     boolean isOutDateRating(@Param("bookingId") Long bookingId, @Param("now") Date now);
+
+    @Query(value = """
+            select
+                    	b.book_id,
+                    	b.check_in_date,
+                    	b.check_out_date,
+                    	b.price,
+                    	b.status,
+                    	b.actual_price,
+                    	b.available_time_id,
+                    	b.commission,
+                    	b.owner_id,
+                    	b.total_days,
+                    	b.user_booking_id,
+                    	b.date_booking
+                    from
+                    	booking b
+                    inner join available_time at on
+                    	at.available_time_id = b.available_time_id
+                    inner join time_frame tf on
+                    	tf.time_frame_id = at.time_frame_id
+                    where
+                    	tf.time_frame_id = :time_frame_id
+                    	and (date(b.check_in_date),
+                    	date(b.check_out_date)) overlaps (date(:check_in_date),
+                    	date(:check_out_date))
+                    """, nativeQuery = true)
+    List<Booking> checkTimeFrameIsHaveAnyBookingYetInTheTimeYet(@Param("check_in_date") Date check_in_date,
+                                                                @Param("check_out_date") Date check_out_date,
+                                                                @Param("time_frame_id") Long time_frame_id);
 }

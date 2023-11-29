@@ -31,4 +31,6 @@ public interface UserService {
     void updateUser(Long userId, UserUpdateRequest userUpdateRequest);
 
     void updateUserProfile(UserProfileUpdateRequest userUpdateRequest);
+
+    void upgradeUserToMember(Long userId);
 }

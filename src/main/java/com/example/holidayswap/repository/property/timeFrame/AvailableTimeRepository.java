@@ -33,6 +33,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     Page<AvailableTime> findAllByResortIdAndDeletedFalse(@Param("resortId") Long resortId, Pageable pageable);
 
 
+    AvailableTime findByTimeFrameId(Long timeFrameId);
 
     @Query("""
             select t from AvailableTime t

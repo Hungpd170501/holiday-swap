@@ -48,7 +48,9 @@ public class BookingServiceImpl implements IBookingService {
 
         if (bookingRequest.getCheckInDate().compareTo(bookingRequest.getCheckOutDate()) >= 0)
             throw new EntityNotFoundException("Check in date must be before check out date");
-
+        var booki = availableTimeRepository.findByTimeFrameId(bookingRequest.getAvailableTimeId());
+        if(booki.getTimeFrame().getUserId() == bookingRequest.getUserId()) 
+            throw new EntityNotFoundException("You can't book your own apartment");
         List<Booking> checkBookingOverlap;
         Booking checkBooking;
         var notificationRequestForOwner = new NotificationRequest();
@@ -60,6 +62,7 @@ public class BookingServiceImpl implements IBookingService {
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
         if (tryLock) {
             try {
+                Thread.sleep(3000);
                 // check List AvailableTime of this apartment
 //                Double amount = 0.0;
 //                Date intersection_date = bookingRequest.getCheckOutDate();
@@ -121,6 +124,7 @@ public class BookingServiceImpl implements IBookingService {
         Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
         User user = (User) principal;
+
         List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
         List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
         if (userBooking.size() > 0) {
@@ -131,7 +135,7 @@ public class BookingServiceImpl implements IBookingService {
                                 booking.getId(),
                                 booking.getCheckInDate(),
                                 booking.getCheckOutDate(),
-                                "check",
+                                booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName(),
                                 booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(),
                                 booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
                                 booking.getStatus().name(), booking.getPrice(),
@@ -160,7 +164,7 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setPropertyName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
-        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink());
+        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
 //        historyBookingDetailResponse.setRating(booking.getRating() != null ? false : true);
 
         return historyBookingDetailResponse;
@@ -178,11 +182,11 @@ public class BookingServiceImpl implements IBookingService {
             for (Booking booking : bookingList) {
                 historyBookingResponses.add(new HistoryBookingResponse(booking.getId(),
                         booking.getCheckInDate(),
-                        booking.getCheckOutDate(), "check",
+                        booking.getCheckOutDate(), booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName(),
                         booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId(),
                         booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
                         booking.getStatus().name(), booking.getActualPrice(),
-                        booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(1).getLink(),
+                        booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
 //                        booking.getRating() != null ? true : false,
                         booking.getAvailableTimeId()));
             }
