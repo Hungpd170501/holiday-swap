@@ -128,9 +128,9 @@ public class PropertyServiceImpl implements PropertyService {
         if (dtoRequest.getNumberKingBeds() == 0 && dtoRequest.getNumberQueenBeds() == 0 && dtoRequest.getNumberSingleBeds() == 0 && dtoRequest.getNumberDoubleBeds() == 0 && dtoRequest.getNumberTwinBeds() == 0 && dtoRequest.getNumberFullBeds() == 0 && dtoRequest.getNumberSofaBeds() == 0 && dtoRequest.getNumberMurphyBeds() == 0)
             throw new DataIntegrityViolationException("Property must have 1 number bed.");
         PropertyMapper.INSTANCE.updateEntityFromDTO(dtoRequest, property);
-        resortRepository.findByIdAndDeletedFalseAndResortStatus(dtoRequest.getPropertyViewId(), ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        var resort = resortRepository.findByIdAndDeletedFalseAndResortStatus(dtoRequest.getPropertyViewId(), ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         propertyViewRepository.findByIdAndIsDeletedIsFalse(dtoRequest.getPropertyViewId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
-        propertyTypeRespository.findByIdAndIsDeletedFalse(dtoRequest.getPropertyTypeId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
+        propertyTypeRespository.findPropertyTypeIsInResort(dtoRequest.getPropertyTypeId(), resort.getId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         List<InRoomAmenity> amenities = new ArrayList<>();
         dtoRequest.getInRoomAmenities().forEach(e -> {
             amenities.add(inRoomAmenityRepository.findByIdAndIsDeletedIsFalse(e).orElseThrow(() -> new EntityNotFoundException(IN_ROOM_AMENITY_NOT_FOUND)));
