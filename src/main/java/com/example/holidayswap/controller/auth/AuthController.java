@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.dto.request.auth.RefreshTokenRequest;
 import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.ResetPasswordRequest;
 import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
+import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.service.auth.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -85,9 +86,9 @@ public class AuthController {
             )
     )
     @PostMapping("/register")
-    public ResponseEntity<Void> registerUser(@RequestBody RegisterRequest registerRequest) {
-        authenticationService.register(registerRequest);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<UserProfileResponse> registerUser(@RequestBody RegisterRequest registerRequest) {
+        var userRes = authenticationService.register(registerRequest);
+        return ResponseEntity.ok(userRes);
     }
 
     @Operation(

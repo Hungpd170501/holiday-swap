@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.dto.request.auth.LoginRequest;
 import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.ResetPasswordRequest;
 import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
+import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.entity.auth.*;
 import com.example.holidayswap.domain.exception.AccessDeniedException;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
@@ -42,6 +43,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     @Autowired
+    UserService userService;
+    @Autowired
     private IWalletService walletService;
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
@@ -68,7 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void register(RegisterRequest request) {
+    public UserProfileResponse register(RegisterRequest request) {
         var role = roleRepository.findById(request.getRole().getRoleId())
                 .orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
         userRepository.getUserByEmailEquals(request.getEmail())
@@ -79,7 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setStatus(UserStatus.PENDING);
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRole(role);
-        userRepository.save(user);
+        var userRes = userRepository.save(user);
         walletService.CreateWallet(user.getUserId());
         try {
             emailService.sendRegistrationReceipt(user.getEmail(), user.getUsername());
@@ -96,6 +99,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             log.error("Error sending verification email", e);
         }
+        return UserMapper.INSTANCE.toUserProfileResponse(userRes);
     }
 
     @Override
