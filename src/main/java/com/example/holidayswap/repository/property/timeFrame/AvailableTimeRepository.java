@@ -117,6 +117,12 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  and p.status = 'ACTIVE'
                  and r.status = 'ACTIVE'
                  and u.status = 'ACTIVE'
+                 and co.isDeleted = false
+                 and tf.isDeleted = false
+                 and at.isDeleted = false
+                 and p.isDeleted = false
+                 and r.isDeleted = false
+               
                and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
                and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))

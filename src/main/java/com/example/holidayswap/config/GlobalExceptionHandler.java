@@ -4,9 +4,11 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.example.holidayswap.domain.exception.*;
+import com.example.holidayswap.domain.exception.message.ValidationErrorMessageFactory;
 import io.jsonwebtoken.JwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,12 +19,29 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @Autowired
+    private List<ValidationErrorMessageFactory> validationErrorMessageFactories;
+
+    private String getDetailedErrorMessage(Exception ex, List<ValidationErrorMessageFactory> validationErrorMessageFactories) {
+        String detailedErrorMessage = ex.getMessage();
+        for (ValidationErrorMessageFactory factory : validationErrorMessageFactories) {
+            if (factory.supports(ex.getClass())) {
+                detailedErrorMessage = factory.createValidationErrorMessage(ex);
+                break;
+            }
+        }
+        return detailedErrorMessage;
+    }
+
+
     //400
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
@@ -31,7 +50,7 @@ public class GlobalExceptionHandler {
     public <T extends RuntimeException> ResponseEntity<ApiError> handleValidationException(T ex, WebRequest request) {
         ApiError message = ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
-                .message(ex.getMessage())
+                .message(getDetailedErrorMessage(ex, validationErrorMessageFactories))
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
@@ -118,7 +137,7 @@ public class GlobalExceptionHandler {
                 .description(request.getDescription(false))
                 .timestamp(LocalDateTime.now())
                 .build();
-        log.warn("Data integrity violation exception: %s".formatted(message));
+        log.warn("Data integrity violation exception: %s".formatted(message.getDescription()));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
 

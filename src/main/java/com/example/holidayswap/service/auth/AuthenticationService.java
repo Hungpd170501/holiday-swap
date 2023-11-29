@@ -4,10 +4,11 @@ import com.example.holidayswap.domain.dto.request.auth.LoginRequest;
 import com.example.holidayswap.domain.dto.request.auth.RegisterRequest;
 import com.example.holidayswap.domain.dto.request.auth.ResetPasswordRequest;
 import com.example.holidayswap.domain.dto.response.auth.AuthenticationResponse;
+import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 
 public interface AuthenticationService {
-    void register(RegisterRequest request);
+    UserProfileResponse register(RegisterRequest request);
 
     AuthenticationResponse login(LoginRequest loginRequest);
 

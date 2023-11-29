@@ -65,6 +65,7 @@ public class BookingServiceImpl implements IBookingService {
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
         if (tryLock) {
             try {
+                Thread.sleep(3000);
                 // check List AvailableTime of this apartment
 //                Double amount = 0.0;
 //                Date intersection_date = bookingRequest.getCheckOutDate();

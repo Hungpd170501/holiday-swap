@@ -32,4 +32,10 @@ public class ConversationController {
         return ResponseEntity.ok(participants);
     }
 
+    @GetMapping("/current-user/contact/{userId}")
+    public ResponseEntity<ConversationResponse> getConversationByUserId(@PathVariable("userId") Long userId) {
+        var conversation = conversationService.getCurrentConverastionWithUserId(userId);
+        return ResponseEntity.ok(conversation);
+    }
+
 }
