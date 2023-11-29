@@ -95,6 +95,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 walletRepository.save(fromWallet);
                 walletRepository.save(toWallet);
                 transactLogRepository.save(transactLog);
+
                 loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
             } finally {
                 fairLock.unlock();

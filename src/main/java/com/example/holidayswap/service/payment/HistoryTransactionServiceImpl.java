@@ -66,7 +66,7 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 }else {
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.SEND);
                 }
-                if(transferPoint.getStatus().equals(EnumPaymentStatus.BankCodeError.SUCCESS)) {
+                if(transferPoint.getStatus().equals("SUCCESS")){
                     historyTransaction.setStatus(EnumPaymentStatus.StatusMoneyTranfer.SUCCESS);
                 }else {
                     historyTransaction.setStatus(EnumPaymentStatus.StatusMoneyTranfer.FAILED);
