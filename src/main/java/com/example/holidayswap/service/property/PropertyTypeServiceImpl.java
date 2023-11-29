@@ -39,6 +39,12 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
     }
 
     @Override
+    public List<PropertyTypeResponse> getPropertyTypeInResort(Long resortId) {
+        var list = propertyTypeRepository.findPropertyTypeIsInResort(resortId);
+        return list.stream().map(propertyTypeMapper::toDtoResponse).collect(Collectors.toList());
+    }
+
+    @Override
     public PropertyTypeResponse get(Long id) {
         var entity = propertyTypeRepository.findByIdAndIsDeletedFalse(id).orElseThrow(
                 () -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));

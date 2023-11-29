@@ -61,7 +61,7 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public ResortResponse get(Long id) {
-        var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        var entity = resortRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
 
         dtoResponse.setResortImages(resortImageService.gets(id));

@@ -1,16 +1,5 @@
 package com.example.holidayswap.repository.resort;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentDTO;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
@@ -18,11 +7,24 @@ import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeSta
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ResortRepository extends JpaRepository<Resort, Long> {
     @Query("select r from Resort r where r.id = :resortId and r.isDeleted = false and r.status = :resortStatus")
     Optional<Resort> findByIdAndDeletedFalseAndResortStatus(@Param(("resortId")) Long id, @Param(("resortStatus")) ResortStatus resortStatus);
+
+    @Query("select r from Resort r where r.id = :resortId and r.isDeleted = false ")
+    Optional<Resort> findByIdAndIsDeletedIsFalse(@Param(("resortId")) Long id);
 
     @Query("""
             select  r  from Resort r
