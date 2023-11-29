@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.dto.request.notification.NotificationReque
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
+import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
@@ -221,5 +222,13 @@ public class BookingServiceImpl implements IBookingService {
 //        historyBookingDetailResponse.setRating(booking.getRating() != null ? true : false);
 
         return historyBookingDetailResponse;
+    }
+
+    @Override
+    public List<TimeHasBooked> getTimeHasBooked(Long timeFameId, int year) {
+
+        var listTimeHasBooked = bookingRepository.getTimeHasBooked(timeFameId, year);
+
+        return listTimeHasBooked;
     }
 }
