@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.dto.response.chat.ConversationResponse;
 import com.example.holidayswap.domain.entity.chat.Conversation;
 import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
 import com.example.holidayswap.domain.entity.chat.ConversationParticipantPK;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.chat.ConversationParticipantMapper;
 import com.example.holidayswap.domain.mapper.chat.MessageMapper;
@@ -58,6 +59,13 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     @Transactional
     public void createConversation(ConversationRequest conversationRequest) {
+        List<Long> userIds = conversationRequest.getUserIds();
+        if (userIds.size() >= 2 && (conversationRequest.getConversationName() == null || conversationRequest.getConversationName().isEmpty())) {
+            throw new DataIntegrityViolationException("Group conversation name is required");
+        } else if (userIds.size() == 2) {
+            conversationRepository.findConversationByUserIds(userIds.get(0), userIds.get(1))
+                    .orElseThrow(() -> new EntityNotFoundException("A conversation already exists with these users"));
+        }
         Conversation conversation = Conversation.builder()
                 .conversationName(conversationRequest.getConversationName())
                 .build();
@@ -80,5 +88,15 @@ public class ConversationServiceImpl implements ConversationService {
         return conversationParticipantRepository.findByConversationId(conversationId).stream()
                 .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
                 .toList();
+    }
+
+    @Override
+    public ConversationResponse getCurrentConverastionWithUserId(Long userId) {
+        var user = authUtils.getAuthenticatedUser();
+        var conversation = conversationRepository.findConversationByUserIds(user.getUserId(), userId)
+                .orElseThrow(()-> new EntityNotFoundException("No contact found with id " + userId));
+        return ConversationResponse.builder()
+                .conversationId(conversation.getConversationId())
+                .build();
     }
 }

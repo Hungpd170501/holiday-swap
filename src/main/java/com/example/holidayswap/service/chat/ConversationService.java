@@ -12,4 +12,6 @@ public interface ConversationService {
     void createConversation(ConversationRequest conversationRequest);
 
     List<ConversationParticipantResponse> getConversationParticipants(Long conversationId);
+
+    ConversationResponse getCurrentConverastionWithUserId(Long userId);
 }
