@@ -5,9 +5,8 @@ import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
+import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -21,4 +20,6 @@ public interface IBookingService {
     List<HistoryBookingResponse> historyBookingOwnerLogin();
 
     HistoryDetailBookingOwnerResponse historyBookingDetailOwner(Long bookingId);
+
+    List<TimeHasBooked> getTimeHasBooked(Long timeFrameId, int year);
 }

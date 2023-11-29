@@ -1,11 +1,14 @@
 package com.example.holidayswap.controller.booking;
 
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
+import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.service.booking.IBookingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -38,5 +41,11 @@ public class BookingController {
     public ResponseEntity<?> getOwnerHistoryBookingDetail(@PathVariable Long bookingId){
         var historyBookingDetail = bookingService.historyBookingDetailOwner(bookingId);
         return historyBookingDetail != null ? ResponseEntity.ok(historyBookingDetail) : ResponseEntity.badRequest().body("Not Found");
+    }
+
+    @GetMapping("/timeHasBooked")
+    public ResponseEntity<List<TimeHasBooked>> getTimeHasBooked(@RequestParam Long timeFrameId, @RequestParam int year) {
+        var listTimeHasBooked = bookingService.getTimeHasBooked(timeFrameId, year);
+        return ResponseEntity.ok(listTimeHasBooked);
     }
 }
