@@ -37,6 +37,12 @@ public class PropertyTypesController {
         var inRoomAmenityTypeResponse = propertyTypeService.gets();
         return ResponseEntity.ok(inRoomAmenityTypeResponse);
     }
+
+    @GetMapping("/listPropertyTypeInResort/{resortId}")
+    public ResponseEntity<List<PropertyTypeResponse>> getListPropertyTypeInResort(@PathVariable("resortId") long resortId) {
+        var inRoomAmenityTypeResponse = propertyTypeService.getPropertyTypeInResort(resortId);
+        return ResponseEntity.ok(inRoomAmenityTypeResponse);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<PropertyTypeResponse> get(
             @PathVariable("id") Long id) {

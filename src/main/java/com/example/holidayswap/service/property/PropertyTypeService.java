@@ -12,6 +12,8 @@ public interface PropertyTypeService {
 
     List<PropertyTypeResponse> gets();
 
+    List<PropertyTypeResponse> getPropertyTypeInResort(Long resortId);
+
     PropertyTypeResponse get(Long id);
 
     PropertyTypeResponse create(PropertyTypeRequest dtoRequest);
