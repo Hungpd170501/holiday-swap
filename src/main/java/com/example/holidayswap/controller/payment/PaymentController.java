@@ -126,6 +126,6 @@ public class PaymentController {
         }else {
             moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranfer.getId(), EnumPaymentStatus.StatusMoneyTranfer.FAILED);
         }
-        return check ? ResponseEntity.ok(topUpWalletDTO) : ResponseEntity.badRequest().body("Transfer fail");
+        return check ? ResponseEntity.ok(topUpWalletDTO) : ResponseEntity.status(402).body("Transaction failed");
     }
 }
