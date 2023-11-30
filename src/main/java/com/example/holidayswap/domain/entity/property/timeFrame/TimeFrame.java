@@ -2,6 +2,8 @@ package com.example.holidayswap.domain.entity.property.timeFrame;
 
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +25,8 @@ public class TimeFrame {
     private Long id;
     @Column(name = "week_number")
     @NotNull
+    @Min(value = 1)
+    @Max(value = 52)
     private int weekNumber;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")

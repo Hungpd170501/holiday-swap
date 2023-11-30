@@ -17,7 +17,9 @@ import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.EmailService;
 import com.example.holidayswap.service.auth.UserService;
+import com.example.holidayswap.service.property.PropertyService;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
+import com.example.holidayswap.service.resort.ResortService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,6 +45,9 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final UserService userService;
     private final ResortRepository resortRepository;
     private final EmailService emailService;
+    private final ResortService resortService;
+    private final PropertyService propertyService;
+
 
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
@@ -56,6 +61,9 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     public CoOwnerResponse get(Long propertyId, Long userId, String roomId) {
         var dtoResponse = CoOwnerMapper.INSTANCE.toDtoResponse(coOwnerRepository.findByPropertyIdAndUserIdAndIdRoomId(propertyId, userId, roomId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND)));
         dtoResponse.setContractImages(contractImageService.gets(dtoResponse.getId().getPropertyId(), dtoResponse.getId().getUserId(), dtoResponse.getId().getRoomId()));
+        var property = propertyService.get(propertyId);
+        var resort = resortService.get(property.getResortId());
+        dtoResponse.setResort(resort);
         return dtoResponse;
     }
 
@@ -80,7 +88,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         }
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalseAndStatus(coOwnerId.getPropertyId(), PropertyStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
-        var resort = resortRepository.findByIdAndDeletedFalseAndResortStatus(property.getResortId(), ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        var resort = resortRepository.findByIdAndDeletedFalseAndResortStatus(property.getResortId(), ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Resort not found"));
         var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
         entity.setId(coOwnerId);
         entity.setProperty(property);

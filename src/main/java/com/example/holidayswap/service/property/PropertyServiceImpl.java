@@ -63,6 +63,13 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public List<PropertyResponse> getListPropertyActive() {
+        var entities = propertyRepository.getListPropertyActive();
+        var dtoResponse = entities.stream().map(propertyMapper::toDtoResponse).collect(Collectors.toList());
+        return dtoResponse;
+    }
+
+    @Override
     public PropertyResponse get(Long id) {
         var entity = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var dtoResponse = PropertyMapper.INSTANCE.toDtoResponse(entity);
@@ -92,6 +99,8 @@ public class PropertyServiceImpl implements PropertyService {
     @Transactional
     public PropertyResponse create(PropertyRegisterRequest dtoRequest, List<MultipartFile> propertyImages) {
         var entity = create(dtoRequest);
+        if (propertyImages.size() < 5)
+            throw new DataIntegrityViolationException("Please input more than 5 file image of property");
         propertyImages.forEach(e -> {
             propertyImageService.create(entity.getId(), e);
         });
@@ -108,6 +117,8 @@ public class PropertyServiceImpl implements PropertyService {
         var resort = resortRepository.findById(dtoRequest.getPropertyViewId()).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         if (resort.isDeleted()) throw new DataIntegrityViolationException("Resort has been deleted!.");
         if (resort.getStatus() == ResortStatus.ACTIVE) throw new DataIntegrityViolationException("Resort not ACTIVE!.");
+        if (dtoRequest.getInRoomAmenities().isEmpty())
+            throw new DataIntegrityViolationException("In room amenity can not be null");
         propertyViewRepository.findByIdAndIsDeletedIsFalse(dtoRequest.getPropertyViewId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
         propertyTypeRespository.findPropertyTypeIsInResort(dtoRequest.getPropertyTypeId(), resort.getId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         List<InRoomAmenity> amenities = new ArrayList<>();
@@ -124,7 +135,12 @@ public class PropertyServiceImpl implements PropertyService {
      */
     @Override
     public void update(Long id, PropertyUpdateRequest dtoRequest, List<MultipartFile> propertyImages) {
+        if (dtoRequest.getInRoomAmenities().isEmpty())
+            throw new DataIntegrityViolationException("In room amenity can not be null");
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        var propertyImage = propertyImageService.gets(id);
+        if ((propertyImages.size() + property.getPropertyImages().size() - dtoRequest.getListImageDelete().size()) < 5)
+            throw new DataIntegrityViolationException("Please input more than 5 file image of propery");
         if (dtoRequest.getNumberKingBeds() == 0 && dtoRequest.getNumberQueenBeds() == 0 && dtoRequest.getNumberSingleBeds() == 0 && dtoRequest.getNumberDoubleBeds() == 0 && dtoRequest.getNumberTwinBeds() == 0 && dtoRequest.getNumberFullBeds() == 0 && dtoRequest.getNumberSofaBeds() == 0 && dtoRequest.getNumberMurphyBeds() == 0)
             throw new DataIntegrityViolationException("Property must have 1 number bed.");
         PropertyMapper.INSTANCE.updateEntityFromDTO(dtoRequest, property);
@@ -150,7 +166,7 @@ public class PropertyServiceImpl implements PropertyService {
         //Delete image
         dtoRequest.getListImageDelete().forEach(propertyImageService::delete);
         //Create image
-        if (propertyImages != null){
+        if (propertyImages != null) {
             propertyImages.forEach(e -> {
                 propertyImageService.create(id, e);
             });

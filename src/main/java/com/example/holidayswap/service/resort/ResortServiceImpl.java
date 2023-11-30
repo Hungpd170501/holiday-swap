@@ -7,6 +7,7 @@ import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.DuplicateRecordException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.address.CountryMapper;
@@ -46,6 +47,9 @@ public class ResortServiceImpl implements ResortService {
     private final ResortAmenityRepository resortAmenityRepository;
     private final PropertyTypeRespository propertyTypeRespository;
     private final LocationService locationService;
+    private final DistrictRepository districtRepository;
+    private final StateOrProvinceRepository stateOrProvinceRepository;
+    private final CountryRepository countryRepository;
 
     @Override
     public Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
@@ -69,9 +73,7 @@ public class ResortServiceImpl implements ResortService {
 
         return dtoResponse;
     }
-    private final DistrictRepository districtRepository;
-    private final StateOrProvinceRepository stateOrProvinceRepository;
-    private final CountryRepository countryRepository;
+
     @Override
     @Transactional
     public ResortResponse create(ResortRequest resortRequest) {
@@ -113,21 +115,34 @@ public class ResortServiceImpl implements ResortService {
     @Transactional
     public ResortResponse create(ResortRequest resortRequest, List<MultipartFile> resortImage) {
         var entity = create(resortRequest);
+        if (resortImage.size() < 5)
+            throw new DataIntegrityViolationException("Please input more than 5 file image of resort");
+        if (resortRequest.getAmenities().isEmpty())
+            throw new DataIntegrityViolationException("Please input resort amenity");
+        if (resortRequest.getPropertyTypes().isEmpty())
+            throw new DataIntegrityViolationException("Please input resort's property Type");
         resortImage.forEach(e -> resortImageService.create(entity.getId(), e));
         return get(entity.getId());
     }
 
     @Override
     public void update(Long id, ResortUpdateRequest resortRequest, List<MultipartFile> resortImage) {
+        if (resortRequest.getAmenities().isEmpty())
+            throw new DataIntegrityViolationException("Please input resort amenity");
+        if (resortRequest.getPropertyTypes().isEmpty())
+            throw new DataIntegrityViolationException("Please input resort's property Type");
         var entityFound = resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         }
-        if((resortImage.isEmpty() || resortImage == null) && (resortRequest.getOldImages() == null || resortRequest.getOldImages().isEmpty()))
+        if ((resortImage.isEmpty() || resortImage == null) && (resortRequest.getOldImages() == null || resortRequest.getOldImages().isEmpty()))
             throw new EntityNotFoundException("Resort image is required");
-        if(resortRequest.getPropertyTypes().isEmpty() || resortRequest.getPropertyTypes() == null)
+        if (resortRequest.getOldImages().size() + resortImage.size() < 5)
+            throw new DataIntegrityViolationException("Please input more than 5 file image of resort");
+
+        if (resortRequest.getPropertyTypes().isEmpty() || resortRequest.getPropertyTypes() == null)
             throw new EntityNotFoundException("Property type is required");
-        if(resortRequest.getAmenities().isEmpty() || resortRequest.getAmenities() == null)
+        if (resortRequest.getAmenities().isEmpty() || resortRequest.getAmenities() == null)
             throw new EntityNotFoundException("Amenity is required");
 
         var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
@@ -137,16 +152,16 @@ public class ResortServiceImpl implements ResortService {
         });
 
         entity.getResortImages().forEach(e -> {
-                resortImageService.delete(e.getId());
+            resortImageService.delete(e.getId());
         });
 
-        for (PropertyType propertyType : entity.getPropertyTypes() ){
+        for (PropertyType propertyType : entity.getPropertyTypes()) {
             propertyType.getResorts().remove(entity);
             propertyTypeRespository.save(propertyType);
         }
 
         resortImageService.setImageToResort(entity.getId(), resortRequest.getOldImages());
-        if(resortImage != null){
+        if (resortImage != null) {
             resortImage.forEach(e -> resortImageService.create(entity.getId(), e));
         }
         List<PropertyType> propertyTypes = new ArrayList<>();

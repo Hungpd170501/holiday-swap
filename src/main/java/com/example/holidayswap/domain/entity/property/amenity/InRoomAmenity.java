@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class InRoomAmenity {
     @Column(name = "in_room_amenity_id", nullable = false)
     private Long id;
     @NotNull(message = "In-room amenity name must not null.")
+    @Length(min = 5, message = "Name length must greater than 5")
     @Column(name = "in_room_amenity_name", length = Integer.MAX_VALUE)
     private String inRoomAmenityName;
     @Column(name = "in_room_amenity_description", length = Integer.MAX_VALUE)
