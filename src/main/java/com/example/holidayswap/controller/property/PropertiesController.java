@@ -71,8 +71,8 @@ public class PropertiesController {
     }
 
     @GetMapping("/getListPropertyActive")
-    public ResponseEntity<List<PropertyResponse>> getListPropertyActive() {
-        var property = propertyService.getListPropertyActive();
+    public ResponseEntity<List<PropertyResponse>> getListPropertyActive(@RequestParam Long resortId) {
+        var property = propertyService.getListPropertyActive(resortId);
         return ResponseEntity.ok(property);
     }
 
@@ -85,8 +85,8 @@ public class PropertiesController {
 
     @PutMapping("/{propertyId}")
     public ResponseEntity<Void> update(@PathVariable("propertyId") Long propertyId,
-                                       @RequestPart(required = false) PropertyUpdateRequest propertyUpdateRequest
-            , @RequestPart List<MultipartFile> propertyImages) {
+                                       @RequestPart PropertyUpdateRequest propertyUpdateRequest
+            , @RequestPart(required = false) List<MultipartFile> propertyImages) {
         propertyService.update(propertyId, propertyUpdateRequest, propertyImages);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(propertyId).toUri();
         return ResponseEntity.created(location).build();

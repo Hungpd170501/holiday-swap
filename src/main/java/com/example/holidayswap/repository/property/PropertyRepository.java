@@ -85,8 +85,9 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             where 
             p.isDeleted = false  and r.isDeleted = false 
             and p.status = 'ACTIVE' and r.status = 'ACTIVE'
+            and r.id = :resort_id
             """)
-    List<Property> getListPropertyActive();
+    List<Property> getListPropertyActive(@Param("resort_id") Long resort_id);
 
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")
     Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);

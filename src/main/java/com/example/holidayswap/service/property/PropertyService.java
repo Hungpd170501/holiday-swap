@@ -17,7 +17,7 @@ public interface PropertyService {
 
     PropertyResponse get(Long id);
 
-    List<PropertyResponse> getListPropertyActive();
+    List<PropertyResponse> getListPropertyActive(Long resortId);
 
     List<PropertyResponse> getByResortId(Long resortId);
 
