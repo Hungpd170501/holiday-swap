@@ -32,7 +32,7 @@ public interface PropertyTypeRespository extends JpaRepository<PropertyType, Lon
                     inner join property_type pt on
                         rptp.property_type_id = pt.property_type_id
             where
-                    pt.property_type_id = :property_type_id  and resort_id = :resort_id
+                    pt.property_type_id = :property_type_id  and rptp.resort_id = :resort_id
             """, nativeQuery = true)
     Optional<PropertyType> findPropertyTypeIsInResort(@Param("property_type_id") Long property_type_id, @Param("resort_id") Long resort_id);
 
