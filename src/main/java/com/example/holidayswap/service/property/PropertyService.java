@@ -17,6 +17,8 @@ public interface PropertyService {
 
     PropertyResponse get(Long id);
 
+    List<PropertyResponse> getListPropertyActive();
+
     List<PropertyResponse> getByResortId(Long resortId);
 
     PropertyResponse create(PropertyRegisterRequest dtoRequest, List<MultipartFile> propertyImages);

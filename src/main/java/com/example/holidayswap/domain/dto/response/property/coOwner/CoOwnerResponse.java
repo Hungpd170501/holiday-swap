@@ -1,6 +1,8 @@
 package com.example.holidayswap.domain.dto.response.property.coOwner;
 
+import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.TimeFrameResponse;
+import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
@@ -20,4 +22,6 @@ public class CoOwnerResponse {
     private List<ContractImageResponse> contractImages;
     private List<TimeFrameResponse> timeFrames;
     private Date createDate;
+    private PropertyResponse property;
+    private ResortResponse resort;
 }

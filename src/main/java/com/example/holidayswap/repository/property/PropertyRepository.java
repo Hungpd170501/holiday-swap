@@ -16,12 +16,12 @@ import java.util.Optional;
 @Repository
 public interface PropertyRepository extends JpaRepository<Property, Long> {
     @Query("select p from Property p " +
-           "join p.propertyType pt " +
-           "join  pt.resorts r " +
-           "where p.resortId = ?1 " +
-           "and p.isDeleted = false " +
-           "and pt.isDeleted = false " +
-           "and r.isDeleted = false ")
+            "join p.propertyType pt " +
+            "join  pt.resorts r " +
+            "where p.resortId = ?1 " +
+            "and p.isDeleted = false " +
+            "and pt.isDeleted = false " +
+            "and r.isDeleted = false ")
     List<Property> findAllByResortIdAndIsDeleteIsFalse(Long resortId);
 
     @Query(value = """
@@ -78,6 +78,16 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
                                    @Param("propertyStatus") PropertyStatus[] propertyStatus,
 
                                    Pageable pageable);
+
+    @Query(value = """
+            select distinct p from Property p 
+            inner join p.resort r    
+            where 
+            p.isDeleted = false  and r.isDeleted = false 
+            and p.status = 'ACTIVE' and r.status = 'ACTIVE'
+            """)
+    List<Property> getListPropertyActive();
+
     @Query("select p from Property p where p.id = ?1 and p.isDeleted = false ")
     Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);
 
