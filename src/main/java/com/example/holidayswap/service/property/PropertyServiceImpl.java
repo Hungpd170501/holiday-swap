@@ -63,8 +63,8 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public List<PropertyResponse> getListPropertyActive() {
-        var entities = propertyRepository.getListPropertyActive();
+    public List<PropertyResponse> getListPropertyActive(Long resortId) {
+        var entities = propertyRepository.getListPropertyActive(resortId);
         var dtoResponse = entities.stream().map(propertyMapper::toDtoResponse).collect(Collectors.toList());
         return dtoResponse;
     }
