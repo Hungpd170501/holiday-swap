@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
@@ -38,54 +39,53 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public List<ConversationResponse> getUserConversations() {
         var user = authUtils.getAuthenticatedUser();
-        return conversationRepository.findByUserId(user.getUserId()).stream().map(conversation -> {
-            var latestMessage = messageRepository.findLatestMessageByConversation(conversation.getConversationId());
-            return ConversationResponse.builder()
-                    .conversationId(conversation.getConversationId())
-                    .creationDate(conversation.getCreatedOn())
-                    .conversationName(conversation.getConversationName())
-                    .participants(conversation.getParticipants().stream()
-                            .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
-                            .toList())
-                    .message(latestMessage.map(messageMapper::toMessageResponse).orElse(null))
-                    .build();
-        }).sorted((o1, o2) -> {
-            LocalDateTime date1 = o1.getMessage() != null ? o1.getMessage().getCreatedOn() : o1.getCreationDate();
-            LocalDateTime date2 = o2.getMessage() != null ? o2.getMessage().getCreatedOn() : o2.getCreationDate();
-            return date2.compareTo(date1);
-        }).toList();
+        return conversationRepository.findByUserId(user.getUserId())
+                .stream()
+                .map(this::mapToConversationResponse)
+                .sorted(Comparator.comparing(this::getSortDate).reversed())
+                .toList();
+    }
+
+    private ConversationResponse mapToConversationResponse(Conversation conversation) {
+        var latestMessage = messageRepository.findLatestMessageByConversation(conversation.getConversationId());
+        return ConversationResponse.builder()
+                .conversationId(conversation.getConversationId())
+                .creationDate(conversation.getCreatedOn())
+                .conversationName(conversation.getConversationName())
+                .participants(conversation.getParticipants()
+                        .stream()
+                        .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
+                        .toList())
+                .message(latestMessage.map(messageMapper::toMessageResponse).orElse(null))
+                .build();
+    }
+
+    private LocalDateTime getSortDate(ConversationResponse conversation) {
+        return conversation.getMessage() != null ? conversation.getMessage().getCreatedOn() : conversation.getCreationDate();
     }
 
     @Override
     @Transactional
     public void createConversation(ConversationRequest conversationRequest) {
         List<Long> userIds = conversationRequest.getUserIds();
-        if (userIds.size() >= 2 && (conversationRequest.getConversationName() == null || conversationRequest.getConversationName().isEmpty())) {
+        if (userIds.size() > 2 && (conversationRequest.getConversationName() == null || conversationRequest.getConversationName().isEmpty())) {
             throw new DataIntegrityViolationException("Group conversation name is required");
-        } else if (userIds.size() == 2) {
-            conversationRepository.findConversationByUserIds(userIds.get(0), userIds.get(1))
-                    .orElseThrow(() -> new EntityNotFoundException("A conversation already exists with these users"));
+        } else if (userIds.size() == 2 && conversationRepository.findConversationByUserIds(userIds.get(0), userIds.get(1)).isPresent()) {
+            throw new DataIntegrityViolationException("Conversation already exists");
         }
+
         Conversation conversation = Conversation.builder()
                 .conversationName(conversationRequest.getConversationName())
                 .build();
         conversationRepository.save(conversation);
-        for (Long userId : conversationRequest.getUserIds()) {
-            var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-            ConversationParticipant participant = new ConversationParticipant();
-            ConversationParticipantPK participantPK = new ConversationParticipantPK();
-            participantPK.setConversationId(conversation.getConversationId());
-            participantPK.setUserId(user.getUserId());
-            participant.setConversationParticipantId(participantPK);
-            participant.setConversation(conversation);
-            participant.setUser(user);
-            conversationParticipantRepository.save(participant);
-        }
+
+        createConversationParticipants(conversation, userIds);
     }
 
     @Override
     public List<ConversationParticipantResponse> getConversationParticipants(Long conversationId) {
-        return conversationParticipantRepository.findByConversationId(conversationId).stream()
+        return conversationParticipantRepository.findByConversationId(conversationId)
+                .stream()
                 .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
                 .toList();
     }
@@ -94,9 +94,43 @@ public class ConversationServiceImpl implements ConversationService {
     public ConversationResponse getCurrentConverastionWithUserId(Long userId) {
         var user = authUtils.getAuthenticatedUser();
         var conversation = conversationRepository.findConversationByUserIds(user.getUserId(), userId)
-                .orElseThrow(()-> new EntityNotFoundException("No contact found with id " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("No contact found with this user."));
         return ConversationResponse.builder()
                 .conversationId(conversation.getConversationId())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public ConversationResponse createCurrentConversationWithUserId(Long userId) {
+        var currentUser = authUtils.getAuthenticatedUser();
+        conversationRepository.findConversationByUserIds(currentUser.getUserId(), userId)
+                .ifPresent(conversation -> {
+                    throw new DataIntegrityViolationException("Conversation already exists");
+                });
+        Conversation conversationEntity = Conversation.builder()
+                .build();
+        conversationRepository.save(conversationEntity);
+        var userIds = List.of(currentUser.getUserId(), userId);
+        createConversationParticipants(conversationEntity, userIds);
+        return ConversationResponse.builder()
+                .conversationId(conversationEntity.getConversationId())
+                .build();
+    }
+
+    private void createConversationParticipants(Conversation conversationEntity, List<Long> userIds) {
+        userIds.stream()
+                .map(id -> userRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND)))
+                .forEach(user -> {
+                    ConversationParticipant participant = new ConversationParticipant();
+                    ConversationParticipantPK participantPK = new ConversationParticipantPK();
+                    participantPK.setConversationId(conversationEntity.getConversationId());
+                    participantPK.setUserId(user.getUserId());
+                    participant.setConversationParticipantId(participantPK);
+                    participant.setConversation(conversationEntity);
+                    participant.setUser(user);
+                    conversationParticipantRepository.save(participant);
+                });
     }
 }

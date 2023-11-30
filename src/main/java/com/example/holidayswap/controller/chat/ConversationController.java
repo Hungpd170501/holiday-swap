@@ -38,4 +38,9 @@ public class ConversationController {
         return ResponseEntity.ok(conversation);
     }
 
+    @PostMapping("/current-user/contact/{userId}")
+    public ResponseEntity<ConversationResponse> createConversationWithUser(@PathVariable("userId") Long userId) {
+        var conversation = conversationService.createCurrentConversationWithUserId(userId);
+        return ResponseEntity.ok(conversation);
+    }
 }
