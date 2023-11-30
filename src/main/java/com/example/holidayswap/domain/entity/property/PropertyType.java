@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class PropertyType {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
     @NotNull
+    @Length(min = 5, message = "Name length must greater than 5")
     @Column(name = "property_type_name", length = Integer.MAX_VALUE)
     private String propertyTypeName;
     @ManyToMany

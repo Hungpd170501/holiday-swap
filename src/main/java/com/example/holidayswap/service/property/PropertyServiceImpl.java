@@ -99,6 +99,8 @@ public class PropertyServiceImpl implements PropertyService {
     @Transactional
     public PropertyResponse create(PropertyRegisterRequest dtoRequest, List<MultipartFile> propertyImages) {
         var entity = create(dtoRequest);
+        if (propertyImages.size() < 5)
+            throw new DataIntegrityViolationException("Please input more than 5 file image of property");
         propertyImages.forEach(e -> {
             propertyImageService.create(entity.getId(), e);
         });
@@ -136,6 +138,9 @@ public class PropertyServiceImpl implements PropertyService {
         if (dtoRequest.getInRoomAmenities().isEmpty())
             throw new DataIntegrityViolationException("In room amenity can not be null");
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        var propertyImage = propertyImageService.gets(id);
+        if ((propertyImages.size() + property.getPropertyImages().size() - dtoRequest.getListImageDelete().size()) < 5)
+            throw new DataIntegrityViolationException("Please input more than 5 file image of propery");
         if (dtoRequest.getNumberKingBeds() == 0 && dtoRequest.getNumberQueenBeds() == 0 && dtoRequest.getNumberSingleBeds() == 0 && dtoRequest.getNumberDoubleBeds() == 0 && dtoRequest.getNumberTwinBeds() == 0 && dtoRequest.getNumberFullBeds() == 0 && dtoRequest.getNumberSofaBeds() == 0 && dtoRequest.getNumberMurphyBeds() == 0)
             throw new DataIntegrityViolationException("Property must have 1 number bed.");
         PropertyMapper.INSTANCE.updateEntityFromDTO(dtoRequest, property);

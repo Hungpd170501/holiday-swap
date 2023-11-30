@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class Resort {
     private Long id;
     @Size(max = 255)
     @NotNull
+    @Length(min = 5, message = "Name length must greater than 5")
     @Column(name = "resort_name")
     private String resortName;
     @Column(name = "resort_description")
