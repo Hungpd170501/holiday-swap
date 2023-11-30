@@ -22,4 +22,10 @@ public interface IBookingService {
     HistoryDetailBookingOwnerResponse historyBookingDetailOwner(Long bookingId);
 
     List<TimeHasBooked> getTimeHasBooked(Long timeFrameId, int year);
+
+    void deactiveResortNotifyBookingUser(Long resortId);
+
+    void deactivePropertyNotifyBookingUser(Long propertyId);
+
+    String returnPointBooking(Long bookingId) throws InterruptedException;
 }

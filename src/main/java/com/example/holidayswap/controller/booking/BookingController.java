@@ -48,4 +48,10 @@ public class BookingController {
         var listTimeHasBooked = bookingService.getTimeHasBooked(timeFrameId, year);
         return ResponseEntity.ok(listTimeHasBooked);
     }
+
+    @PutMapping("/cancel/{bookingId}")
+    public ResponseEntity<?> cancelBooking(@PathVariable Long bookingId) throws InterruptedException {
+        var cancelBooking = bookingService.returnPointBooking(bookingId);
+        return cancelBooking != null ? ResponseEntity.ok(cancelBooking) : ResponseEntity.badRequest().body("Can not cancel booking");
+    }
 }

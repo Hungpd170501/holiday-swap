@@ -17,6 +17,7 @@ import com.example.holidayswap.repository.property.amenity.InRoomAmenityReposito
 import com.example.holidayswap.repository.property.rating.RatingRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.auth.UserService;
+import com.example.holidayswap.service.booking.IBookingService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final ResortRepository resortRepository;
     private final UserService userService;
     private final RatingRepository ratingRepository;
+    private final IBookingService bookingService;
 
     @Override
     public Page<PropertyResponse> gets(Long[] resortId, String propertyName, PropertyStatus[] propertyStatus,
@@ -185,6 +187,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public void delete(Long id) {
         var propertyFound = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        bookingService.deactivePropertyNotifyBookingUser(id);
         propertyFound.setIsDeleted(true);
         propertyRepository.save(propertyFound);
     }

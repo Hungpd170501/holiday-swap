@@ -80,4 +80,17 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
             select property_id, room_id, user_id, end_time, is_deleted, start_time, status, type, create_date from co_owner co where co.property_id = :propertyId and co.user_id = :userId and co.room_id = :roomId and case when co.type = 'DEEDED' then(   ((:coOwnerStatus is null) or (co.status = :coOwnerStatus))) else ( ((:coOwnerStatus is null) or (co.status = :coOwnerStatus)) and extract(year from date(:startTime)) >= extract(year from date(co.start_time)) and extract(year from date(:endTime)) <= extract(year from date(co.end_time)) ) end
             """, nativeQuery = true)
     Optional<CoOwner> isMatchingCoOwner(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("startTime") Date startTime, @Param("endTime") Date endTime, @Param("coOwnerStatus") String coOwnerStatus);
+
+    @Query(value = """
+           SELECT co_owner.* FROM co_owner join property ON property.property_id = co_owner.property_id
+           join resort ON resort.resort_id = property.resort_id
+           where resort.resort_id = ?1 and resort.resort_status = 'ACTIVE'
+           """, nativeQuery = true)
+    List<CoOwner> getListCownerByResortId(Long resortId);
+
+    @Query(value = """
+           SELECT co_owner.* FROM co_owner join property on property.property_id = co_owner.property_id
+                                          where property.property_id = ?1 and property.is_deleted = false
+           """, nativeQuery = true)
+    List<CoOwner> getListCoOwnerByPropertyId(Long propertyId);
 }

@@ -69,8 +69,12 @@ public class Booking {
     @Column(name = "date_booking", nullable = false)
     private String dateBooking;
 
-//    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-//    private List<BookingDetail> bookingDetail;
+
+    @Column(name = "totalMember", nullable = false)
+    private int totalMember;
+
+    @Column(name = "status_check_return", nullable = false)
+    private Boolean statusCheckReturn;
 
     @OneToMany(mappedBy = "booking")
     private Set<UserOfBooking> userOfBookings;
