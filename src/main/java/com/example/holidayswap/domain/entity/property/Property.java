@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class Property {
 
     @Column(name = "property_name")
     @NotNull
+    @Length(min = 5, message = "Name length must greater than 5")
     private String propertyName;
     @Column(name = "property_description")
     private String propertyDescription;

@@ -70,6 +70,12 @@ public class PropertiesController {
         return ResponseEntity.ok(property);
     }
 
+    @GetMapping("/getListPropertyActive")
+    public ResponseEntity<List<PropertyResponse>> getListPropertyActive() {
+        var property = propertyService.getListPropertyActive();
+        return ResponseEntity.ok(property);
+    }
+
     @PostMapping
     public ResponseEntity<PropertyResponse> create(@RequestPart(name = "property") PropertyRegisterRequest propertyRegisterRequest, @RequestPart List<MultipartFile> propertyImages) {
         var propertyCreated = propertyService.create(propertyRegisterRequest, propertyImages);

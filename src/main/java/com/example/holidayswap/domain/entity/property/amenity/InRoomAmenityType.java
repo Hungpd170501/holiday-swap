@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class InRoomAmenityType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "in_room_amenity_type_id", nullable = false)
     private Long id;
+    @Length(min = 5, message = "Name length must greater than 5")
     @Column(name = "in_room_amenity_type_name", length = Integer.MAX_VALUE)
     @NotNull
     private String inRoomAmenityTypeName;
