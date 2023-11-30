@@ -22,17 +22,17 @@ public interface PropertyTypeRespository extends JpaRepository<PropertyType, Lon
     Optional<PropertyType> findByIdAndIsDeletedFalse(Long id);
 
     @Query(value = """
-             select
-            pt.property_type_id ,
-            pt.property_type_description ,
-            pt.is_deleted ,
-            pt.property_type_name
+            select
+                pt.property_type_id ,
+                pt.property_type_description ,
+                pt.is_deleted ,
+                pt.property_type_name
             from
-            resorts_property_type_property rptp
-            inner join property_type pt on
-            rptp.property_type_id = pt.property_type_id
+                resorts_property_type_property rptp
+                    inner join property_type pt on
+                        rptp.property_type_id = pt.property_type_id
             where
-            property_type_id = :property_type_id  and resort_id = :resort_id
+                    pt.property_type_id = :property_type_id  and resort_id = :resort_id
             """, nativeQuery = true)
     Optional<PropertyType> findPropertyTypeIsInResort(@Param("property_type_id") Long property_type_id, @Param("resort_id") Long resort_id);
 
