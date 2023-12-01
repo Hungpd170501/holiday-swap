@@ -1,5 +1,6 @@
 package com.example.holidayswap.service.payment;
 
+import com.example.holidayswap.domain.dto.request.notification.NotificationRequest;
 import com.example.holidayswap.domain.dto.response.payment.TransactionTranferPointResponse;
 import com.example.holidayswap.domain.dto.response.payment.TransferResponse;
 import com.example.holidayswap.domain.entity.booking.Booking;
@@ -10,6 +11,7 @@ import com.example.holidayswap.repository.payment.TransactLogRepository;
 import com.example.holidayswap.repository.payment.WalletRepository;
 import com.example.holidayswap.service.BankException;
 import com.example.holidayswap.service.auth.UserService;
+import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.utils.Helper;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
@@ -52,11 +54,12 @@ public class TransferPointServiceImpl implements ITransferPointService {
 
     @Autowired
     private ITransactionBookingRefundOwnerService transactionBookingRefundOwnerService;
+    private final PushNotificationService pushNotificationService;
 
 
     @Override
     @Transactional(rollbackFor = {BankException.class, InterruptedException.class})
-    public TransferResponse transferPoint(long from, long to, long amount) throws InterruptedException {
+    public TransferResponse transferPoint(long from, long to, Double amount) throws InterruptedException {
         Wallet fromWallet;
         Wallet toWallet;
         String currentDate = null;
@@ -182,6 +185,45 @@ public class TransferPointServiceImpl implements ITransferPointService {
             }
         }
 
+        return new TransferResponse(EnumPaymentStatus.BankCodeError.SUCCESS, "Success", Helper.getCurrentDate());
+    }
+
+    @Override
+    public TransferResponse returnPoint(long from, long to, Double amount, Double commision) throws InterruptedException {
+        Wallet fromWallet;
+        AdminWallet adminWallet;
+        Wallet toWallet;
+        Double total;
+        adminWallet = adminWalletRepository.findFirstByOrderByIdDesc();
+        RLock fairLock = RedissonLockUtils.getFairLock("wallet-" + from);
+        boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
+        if (tryLock) {
+            try {
+                fromWallet = walletService.GetWalletByUserId(from);
+                toWallet = walletService.GetWalletByUserId(to);
+                if (fromWallet.getTotalPoint() < amount) {
+                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
+                    throw new BankException(detail);
+                }
+
+                fromWallet.withdraw(amount);
+                adminWallet.setTotalPoint(adminWallet.getTotalPoint() - commision);
+                toWallet.setTotalPoint(toWallet.getTotalPoint() + amount + commision);
+
+                walletRepository.save(toWallet);
+                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
+                walletRepository.save(fromWallet);
+                total = amount + commision;
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Refund point cancelled booking" + total + "point");
+                notificationRequestForUserBooking.setContent(fromWallet.getUser().getUsername() + "refund point for you" + total + "point");
+                notificationRequestForUserBooking.setToUserId(to);
+                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+            } finally {
+                fairLock.unlock();
+            }
+        }
         return new TransferResponse(EnumPaymentStatus.BankCodeError.SUCCESS, "Success", Helper.getCurrentDate());
     }
 }

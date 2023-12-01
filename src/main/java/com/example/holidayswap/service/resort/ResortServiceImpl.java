@@ -22,6 +22,7 @@ import com.example.holidayswap.repository.property.PropertyTypeRespository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
 import com.example.holidayswap.service.address.LocationService;
+import com.example.holidayswap.service.booking.IBookingService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +51,7 @@ public class ResortServiceImpl implements ResortService {
     private final DistrictRepository districtRepository;
     private final StateOrProvinceRepository stateOrProvinceRepository;
     private final CountryRepository countryRepository;
+    private final IBookingService bookingService;
 
     @Override
     public Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
@@ -185,6 +187,7 @@ public class ResortServiceImpl implements ResortService {
     @Override
     public void delete(Long id) {
         var inRoomAmenityTypeFound = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        bookingService.deactiveResortNotifyBookingUser(id);
         inRoomAmenityTypeFound.setDeleted(true);
         resortRepository.save(inRoomAmenityTypeFound);
     }

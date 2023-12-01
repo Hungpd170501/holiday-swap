@@ -9,16 +9,19 @@ import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.booking.UserOfBookingRepository;
+import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.Helper;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -26,8 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +47,8 @@ public class BookingServiceImpl implements IBookingService {
     private final IUserOfBookingService userOfBookingService;
     private final UserOfBookingRepository userOfBookingRepository;
     private final PushNotificationService pushNotificationService;
+
+    private final CoOwnerRepository coOwnerRepository;
 
 
     @Override
@@ -66,10 +74,6 @@ public class BookingServiceImpl implements IBookingService {
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
         if (tryLock) {
             try {
-                Thread.sleep(3000);
-                // check List AvailableTime of this apartment
-//                Double amount = 0.0;
-//                Date intersection_date = bookingRequest.getCheckOutDate();
                 AvailableTime availableTime = availableTimeRepository.findAvailableTimeByIdAndStartTimeAndEndTime(bookingRequest.getAvailableTimeId(),bookingRequest.getCheckInDate(),bookingRequest.getCheckOutDate()).orElseThrow(() -> new EntityNotFoundException("This availableTime not available in this time"));
 
 //                 TODO: check booking of this apartment
@@ -93,6 +97,8 @@ public class BookingServiceImpl implements IBookingService {
                 booking.setAvailableTimeId(bookingRequest.getAvailableTimeId());
                 booking.setAvailableTime(availableTime);
                 booking.setTotalDays(days);
+                booking.setTotalMember(bookingRequest.getNumberOfGuest());
+                booking.setStatusCheckReturn(false);
                 booking.setPrice(days * availableTime.getPricePerNight());
                 booking.setCommission(booking.getPrice() * 10 / 100);
                 booking.setDateBooking(Helper.getCurrentDate());
@@ -133,7 +139,6 @@ public class BookingServiceImpl implements IBookingService {
         List<Booking> userBooking = bookingRepository.findAllByUserId(user.getUserId());
         if (userBooking.size() > 0) {
             for (Booking booking : userBooking) {
-//                boolean isRating = booking.getRating() != null ? false : true;
                 historyBookingResponses.add(
                         new HistoryBookingResponse(
                                 booking.getId(),
@@ -144,8 +149,12 @@ public class BookingServiceImpl implements IBookingService {
                                 booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
                                 booking.getStatus().name(), booking.getPrice(),
                                 booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
-//                                isRating,
-                                booking.getAvailableTimeId()));
+                                booking.getDateBooking(),
+                                booking.getAvailableTimeId(),
+                                false
+                                )
+
+                );
             }
         }
         return historyBookingResponses;
@@ -169,7 +178,7 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
         historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
-//        historyBookingDetailResponse.setRating(booking.getRating() != null ? false : true);
+        historyBookingDetailResponse.setCreatedDate(booking.getDateBooking());
 
         return historyBookingDetailResponse;
     }
@@ -191,8 +200,10 @@ public class BookingServiceImpl implements IBookingService {
                         booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName(),
                         booking.getStatus().name(), booking.getActualPrice(),
                         booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
-//                        booking.getRating() != null ? true : false,
-                        booking.getAvailableTimeId()));
+                        booking.getDateBooking(),
+                        booking.getAvailableTimeId(),
+                        booking.getStatusCheckReturn()
+                        ));
             }
 
         }
@@ -219,7 +230,8 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
         historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
-//        historyBookingDetailResponse.setRating(booking.getRating() != null ? true : false);
+        historyBookingDetailResponse.setCreatedDate(booking.getDateBooking());
+        historyBookingDetailResponse.setCanCancel(booking.getStatusCheckReturn());
 
         return historyBookingDetailResponse;
     }
@@ -231,4 +243,84 @@ public class BookingServiceImpl implements IBookingService {
 
         return listTimeHasBooked;
     }
+
+    @Override
+    public void deactiveResortNotifyBookingUser(Long resortId) {
+        ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+
+        //get list booking of resort and date booking is after current date
+        List<Booking> bookingList = bookingRepository.getListBookingByResortIdAndDate(resortId, hcmZonedDateTime);
+        if(bookingList.size() > 0){
+            bookingList.forEach(booking -> {
+                //create notification for user booking
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Resort of your booking is deactive");
+                notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel,contact owner for more details");
+                notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
+                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                booking.setStatusCheckReturn(true);
+                bookingRepository.save(booking);
+            });
+        }
+        // get list cowner of resort
+    List<CoOwner> coOwnerList = coOwnerRepository.getListCownerByResortId(resortId);
+        if(coOwnerList.size() > 0){
+            coOwnerList.forEach(coOwner -> {
+                //create notification for user booking
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Resort of your ownership is deactive");
+                notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
+                notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
+                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+            });
+        }
+    }
+
+    @Override
+    public void deactivePropertyNotifyBookingUser(Long propertyId) {
+//        String currentDate = Helper.getCurrentDateWithoutTime();
+        ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        //get list booking of resort and date booking is after current date
+        List<Booking> bookingList = bookingRepository.getListBookingByPropertyIdAndDate(propertyId, hcmZonedDateTime);
+        if(bookingList.size() > 0){
+            bookingList.forEach(booking -> {
+                //create notification for user booking
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Property of your booking is deactive");
+                notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel,contact owner for more details");
+                notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
+                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                booking.setStatusCheckReturn(true);
+                bookingRepository.save(booking);
+            });
+        }
+        // get list cowner of resort
+        List<CoOwner> coOwnerList = coOwnerRepository.getListCoOwnerByPropertyId(propertyId);
+        if(coOwnerList.size() > 0){
+            coOwnerList.forEach(coOwner -> {
+                //create notification for user booking
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Property of your ownership is deactive");
+                notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
+                notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
+                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+            });
+        }
+    }
+
+    @Override
+    public String returnPointBooking(Long bookingId) throws InterruptedException {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+        if (booking.getStatusCheckReturn()) {
+            booking.setStatus(EnumBookingStatus.BookingStatus.CANCELLED);
+            booking.setStatusCheckReturn(false);
+            transferPointService.returnPoint(booking.getOwnerId(), booking.getUserBookingId(), booking.getActualPrice(),booking.getCommission());
+            bookingRepository.save(booking);
+            return "Refund point success";
+        }
+        return "can not refund this booking";
+    }
+
+
 }
+

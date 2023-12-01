@@ -8,6 +8,7 @@ public class EnumBookingStatus {
         CANCELLED,
         EXPIRED,
         SUCCESS,
-        FAILED
+        FAILED,
+
     }
 }

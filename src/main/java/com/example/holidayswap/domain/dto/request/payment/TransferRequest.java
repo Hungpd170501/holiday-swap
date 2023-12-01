@@ -12,5 +12,5 @@ import lombok.Setter;
 public class TransferRequest {
     private long from;
     private long to;
-    private long amount;
+    private Double amount;
 }
