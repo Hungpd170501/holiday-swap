@@ -1,8 +1,6 @@
 package com.example.holidayswap.controller.notification;
 
-import com.example.holidayswap.domain.dto.request.auth.RoleRequest;
 import com.example.holidayswap.domain.dto.request.notification.NotificationRequest;
-import com.example.holidayswap.domain.dto.response.auth.RoleResponse;
 import com.example.holidayswap.domain.dto.response.notification.NotificationResponse;
 import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.utils.AuthUtils;
@@ -23,31 +21,36 @@ public class NotificationController {
 
     @GetMapping("/current-user")
     public ResponseEntity<List<NotificationResponse>> getAllNotifications() {
-        return ResponseEntity.ok(pushNotificationService.GetAllNotificationsByCurrentUser());
+        return ResponseEntity.ok(pushNotificationService.getAllNotificationsByCurrentUser());
     }
 
     @PostMapping
     public void createNotification(@RequestBody NotificationRequest notificationRequest) {
-        var user = authUtils.getAuthenticatedUser();
-        var notification = pushNotificationService.SendNotificationToUser(notificationRequest);
-        messagingTemplate.convertAndSend("/topic/notification-" + user.getUserId(), notification);
+        var notification = pushNotificationService.sendNotificationToUser(notificationRequest);
+        messagingTemplate.convertAndSend("/topic/notification-" + notificationRequest.getToUserId().toString(), notification);
     }
 
     @DeleteMapping("/current-user/{notificationId}")
     public ResponseEntity<Void> deleteNotification(@PathVariable("notificationId") Long notificationId) {
-        pushNotificationService.DeleteNotificationByNotificationId(notificationId);
+        pushNotificationService.deleteNotificationByNotificationId(notificationId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/current-user")
     public ResponseEntity<Void> deleteAllNotificationsByCurrentUser() {
-        pushNotificationService.DeleteAllNotificationsByCurrentUser();
+        pushNotificationService.deleteAllNotificationsByCurrentUser();
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/current-user/read-all")
     public ResponseEntity<Void> markAllNotificationsAsReadByCurrentUser() {
-        pushNotificationService.MarkAllNotificationsAsReadByCurrentUser();
+        pushNotificationService.markAllNotificationsAsReadByCurrentUser();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/current-user/read/{notificationId}")
+    public ResponseEntity<Void> markNotificationAsReadByCurrentUser(@PathVariable("notificationId") Long notificationId) {
+        pushNotificationService.markCurrentUserNotificationAsReadByNotificationId(notificationId);
         return ResponseEntity.noContent().build();
     }
 }

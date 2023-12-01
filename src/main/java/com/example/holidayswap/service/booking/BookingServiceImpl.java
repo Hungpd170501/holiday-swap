@@ -21,7 +21,6 @@ import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.Helper;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -115,12 +113,12 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Booking Success");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForUserBooking.setToUserId(bookingRequest.getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
                 //create notification for owner
                 notificationRequestForOwner.setSubject("Booking Apartment + " + booking.getActualPrice() + " point");
                 notificationRequestForOwner.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForOwner.setToUserId(booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForOwner);
+                pushNotificationService.createNotification(notificationRequestForOwner);
                 return EnumBookingStatus.BookingStatus.SUCCESS;
             } finally {
                 fairLock.unlock();
@@ -257,7 +255,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Resort of your booking is deactive");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel,contact owner for more details");
                 notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
                 booking.setStatusCheckReturn(true);
                 bookingRepository.save(booking);
             });
@@ -271,7 +269,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Resort of your ownership is deactive");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
                 notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
             });
         }
     }
@@ -289,7 +287,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Property of your booking is deactive");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel,contact owner for more details");
                 notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
                 booking.setStatusCheckReturn(true);
                 bookingRepository.save(booking);
             });
@@ -303,7 +301,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Property of your ownership is deactive");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
                 notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
             });
         }
     }

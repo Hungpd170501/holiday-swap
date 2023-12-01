@@ -60,7 +60,7 @@ class PushNotificationServiceImplTest {
                 User.builder().build())).thenReturn(notifications);
 
         // Run the test
-        final List<NotificationResponse> result = pushNotificationServiceImplUnderTest.GetAllNotificationsByCurrentUser();
+        final List<NotificationResponse> result = pushNotificationServiceImplUnderTest.getAllNotificationsByCurrentUser();
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -74,7 +74,7 @@ class PushNotificationServiceImplTest {
                 User.builder().build())).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<NotificationResponse> result = pushNotificationServiceImplUnderTest.GetAllNotificationsByCurrentUser();
+        final List<NotificationResponse> result = pushNotificationServiceImplUnderTest.getAllNotificationsByCurrentUser();
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -115,7 +115,7 @@ class PushNotificationServiceImplTest {
                 .build())).thenReturn(notification);
 
         // Run the test
-        final NotificationResponse result = pushNotificationServiceImplUnderTest.SendNotificationToUser(
+        final NotificationResponse result = pushNotificationServiceImplUnderTest.sendNotificationToUser(
                 notificationRequest);
 
         // Verify the results
@@ -135,7 +135,7 @@ class PushNotificationServiceImplTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> pushNotificationServiceImplUnderTest.SendNotificationToUser(notificationRequest))
+                () -> pushNotificationServiceImplUnderTest.sendNotificationToUser(notificationRequest))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -151,7 +151,7 @@ class PushNotificationServiceImplTest {
         when(mockNotificationRepository.findById(0L)).thenReturn(notification);
 
         // Run the test
-        pushNotificationServiceImplUnderTest.MarkNotificationAsReadByNotificationId(0L);
+        pushNotificationServiceImplUnderTest.markNotificationAsReadByNotificationId(0L);
 
         // Verify the results
         mockNotificationRepository.findById(0L).ifPresent(item -> assertTrue(item::getIsRead));
@@ -164,7 +164,7 @@ class PushNotificationServiceImplTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> pushNotificationServiceImplUnderTest.MarkNotificationAsReadByNotificationId(0L))
+                () -> pushNotificationServiceImplUnderTest.markNotificationAsReadByNotificationId(0L))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -183,7 +183,7 @@ class PushNotificationServiceImplTest {
                 User.builder().build())).thenReturn(notifications);
 
         // Run the test
-        pushNotificationServiceImplUnderTest.MarkAllNotificationsAsReadByCurrentUser();
+        pushNotificationServiceImplUnderTest.markAllNotificationsAsReadByCurrentUser();
 
         // Verify the results
         notifications.forEach(notification -> {
@@ -199,7 +199,7 @@ class PushNotificationServiceImplTest {
                 User.builder().build())).thenReturn(Collections.emptyList());
 
         // Run the test
-        pushNotificationServiceImplUnderTest.MarkAllNotificationsAsReadByCurrentUser();
+        pushNotificationServiceImplUnderTest.markAllNotificationsAsReadByCurrentUser();
 
         // Verify the results
         verify(mockNotificationRepository, never()).save(any(Notification.class));
@@ -217,7 +217,7 @@ class PushNotificationServiceImplTest {
         when(mockNotificationRepository.findById(0L)).thenReturn(notification);
 
         // Run the test
-        pushNotificationServiceImplUnderTest.DeleteNotificationByNotificationId(0L);
+        pushNotificationServiceImplUnderTest.deleteNotificationByNotificationId(0L);
 
         // Verify the results
         mockNotificationRepository.findById(0L).ifPresent(item -> assertTrue(item::getIsDeleted));
@@ -230,7 +230,7 @@ class PushNotificationServiceImplTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> pushNotificationServiceImplUnderTest.DeleteNotificationByNotificationId(0L))
+                () -> pushNotificationServiceImplUnderTest.deleteNotificationByNotificationId(0L))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -251,7 +251,7 @@ class PushNotificationServiceImplTest {
                 .thenReturn(notifications);
 
         // Run the test
-        pushNotificationServiceImplUnderTest.DeleteAllNotificationsByCurrentUser();
+        pushNotificationServiceImplUnderTest.deleteAllNotificationsByCurrentUser();
 
         // Verify the results
         verify(mockNotificationRepository, times(2)).save(any(Notification.class));
@@ -268,7 +268,7 @@ class PushNotificationServiceImplTest {
                 User.builder().build())).thenReturn(Collections.emptyList());
 
         // Run the test
-        pushNotificationServiceImplUnderTest.DeleteAllNotificationsByCurrentUser();
+        pushNotificationServiceImplUnderTest.deleteAllNotificationsByCurrentUser();
 
         // Verify the results
         verify(mockNotificationRepository, times(0)).delete(any(Notification.class));
@@ -305,7 +305,7 @@ class PushNotificationServiceImplTest {
                 .build())).thenReturn(notification);
 
         // Run the test
-        pushNotificationServiceImplUnderTest.CreateNotification(notificationRequest);
+        pushNotificationServiceImplUnderTest.createNotification(notificationRequest);
 
         // Verify the results
         verify(mockMessagingTemplate).convertAndSend("/topic/notification-0"
@@ -330,7 +330,7 @@ class PushNotificationServiceImplTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> pushNotificationServiceImplUnderTest.CreateNotification(notificationRequest))
+                () -> pushNotificationServiceImplUnderTest.createNotification(notificationRequest))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -373,7 +373,7 @@ class PushNotificationServiceImplTest {
 
         // Run the test
         assertThatThrownBy(
-                () -> pushNotificationServiceImplUnderTest.CreateNotification(notificationRequest))
+                () -> pushNotificationServiceImplUnderTest.createNotification(notificationRequest))
                 .isInstanceOf(MessagingException.class);
     }
 }
