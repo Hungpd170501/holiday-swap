@@ -24,20 +24,20 @@ public class TransferpointServiceImplTest {
     ITransactionBookingRefundOwnerService transactionBookingRefundOwnerService;
     TransferPointServiceImpl tra;
 
-    @BeforeEach
-    void beforeEach(){
-        walletService = mock(IWalletService.class);
-        allLogPayBookingService = mock(IAllLogPayBookingService.class);
-        loggingService = mock(ILoggingService.class);
-        transactLogRepository = mock(TransactLogRepository.class);
-        bookingRepository = mock(BookingRepository.class);
-        walletRepository = mock(WalletRepository.class);
-        userService = mock(UserService.class);
-        allLogRepository = mock(AllLogRepository.class);
-        adminWalletRepository = mock(AdminWalletRepository.class);
-        transactionBookingRefundOwnerService = mock(ITransactionBookingRefundOwnerService.class);
-        tra = new TransferPointServiceImpl(walletService, allLogPayBookingService, loggingService, transactLogRepository, walletRepository, userService, allLogRepository, adminWalletRepository, transactionBookingRefundOwnerService);
-    }
+//    @BeforeEach
+//    void beforeEach(){
+//        walletService = mock(IWalletService.class);
+//        allLogPayBookingService = mock(IAllLogPayBookingService.class);
+//        loggingService = mock(ILoggingService.class);
+//        transactLogRepository = mock(TransactLogRepository.class);
+//        bookingRepository = mock(BookingRepository.class);
+//        walletRepository = mock(WalletRepository.class);
+//        userService = mock(UserService.class);
+//        allLogRepository = mock(AllLogRepository.class);
+//        adminWalletRepository = mock(AdminWalletRepository.class);
+//        transactionBookingRefundOwnerService = mock(ITransactionBookingRefundOwnerService.class);
+//        tra = new TransferPointServiceImpl(walletService, allLogPayBookingService, loggingService, transactLogRepository, walletRepository, userService, allLogRepository, adminWalletRepository, transactionBookingRefundOwnerService);
+//    }
 
 //    @Test
 //    void transferPoint_ShouldthrowError_WhenWalletNotFound() throws InterruptedException {

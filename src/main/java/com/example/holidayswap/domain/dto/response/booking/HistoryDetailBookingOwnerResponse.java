@@ -21,5 +21,6 @@ public class HistoryDetailBookingOwnerResponse {
     private Double total;
     private Long availableTimeId;
     private String propertyImage;
-    private boolean isRating;
+    private String createdDate;
+    private boolean canCancel;
 }

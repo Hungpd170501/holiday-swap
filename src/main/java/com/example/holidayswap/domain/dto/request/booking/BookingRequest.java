@@ -11,5 +11,6 @@ public class BookingRequest {
     private Long userId;
     private Date checkInDate;
     private Date checkOutDate;
+    private int numberOfGuest;
     private List<UserOfBookingRequest> userOfBookingRequests;
 }

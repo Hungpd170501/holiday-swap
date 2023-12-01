@@ -35,6 +35,6 @@ public class TransactLog {
     private Double toTotalPoint;
 
 
-    private long amountPoint;
+    private Double amountPoint;
     private String createdOn;
 }

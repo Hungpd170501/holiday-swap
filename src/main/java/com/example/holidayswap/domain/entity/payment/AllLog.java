@@ -18,7 +18,7 @@ public class AllLog {
     private Long id;
     private long fromId;
     private long toId;
-    private long amount;
+    private Double amount;
     private EnumPaymentStatus.BankCodeError resultCode;
     private String detail;
     private String createdOn;
