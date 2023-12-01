@@ -133,14 +133,16 @@ public class ResortServiceImpl implements ResortService {
             throw new DataIntegrityViolationException("Please input resort amenity");
         if (resortRequest.getPropertyTypes().isEmpty())
             throw new DataIntegrityViolationException("Please input resort's property Type");
-        var entityFound = resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
+        var entityFound = resortRepository.findById(id);
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         }
-        if ((resortImage.isEmpty() || resortImage == null) && (resortRequest.getOldImages() == null || resortRequest.getOldImages().isEmpty()))
-            throw new EntityNotFoundException("Resort image is required");
-        if (resortRequest.getOldImages().size() + resortImage.size() < 5)
-            throw new DataIntegrityViolationException("Please input more than 5 file image of resort");
+        //resort image required
+        int resortCreateMore = 0;
+        if (resortImage != null) resortCreateMore = resortImage.size();
+        if (entityFound.get().getResortImages().size() + resortCreateMore - resortRequest.getOldImages().size() < 5) {
+            throw new DataIntegrityViolationException("Resort image must have 5 or more image");
+        }
 
         if (resortRequest.getPropertyTypes().isEmpty() || resortRequest.getPropertyTypes() == null)
             throw new EntityNotFoundException("Property type is required");

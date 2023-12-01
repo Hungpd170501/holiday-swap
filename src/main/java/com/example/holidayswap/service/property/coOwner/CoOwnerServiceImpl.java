@@ -70,7 +70,8 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     @Override
     @Transactional
     public CoOwnerResponse create(CoOwnerId coOwnerId, CoOwnerRequest dtoRequest) {
-        if (dtoRequest.getTimeFrames().size() == 0 || dtoRequest.getTimeFrames().isEmpty())
+        if (dtoRequest.getTimeFrames() == null) throw new DataIntegrityViolationException("Week number is required!.");
+        if (dtoRequest.getTimeFrames().isEmpty())
             throw new DataIntegrityViolationException("Must have 1 week number input!.");
         if (dtoRequest.getType() == ContractType.DEEDED) {
             dtoRequest.setStartTime(null);
