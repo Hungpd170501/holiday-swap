@@ -219,7 +219,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 notificationRequestForUserBooking.setSubject("Refund point cancelled booking" + total + "point");
                 notificationRequestForUserBooking.setContent(fromWallet.getUser().getUsername() + "refund point for you" + total + "point");
                 notificationRequestForUserBooking.setToUserId(to);
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
             } finally {
                 fairLock.unlock();
             }

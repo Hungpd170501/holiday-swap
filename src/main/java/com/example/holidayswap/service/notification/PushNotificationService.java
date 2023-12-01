@@ -6,17 +6,19 @@ import com.example.holidayswap.domain.dto.response.notification.NotificationResp
 import java.util.List;
 
 public interface PushNotificationService {
-    List<NotificationResponse> GetAllNotificationsByCurrentUser();
+    List<NotificationResponse> getAllNotificationsByCurrentUser();
 
-    NotificationResponse SendNotificationToUser(NotificationRequest notificationRequest);
+    NotificationResponse sendNotificationToUser(NotificationRequest notificationRequest);
 
-    void MarkNotificationAsReadByNotificationId(Long notificationId);
+    void markNotificationAsReadByNotificationId(Long notificationId);
 
-    void MarkAllNotificationsAsReadByCurrentUser();
+    void markAllNotificationsAsReadByCurrentUser();
 
-    void DeleteNotificationByNotificationId(Long notificationId);
+    void deleteNotificationByNotificationId(Long notificationId);
 
-    void DeleteAllNotificationsByCurrentUser();
+    void deleteAllNotificationsByCurrentUser();
 
-    void CreateNotification(NotificationRequest notificationRequest);
+    void createNotification(NotificationRequest notificationRequest);
+
+    void markCurrentUserNotificationAsReadByNotificationId(Long notificationId);
 }

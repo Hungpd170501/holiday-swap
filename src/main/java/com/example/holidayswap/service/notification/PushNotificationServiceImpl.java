@@ -3,7 +3,7 @@ package com.example.holidayswap.service.notification;
 import com.example.holidayswap.constants.ErrorMessage;
 import com.example.holidayswap.domain.dto.request.notification.NotificationRequest;
 import com.example.holidayswap.domain.dto.response.notification.NotificationResponse;
-import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.notification.NotificationMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.notification.NotificationRepository;
@@ -24,7 +24,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public List<NotificationResponse> GetAllNotificationsByCurrentUser() {
+    public List<NotificationResponse> getAllNotificationsByCurrentUser() {
         var user = authUtils.getAuthenticatedUser();
         return notificationRepository.findAllByIsDeletedEqualsAndUserEqualsOrderByCreatedOnDesc(false, user).stream()
                 .map(NotificationMapper.INSTANCE::toNotificationResponse)
@@ -32,12 +32,12 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     }
 
     @Override
-    public NotificationResponse SendNotificationToUser(NotificationRequest notificationRequest) {
+    public NotificationResponse sendNotificationToUser(NotificationRequest notificationRequest) {
         var notification = NotificationMapper.INSTANCE.toNotification(notificationRequest);
         userRepository.findById(notificationRequest.getToUserId()).ifPresentOrElse(
                 notification::setUser,
                 () -> {
-                    throw new RuntimeException(ErrorMessage.USER_NOT_FOUND);
+                    throw new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND);
                 });
         notification.setIsRead(false);
         notification.setIsDeleted(false);
@@ -45,20 +45,20 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     }
 
     @Override
-    public void MarkNotificationAsReadByNotificationId(Long notificationId) {
+    public void markNotificationAsReadByNotificationId(Long notificationId) {
         notificationRepository.findById(notificationId).ifPresentOrElse(
                 notification -> {
                     notification.setIsRead(true);
                     notificationRepository.save(notification);
                 },
                 () -> {
-                    throw new RuntimeException(ErrorMessage.NOTIFICATION_NOT_FOUND);
+                    throw new EntityNotFoundException(ErrorMessage.NOTIFICATION_NOT_FOUND);
                 }
         );
     }
 
     @Override
-    public void MarkAllNotificationsAsReadByCurrentUser() {
+    public void markAllNotificationsAsReadByCurrentUser() {
         var user = authUtils.getAuthenticatedUser();
         notificationRepository.findAllByIsDeletedEqualsAndUserEqualsOrderByCreatedOnDesc(false, user).forEach(
                 notification -> {
@@ -69,20 +69,20 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     }
 
     @Override
-    public void DeleteNotificationByNotificationId(Long notificationId) {
+    public void deleteNotificationByNotificationId(Long notificationId) {
         notificationRepository.findById(notificationId).ifPresentOrElse(
                 notification -> {
                     notification.setIsDeleted(true);
                     notificationRepository.save(notification);
                 },
                 () -> {
-                    throw new RuntimeException(ErrorMessage.NOTIFICATION_NOT_FOUND);
+                    throw new EntityNotFoundException(ErrorMessage.NOTIFICATION_NOT_FOUND);
                 }
         );
     }
 
     @Override
-    public void DeleteAllNotificationsByCurrentUser() {
+    public void deleteAllNotificationsByCurrentUser() {
         var user = authUtils.getAuthenticatedUser();
         notificationRepository.findAllByIsDeletedEqualsAndUserEqualsOrderByCreatedOnDesc(false, user).forEach(
                 notification -> {
@@ -93,8 +93,24 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     }
 
     @Override
-    public void CreateNotification(NotificationRequest notificationRequest) {
-        var notification = SendNotificationToUser(notificationRequest);
+    public void createNotification(NotificationRequest notificationRequest) {
+        var notification = sendNotificationToUser(notificationRequest);
         messagingTemplate.convertAndSend("/topic/notification-" + notificationRequest.getToUserId(), notification);
+    }
+
+    @Override
+    public void markCurrentUserNotificationAsReadByNotificationId(Long notificationId) {
+        var user = authUtils.getAuthenticatedUser();
+        notificationRepository.findById(notificationId).ifPresentOrElse(
+                notification -> {
+                    if (notification.getUser().getUserId().equals(user.getUserId())) {
+                        notification.setIsRead(true);
+                        notificationRepository.save(notification);
+                    }
+                },
+                () -> {
+                    throw new EntityNotFoundException(ErrorMessage.NOTIFICATION_NOT_FOUND);
+                }
+        );
     }
 }
