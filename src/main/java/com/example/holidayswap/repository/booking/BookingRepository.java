@@ -107,6 +107,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                     	b.total_days,
                     	b.user_booking_id,
                     	b.date_booking
+                    	b.status_check_return
                     from
                     	booking b
                     inner join available_time at on
