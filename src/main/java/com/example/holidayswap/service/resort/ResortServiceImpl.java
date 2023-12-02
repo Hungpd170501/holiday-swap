@@ -184,6 +184,9 @@ public class ResortServiceImpl implements ResortService {
         var entity = resortRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         entity.setStatus(resortStatus);
         Long i = resortRepository.save(entity).getId();
+        if (resortStatus == ResortStatus.DEACTIVATE) {
+            bookingService.deactiveResortNotifyBookingUser(id);
+        }
     }
 
     @Override
