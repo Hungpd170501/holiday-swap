@@ -56,7 +56,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                         and (date(tod.start_time), date(tod.end_time)) overlaps (date(:start_time), date(:end_time))
                         and tod.is_deleted  = false
                         and (:status is null or tod.status = :status)""", nativeQuery = true)
-    Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(
+    List<AvailableTime> findOverlapsWhichAnyTimeDeposit(
             @Param("time_frame_id") Long timeFrameId,
             @Param("start_time") Date startTime,
             @Param("end_time") Date endTime,

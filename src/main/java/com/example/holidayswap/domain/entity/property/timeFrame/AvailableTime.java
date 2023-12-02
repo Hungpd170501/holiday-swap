@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.entity.booking.Booking;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class  AvailableTime {
     private Date endTime;
     @Column(name = "price_per_night")
     @NotNull
+    @Positive(message = "Price can not be negative value")
     private double pricePerNight;
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     @NotNull
