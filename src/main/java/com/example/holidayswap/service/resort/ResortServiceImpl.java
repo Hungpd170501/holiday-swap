@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -52,6 +53,7 @@ public class ResortServiceImpl implements ResortService {
     private final StateOrProvinceRepository stateOrProvinceRepository;
     private final CountryRepository countryRepository;
     private final IBookingService bookingService;
+    private final ResortMapper resortMapper;
 
     @Override
     public Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
@@ -63,6 +65,12 @@ public class ResortServiceImpl implements ResortService {
 //            dto.setResortAmenityTypes(resortAmenityTypeService.gets(e.getId()));
             return dto;
         });
+    }
+
+    @Override
+    public List<ResortResponse> getsListResortHaveProperty() {
+        var list = resortRepository.getsListResortHaveProperty();
+        return list.stream().map(resortMapper::toResortResponse).collect(Collectors.toList());
     }
 
     @Override
