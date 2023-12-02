@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -146,4 +147,11 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                )
             """)
     Page<ResortApartmentForRentDTO> findResort(@Param("locationName") String locationName, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, @Param("userId") Long userId, Pageable pageable);
+
+    @Query(value = """
+            select distinct r from Resort r
+            inner join r.properties p
+            where r.status = 'ACTIVE' and p.status = 'ACTIVE'
+                """)
+    List<Resort> getsListResortHaveProperty();
 }
