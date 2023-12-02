@@ -81,4 +81,8 @@ public class Booking {
 
     @Column(name = "status", nullable = false)
     private EnumBookingStatus.BookingStatus status;
+
+    @Column(name ="transfer_status")
+    private EnumBookingStatus.TransferStatus transferStatus;
+
 }

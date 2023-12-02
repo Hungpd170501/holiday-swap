@@ -8,6 +8,7 @@ import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingO
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IBookingService {
@@ -23,9 +24,11 @@ public interface IBookingService {
 
     List<TimeHasBooked> getTimeHasBooked(Long timeFrameId, int year);
 
-    void deactiveResortNotifyBookingUser(Long resortId);
+    void deactiveResortNotifyBookingUser(Long resortId, LocalDate startDate);
 
-    void deactivePropertyNotifyBookingUser(Long propertyId);
+    void deactivePropertyNotifyBookingUser(Long propertyId, LocalDate startDate);
 
     String returnPointBooking(Long bookingId) throws InterruptedException;
+
+    void refundPointBookingToOwner(LocalDate date);
 }

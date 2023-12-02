@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
@@ -129,12 +130,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                             join resort ON resort.resort_id = property.resort_id
                                             where property.resort_id = ?1 and b.check_in_date > ?2 and resort.resort_status= 'ACTIVE'
                     """, nativeQuery = true)
-    List<Booking> getListBookingByResortIdAndDate(Long resortId, ZonedDateTime date);
+    List<Booking> getListBookingByResortIdAndDate(Long resortId, LocalDate date);
 
     @Query(value = """
         SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
         time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
-        where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > (date)?2
+        where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > ?2
         """, nativeQuery = true)
-    List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,ZonedDateTime date);
+    List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,LocalDate date);
+
+    @Query(value = """
+       SELECT b.* FROM booking b where date (b.check_in_date) = date(?1) and status = ?2 and transfer_status = ?3 
+        """, nativeQuery = true)
+    List<Booking> getListBookingByDateAndStatusAndTransferStatus(LocalDate date, EnumBookingStatus.BookingStatus status, EnumBookingStatus.TransferStatus transferStatus);
+
 }

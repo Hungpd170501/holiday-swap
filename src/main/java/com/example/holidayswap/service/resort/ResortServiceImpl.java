@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -185,10 +186,29 @@ public class ResortServiceImpl implements ResortService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id, LocalDate startDate ) {
         var inRoomAmenityTypeFound = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
-        bookingService.deactiveResortNotifyBookingUser(id);
+        bookingService.deactiveResortNotifyBookingUser(id,startDate);
         inRoomAmenityTypeFound.setDeleted(true);
         resortRepository.save(inRoomAmenityTypeFound);
+    }
+
+    @Override
+    public void updateStatus(Long id, ResortStatus resortStatus, LocalDate startDate, LocalDate endDate) {
+        if(startDate.isBefore(LocalDate.now())) throw new DataIntegrityViolationException("Start date must be after today");
+        if(startDate.isEqual(LocalDate.now())) throw new DataIntegrityViolationException("Start date must be after today");
+        var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        if(entity.getCloseDate()!=null) throw new DataIntegrityViolationException("Can not change status resort");
+        if(resortStatus == ResortStatus.MAINTENANCE){
+            if(startDate == null || endDate == null) throw new DataIntegrityViolationException("Please input start date and end date");
+            if(startDate.isAfter(endDate)) throw new DataIntegrityViolationException("Start date must be before end date");
+            entity.setCloseDate(startDate);
+            entity.setOpenDate(endDate);
+        }else if(resortStatus == ResortStatus.DEACTIVATE){
+            if(startDate == null) throw new DataIntegrityViolationException("Please input start date");
+            entity.setCloseDate(startDate);
+        }
+
+        resortRepository.save(entity);
     }
 }

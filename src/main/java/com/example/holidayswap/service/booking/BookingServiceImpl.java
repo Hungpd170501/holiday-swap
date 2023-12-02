@@ -104,6 +104,7 @@ public class BookingServiceImpl implements IBookingService {
                 booking.setDateBooking(Helper.getCurrentDate());
                 booking.setActualPrice(booking.getPrice() - booking.getCommission());
                 booking.setStatus(EnumBookingStatus.BookingStatus.SUCCESS);
+                booking.setTransferStatus(EnumBookingStatus.TransferStatus.WAITING);
                 bookingRepository.save(booking);
                 userOfBookingService.saveUserOfBooking(booking.getId(), bookingRequest.getUserOfBookingRequests());
 
@@ -117,7 +118,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setToUserId(bookingRequest.getUserId());
                 pushNotificationService.CreateNotification(notificationRequestForUserBooking);
                 //create notification for owner
-                notificationRequestForOwner.setSubject("Booking Apartment + " + booking.getActualPrice() + " point");
+                notificationRequestForOwner.setSubject("Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " has been booked");
                 notificationRequestForOwner.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForOwner.setToUserId(booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getUserId());
                 pushNotificationService.CreateNotification(notificationRequestForOwner);
@@ -245,21 +246,29 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public void deactiveResortNotifyBookingUser(Long resortId) {
+    public void deactiveResortNotifyBookingUser(Long resortId, LocalDate startDate) {
         ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
 
         //get list booking of resort and date booking is after current date
-        List<Booking> bookingList = bookingRepository.getListBookingByResortIdAndDate(resortId, hcmZonedDateTime);
+        List<Booking> bookingList = bookingRepository.getListBookingByResortIdAndDate(resortId, startDate);
         if(bookingList.size() > 0){
             bookingList.forEach(booking -> {
                 //create notification for user booking
                 var notificationRequestForUserBooking = new NotificationRequest();
-                notificationRequestForUserBooking.setSubject("Resort of your booking is deactive");
+                notificationRequestForUserBooking.setSubject("Resort of your booking is deactive date "  +startDate );
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel,contact owner for more details");
                 notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
                 pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+
+                //refund booking
+
                 booking.setStatusCheckReturn(true);
                 bookingRepository.save(booking);
+                try {
+                    returnPointBooking(booking.getId());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             });
         }
         // get list cowner of resort
@@ -268,7 +277,7 @@ public class BookingServiceImpl implements IBookingService {
             coOwnerList.forEach(coOwner -> {
                 //create notification for user booking
                 var notificationRequestForUserBooking = new NotificationRequest();
-                notificationRequestForUserBooking.setSubject("Resort of your ownership is deactive");
+                notificationRequestForUserBooking.setSubject("Resort of your ownership is deactive date: " + startDate);
                 notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
                 notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
                 pushNotificationService.CreateNotification(notificationRequestForUserBooking);
@@ -277,21 +286,26 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public void deactivePropertyNotifyBookingUser(Long propertyId) {
+    public void deactivePropertyNotifyBookingUser(Long propertyId, LocalDate startDate) {
 //        String currentDate = Helper.getCurrentDateWithoutTime();
-        ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         //get list booking of resort and date booking is after current date
-        List<Booking> bookingList = bookingRepository.getListBookingByPropertyIdAndDate(propertyId, hcmZonedDateTime);
+        List<Booking> bookingList = bookingRepository.getListBookingByPropertyIdAndDate(propertyId, startDate);
         if(bookingList.size() > 0){
             bookingList.forEach(booking -> {
                 //create notification for user booking
                 var notificationRequestForUserBooking = new NotificationRequest();
-                notificationRequestForUserBooking.setSubject("Property of your booking is deactive");
-                notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel,contact owner for more details");
+
+                notificationRequestForUserBooking.setSubject("Property of your booking is deactive date: " + startDate );
+                notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel, contact owner for more details");
                 notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
                 pushNotificationService.CreateNotification(notificationRequestForUserBooking);
                 booking.setStatusCheckReturn(true);
                 bookingRepository.save(booking);
+                try {
+                    returnPointBooking(booking.getId());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             });
         }
         // get list cowner of resort
@@ -300,7 +314,7 @@ public class BookingServiceImpl implements IBookingService {
             coOwnerList.forEach(coOwner -> {
                 //create notification for user booking
                 var notificationRequestForUserBooking = new NotificationRequest();
-                notificationRequestForUserBooking.setSubject("Property of your ownership is deactive");
+                notificationRequestForUserBooking.setSubject("Property of your ownership is deactive date: " +startDate);
                 notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
                 notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
                 pushNotificationService.CreateNotification(notificationRequestForUserBooking);
@@ -319,6 +333,22 @@ public class BookingServiceImpl implements IBookingService {
             return "Refund point success";
         }
         return "can not refund this booking";
+    }
+
+    @Override
+    @Transactional
+    public void refundPointBookingToOwner(LocalDate startDate) {
+        List<Booking> bookingList = bookingRepository.getListBookingByDateAndStatusAndTransferStatus(startDate, EnumBookingStatus.BookingStatus.SUCCESS, EnumBookingStatus.TransferStatus.WAITING);
+        if(bookingList.size() > 0){
+            bookingList.forEach(booking -> {
+                try {
+                    transferPointService.refundPointBookingToOwner(booking.getId());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
+        }
     }
 
 

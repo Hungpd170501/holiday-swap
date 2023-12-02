@@ -9,6 +9,10 @@ public class EnumBookingStatus {
         EXPIRED,
         SUCCESS,
         FAILED,
-
+    }
+    public enum TransferStatus{
+        WAITING,
+        SUCCESS,
+        REFUND_USER
     }
 }
