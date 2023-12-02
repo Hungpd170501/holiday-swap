@@ -67,17 +67,17 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = """
                     select av from AvailableTime av
-                    inner join av.timeFrame af
-                    inner join af.coOwner co
+                    left join av.timeFrame af
+                    left join af.coOwner co
                     where co.id.roomId = :roomId
             """)
     List<AvailableTime> findAllByRoomId(@Param("roomId") String roomId);
 
     @Query(value = """
                     select at from AvailableTime at
-                    inner join at.timeFrame tf
-                    inner join tf.coOwner co
-                    inner join co.property p
+                    left join at.timeFrame tf
+                    left join tf.coOwner co
+                    left join co.property p
                     where co.id.propertyId = :propertyId
                     and co.id.userId =  :userId
                     and co.id.roomId = :roomId
@@ -93,14 +93,14 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             p, r, u, at
             )
             from AvailableTime at
-                 inner join at.timeFrame tf
-                 inner join tf.coOwner co
-                 inner join co.property p
-                 inner join p.resort r
-                 inner join co.user u
-                 inner join p.inRoomAmenities ira
-                 inner join p.propertyType pt
-                 inner join p.propertyView pv
+                 left join at.timeFrame tf
+                 left join tf.coOwner co
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
+                 left join p.inRoomAmenities ira
+                 left join p.propertyType pt
+                 left join p.propertyView pv
                  left join  at.bookings bk
                  where
                  ((:resortId is null) or (r.id = :resortId))
@@ -163,11 +163,11 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     p, r, u, at
             )
                  from AvailableTime at
-                 inner join at.timeFrame tf
-                 inner join tf.coOwner co
-                 inner join co.property p
-                 inner join p.resort r
-                 inner join co.user u
+                 left join at.timeFrame tf
+                 left join tf.coOwner co
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
                  where
                  at.id = :availableId
                  and co.status = 'ACCEPTED'
@@ -185,14 +185,14 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             p, r, u, at
             )
             from AvailableTime at
-                 inner join at.timeFrame tf
-                 inner join tf.coOwner co
-                 inner join co.property p
-                 inner join p.resort r
-                 inner join co.user u
-                 inner join p.inRoomAmenities ira
-                 inner join p.propertyType pt
-                 inner join p.propertyView pv
+                 left join at.timeFrame tf
+                 left join tf.coOwner co
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
+                 left join p.inRoomAmenities ira
+                 left join p.propertyType pt
+                 left join p.propertyView pv
                  left join  at.bookings bk
                  where
                co.id.userId  = :userId

@@ -26,11 +26,11 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     @Query(value = """
             select p from Property p
-            inner join PropertyType pt on p.propertyTypeId = pt.id
-            inner join pt.resorts r
-            inner join CoOwner o on p.id = o.id.propertyId
-            inner join TimeFrame v on v.propertyId = p.id
-            inner join AvailableTime tod on tod.timeFrameId = v.id
+            left join PropertyType pt on p.propertyTypeId = pt.id
+            left join pt.resorts r
+            left join CoOwner o on p.id = o.id.propertyId
+            left join TimeFrame v on v.propertyId = p.id
+            left join AvailableTime tod on tod.timeFrameId = v.id
             where (:resortId is null or p.resortId = :resortId)
             and p.isDeleted = false
             and (:propertyStatus is null  or p.status = :propertyStatus)
@@ -81,7 +81,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     @Query(value = """
             select distinct p from Property p 
-            inner join p.resort r    
+            left join p.resort r    
             where 
             p.isDeleted = false  and r.isDeleted = false 
             and p.status = 'ACTIVE' and r.status = 'ACTIVE'
