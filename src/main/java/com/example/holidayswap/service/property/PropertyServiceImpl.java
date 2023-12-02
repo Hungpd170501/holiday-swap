@@ -185,6 +185,9 @@ public class PropertyServiceImpl implements PropertyService {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         property.setStatus(propertyStatus);
         propertyRepository.save(property);
+        if (propertyStatus == PropertyStatus.DEACTIVATE) {
+            bookingService.deactivePropertyNotifyBookingUser(id);
+        }
     }
 
     @Override
