@@ -155,6 +155,16 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             } catch (Exception e) {
                 log.error("Error sending verification email", e);
             }
+        } else if (coOwnerStatus.equals(CoOwnerStatus.REJECTED)) {
+            userService.upgradeUserToMember(coOwnerId.getUserId());
+            var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found to accept co-Owner in apartment!."));
+            //send mail
+            try {
+                emailService.sendNotificationRegisterCoOwnerDeclineEmail(user.getEmail(), user.getUsername());
+            } catch (Exception e) {
+                log.error("Error sending verification email", e);
+            }
+
         }
 
         return CoOwnerMapper.INSTANCE.toDtoResponse(updated);

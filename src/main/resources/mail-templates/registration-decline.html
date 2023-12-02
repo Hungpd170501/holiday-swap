@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+</head>
+<body>
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+    <tr>
+        <td align="center" bgcolor="#ffffff" style="padding: 40px 0 30px 0;">
+            <img alt="Logo" src="https://example.com/logo.png" width="150">
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="center" style="font-family: Arial, sans-serif; font-size: 24px; color: #333333;">
+                        Receipt of your membership application
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <table border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding: 20px 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #666666;">
+                                    <p>Dear <span th:remove="tag" th:text="${name}"></span>,</p>
+                                    <p>After careful consideration, we regret to inform you that your registration as a
+                                        co-owner in the apartment has been declined. We appreciate your interest in
+                                        becoming a part of our community.</p>
+                                    <p>While we understand this may be disappointing, please note that the decision was
+                                        made based on various factors. If you have any specific questions regarding the
+                                        decline or if there's additional information you'd like to provide for
+                                        reconsideration, feel free to reach out to us.</p>
+                                    <p>We appreciate your understanding and thank you for considering Deline. If you
+                                        have any further inquiries or if there's any other way we can assist you, please
+                                        don't hesitate to contact us.</p>
+                                    <p>Best regards,</p>
+                                    <p class="signature">HolidaySwap</p>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#f4f4f4" style="padding: 20px 30px 20px 30px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td style="font-family: Arial, sans-serif; font-size: 14px; color: #999999; text-align: center;">
+                        This is an automated email, please do not reply.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

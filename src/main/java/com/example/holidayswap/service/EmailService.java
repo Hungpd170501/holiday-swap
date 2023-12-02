@@ -74,6 +74,17 @@ public class EmailService {
                 .attributes(attribute).build());
     }
 
+    public void sendNotificationRegisterCoOwnerDeclineEmail(String email, String name) {
+        Map<String, Object> attribute = new HashMap<>();
+        attribute.put("name", name);
+        sendMessage(EmailRequest
+                .builder()
+                .to(email)
+                .subject("HolidaySwap - Your register co-owner in apartment has been Rejected")
+                .template("registration-decline")
+                .attributes(attribute).build());
+    }
+
 
     public void sendMessage(EmailRequest emailRequest) {
         rabbitMQMessageProducer.publish(
