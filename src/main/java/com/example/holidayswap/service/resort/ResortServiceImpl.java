@@ -140,7 +140,7 @@ public class ResortServiceImpl implements ResortService {
         //resort image required
         int resortCreateMore = 0;
         if (resortImage != null) resortCreateMore = resortImage.size();
-        if (resortRequest.getOldImages().size() - resortCreateMore < 5) {
+        if (resortRequest.getOldImages().size() + resortCreateMore < 5) {
             throw new DataIntegrityViolationException("Resort image must have 5 or more image");
         }
 
