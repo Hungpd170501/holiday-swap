@@ -55,7 +55,7 @@ public class BookingServiceImpl implements IBookingService {
 
         if (bookingRequest.getCheckInDate().compareTo(bookingRequest.getCheckOutDate()) >= 0)
             throw new EntityNotFoundException("Check in date must be before check out date");
-        var booki = availableTimeRepository.findByTimeFrameId(bookingRequest.getAvailableTimeId());
+        var booki = availableTimeRepository.findById(bookingRequest.getAvailableTimeId()).get();
         if(booki != null){
             if(booki.getTimeFrame().getUserId() == bookingRequest.getUserId())
                 throw new EntityNotFoundException("You can't book your own apartment");
