@@ -127,14 +127,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
                                             time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
                                             join resort ON resort.resort_id = property.resort_id
-                                            where property.resort_id = ?1 and b.check_in_date > date(?2) and resort.resort_status= 'ACTIVE'
+                                            where property.resort_id = ?1 and b.check_in_date > date(?2) and resort.resort_status= 'ACTIVE' and b.status = 5
                     """, nativeQuery = true)
     List<Booking> getListBookingByResortIdAndDate(Long resortId, ZonedDateTime date);
 
     @Query(value = """
         SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
         time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
-                where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > date(?2) and property.status = 'ACTIVE'
+                    where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > date(?2) and property.status = 'ACTIVE' and b.status = 5
         """, nativeQuery = true)
     List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,ZonedDateTime date);
 }
