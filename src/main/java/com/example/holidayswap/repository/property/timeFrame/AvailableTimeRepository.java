@@ -198,4 +198,19 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                co.id.userId  = :userId
             """)
     Page<ApartmentForRentDTO> findApartmentForRentByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query(value = """
+            select
+                    	at2.*
+                    from
+                    	available_time at2
+                    where
+                    	at2.time_frame_id = :time_frame_id
+                    	and extract (year
+                    from
+                    	at2.start_time) = :year
+                    	and at2.status = 'OPEN'
+                    	and is_deleted = false
+                    """, nativeQuery = true)
+    List<AvailableTime> findAllByTimeFrameIdAndYear(@Param("time_frame_id") Long timeFrameId, @Param("year") int year);
 }
