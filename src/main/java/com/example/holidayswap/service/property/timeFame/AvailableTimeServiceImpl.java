@@ -53,6 +53,14 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     }
 
     @Override
+    public List<AvailableTimeResponse> getAllByTimeFrameIdAndYear(Long timeFrameId, int year) {
+        var list = availableTimeRepository.
+                findAllByTimeFrameIdAndYear(timeFrameId, year);
+
+        return list.stream().map(availableTimeMapper::toDtoResponse).collect(Collectors.toList());
+    }
+
+    @Override
     public Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable) {
         var availableTimePage = availableTimeRepository.
                 findAllByResortIdAndDeletedFalse(resortId, pageable);
