@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.property.rating.RatingId;
 import com.example.holidayswap.domain.entity.property.rating.RatingType;
 import com.example.holidayswap.domain.exception.AccessDeniedException;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.rating.RatingMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 
 import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
 
@@ -85,6 +87,8 @@ public class RatingServiceImpl implements RatingService {
         var booking =
                 bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not " +
                         "found"));
+        if (!Objects.equals(userId, booking.getUser().getUserId()))
+            throw new DataIntegrityViolationException("You are not owner of this booking to create booking!.");
         if (booking.getStatus() != EnumBookingStatus.BookingStatus.SUCCESS)
             throw new EntityNotFoundException("Booking is not success to action rating!.");
         e.setBooking(booking);
@@ -100,6 +104,8 @@ public class RatingServiceImpl implements RatingService {
         var booking =
                 bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not " +
                         "found"));
+        if (!Objects.equals(userId, booking.getUser().getUserId()))
+            throw new DataIntegrityViolationException("You are not owner of this booking to create booking!.");
         if (booking.getStatus() != EnumBookingStatus.BookingStatus.SUCCESS)
             throw new EntityNotFoundException("Booking is not success to action rating!.");
         var id = new RatingId(bookingId, userId);

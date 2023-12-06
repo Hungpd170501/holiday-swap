@@ -24,12 +24,13 @@ public class Rating {
 //    @Column(name = "rating_id", nullable = false)
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private RatingId id;
+    //    @ManyToOne
+//    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false, insertable = false, updatable = false)
     @MapsId("userId")
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @OneToOne
     private User user;
-    @MapsId("book_id")
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("bookId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     private Booking booking;
     private String comment;
