@@ -1,7 +1,6 @@
 package com.example.holidayswap.repository.property.rating;
 
 import com.example.holidayswap.domain.entity.property.rating.Rating;
-import com.example.holidayswap.domain.entity.property.rating.RatingId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RatingRepository extends JpaRepository<Rating, RatingId> {
+public interface RatingRepository extends JpaRepository<Rating, Long> {
     @Query("""
               select r from Rating r inner join r.booking b
             inner join   b.availableTime at inner join at.timeFrame tf inner join  tf.coOwner co

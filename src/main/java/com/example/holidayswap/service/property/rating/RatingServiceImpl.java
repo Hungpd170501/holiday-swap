@@ -3,7 +3,6 @@ package com.example.holidayswap.service.property.rating;
 import com.example.holidayswap.domain.dto.request.property.rating.RatingRequest;
 import com.example.holidayswap.domain.dto.response.property.rating.RatingResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-import com.example.holidayswap.domain.entity.property.rating.RatingId;
 import com.example.holidayswap.domain.entity.property.rating.RatingType;
 import com.example.holidayswap.domain.exception.AccessDeniedException;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
@@ -81,9 +80,11 @@ public class RatingServiceImpl implements RatingService {
     public void create(Long bookingId, Long userId, RatingRequest ratingRequest) {
 //        isOutOfDateToRating(bookingId);
 //        isDoneTraveled(bookingId);
-        var id = new RatingId(bookingId, userId);
+        var rating =
+                ratingRepository.findById(bookingId);
+        if (rating.isPresent()) throw new DataIntegrityViolationException("Rating already created!.");
         var e = ratingMapper.toEntity(ratingRequest);
-        e.setId(id);
+
         var booking =
                 bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not " +
                         "found"));
@@ -108,9 +109,7 @@ public class RatingServiceImpl implements RatingService {
             throw new DataIntegrityViolationException("You are not owner of this booking to create booking!.");
         if (booking.getStatus() != EnumBookingStatus.BookingStatus.SUCCESS)
             throw new EntityNotFoundException("Booking is not success to action rating!.");
-        var id = new RatingId(bookingId, userId);
-
-        var e = ratingRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Rating not found to " +
+        var e = ratingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Rating not found to " +
                 "update!."));
         ratingMapper.updateEntityFromDTO(ratingRequest, e);
         e.setUpdateDate(new Date());
@@ -118,9 +117,8 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public void deleteRatingById(Long availableTimeId, Long userId) {
-        var id = new RatingId(availableTimeId, userId);
-        ratingRepository.deleteById(id);
+    public void deleteRatingById(Long bookingId, Long userId) {
+        ratingRepository.deleteById(bookingId);
     }
 
     public void isOutOfDateToRating(Long bookingId) {
