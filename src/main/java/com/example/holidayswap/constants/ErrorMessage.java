@@ -46,5 +46,7 @@ public class ErrorMessage {
     public static final String PLAN_ALREADY_EXISTS = "Plan already exists.";
     public static final String SUBSCRIPTION_NOT_FOUND = "Subscription not found.";
     public static final String NOTIFICATION_NOT_FOUND = "Notification not found.";
+    public static final String CURRENT_PASSWORD_INCORRECT = "Your current password is incorrect. Please try again.";
+    public static final String PASSWORDS_DONT_MATCH = "Passwords are not the same.";
     public static final String SERVICE_UNAVAILABLE = "Oops! Something went wrong. Please try again later or contact our support team for assistance.";
 }

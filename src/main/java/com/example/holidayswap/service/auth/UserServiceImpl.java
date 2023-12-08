@@ -1,6 +1,7 @@
 package com.example.holidayswap.service.auth;
 
 import com.amazonaws.AmazonServiceException;
+import com.example.holidayswap.domain.dto.request.auth.ChangePasswordRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserProfileUpdateRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserUpdateRequest;
@@ -9,6 +10,7 @@ import com.example.holidayswap.domain.entity.auth.RoleName;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.auth.UserStatus;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
+import com.example.holidayswap.domain.exception.VerificationException;
 import com.example.holidayswap.domain.mapper.auth.UserMapper;
 import com.example.holidayswap.repository.auth.RoleRepository;
 import com.example.holidayswap.repository.auth.UserRepository;
@@ -146,6 +148,19 @@ public class UserServiceImpl implements UserService {
         Long roleMemberShip = (long) RoleName.Membership.ordinal();
         var role = roleRepository.findById(roleMemberShip).orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
         user.setRole(role);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest changePasswordRequest) {
+        var user = authUtils.getAuthenticatedUser();
+        if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPasswordHash())) {
+            throw new VerificationException(CURRENT_PASSWORD_INCORRECT);
+        }
+        if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
+            throw new VerificationException(PASSWORDS_DONT_MATCH);
+        }
+        user.setPasswordHash(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
     }
 }

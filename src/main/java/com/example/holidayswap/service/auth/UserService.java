@@ -1,5 +1,6 @@
 package com.example.holidayswap.service.auth;
 
+import com.example.holidayswap.domain.dto.request.auth.ChangePasswordRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserProfileUpdateRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserUpdateRequest;
@@ -9,6 +10,7 @@ import com.example.holidayswap.domain.entity.auth.UserStatus;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,4 +35,6 @@ public interface UserService {
     void updateUserProfile(UserProfileUpdateRequest userUpdateRequest);
 
     void upgradeUserToMember(Long userId);
+
+    void changePassword(ChangePasswordRequest changePasswordRequest);
 }

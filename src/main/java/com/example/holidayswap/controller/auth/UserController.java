@@ -1,5 +1,6 @@
 package com.example.holidayswap.controller.auth;
 
+import com.example.holidayswap.domain.dto.request.auth.ChangePasswordRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserProfileUpdateRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserRequest;
 import com.example.holidayswap.domain.dto.request.auth.UserUpdateRequest;
@@ -78,8 +79,14 @@ public class UserController {
     }
 
     @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateUserProfile(@ModelAttribute UserProfileUpdateRequest userUpdateRequest){
+    public ResponseEntity<Void> updateUserProfile(@ModelAttribute UserProfileUpdateRequest userUpdateRequest) {
         userService.updateUserProfile(userUpdateRequest);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        userService.changePassword(changePasswordRequest);
+        return ResponseEntity.ok().build();
     }
 }
