@@ -18,24 +18,39 @@ import java.util.Optional;
 
 public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     @Query(value = """
-            select co.property_id,
-                   co.room_id,
-                   co.user_id,
-                   co.end_time,
-                   co.is_deleted,
-                   co.start_time,
-                   co.status,
-                   co.type,
-                   co.create_date
-            from co_owner co
-                    inner join property p on co.property_id = p.property_id
-            where (:resortId is null or p.property_id = :resortId)
-              and (:propertyId is null or co.property_id = :propertyId)
-              and (:userId is null or co.user_id = :userId)
-              and (:roomId is null or co.room_id = :roomId)
-              and (:coOwnerStatus is null or co.status = :coOwnerStatus)
+            select
+            	co.property_id,
+            	co.room_id,
+            	co.user_id,
+            	co.end_time,
+            	co.is_deleted,
+            	co.start_time,
+            	co.status,
+            	co.type,
+            	co.create_date
+            from
+            	co_owner co
+            inner join property p on
+            	co.property_id = p.property_id
+            inner join resort r on
+            	r.resort_id = p.resort_id
+            where
+            	(:resortId is null
+            		or p.property_id = :resortId)
+            	and (:propertyId is null
+            		or co.property_id = :propertyId)
+            	and (:userId is null
+            		or co.user_id = :userId)
+            	and (:roomId is null
+            		or co.room_id = :roomId)
+            	and (:coOwnerStatus is null
+            		or co.status = :coOwnerStatus)
+            	and (:property_status is null
+            		or p.status = :property_status)
+            	and (:resort_status is null
+            		or r.resort_status = :resort_status)
             """, nativeQuery = true)
-    Page<CoOwner> findAllByResortIdPropertyIdAndUserIdAndRoomId(@Param("resortId") Long resortId, @Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("coOwnerStatus") String coOwnerStatus, Pageable pageable);
+    Page<CoOwner> findAllByResortIdPropertyIdAndUserIdAndRoomId(@Param("resortId") Long resortId, @Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("coOwnerStatus") String coOwnerStatus, @Param("property_status") String property_status, @Param("resort_status") String resort_status, Pageable pageable);
 
     @Query("""
             select o from CoOwner o
@@ -82,15 +97,15 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     Optional<CoOwner> isMatchingCoOwner(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("startTime") Date startTime, @Param("endTime") Date endTime, @Param("coOwnerStatus") String coOwnerStatus);
 
     @Query(value = """
-           SELECT co_owner.* FROM co_owner join property ON property.property_id = co_owner.property_id
-           join resort ON resort.resort_id = property.resort_id
-           where resort.resort_id = ?1 and resort.resort_status = 'ACTIVE'
-           """, nativeQuery = true)
+            SELECT co_owner.* FROM co_owner join property ON property.property_id = co_owner.property_id
+            join resort ON resort.resort_id = property.resort_id
+            where resort.resort_id = ?1 and resort.resort_status = 'ACTIVE'
+            """, nativeQuery = true)
     List<CoOwner> getListCownerByResortId(Long resortId);
 
     @Query(value = """
-           SELECT co_owner.* FROM co_owner join property on property.property_id = co_owner.property_id
-                                          where property.property_id = ?1 and property.is_deleted = false
-           """, nativeQuery = true)
+            SELECT co_owner.* FROM co_owner join property on property.property_id = co_owner.property_id
+                                           where property.property_id = ?1 and property.is_deleted = false
+            """, nativeQuery = true)
     List<CoOwner> getListCoOwnerByPropertyId(Long propertyId);
 }

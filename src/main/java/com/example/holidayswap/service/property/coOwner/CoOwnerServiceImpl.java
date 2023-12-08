@@ -20,6 +20,7 @@ import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.property.PropertyService;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import com.example.holidayswap.service.resort.ResortService;
+import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,13 +48,22 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final EmailService emailService;
     private final ResortService resortService;
     private final PropertyService propertyService;
-
+    private final AuthUtils authUtils;
 
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
         String status = null;
+        String propertyStatus = null;
+        String resortStatus = null;
+        var user = authUtils.GetUser();
+        if (user.isPresent()) {
+            if (user.get().getRole().getRoleId() == 4) {
+                propertyStatus = PropertyStatus.ACTIVE.toString();
+                resortStatus = ResortStatus.ACTIVE.toString();
+            }
+        }
         if (coOwnerStatus != null) status = coOwnerStatus.toString();
-        var entities = coOwnerRepository.findAllByResortIdPropertyIdAndUserIdAndRoomId(resortId, propertyId, userId, roomId, status, pageable).map(CoOwnerMapper.INSTANCE::toDtoResponse);
+        var entities = coOwnerRepository.findAllByResortIdPropertyIdAndUserIdAndRoomId(resortId, propertyId, userId, roomId, status, propertyStatus, resortStatus, pageable).map(CoOwnerMapper.INSTANCE::toDtoResponse);
         return entities;
     }
 
