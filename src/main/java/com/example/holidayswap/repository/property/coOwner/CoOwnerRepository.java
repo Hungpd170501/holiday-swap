@@ -49,6 +49,8 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
             		or p.status = :property_status)
             	and (:resort_status is null
             		or r.resort_status = :resort_status)
+            		and p.is_deleted = false
+            		and r.is_deleted = false
             """, nativeQuery = true)
     Page<CoOwner> findAllByResortIdPropertyIdAndUserIdAndRoomId(@Param("resortId") Long resortId, @Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("coOwnerStatus") String coOwnerStatus, @Param("property_status") String property_status, @Param("resort_status") String resort_status, Pageable pageable);
 
