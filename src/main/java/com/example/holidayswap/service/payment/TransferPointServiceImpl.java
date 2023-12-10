@@ -152,15 +152,6 @@ public class TransferPointServiceImpl implements ITransferPointService {
     @Transactional(rollbackFor = {BankException.class, InterruptedException.class})
     public TransferResponse payBooking(Booking booking) throws InterruptedException {
         Wallet fromWallet;
-//        AdminWallet adminWallet;
-//        Wallet owner;
-
-//        adminWallet = adminWalletRepository.findFirstByOrderByIdDesc();
-//        if (adminWallet == null) {
-//            adminWallet = new AdminWallet();
-//            adminWallet.setTotalPoint(0D);
-//            adminWalletRepository.save(adminWallet);
-//        }
 
         RLock fairLock = RedissonLockUtils.getFairLock("wallet-" + booking.getUserBookingId());
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
@@ -177,11 +168,6 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 fromWallet.withdraw(booking.getPrice());
                 //TODO get list Bookingdetail by booking id
 
-//                owner = walletService.GetWalletByUserId(booking.getOwnerId());
-//                owner.setTotalPoint(owner.getTotalPoint() + booking.getActualPrice());
-//                adminWallet.setTotalPoint(adminWallet.getTotalPoint() + booking.getPrice() * booking.getCommission() / 100);
-//                transactionBookingRefundOwnerService.saveLog(booking.getId(), booking.getOwnerId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "booking " + booking.getCheckInDate() + " to " + booking.getCheckOutDate(), Helper.getCurrentDate(), owner.getTotalPoint());
-//                walletRepository.save(owner);
 
                 allLogPayBookingService.saveLog(booking.getUserBookingId(), booking.getId(), booking.getPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "booking from " + booking.getCheckInDate() + " to " + booking.getCheckOutDate(), Helper.getCurrentDate(), fromWallet.getTotalPoint());
 

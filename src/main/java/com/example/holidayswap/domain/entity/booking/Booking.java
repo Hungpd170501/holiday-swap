@@ -85,4 +85,6 @@ public class Booking {
     @Column(name ="transfer_status")
     private EnumBookingStatus.TransferStatus transferStatus;
 
+    @OneToMany(mappedBy = "booking")
+    private Set<IssueBooking> issueBookings;
 }

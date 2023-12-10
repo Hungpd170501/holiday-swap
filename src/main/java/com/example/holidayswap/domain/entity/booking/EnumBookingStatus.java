@@ -15,4 +15,8 @@ public class EnumBookingStatus {
         SUCCESS,
         REFUND_USER
     }
+    public enum IssueBookingStatus{
+        OPEN,
+        RESOLVE
+    }
 }
