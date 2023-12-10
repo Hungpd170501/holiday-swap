@@ -17,6 +17,8 @@ public interface AvailableTimeService {
     //    Page<TimeOffDepositResponse> getAllBy(Long propertyId, Pageable pageable);
     Page<AvailableTimeResponse> getAllByPropertyId(Long propertyId, Pageable pageable);
 
+    List<AvailableTimeResponse> getAllByTimeFrameIdAndYear(Long timeFrameId, int year);
+
     Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable);
 
     List<AvailableTimeResponse> getAllByCoOwnerId(CoOwnerId coOwnerId);

@@ -20,17 +20,16 @@ import java.util.Date;
 @NoArgsConstructor
 @Table(name = "rating", schema = "public")
 public class Rating {
-    @EmbeddedId
-//    @Column(name = "rating_id", nullable = false)
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private RatingId id;
-    @MapsId("userId")
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "rating_id", nullable = false)
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @MapsId("book_id")
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "rating_id", nullable = false)
     private Booking booking;
     private String comment;
     @NotNull
@@ -41,6 +40,4 @@ public class Rating {
     private RatingType ratingType;
     private Date createDate;
     private Date updateDate;
-
-
 }

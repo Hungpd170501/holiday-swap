@@ -57,10 +57,8 @@ public class TransferPointServiceImpl implements ITransferPointService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    @Autowired
-    private AdminWalletRepository adminWalletRepository;
-
     private final PushNotificationService pushNotificationService;
+    private final AdminWalletRepository adminWalletRepository;
 
 
     @Override
@@ -211,7 +209,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 notificationRequestForUserBooking.setSubject("Refund point cancelled booking" + total + "point");
                 notificationRequestForUserBooking.setContent(fromWallet.getUser().getUsername() + "refund point for you" + total + "point");
                 notificationRequestForUserBooking.setToUserId(to);
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
             } finally {
                 fairLock.unlock();
             }
@@ -251,7 +249,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 notificationRequestForUserBooking.setSubject("Refund point booking" + booking.getActualPrice() + "point");
                 notificationRequestForUserBooking.setContent(booking.getId()+ "refund point for you" +  booking.getActualPrice() + "point");
                 notificationRequestForUserBooking.setToUserId(booking.getOwnerId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
                 loggingService.saveLog(bookingId, booking.getOwnerId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "Success", 0D, ownerWallet.getTotalPoint(), booking.getCommission());
                 booking.setTransferStatus(EnumBookingStatus.TransferStatus.SUCCESS);
                 bookingRepository.save(booking);

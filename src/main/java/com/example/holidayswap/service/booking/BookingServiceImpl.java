@@ -57,7 +57,7 @@ public class BookingServiceImpl implements IBookingService {
 
         if (bookingRequest.getCheckInDate().compareTo(bookingRequest.getCheckOutDate()) >= 0)
             throw new EntityNotFoundException("Check in date must be before check out date");
-        var booki = availableTimeRepository.findByTimeFrameId(bookingRequest.getAvailableTimeId());
+        var booki = availableTimeRepository.findById(bookingRequest.getAvailableTimeId()).get();
         if(booki != null){
             if(booki.getTimeFrame().getUserId() == bookingRequest.getUserId())
                 throw new EntityNotFoundException("You can't book your own apartment");
@@ -116,12 +116,12 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Booking Success");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForUserBooking.setToUserId(bookingRequest.getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
                 //create notification for owner
                 notificationRequestForOwner.setSubject("Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " has been booked");
                 notificationRequestForOwner.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForOwner.setToUserId(booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForOwner);
+                pushNotificationService.createNotification(notificationRequestForOwner);
                 return EnumBookingStatus.BookingStatus.SUCCESS;
             } finally {
                 fairLock.unlock();
@@ -250,7 +250,7 @@ public class BookingServiceImpl implements IBookingService {
         ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
 
         //get list booking of resort and date booking is after current date
-        List<Booking> bookingList = bookingRepository.getListBookingByResortIdAndDate(resortId, startDate);
+        List<Booking> bookingList = bookingRepository.getListBookingByResortIdAndDate(resortId, hcmZonedDateTime);
         if(bookingList.size() > 0){
             bookingList.forEach(booking -> {
                 //create notification for user booking
@@ -258,7 +258,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Resort of your booking is deactive date "  +startDate );
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel,contact owner for more details");
                 notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
 
                 //refund booking
 
@@ -280,7 +280,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Resort of your ownership is deactive date: " + startDate);
                 notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
                 notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
             });
         }
     }
@@ -288,8 +288,9 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public void deactivePropertyNotifyBookingUser(Long propertyId, LocalDate startDate) {
 //        String currentDate = Helper.getCurrentDateWithoutTime();
+        ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         //get list booking of resort and date booking is after current date
-        List<Booking> bookingList = bookingRepository.getListBookingByPropertyIdAndDate(propertyId, startDate);
+        List<Booking> bookingList = bookingRepository.getListBookingByPropertyIdAndDate(propertyId, hcmZonedDateTime);
         if(bookingList.size() > 0){
             bookingList.forEach(booking -> {
                 //create notification for user booking
@@ -298,7 +299,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Property of your booking is deactive date: " + startDate );
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel, contact owner for more details");
                 notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
                 booking.setStatusCheckReturn(true);
                 bookingRepository.save(booking);
                 try {
@@ -317,7 +318,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForUserBooking.setSubject("Property of your ownership is deactive date: " +startDate);
                 notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getId().getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
                 notificationRequestForUserBooking.setToUserId(coOwner.getId().getUserId());
-                pushNotificationService.CreateNotification(notificationRequestForUserBooking);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
             });
         }
     }

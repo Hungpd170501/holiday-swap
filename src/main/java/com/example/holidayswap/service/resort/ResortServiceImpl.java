@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -53,6 +54,7 @@ public class ResortServiceImpl implements ResortService {
     private final StateOrProvinceRepository stateOrProvinceRepository;
     private final CountryRepository countryRepository;
     private final IBookingService bookingService;
+    private final ResortMapper resortMapper;
 
     @Override
     public Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
@@ -68,7 +70,8 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public List<ResortResponse> getsListResortHaveProperty() {
-        return null;
+        var list = resortRepository.getsListResortHaveProperty();
+        return list.stream().map(resortMapper::toResortResponse).collect(Collectors.toList());
     }
 
     @Override
@@ -139,14 +142,16 @@ public class ResortServiceImpl implements ResortService {
             throw new DataIntegrityViolationException("Please input resort amenity");
         if (resortRequest.getPropertyTypes().isEmpty())
             throw new DataIntegrityViolationException("Please input resort's property Type");
-        var entityFound = resortRepository.findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(resortRequest.getResortName());
+        var entityFound = resortRepository.findById(id);
         if (entityFound.isPresent() && !Objects.equals(entityFound.get().getId(), id)) {
             throw new DuplicateRecordException(DUPLICATE_RESORT_NAME);
         }
-        if ((resortImage.isEmpty() || resortImage == null) && (resortRequest.getOldImages() == null || resortRequest.getOldImages().isEmpty()))
-            throw new EntityNotFoundException("Resort image is required");
-        if (resortRequest.getOldImages().size() + resortImage.size() < 5)
-            throw new DataIntegrityViolationException("Please input more than 5 file image of resort");
+        //resort image required
+        int resortCreateMore = 0;
+        if (resortImage != null) resortCreateMore = resortImage.size();
+        if (resortRequest.getOldImages().size() + resortCreateMore < 5) {
+            throw new DataIntegrityViolationException("Resort image must have 5 or more image");
+        }
 
         if (resortRequest.getPropertyTypes().isEmpty() || resortRequest.getPropertyTypes() == null)
             throw new EntityNotFoundException("Property type is required");
@@ -186,6 +191,9 @@ public class ResortServiceImpl implements ResortService {
     @Override
     public void update(Long id, ResortStatus resortStatus) {
         var entity = resortRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        if (resortStatus == ResortStatus.DEACTIVATE) {
+            bookingService.deactiveResortNotifyBookingUser(id, LocalDate.now());
+        }
         entity.setStatus(resortStatus);
         Long i = resortRepository.save(entity).getId();
     }
@@ -193,7 +201,7 @@ public class ResortServiceImpl implements ResortService {
     @Override
     public void delete(Long id, LocalDate startDate ) {
         var inRoomAmenityTypeFound = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
-        bookingService.deactiveResortNotifyBookingUser(id,startDate);
+        bookingService.deactiveResortNotifyBookingUser(id, startDate);
         inRoomAmenityTypeFound.setDeleted(true);
         resortRepository.save(inRoomAmenityTypeFound);
     }

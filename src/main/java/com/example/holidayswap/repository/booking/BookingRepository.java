@@ -28,7 +28,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT* FROM booking b WHERE ?1 = check_in_date AND ?2 = check_out_date AND available_time_id = ?3", nativeQuery = true)
     Booking checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(Date checkInDate, Date checkOutDate, Long availableTimeId);
     @Query("select b from Booking b where b.userBookingId = ?1")
-    List<Booking> findAllByUserId(Long userId);
+    List<Booking>findAllByUserId (Long userId);
 
     @Query(value = "SELECT b.* FROM booking b where b.owner_id= ?1", nativeQuery = true)
     List<Booking> findAllByOwnerLogin(Long userId);
@@ -95,30 +95,30 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean isOutDateRating(@Param("bookingId") Long bookingId, @Param("now") Date now);
 
     @Query(value = """
-            select
-                    	b.book_id,
-                    	b.check_in_date,
-                    	b.check_out_date,
-                    	b.price,
-                    	b.status,
-                    	b.actual_price,
-                    	b.available_time_id,
-                    	b.commission,
-                    	b.owner_id,
-                    	b.total_days,
-                    	b.user_booking_id,
-                    	b.date_booking
-                    from
-                    	booking b
-                    inner join available_time at on
-                    	at.available_time_id = b.available_time_id
-                    inner join time_frame tf on
-                    	tf.time_frame_id = at.time_frame_id
-                    where
-                    	tf.time_frame_id = :time_frame_id
-                    	and (date(b.check_in_date),
-                    	date(b.check_out_date)) overlaps (date(:check_in_date),
-                    	date(:check_out_date))
+
+            select b.book_id,
+                           b.check_in_date,
+                           b.check_out_date,
+                           b.price,
+                           b.status,
+                           b.actual_price,
+                           b.available_time_id,
+                           b.commission,
+                           b.owner_id,
+                           b.total_days,
+                           b.user_booking_id,
+                           b.date_booking,
+                           b.status_check_return,
+                           b.total_member
+                    from booking b
+                             inner join available_time at on
+                        at.available_time_id = b.available_time_id
+                             inner join time_frame tf on
+                        tf.time_frame_id = at.time_frame_id
+                    where tf.time_frame_id = :time_frame_id
+                      and (date(b.check_in_date),
+                           date(b.check_out_date)) overlaps (date(:check_in_date),
+                                                             date(:check_out_date))
                     """, nativeQuery = true)
     List<Booking> checkTimeFrameIsHaveAnyBookingYetInTheTimeYet(@Param("check_in_date") Date check_in_date,
                                                                 @Param("check_out_date") Date check_out_date,
@@ -128,20 +128,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
                                             time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
                                             join resort ON resort.resort_id = property.resort_id
-                                            where property.resort_id = ?1 and b.check_in_date > ?2 and resort.resort_status= 'ACTIVE'
+                                            where property.resort_id = ?1 and b.check_in_date > date(?2) and resort.resort_status= 'ACTIVE' and b.status = 5
                     """, nativeQuery = true)
-    List<Booking> getListBookingByResortIdAndDate(Long resortId, LocalDate date);
+    List<Booking> getListBookingByResortIdAndDate(Long resortId, ZonedDateTime date);
 
     @Query(value = """
         SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
         time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
-        where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > ?2
+        where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > date(?2) and property.status = 'ACTIVE' and b.status = 5
         """, nativeQuery = true)
-    List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,LocalDate date);
+    List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,ZonedDateTime date);
+
 
     @Query(value = """
        SELECT b.* FROM booking b where date (b.check_in_date) = date(?1) and status = ?2 and transfer_status = ?3 
         """, nativeQuery = true)
     List<Booking> getListBookingByDateAndStatusAndTransferStatus(LocalDate date, EnumBookingStatus.BookingStatus status, EnumBookingStatus.TransferStatus transferStatus);
 
+                    
 }

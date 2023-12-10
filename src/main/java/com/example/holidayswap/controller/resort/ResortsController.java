@@ -67,6 +67,11 @@ public class ResortsController {
         return ResponseEntity.ok(resortAmenityService.gets(amenityId, resortId));
     }
 
+    @GetMapping("/getList")
+    public ResponseEntity<List<ResortResponse>> gets() {
+        return ResponseEntity.ok(resortService.getsListResortHaveProperty());
+    }
+
     @GetMapping("/{resortId}")
     public ResponseEntity<ResortResponse> get(
             @PathVariable("resortId") Long resortId) {
@@ -114,7 +119,7 @@ public class ResortsController {
 
     @DeleteMapping("/{resortId}")
     public ResponseEntity<Void> delete(@PathVariable("resortId") Long resortId) {
-        resortService.delete(resortId);
+        resortService.delete(resortId, new java.util.Date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
         return ResponseEntity.noContent().build();
     }
 }

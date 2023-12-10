@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -101,7 +102,7 @@ public class PropertiesController {
 
     @DeleteMapping("/{propertyId}")
     public ResponseEntity<Void> delete(@PathVariable("propertyId") Long propertyId) {
-        propertyService.delete(propertyId);
+        propertyService.delete(propertyId, new Date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
         return ResponseEntity.noContent().build();
     }
 

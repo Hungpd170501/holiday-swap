@@ -117,9 +117,9 @@ public class PropertyServiceImpl implements PropertyService {
             throw new DataIntegrityViolationException("Property must have 1 number bed.");
         var entity = PropertyMapper.INSTANCE.toEntity(dtoRequest);
         entity.setStatus(PropertyStatus.ACTIVE);
-        var resort = resortRepository.findById(dtoRequest.getPropertyViewId()).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        var resort = resortRepository.findById(dtoRequest.getResortId()).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         if (resort.isDeleted()) throw new DataIntegrityViolationException("Resort has been deleted!.");
-        if (resort.getStatus() == ResortStatus.ACTIVE) throw new DataIntegrityViolationException("Resort not ACTIVE!.");
+        if (resort.getStatus() != ResortStatus.ACTIVE) throw new DataIntegrityViolationException("Resort not ACTIVE!.");
         if (dtoRequest.getInRoomAmenities().isEmpty())
             throw new DataIntegrityViolationException("In room amenity can not be null");
         propertyViewRepository.findByIdAndIsDeletedIsFalse(dtoRequest.getPropertyViewId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
@@ -142,12 +142,15 @@ public class PropertyServiceImpl implements PropertyService {
             throw new DataIntegrityViolationException("In room amenity can not be null");
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         var propertyImage = propertyImageService.gets(id);
-        if ((propertyImages.size() + property.getPropertyImages().size() - dtoRequest.getListImageDelete().size()) < 5)
-            throw new DataIntegrityViolationException("Please input more than 5 file image of propery");
+        int numberImageCreateMore = 0;
+        if (propertyImages != null)
+            numberImageCreateMore = propertyImages.size();
+        if ((propertyImage.size() + numberImageCreateMore - dtoRequest.getListImageDelete().size()) < 5)
+            throw new DataIntegrityViolationException("Please input more than 5 file image of apartment");
         if (dtoRequest.getNumberKingBeds() == 0 && dtoRequest.getNumberQueenBeds() == 0 && dtoRequest.getNumberSingleBeds() == 0 && dtoRequest.getNumberDoubleBeds() == 0 && dtoRequest.getNumberTwinBeds() == 0 && dtoRequest.getNumberFullBeds() == 0 && dtoRequest.getNumberSofaBeds() == 0 && dtoRequest.getNumberMurphyBeds() == 0)
             throw new DataIntegrityViolationException("Property must have 1 number bed.");
         PropertyMapper.INSTANCE.updateEntityFromDTO(dtoRequest, property);
-        var resort = resortRepository.findByIdAndDeletedFalseAndResortStatus(dtoRequest.getPropertyViewId(), ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
+        var resort = resortRepository.findByIdAndDeletedFalseAndResortStatus(property.getResortId(), ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         propertyViewRepository.findByIdAndIsDeletedIsFalse(dtoRequest.getPropertyViewId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_VIEW_NOT_FOUND));
         propertyTypeRespository.findPropertyTypeIsInResort(dtoRequest.getPropertyTypeId(), resort.getId()).orElseThrow(() -> new EntityNotFoundException(PROPERTY_TYPE_NOT_FOUND));
         List<InRoomAmenity> amenities = new ArrayList<>();
@@ -171,6 +174,9 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public void update(Long id, PropertyStatus propertyStatus) {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+        if (propertyStatus == PropertyStatus.DEACTIVATE) {
+            bookingService.deactivePropertyNotifyBookingUser(id, LocalDate.now());
+        }
         property.setStatus(propertyStatus);
         propertyRepository.save(property);
     }

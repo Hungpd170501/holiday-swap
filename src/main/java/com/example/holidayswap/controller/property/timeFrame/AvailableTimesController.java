@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +42,14 @@ public class AvailableTimesController {
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var dtoResponses = availableTimeService.getAllByPropertyId(timeFrameId, pageable);
+        return ResponseEntity.ok(dtoResponses);
+    }
+
+    @GetMapping("/getAvailableTimeCreated")
+    public ResponseEntity<List<AvailableTimeResponse>> getAvailableTimeCreated(
+            @RequestParam("timeFrameId") Long timeFrameId,
+            @RequestParam int year) {
+        var dtoResponses = availableTimeService.getAllByTimeFrameIdAndYear(timeFrameId, year);
         return ResponseEntity.ok(dtoResponses);
     }
 

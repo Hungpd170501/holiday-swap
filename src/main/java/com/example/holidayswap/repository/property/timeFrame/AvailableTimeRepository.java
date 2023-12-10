@@ -56,7 +56,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                         and (date(tod.start_time), date(tod.end_time)) overlaps (date(:start_time), date(:end_time))
                         and tod.is_deleted  = false
                         and (:status is null or tod.status = :status)""", nativeQuery = true)
-    Optional<AvailableTime> findOverlapsWhichAnyTimeDeposit(
+    List<AvailableTime> findOverlapsWhichAnyTimeDeposit(
             @Param("time_frame_id") Long timeFrameId,
             @Param("start_time") Date startTime,
             @Param("end_time") Date endTime,
@@ -67,17 +67,17 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = """
                     select av from AvailableTime av
-                    inner join av.timeFrame af
-                    inner join af.coOwner co
+                    left join av.timeFrame af
+                    left join af.coOwner co
                     where co.id.roomId = :roomId
             """)
     List<AvailableTime> findAllByRoomId(@Param("roomId") String roomId);
 
     @Query(value = """
                     select at from AvailableTime at
-                    inner join at.timeFrame tf
-                    inner join tf.coOwner co
-                    inner join co.property p
+                    left join at.timeFrame tf
+                    left join tf.coOwner co
+                    left join co.property p
                     where co.id.propertyId = :propertyId
                     and co.id.userId =  :userId
                     and co.id.roomId = :roomId
@@ -93,14 +93,14 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             p, r, u, at
             )
             from AvailableTime at
-                 inner join at.timeFrame tf
-                 inner join tf.coOwner co
-                 inner join co.property p
-                 inner join p.resort r
-                 inner join co.user u
-                 inner join p.inRoomAmenities ira
-                 inner join p.propertyType pt
-                 inner join p.propertyView pv
+                 left join at.timeFrame tf
+                 left join tf.coOwner co
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
+                 left join p.inRoomAmenities ira
+                 left join p.propertyType pt
+                 left join p.propertyView pv
                  left join  at.bookings bk
                  where
                  ((:resortId is null) or (r.id = :resortId))
@@ -163,11 +163,11 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     p, r, u, at
             )
                  from AvailableTime at
-                 inner join at.timeFrame tf
-                 inner join tf.coOwner co
-                 inner join co.property p
-                 inner join p.resort r
-                 inner join co.user u
+                 left join at.timeFrame tf
+                 left join tf.coOwner co
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
                  where
                  at.id = :availableId
                  and co.status = 'ACCEPTED'
@@ -185,17 +185,32 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             p, r, u, at
             )
             from AvailableTime at
-                 inner join at.timeFrame tf
-                 inner join tf.coOwner co
-                 inner join co.property p
-                 inner join p.resort r
-                 inner join co.user u
-                 inner join p.inRoomAmenities ira
-                 inner join p.propertyType pt
-                 inner join p.propertyView pv
+                 left join at.timeFrame tf
+                 left join tf.coOwner co
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
+                 left join p.inRoomAmenities ira
+                 left join p.propertyType pt
+                 left join p.propertyView pv
                  left join  at.bookings bk
                  where
                co.id.userId  = :userId
             """)
     Page<ApartmentForRentDTO> findApartmentForRentByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query(value = """
+            select
+                    	at2.*
+                    from
+                    	available_time at2
+                    where
+                    	at2.time_frame_id = :time_frame_id
+                    	and extract (year
+                    from
+                    	at2.start_time) = :year
+                    	and at2.status = 'OPEN'
+                    	and is_deleted = false
+                    """, nativeQuery = true)
+    List<AvailableTime> findAllByTimeFrameIdAndYear(@Param("time_frame_id") Long timeFrameId, @Param("year") int year);
 }

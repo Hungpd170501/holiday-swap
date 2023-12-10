@@ -15,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,13 +29,13 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
 
     @Query("""
             select  r  from Resort r
-            inner join r.propertyTypes pt
-            inner join r.amenities ra
-            inner join Property p on p.resortId = r.id
-            inner join p.inRoomAmenities pa
-            inner join CoOwner o on p.id = o.id.propertyId
-            inner join TimeFrame v on v.propertyId = p.id
-            inner join AvailableTime at on at.timeFrameId = v.id
+            left join r.propertyTypes pt
+            left join r.amenities ra
+            left join Property p on p.resortId = r.id
+            left join p.inRoomAmenities pa
+            left join CoOwner o on p.id = o.id.propertyId
+            left join TimeFrame v on v.propertyId = p.id
+            left join AvailableTime at on at.timeFrameId = v.id
             where upper(r.resortName) like upper(concat('%', :name, '%'))
             and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
             and p.isDeleted = false and (:propertyStatus is null or p.status = :propertyStatus)
@@ -67,8 +68,8 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
 
     @Query("""
             select DISTINCT r  from Resort r
-            inner join r.propertyTypes pt
-            inner join r.amenities ra
+            left join r.propertyTypes pt
+            left join r.amenities ra
             where upper(r.resortName) like upper(concat('%', :name, '%'))
             and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
             and ((:#{#listOfResortAmenity == null} = true) or (ra.id in :listOfResortAmenity))
@@ -84,8 +85,8 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
 
     @Query(value = """
             select r from Resort r
-            inner  join r.properties p
-            inner  join  p.coOwners co
+            left  join r.properties p
+            left  join  p.coOwners co
             where co.user.userId = :userId
             and r.isDeleted = false 
             and p.isDeleted = false 
@@ -99,14 +100,14 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
               r
             )
             from Resort r
-            inner join r.properties p
-            inner join p.coOwners co
-            inner join  co.timeFrames tf
-            inner join  tf.availableTimes at
-                 inner join co.user u
-                 inner join p.inRoomAmenities ira
-                 inner join p.propertyType pt
-                 inner join p.propertyView pv
+            left join r.properties p
+            left join p.coOwners co
+            left join  co.timeFrames tf
+            left join  tf.availableTimes at
+                 left join co.user u
+                 left join p.inRoomAmenities ira
+                 left join p.propertyType pt
+                 left join p.propertyView pv
                  left join at.bookings bk
                  where
               
@@ -146,4 +147,11 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                )
             """)
     Page<ResortApartmentForRentDTO> findResort(@Param("locationName") String locationName, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, @Param("userId") Long userId, Pageable pageable);
+
+    @Query(value = """
+            select distinct r from Resort r
+            inner join r.properties p
+            where r.status = 'ACTIVE' and p.status = 'ACTIVE'
+                """)
+    List<Resort> getsListResortHaveProperty();
 }

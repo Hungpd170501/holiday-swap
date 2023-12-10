@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerReques
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.service.property.coOwner.CoOwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -49,6 +50,7 @@ public class CoOwnersController {
     public ResponseEntity<CoOwnerResponse> create(@RequestPart("coOwnerId") CoOwnerId coOwnerId,
                                                   @RequestPart("coOwner") CoOwnerRequest dtoRequest,
                                                   @RequestPart List<MultipartFile> contractImages) {
+        if (contractImages.isEmpty()) throw new DataIntegrityViolationException("Contract image can not be empty!.");
         return ResponseEntity.ok(coOwnerService.create(coOwnerId, dtoRequest, contractImages));
     }
 

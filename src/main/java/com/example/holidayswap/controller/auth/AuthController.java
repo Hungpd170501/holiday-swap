@@ -12,17 +12,24 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/auth")
 @Validated
+@Slf4j
 public class AuthController {
     private final AuthenticationService authenticationService;
+    private static final String FORGOT_PASSWORD_REDIRECT = "https://holiday-swap.vercel.app/forgot-password";
 
     @Operation(
             description = "Returns new access and refresh token",
@@ -30,9 +37,9 @@ public class AuthController {
                     @ApiResponse(responseCode = "200", description = "successful operation", content = {
                             @Content(mediaType = "application/json", schema = @Schema(implementation = AuthenticationResponse.class))
                     }),
-                    @ApiResponse(responseCode = "401", description = "Incorrect email or password.",content = @Content),
-                    @ApiResponse(responseCode = "403", description = "User not verified. || User is blocked.",content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Email not found.",content = @Content)
+                    @ApiResponse(responseCode = "401", description = "Incorrect email or password.", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "User not verified. || User is blocked.", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Email not found.", content = @Content)
             },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
@@ -141,15 +148,22 @@ public class AuthController {
     @GetMapping("/verify-email")
     public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
         authenticationService.verifyEmailToken(token);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
             description = "Verify reset password token when user click on link in email"
     )
     @GetMapping("/forgot-password")
-    public ResponseEntity<Void> verifyForgotPasswordToken(@RequestParam String token) {
+    public ResponseEntity<Void> verifyForgotPasswordToken(@RequestParam String token, HttpServletResponse response) throws IOException {
         authenticationService.verifyForgotPasswordToken(token);
+        String redirectUrl = UriComponentsBuilder
+                .fromUriString(FORGOT_PASSWORD_REDIRECT)
+                .queryParam("token", token)
+                .queryParam("email", authenticationService.getUserFromToken(token).getEmail())
+                .build()
+                .toUriString();
+        response.sendRedirect(redirectUrl);
         return ResponseEntity.ok().build();
     }
 }
