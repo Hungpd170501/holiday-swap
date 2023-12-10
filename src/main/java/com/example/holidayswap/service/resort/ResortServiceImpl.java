@@ -67,6 +67,11 @@ public class ResortServiceImpl implements ResortService {
     }
 
     @Override
+    public List<ResortResponse> getsListResortHaveProperty() {
+        return null;
+    }
+
+    @Override
     public ResortResponse get(Long id) {
         var entity = resortRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
