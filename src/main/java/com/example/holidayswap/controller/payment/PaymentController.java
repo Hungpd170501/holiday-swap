@@ -6,7 +6,9 @@ import com.example.holidayswap.domain.dto.response.payment.PaymentResDTO;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
+import com.example.holidayswap.domain.entity.payment.Point;
 import com.example.holidayswap.service.payment.IMoneyTranferService;
+import com.example.holidayswap.service.payment.IPointService;
 import com.example.holidayswap.service.payment.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,8 @@ public class PaymentController {
     @Autowired
     private ITransactionService transactionService;
     @Autowired
+    private IPointService pointService;
+    @Autowired
     private IMoneyTranferService moneyTranferService;
     @GetMapping("/Create_payment")
     public ResponseEntity<PaymentResDTO> createPayment(@RequestParam String amount, @RequestParam String orderInfor,@RequestParam(required = false, defaultValue = "http://localhost:8080/api/v1/payment/payment_infor") String returnURL) throws UnsupportedEncodingException {
@@ -46,7 +50,7 @@ public class PaymentController {
         User user = (User) principal;
         //create history money transfer
         TopUpWalletDTO topUpWalletDTO = new TopUpWalletDTO();
-        topUpWalletDTO.setAmount(Integer.parseInt(amount));
+        topUpWalletDTO.setAmount(Double.parseDouble(amount));
         topUpWalletDTO.setOrderInfor(orderInfor);
         topUpWalletDTO.setUserId(String.valueOf(user.getUserId()));
         topUpWalletDTO.setPaymentDate(vnp_CreateDate);
@@ -108,12 +112,12 @@ public class PaymentController {
 
     @GetMapping("/payment_infor/{moneyTransferId}")
     public ResponseEntity<?> transaction(@PathVariable String moneyTransferId ,  @RequestParam(value = "vnp_ResponseCode") String responseCode){
-
+        Point point = pointService.GetActivePoint();
         MoneyTranfer moneyTranfer = moneyTranferService.GetMoneyTranferTransaction(Long.parseLong(moneyTransferId));
         if(moneyTranfer == null) return ResponseEntity.badRequest().body("Transaction not found");
         if(!moneyTranfer.getStatus().name().equals(EnumPaymentStatus.StatusMoneyTranfer.WAITING.name())) return ResponseEntity.badRequest().body("Transaction has been completed");
         TopUpWalletDTO topUpWalletDTO = new TopUpWalletDTO();
-        topUpWalletDTO.setAmount((int) moneyTranfer.getAmount());
+        topUpWalletDTO.setAmount(moneyTranfer.getAmount()/point.getPointPrice());
         topUpWalletDTO.setBankCode(moneyTranfer.getBankCode());
         topUpWalletDTO.setOrderInfor(moneyTranfer.getOrderInfor());
         topUpWalletDTO.setPaymentDate(moneyTranfer.getPaymentDate());

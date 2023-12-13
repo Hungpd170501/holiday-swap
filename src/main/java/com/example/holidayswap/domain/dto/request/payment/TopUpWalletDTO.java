@@ -12,7 +12,7 @@ import lombok.Setter;
 public class TopUpWalletDTO {
     private String bankCode;
     private String orderInfor;
-    private int amount;
+    private Double amount;
     private String userId;
     private String paymentDate;
 
