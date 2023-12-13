@@ -176,7 +176,7 @@ public class AuthController {
     @Operation(
             description = "Update new password by optin"
     )
-    @PutMapping("/reset-password/opt")
+    @PutMapping("/reset-password/otp")
     public ResponseEntity<Void> resetPasswordByOtp(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         authenticationService.resetPasswordByOtp(resetPasswordRequest);
         return ResponseEntity.noContent().build();
