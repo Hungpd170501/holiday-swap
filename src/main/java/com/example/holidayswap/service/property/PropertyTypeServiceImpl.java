@@ -33,7 +33,7 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
 
     @Override
     public List<PropertyTypeResponse> gets() {
-        var entity = propertyTypeRepository.findAll();
+        var entity = propertyTypeRepository.findAllAndIsDeletedIsFasle();
         var dtoResponse = entity.stream().map(propertyTypeMapper::toDtoResponse).collect(Collectors.toList());
         return dtoResponse;
     }

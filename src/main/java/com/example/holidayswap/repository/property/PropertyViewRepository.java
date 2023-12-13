@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,4 +22,7 @@ public interface PropertyViewRepository extends JpaRepository<PropertyView, Long
 
     @Query("select p from PropertyView p where upper(p.propertyViewName) = upper(?1) and p.isDeleted = false")
     Optional<PropertyView> findByPropertyViewNameEqualsIgnoreCaseAndIsDeletedIsFalse(String name);
+
+    @Query("select p from PropertyView p where  p.isDeleted = false")
+    List<PropertyView> findAllAndDeletedIsFalse();
 }

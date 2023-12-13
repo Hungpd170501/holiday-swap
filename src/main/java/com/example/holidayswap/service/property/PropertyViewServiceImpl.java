@@ -34,7 +34,7 @@ public class PropertyViewServiceImpl implements PropertyViewService {
 
     @Override
     public List<PropertyViewResponse> gets() {
-        var entity = propertyViewRepository.findAll();
+        var entity = propertyViewRepository.findAllAndDeletedIsFalse();
         var dtoRespone = entity.stream().map(propertyViewMapper::toDtoResponse).collect(Collectors.toList());
         return dtoRespone;
     }

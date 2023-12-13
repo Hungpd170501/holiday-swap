@@ -176,11 +176,12 @@ public class AuthController {
     @Operation(
             description = "Update new password by otp"
     )
-    @PutMapping("/reset-password/opt")
+    @PutMapping("/reset-password/otp")
     public ResponseEntity<Void> resetPasswordByOtp(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         authenticationService.resetPasswordByOtp(resetPasswordRequest);
         return ResponseEntity.noContent().build();
     }
+
 
     @GetMapping("/verify-otp")
     public ResponseEntity<Void> verify(@RequestParam String otp, @RequestParam String email) {
