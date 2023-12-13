@@ -21,7 +21,7 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
                 WHERE u.email = :email AND t.status = 'VALID' AND t.value=:token
                 AND t.tokenType='OTP' AND t.expirationTime > CURRENT_TIMESTAMP
             """)
-    Optional<Token> findByValueEqualsAndAndUserIdEqualsAndTypeEqualsOPT(String email, String token);
+    Optional<Token> findByValueEqualsAndAndUserIdEqualsAndTypeEqualsOtp(String email, String token);
 
     Optional<Token> findByValueEquals(String token);
 }

@@ -33,4 +33,6 @@ public interface AuthenticationService {
     void sendVerificationCodeViaGoogle(String email);
 
     void resetPasswordByOtp(ResetPasswordRequest resetPasswordRequest);
+
+    void verifyOtp(String otp, String email);
 }
