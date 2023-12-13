@@ -185,6 +185,7 @@ public class ResortServiceImpl implements ResortService {
         entity.setAmenities(resortAmenities);
         entity.setPropertyTypes(propertyTypes);
         resortRepository.save(entity);
+        locationService.updateLocation(id, resortRequest.getLocation());
     }
 
     @Override

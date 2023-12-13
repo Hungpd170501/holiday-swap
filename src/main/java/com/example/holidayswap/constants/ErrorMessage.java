@@ -15,6 +15,7 @@ public class ErrorMessage {
     public static final String USER_NOT_IN_CONVERSATION = "User is not in conversation.";
     public static final String EMAIL_ALREADY_EXISTS = "Email already exists.";
     public static final String EMAIL_HAS_ALREADY_BEEN_TAKEN = "Email has already been taken.";
+    public static final String USERNAME_HAS_ALREADY_BEEN_TAKEN = "Username has already been taken.";
     public static final String ROLE_NOT_FOUND = "Role not found.";
     public static final String ROLE_ALREADY_EXISTS = "Role already exists.";
     public static final String PROFILE_NOT_FOUND = "Profile not found.";
@@ -48,5 +49,6 @@ public class ErrorMessage {
     public static final String NOTIFICATION_NOT_FOUND = "Notification not found.";
     public static final String CURRENT_PASSWORD_INCORRECT = "Your current password is incorrect. Please try again.";
     public static final String PASSWORDS_DONT_MATCH = "Passwords are not the same.";
+    public static final String OTP_INVALID = "OTP is expired or invalid.";
     public static final String SERVICE_UNAVAILABLE = "Oops! Something went wrong. Please try again later or contact our support team for assistance.";
 }
