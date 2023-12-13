@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.dto.response.property.coOwner;
 
+import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.TimeFrameResponse;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
@@ -24,4 +25,5 @@ public class CoOwnerResponse {
     private Date createDate;
     private PropertyResponse property;
     private ResortResponse resort;
+    private UserProfileResponse user;
 }
