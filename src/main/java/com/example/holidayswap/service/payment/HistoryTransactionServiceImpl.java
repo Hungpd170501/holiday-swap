@@ -63,6 +63,9 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 historyTransaction.setTotalPoint(transferPoint.getTotalPoint());
                 if(transferPoint.getStatusPointTransfer() == EnumPaymentStatus.StatusPointTransfer.POINT_RECEIVE){
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.RECIVED);
+                    if(transferPoint.getDetail().equals("Refund")){
+                        historyTransaction.setAmount(transferPoint.getAmount() + transferPoint.getCommission());
+                    }
                 }else {
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.SEND);
                 }
@@ -71,7 +74,11 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 }else {
                     historyTransaction.setStatus(EnumPaymentStatus.StatusMoneyTranfer.FAILED);
                 }
-                listHistoryTransaction.add(historyTransaction);
+                if(transferPoint.getStatusPointTransfer() == EnumPaymentStatus.StatusPointTransfer.POINT_RECEIVE && !transferPoint.getStatus().equals("SUCCESS")){}
+                else {
+                    listHistoryTransaction.add(historyTransaction);
+                }
+
             }
         }
         if(listDepositePoint != null){

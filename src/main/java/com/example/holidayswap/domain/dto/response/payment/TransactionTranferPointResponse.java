@@ -20,4 +20,5 @@ public class TransactionTranferPointResponse {
     private String date;
     private EnumPaymentStatus.StatusPointTransfer statusPointTransfer;
     private Double commission;
+    private String detail;
 }
