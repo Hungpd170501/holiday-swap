@@ -166,4 +166,19 @@ public class AuthController {
         response.sendRedirect(redirectUrl);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/verification-code/google")
+    public ResponseEntity<Void> sendVerificationCode(@RequestParam String email) {
+        authenticationService.sendVerificationCodeViaGoogle(email);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            description = "Update new password by optin"
+    )
+    @PutMapping("/reset-password/opt")
+    public ResponseEntity<Void> resetPasswordByOtp(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        authenticationService.resetPasswordByOtp(resetPasswordRequest);
+        return ResponseEntity.noContent().build();
+    }
 }

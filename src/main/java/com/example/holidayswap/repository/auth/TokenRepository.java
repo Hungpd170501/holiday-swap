@@ -15,5 +15,13 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
             """)
     List<Token> findAllValidTokenByUser(Long id);
 
+    @Query(value = """
+                SELECT t FROM Token t
+                INNER JOIN User u ON t.user.userId = u.userId
+                WHERE u.email = :email AND t.status = 'VALID' AND t.value=:token
+                AND t.tokenType='OTP' AND t.expirationTime > CURRENT_TIMESTAMP
+            """)
+    Optional<Token> findByValueEqualsAndAndUserIdEqualsAndTypeEqualsOPT(String email, String token);
+
     Optional<Token> findByValueEquals(String token);
 }

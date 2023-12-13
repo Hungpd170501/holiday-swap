@@ -85,6 +85,18 @@ public class EmailService {
                 .attributes(attribute).build());
     }
 
+    public void sendVerificationCode(String email, String name, String code) {
+        Map<String, Object> attribute = new HashMap<>();
+        attribute.put("name", name);
+        attribute.put("code", code);
+        sendMessage(EmailRequest
+                .builder()
+                .to(email)
+                .subject("HolidaySwap – Verification Code")
+                .template("verification-code")
+                .attributes(attribute).build());
+    }
+
 
     public void sendMessage(EmailRequest emailRequest) {
         rabbitMQMessageProducer.publish(

@@ -29,4 +29,8 @@ public interface AuthenticationService {
     User getUserFromToken(String token);
 
     AuthenticationResponse getAuthenticationResponse(User user);
+
+    void sendVerificationCodeViaGoogle(String email);
+
+    void resetPasswordByOtp(ResetPasswordRequest resetPasswordRequest);
 }
