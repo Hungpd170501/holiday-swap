@@ -255,8 +255,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void verifyOtp(String otp, String email) {
         tokenRepository.findByValueEqualsAndAndUserIdEqualsAndTypeEqualsOtp(email, otp)
-                .orElseThrow(
-                        () -> new VerificationException(OTP_INVALID)
+                .ifPresentOrElse(
+                        token -> {},
+                        () -> { throw new VerificationException(OTP_INVALID); }
                 );
     }
 
