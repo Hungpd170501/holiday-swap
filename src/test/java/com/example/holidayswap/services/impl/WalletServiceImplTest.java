@@ -84,7 +84,7 @@ public class WalletServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(initialUser));
         when(walletRepository.findByUser(initialUser)).thenReturn(initialWallet);
         when(walletRepository.save(initialWallet)).thenReturn(initialWallet);
-        boolean actual = walletService.TopUpWallet(1L, 100);
+        boolean actual = walletService.TopUpWallet(1L, 100D);
         assertEquals(true, actual);
     }
 }

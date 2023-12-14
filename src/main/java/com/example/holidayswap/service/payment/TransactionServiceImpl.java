@@ -27,7 +27,7 @@ public class TransactionServiceImpl implements ITransactionService {
     public boolean TransactionTopUpWallet(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status, Long moneyTranferId) {
         try {
             Point  point = pointService.GetActivePoint();
-            walletService.TopUpWallet(Long.parseLong(topUpWalletDTO.getUserId()) , Integer.parseInt(String.valueOf(topUpWalletDTO.getAmount())));
+            walletService.TopUpWallet( Long.parseLong(topUpWalletDTO.getUserId())  , topUpWalletDTO.getAmount());
             moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranferId,status);
             return true;
         }catch (BankException e){
