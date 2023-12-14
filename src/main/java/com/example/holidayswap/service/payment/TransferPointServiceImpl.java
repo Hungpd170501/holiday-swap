@@ -74,14 +74,14 @@ public class TransferPointServiceImpl implements ITransferPointService {
                     throw new BankException("Account not found");
                 }
                 if (fromWallet.getTotalPoint() < amount) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " + fromWallet.getUser().getUsername()+ " does not have enough balance";
                     loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
                     throw new BankException(detail);
                 }
 
                 boolean check = fromWallet.withdraw(amount);
                 if (!check) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " +  fromWallet.getUser().getUsername()+ " does not have enough balance";
                     loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
                     throw new BankException(detail);
                 }
@@ -98,6 +98,16 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 walletRepository.save(fromWallet);
                 walletRepository.save(toWallet);
                 transactLogRepository.save(transactLog);
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Transfer point");
+                notificationRequestForUserBooking.setContent("transfer from" + fromWallet.getUser().getUsername() + amount + "point");
+                notificationRequestForUserBooking.setToUserId(to);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
+                notificationRequestForUserBooking.setSubject("Transfer success");
+                notificationRequestForUserBooking.setContent("transfer to" + toWallet.getUser().getUsername() + amount + "point");
+                notificationRequestForUserBooking.setToUserId(from);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
+
 
                 loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
             } finally {
@@ -120,7 +130,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
             transactionTranferPointResponse.setId(allLog.getId());
             transactionTranferPointResponse.setFrom(userService.getUserById(allLog.getFromId()).getUsername());
             transactionTranferPointResponse.setTo(userService.getUserById(allLog.getToId()).getUsername());
-
+            transactionTranferPointResponse.setDetail(allLog.getDetail());
             if (allLog.getFromId() == userId) {
                 transactionTranferPointResponse.setTotalPoint(allLog.getFromBalance());
                 transactionTranferPointResponse.setAmount("-" + allLog.getAmount());
@@ -163,7 +173,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
             try {
                 fromWallet = walletService.GetWalletByUserId(booking.getUserBookingId());
                 if (fromWallet.getTotalPoint() < booking.getPrice()) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " + fromWallet.getUser().getUsername() + " does not have enough balance";
                     allLogPayBookingService.saveLog(booking.getUserBookingId(), booking.getId(), booking.getPrice(), EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, Helper.getCurrentDate(), fromWallet.getTotalPoint());
                     throw new BankException(detail);
                 }
@@ -202,7 +212,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 fromWallet = walletService.GetWalletByUserId(from);
                 toWallet = walletService.GetWalletByUserId(to);
                 if (fromWallet.getTotalPoint() < amount) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " + fromWallet.getUser().getUsername() + " does not have enough balance";
                     loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
                     throw new BankException(detail);
                 }
@@ -212,7 +222,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 toWallet.setTotalPoint(toWallet.getTotalPoint() + amount + commision);
 
                 walletRepository.save(toWallet);
-                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
+                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Refund", fromWallet.getTotalPoint(), toWallet.getTotalPoint(),commision );
                 walletRepository.save(fromWallet);
                 total = amount + commision;
                 var notificationRequestForUserBooking = new NotificationRequest();
