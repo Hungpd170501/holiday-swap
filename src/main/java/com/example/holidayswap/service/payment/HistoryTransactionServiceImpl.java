@@ -55,7 +55,7 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 historyTransaction.setFrom(transferPoint.getFrom());
                 historyTransaction.setTo(transferPoint.getTo());
                 historyTransaction.setDateConvert(transferPoint.getDate());
-                historyTransaction.setAmount(transferPoint.getAmount());
+                historyTransaction.setAmount(""+transferPoint.getAmount());
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Date date = dateFormat.parse(transferPoint.getDate());
                 historyTransaction.setCreatedOn(date);
@@ -64,7 +64,8 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 if(transferPoint.getStatusPointTransfer() == EnumPaymentStatus.StatusPointTransfer.POINT_RECEIVE){
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.RECIVED);
                     if(transferPoint.getDetail().equals("Refund")){
-                        historyTransaction.setAmount(transferPoint.getAmount() + transferPoint.getCommission());
+                        Double amountTotal = Double.parseDouble(transferPoint.getAmount())  + transferPoint.getCommission();
+                        historyTransaction.setAmount("+"+amountTotal);
                     }
                 }else {
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.SEND);

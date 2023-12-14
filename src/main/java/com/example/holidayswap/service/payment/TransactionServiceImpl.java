@@ -2,6 +2,7 @@ package com.example.holidayswap.service.payment;
 
 import com.example.holidayswap.domain.dto.request.payment.TopUpWalletDTO;
 import com.example.holidayswap.domain.entity.payment.EnumPaymentStatus;
+import com.example.holidayswap.domain.entity.payment.MoneyTranfer;
 import com.example.holidayswap.domain.entity.payment.Point;
 import com.example.holidayswap.service.BankException;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class TransactionServiceImpl implements ITransactionService {
     public boolean TransactionTopUpWallet(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status, Long moneyTranferId) {
         try {
             Point  point = pointService.GetActivePoint();
-            walletService.TopUpWallet(Long.parseLong(topUpWalletDTO.getUserId()) , (int) (topUpWalletDTO.getAmount() / point.getPointPrice()));
+            walletService.TopUpWallet(Long.parseLong(topUpWalletDTO.getUserId()) , Integer.parseInt(String.valueOf(topUpWalletDTO.getAmount())));
             moneyTranferService.UpdateStatusMoneyTranferTransaction(moneyTranferId,status);
             return true;
         }catch (BankException e){
@@ -36,4 +37,6 @@ public class TransactionServiceImpl implements ITransactionService {
         }
 
     }
+
+
 }
