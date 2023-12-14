@@ -122,7 +122,9 @@ public class PaymentController {
         topUpWalletDTO.setOrderInfor(moneyTranfer.getOrderInfor());
         topUpWalletDTO.setPaymentDate(moneyTranfer.getPaymentDate());
         topUpWalletDTO.setUserId(moneyTranfer.getUser().getUserId().toString());
-
+        Double amountTotal = moneyTranfer.getAmount()/point.getPointPrice();
+        moneyTranfer.setAmount(amountTotal);
+        moneyTranferService.Save(moneyTranfer);
         var check = false;
 
         if(responseCode.equals("00")) {

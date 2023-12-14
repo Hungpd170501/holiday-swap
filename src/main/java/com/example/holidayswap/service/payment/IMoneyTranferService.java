@@ -11,6 +11,7 @@ public interface IMoneyTranferService {
     MoneyTranfer CreateMoneyTranferTransaction(TopUpWalletDTO topUpWalletDTO, EnumPaymentStatus.StatusMoneyTranfer status);
 
     MoneyTranfer GetMoneyTranferTransaction(Long id);
+    void Save(MoneyTranfer moneyTranfer);
 
     boolean UpdateStatusMoneyTranferTransaction(Long id, EnumPaymentStatus.StatusMoneyTranfer status);
     List<MoneyTranfer> GetMoneyTranferTransactionByUserId(Long id);
