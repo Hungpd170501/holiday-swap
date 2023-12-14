@@ -141,12 +141,17 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and (:userId is null or co.id.userId  != :userId)
                and u.status = 'ACTIVE'
                and (
-                   (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
-                   >
-                   (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk where bk.availableTimeId = at.id and bk.status = 5)
-                   or bk.id is null
-               )
-               and (at.startTime > current_date and (at.endTime) > current_date   )
+                    case when bk.status = 5 then (
+                           (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
+                           >
+                           (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk
+                           where bk.availableTimeId = at.id))
+                       else (
+                            bk.id is null or bk.status != 5
+                       ) 
+                       end 
+                    )
+               and (at.startTime > current_date and (at.endTime) > current_date)
             """)
     Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
                                                    @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,
