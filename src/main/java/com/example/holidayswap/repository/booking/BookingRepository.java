@@ -95,20 +95,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = """
 
-            select b.book_id,
-                           b.check_in_date,
-                           b.check_out_date,
-                           b.price,
-                           b.status,
-                           b.actual_price,
-                           b.available_time_id,
-                           b.commission,
-                           b.owner_id,
-                           b.total_days,
-                           b.user_booking_id,
-                           b.date_booking,
-                           b.status_check_return,
-                           b.total_member
+            select b.*
                     from booking b
                              inner join available_time at on
                         at.available_time_id = b.available_time_id
@@ -137,4 +124,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                     where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > date(?2) and property.status = 'ACTIVE' and b.status = 5
         """, nativeQuery = true)
     List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,ZonedDateTime date);
+    @Query("select b from Booking b where b.uuid = ?1")
+    Booking findByUuid(String uuid);
 }

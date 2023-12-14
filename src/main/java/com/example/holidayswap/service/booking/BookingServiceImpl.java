@@ -16,16 +16,19 @@ import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.booking.UserOfBookingRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
+import com.example.holidayswap.service.FileService;
 import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.Helper;
 import com.example.holidayswap.utils.RedissonLockUtils;
+import com.google.zxing.WriterException;
 import lombok.AllArgsConstructor;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -33,12 +36,14 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @AllArgsConstructor
 
 public class BookingServiceImpl implements IBookingService {
+    private final FileService fileService;
     private final AvailableTimeRepository availableTimeRepository;
     private final BookingRepository bookingRepository;
     private final ITransferPointService transferPointService;
@@ -51,7 +56,7 @@ public class BookingServiceImpl implements IBookingService {
 
     @Override
     @Transactional
-    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException {
+    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException {
 
         if (bookingRequest.getCheckInDate().compareTo(bookingRequest.getCheckOutDate()) >= 0)
             throw new EntityNotFoundException("Check in date must be before check out date");
@@ -63,10 +68,13 @@ public class BookingServiceImpl implements IBookingService {
 
         List<Booking> checkBookingOverlap;
         Booking checkBooking;
+        UUID uuid = UUID.randomUUID();
+        String uuidString = uuid.toString();
         var notificationRequestForOwner = new NotificationRequest();
         var notificationRequestForUserBooking = new NotificationRequest();
         LocalDate localDateCheckin;
         LocalDate localDateCheckout;
+        String qrCode;
         long days;
         RLock fairLock = RedissonLockUtils.getFairLock("booking-" + bookingRequest.getAvailableTimeId());
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
@@ -87,7 +95,11 @@ public class BookingServiceImpl implements IBookingService {
                 localDateCheckout = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(bookingRequest.getCheckOutDate()));
                 days = ChronoUnit.DAYS.between(localDateCheckin, localDateCheckout);
 
+                //thêm đường dẫn vào trước uuidString
+                qrCode= fileService.createQRCode(uuidString);
                 Booking booking = new Booking();
+                booking.setUuid(uuidString);
+                booking.setQrcode(qrCode);
                 booking.setCheckInDate(bookingRequest.getCheckInDate());
                 booking.setCheckOutDate(bookingRequest.getCheckOutDate());
                 booking.setUserBookingId(bookingRequest.getUserId());
@@ -175,6 +187,7 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setPropertyName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
         historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
         historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
+        historyBookingDetailResponse.setQrcode(booking.getQrcode());
         historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
         historyBookingDetailResponse.setCreatedDate(booking.getDateBooking());
 
@@ -317,6 +330,30 @@ public class BookingServiceImpl implements IBookingService {
             return "Refund point success";
         }
         return "can not refund this booking";
+    }
+
+    @Override
+    public HistoryBookingDetailResponse historyBookingByUUID(String uuid) {
+        var booking = bookingRepository.findByUuid(uuid);
+        var listUserOfBookingEntity = userOfBookingRepository.findAllByBookingId(booking.getId());
+        var historyBookingDetailResponse = new HistoryBookingDetailResponse();
+
+        historyBookingDetailResponse.setResortName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName());
+        historyBookingDetailResponse.setDateCheckIn(booking.getCheckInDate());
+        historyBookingDetailResponse.setDateCheckOut(booking.getCheckOutDate());
+        historyBookingDetailResponse.setRoomId(booking.getAvailableTime().getTimeFrame().getRoomId());
+        historyBookingDetailResponse.setPrice(booking.getPrice());
+        historyBookingDetailResponse.setNumberOfGuest(booking.getUserOfBookings().size());
+        historyBookingDetailResponse.setOwnerEmail(booking.getAvailableTime().getTimeFrame().getCoOwner().getUser().getEmail());
+        historyBookingDetailResponse.setStatus(booking.getStatus().name());
+        historyBookingDetailResponse.setPropertyName(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
+        historyBookingDetailResponse.setUserOfBooking(listUserOfBookingEntity);
+        historyBookingDetailResponse.setAvailableTimeId(booking.getAvailableTimeId());
+        historyBookingDetailResponse.setQrcode(booking.getQrcode());
+        historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
+        historyBookingDetailResponse.setCreatedDate(booking.getDateBooking());
+
+        return historyBookingDetailResponse;
     }
 
 
