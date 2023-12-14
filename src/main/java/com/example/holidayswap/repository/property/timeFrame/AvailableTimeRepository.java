@@ -108,9 +108,10 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  and ((:max is null) or at.pricePerNight <= cast(:max as double)))
                  and (
                     ((cast(:checkIn as date ) is null) and (cast(:checkOut as date) is null))
-                       
-                          or ((date(at.startTime) between date(:checkIn) and date(:checkOut))
+                     or ((date(at.startTime) between date(:checkIn) and date(:checkOut))
                         and (date(at.endTime)) between date(:checkIn) and date(:checkOut))
+                     or ((date(:checkOut) between date(at.startTime) and date(at.endTime))
+                        and (date(:checkIn)) between date(at.startTime) and date(at.endTime))
                      )
                  and co.status = 'ACCEPTED'
                  and tf.status = 'ACCEPTED'
@@ -123,7 +124,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  and at.isDeleted = false
                  and p.isDeleted = false
                  and r.isDeleted = false
-               
                and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
                and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
@@ -139,10 +139,11 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and p.numberBathRoom >= :numberBathRoom
                AND (:locationName = '' OR unaccent(upper(r.locationFormattedName)) LIKE %:locationName%)
                and (:userId is null or co.id.userId  != :userId)
+               and u.status = 'ACTIVE'
                and (
                    (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
                    >
-                   (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk where bk.availableTimeId = at.id)
+                   (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk where bk.availableTimeId = at.id and bk.status = 5)
                    or bk.id is null
                )
                and (at.startTime > current_date and (at.endTime) > current_date   )
