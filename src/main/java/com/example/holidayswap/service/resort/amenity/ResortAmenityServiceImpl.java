@@ -87,8 +87,8 @@ public class ResortAmenityServiceImpl implements ResortAmenityService {
         }
         var entity = ResortAmenityMapper.INSTANCE.toEntity(dtoRequest);
         entity.setResortAmenityLinkIcon(link);
-        resortAmenityRepository.save(entity);
-        var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(entity);
+        entity.setIsDeleted(false);
+        var dtoResponse = ResortAmenityMapper.INSTANCE.toDtoResponse(resortAmenityRepository.save(entity));
         return dtoResponse;
     }
 

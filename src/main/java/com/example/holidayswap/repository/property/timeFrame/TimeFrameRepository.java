@@ -38,11 +38,13 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
             where tf.propertyId = :propertyId
             and tf.roomId =:roomId
             and tf.weekNumber = :numberWeek
+            and tf.userId != :userId
             """)
     List<TimeFrame> findOverlapWith(
             @Param("propertyId") Long propertyId,
             @Param("roomId") String roomId,
-            @Param("numberWeek") int numberWeek
+            @Param("numberWeek") int numberWeek,
+            @Param("userId") Long userId
     );
 
     @Query(value = """
@@ -74,4 +76,19 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
             @Param("endTime") Date endTime,
             @Param("timeFrameStatus") String timeFrameStatus
     );
+
+    @Query(value = """
+            select tf from TimeFrame tf
+            where tf.roomId = :roomId
+            and tf.userId = :userId
+            and tf.propertyId = :propertyId
+            and tf.weekNumber = :weekNumber
+            """)
+    Optional<TimeFrame> findByCoOwnerId(
+            String roomId,
+            Long userId,
+            Long propertyId,
+            int weekNumber
+    );
+
 }
