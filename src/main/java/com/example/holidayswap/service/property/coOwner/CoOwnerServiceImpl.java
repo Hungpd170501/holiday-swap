@@ -90,11 +90,11 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             Date currentDate = new Date();
             //start year must less than end year
             if (dtoRequest.getStartTime().getYear() >= dtoRequest.getEndTime().getYear()) {
-                throw new DataIntegrityViolationException("START YEAR must less than END YEAR");
+                throw new DataIntegrityViolationException("START YEAR Can not greater than END YEAR");
             }
 //            year must equals or greater than year now
             if (dtoRequest.getEndTime().getYear() < currentDate.getYear()) {
-                throw new DataIntegrityViolationException("YEAR INPUT must greater than YEAR NOW");
+                throw new DataIntegrityViolationException("YEAR must greater than YEAR NOW");
             }
         }
         var entity = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);

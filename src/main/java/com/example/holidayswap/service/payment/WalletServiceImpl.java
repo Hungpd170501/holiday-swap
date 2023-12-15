@@ -23,7 +23,7 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     @Transactional
-    public boolean TopUpWallet(Long userId, int amount) {
+    public boolean TopUpWallet(Long userId, Double amount) {
         Wallet userWallet = walletRepository.findByUser(userRepository.findById(userId).orElse(null));
         if (userWallet == null) userWallet = CreateWallet(userId);
 
