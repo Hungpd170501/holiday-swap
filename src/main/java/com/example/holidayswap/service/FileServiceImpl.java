@@ -53,7 +53,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public String createQRCode(String link) throws IOException, WriterException {
         String result = null;
-        BitMatrix bitMatrix = new QRCodeWriter().encode(link, BarcodeFormat.QR_CODE, 300, 300);
+        BitMatrix bitMatrix = new QRCodeWriter().encode(link, BarcodeFormat.QR_CODE, 500, 500);
         File qrCodeFile = new File(UUID.randomUUID() + "_qrcode.png");
         MatrixToImageWriter.writeToPath(bitMatrix, "PNG", qrCodeFile.toPath());
         String fileName = UUID.randomUUID() + "_qrcode.png";
