@@ -21,10 +21,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         WHERE ((?2 > check_in_date AND ?2 < check_out_date)
         OR (?3 > check_in_date AND ?3 < check_out_date) 
         OR(?2 <= check_in_date AND ?3 >= check_out_date )) 
-        and available_time_id = ?1""", nativeQuery = true)
+        and available_time_id = ?1 
+        and b.status = 5
+        """, nativeQuery = true)
     List<Booking> checkBookingIsAvailableByCheckinDateAndCheckoutDate(Long availableTimeId, Date checkInDate, Date checkOutDate);
 
-    @Query(value = "SELECT* FROM booking b WHERE ?1 = check_in_date AND ?2 = check_out_date AND available_time_id = ?3", nativeQuery = true)
+    @Query(value = "SELECT* FROM booking b WHERE ?1 = check_in_date AND ?2 = check_out_date AND available_time_id = ?3 and b.status = 5", nativeQuery = true)
     Booking checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(Date checkInDate, Date checkOutDate, Long availableTimeId);
     @Query("select b from Booking b where b.userBookingId = ?1")
     List<Booking>findAllByUserId (Long userId);
