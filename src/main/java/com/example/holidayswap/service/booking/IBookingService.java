@@ -7,11 +7,13 @@ import com.example.holidayswap.domain.dto.response.booking.HistoryBookingRespons
 import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.google.zxing.WriterException;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface IBookingService {
-    EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException;
+    EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException;
 
     List<HistoryBookingResponse> historyBookingUserLogin();
 
@@ -28,4 +30,7 @@ public interface IBookingService {
     void deactivePropertyNotifyBookingUser(Long propertyId);
 
     String returnPointBooking(Long bookingId) throws InterruptedException;
+
+    HistoryBookingDetailResponse historyBookingByUUID(String uuid);
+
 }

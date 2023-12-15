@@ -2,6 +2,11 @@ package com.example.holidayswap.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,4 +49,18 @@ public class FileServiceImpl implements FileService {
         }
         return result;
     }
+
+    @Override
+    public String createQRCode(String link) throws IOException, WriterException {
+        String result = null;
+        BitMatrix bitMatrix = new QRCodeWriter().encode(link, BarcodeFormat.QR_CODE, 500, 500);
+        File qrCodeFile = new File(UUID.randomUUID() + "_qrcode.png");
+        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", qrCodeFile.toPath());
+        String fileName = UUID.randomUUID() + "_qrcode.png";
+        amazonS3client.putObject(new PutObjectRequest(bucketName, fileName, qrCodeFile));
+        result = amazonS3client.getUrl(bucketName, fileName).toString();
+        Files.delete(qrCodeFile.toPath());
+        return result;
+    }
+
 }
