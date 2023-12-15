@@ -58,8 +58,8 @@ public class BookingController {
         var cancelBooking = bookingService.returnPointBooking(bookingId);
         return cancelBooking != null ? ResponseEntity.ok(cancelBooking) : ResponseEntity.badRequest().body("Can not cancel booking");
     }
-    @GetMapping("/getqrcode")
-    public ResponseEntity<?> generateQr(@RequestParam String uuid) throws IOException, WriterException {
+    @GetMapping("/getqrcode/{uuid}")
+    public ResponseEntity<?> generateQr(@PathVariable String uuid) throws IOException, WriterException {
         var history = bookingService.historyBookingByUUID(uuid);
         return history != null ? ResponseEntity.ok(history) : ResponseEntity.badRequest().body("Not Found");
 
