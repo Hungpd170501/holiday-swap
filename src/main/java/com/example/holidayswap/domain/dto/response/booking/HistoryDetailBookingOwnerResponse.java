@@ -23,4 +23,6 @@ public class HistoryDetailBookingOwnerResponse {
     private String propertyImage;
     private String createdDate;
     private boolean canCancel;
+    private String userNameBooking;
+    private String userNameOwner;
 }

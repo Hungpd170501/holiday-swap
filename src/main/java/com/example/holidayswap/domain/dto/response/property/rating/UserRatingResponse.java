@@ -9,6 +9,7 @@ public class UserRatingResponse {
     private Long userId;
     private String email;
     private String fullName;
+    private String userName;
     private LocalDate dob;
     private String avatar;
 }

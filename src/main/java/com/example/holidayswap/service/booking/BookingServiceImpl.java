@@ -35,6 +35,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +97,7 @@ public class BookingServiceImpl implements IBookingService {
                 days = ChronoUnit.DAYS.between(localDateCheckin, localDateCheckout);
 
                 //thêm đường dẫn vào trước uuidString
-                qrCode= fileService.createQRCode(uuidString);
+                qrCode= fileService.createQRCode("https://holiday-swap.vercel.app/informationBooking/"+uuidString);
                 Booking booking = new Booking();
                 booking.setUuid(uuidString);
                 booking.setQrcode(qrCode);
@@ -161,7 +162,9 @@ public class BookingServiceImpl implements IBookingService {
                                 booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
                                 booking.getDateBooking(),
                                 booking.getAvailableTimeId(),
-                                false
+                                false,
+                                booking.getUser().getUsername(),
+                                booking.getUserOwner().getUsername()
                                 )
 
                 );
@@ -213,7 +216,9 @@ public class BookingServiceImpl implements IBookingService {
                         booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink(),
                         booking.getDateBooking(),
                         booking.getAvailableTimeId(),
-                        booking.getStatusCheckReturn()
+                        booking.getStatusCheckReturn(),
+                        booking.getUser().getUsername(),
+                        booking.getUserOwner().getUsername()
                         ));
             }
 
@@ -243,6 +248,8 @@ public class BookingServiceImpl implements IBookingService {
         historyBookingDetailResponse.setPropertyImage(booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyImages().get(0).getLink());
         historyBookingDetailResponse.setCreatedDate(booking.getDateBooking());
         historyBookingDetailResponse.setCanCancel(booking.getStatusCheckReturn());
+        historyBookingDetailResponse.setUserNameBooking(booking.getUser().getUsername());
+        historyBookingDetailResponse.setUserNameOwner(booking.getUserOwner().getUsername());
 
         return historyBookingDetailResponse;
     }
@@ -322,6 +329,11 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public String returnPointBooking(Long bookingId) throws InterruptedException {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+
+        long threeDaysAgoMillis = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000);
+        Date threeDaysAgo = new Date(threeDaysAgoMillis);
+        if(booking.getCheckOutDate().before(threeDaysAgo))
+            throw new EntityNotFoundException("Can not return point because check out date is before 3 days ago");
         if (booking.getStatusCheckReturn()) {
             booking.setStatus(EnumBookingStatus.BookingStatus.CANCELLED);
             booking.setStatusCheckReturn(false);
