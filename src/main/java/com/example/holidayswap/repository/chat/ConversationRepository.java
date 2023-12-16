@@ -13,6 +13,9 @@ import java.util.Optional;
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
     @Query("SELECT c FROM Conversation c JOIN c.participants p WHERE p.conversationParticipantId.userId = :userId and p.leftChat = false")
     List<Conversation> findByUserId(@Param("userId") Long userId);
+    @Query("SELECT c FROM Conversation c JOIN c.participants p WHERE p.conversationParticipantId.conversationId = :conversationId and p.leftChat = false")
+
+    Optional<Conversation> findByConversationId(@Param("conversationId") Long conversationId);
 
     @Query("SELECT c.conversationId FROM Conversation c JOIN c.participants p WHERE p.conversationParticipantId.userId = :userId and p.leftChat = false and c.conversationId = :conversationId")
     Optional<Conversation> findByUserIdEqualsAndConversationIdEquals(@Param("userId") Long userId, @Param("conversationId") Long conversationId);

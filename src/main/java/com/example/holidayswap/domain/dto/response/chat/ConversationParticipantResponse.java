@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
-
 public class ConversationParticipantResponse {
-
     private boolean leftChat;
+    private Long messageId;
+    private Long countUnreadMessages;
 
     @JsonIgnoreProperties({"email_verified", "phone_verified", "phone"})
     private UserProfileResponse user;

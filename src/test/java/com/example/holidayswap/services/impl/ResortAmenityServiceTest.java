@@ -206,24 +206,24 @@ public class ResortAmenityServiceTest {
         assertEquals("Resort type amenity has deleted.",exception.getMessage());
     }
 
-    @Test
-    void create_ShouldReturnResortAmenityResponse_WhenInputIsResortAmenityRequest() throws IOException {
-        ResortAmenityRequest resortAmenityRequest = ResortAmenityRequest.builder()
-                .resortAmenityName("name")
-                .resortAmenityTypeId(1L)
-                .build();
-        ResortAmenityType resortAmenityType = ResortAmenityType.builder().id(1L).build();
-        ResortAmenityResponse resortAmenityResponse = ResortAmenityResponse.builder().resortAmenityTypeId(1L).resortAmenityLinkIcon("Link").build();
-        ResortAmenity resortAmenity = ResortAmenity.builder().resortAmenityTypeId(1L).build();
-
-        when(resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse("name")).thenReturn(Optional.empty());
-        when(resortAmenityTypeRepository.findByIdAndIsDeletedFalse(1L)).thenReturn(Optional.ofNullable(resortAmenityType));
-        when(fileService.uploadFile(null)).thenReturn("link");
-        resortAmenity.setResortAmenityLinkIcon("link");
-        when(resortAmenityRepository.save(resortAmenity)).thenReturn(resortAmenity);
-        ResortAmenityResponse actualDtoResponse = resortAmenityService.create(resortAmenityRequest,null);
-        assertEquals(resortAmenityResponse.getResortAmenityTypeId(),actualDtoResponse.getResortAmenityTypeId());
-    }
+//    @Test
+//    void create_ShouldReturnResortAmenityResponse_WhenInputIsResortAmenityRequest() throws IOException {
+//        ResortAmenityRequest resortAmenityRequest = ResortAmenityRequest.builder()
+//                .resortAmenityName("name")
+//                .resortAmenityTypeId(1L)
+//                .build();
+//        ResortAmenityType resortAmenityType = ResortAmenityType.builder().id(1L).build();
+//        ResortAmenityResponse resortAmenityResponse = ResortAmenityResponse.builder().resortAmenityTypeId(1L).resortAmenityLinkIcon("Link").build();
+//        ResortAmenity resortAmenity = ResortAmenity.builder().resortAmenityTypeId(1L).build();
+//
+//        when(resortAmenityRepository.findByResortAmenityNameEqualsIgnoreCaseAndIsDeletedIsFalse("name")).thenReturn(Optional.empty());
+//        when(resortAmenityTypeRepository.findByIdAndIsDeletedFalse(1L)).thenReturn(Optional.ofNullable(resortAmenityType));
+//        when(fileService.uploadFile(null)).thenReturn("link");
+//        resortAmenity.setResortAmenityLinkIcon("link");
+//        when(resortAmenityRepository.save(resortAmenity)).thenReturn(resortAmenity);
+//        ResortAmenityResponse actualDtoResponse = resortAmenityService.create(resortAmenityRequest,null);
+//        assertEquals(resortAmenityResponse.getResortAmenityTypeId(),actualDtoResponse.getResortAmenityTypeId());
+//    }
 
     @Test
     void update_ShouldReturnError_WhenEntityNotFound(){

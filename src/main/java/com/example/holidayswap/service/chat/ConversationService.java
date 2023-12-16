@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.dto.response.chat.ConversationParticipantR
 import com.example.holidayswap.domain.dto.response.chat.ConversationResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ConversationService {
     List<ConversationResponse> getUserConversations();
@@ -15,5 +16,5 @@ public interface ConversationService {
 
     ConversationResponse getCurrentConverastionWithUserId(Long userId);
 
-    ConversationResponse createCurrentConversationWithUserId(Long userId);
+    Optional<ConversationResponse> createCurrentConversationWithUserId(Long userId);
 }

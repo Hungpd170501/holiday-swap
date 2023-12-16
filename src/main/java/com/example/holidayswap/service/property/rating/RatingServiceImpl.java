@@ -54,6 +54,7 @@ public class RatingServiceImpl implements RatingService {
                 element.getUser().setUserId(null);
                 element.getUser().setEmail(null);
                 element.getUser().setAvatar(null);
+
                 element.getUser().setDob(null);
                 element.getUser().setFullName(convertedFullName);
             }

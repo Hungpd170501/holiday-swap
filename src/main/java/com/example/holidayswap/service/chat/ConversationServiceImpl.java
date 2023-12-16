@@ -8,6 +8,7 @@ import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
 import com.example.holidayswap.domain.entity.chat.ConversationParticipantPK;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
+import com.example.holidayswap.domain.mapper.chat.ConversationMapper;
 import com.example.holidayswap.domain.mapper.chat.ConversationParticipantMapper;
 import com.example.holidayswap.domain.mapper.chat.MessageMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
@@ -16,12 +17,16 @@ import com.example.holidayswap.repository.chat.ConversationRepository;
 import com.example.holidayswap.repository.chat.MessageRepository;
 import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
 
@@ -35,6 +40,8 @@ public class ConversationServiceImpl implements ConversationService {
     private final UserRepository userRepository;
     private final AuthUtils authUtils;
     private final MessageMapper messageMapper;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final ConversationMapper conversationMapper;
 
     @Override
     public List<ConversationResponse> getUserConversations() {
@@ -54,7 +61,12 @@ public class ConversationServiceImpl implements ConversationService {
                 .conversationName(conversation.getConversationName())
                 .participants(conversation.getParticipants()
                         .stream()
-                        .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
+                        .map(conversationParticipant -> {
+                            var conversationParticipantResponse = ConversationParticipantMapper.INSTANCE
+                                    .toConversationParticipantResponse(conversationParticipant);
+                            conversationParticipantResponse.setCountUnreadMessages(conversationParticipant.countUnreadMessages());
+                            return conversationParticipantResponse;
+                        })
                         .toList())
                 .message(latestMessage.map(messageMapper::toMessageResponse).orElse(null))
                 .build();
@@ -73,13 +85,22 @@ public class ConversationServiceImpl implements ConversationService {
         } else if (userIds.size() == 2 && conversationRepository.findConversationByUserIds(userIds.get(0), userIds.get(1)).isPresent()) {
             throw new DataIntegrityViolationException("Conversation already exists");
         }
-
         Conversation conversation = Conversation.builder()
                 .conversationName(conversationRequest.getConversationName())
                 .build();
         conversationRepository.save(conversation);
-
         createConversationParticipants(conversation, userIds);
+        var updatedConversation = conversationRepository.findByConversationId(conversation.getConversationId())
+                .map(this::mapToConversationResponse);
+        if (updatedConversation.isEmpty()) {
+            throw new EntityNotFoundException("Conversation not found");
+        }
+        CompletableFuture.runAsync(() -> {
+            userIds.forEach(id ->
+                    messagingTemplate.convertAndSend("/queue/new-conversation-" + id,
+                            updatedConversation
+                    ));
+        });
     }
 
     @Override
@@ -102,23 +123,29 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     @Transactional
-    public ConversationResponse createCurrentConversationWithUserId(Long userId) {
+    public Optional<ConversationResponse> createCurrentConversationWithUserId(Long userId) {
         var currentUser = authUtils.getAuthenticatedUser();
         conversationRepository.findConversationByUserIds(currentUser.getUserId(), userId)
                 .ifPresent(conversation -> {
                     throw new DataIntegrityViolationException("Conversation already exists");
                 });
-        Conversation conversationEntity = Conversation.builder()
-                .build();
-        conversationRepository.save(conversationEntity);
+        var conversation =conversationRepository.save(Conversation.builder()
+                .build());
         var userIds = List.of(currentUser.getUserId(), userId);
-        createConversationParticipants(conversationEntity, userIds);
-        return ConversationResponse.builder()
-                .conversationId(conversationEntity.getConversationId())
-                .build();
+        createConversationParticipants(conversation, userIds);
+        var updatedConversation = conversationRepository.findByConversationId(conversation.getConversationId());
+        if (updatedConversation.isEmpty()) {
+            throw new EntityNotFoundException("Conversation not found");
+        }
+        var conversationResponse = mapToConversationResponse(updatedConversation.get());
+        CompletableFuture.runAsync(() -> userIds.forEach(id ->
+                messagingTemplate.convertAndSend("/queue/new-conversation-" + id,
+                        conversationResponse)));
+        return Optional.ofNullable(conversationResponse);
     }
 
     private void createConversationParticipants(Conversation conversationEntity, List<Long> userIds) {
+        List<ConversationParticipant> participants = new ArrayList<>();
         userIds.stream()
                 .map(id -> userRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND)))
@@ -130,7 +157,8 @@ public class ConversationServiceImpl implements ConversationService {
                     participant.setConversationParticipantId(participantPK);
                     participant.setConversation(conversationEntity);
                     participant.setUser(user);
-                    conversationParticipantRepository.save(participant);
+                    var newParticipant = conversationParticipantRepository.save(participant);
+                    participants.add(newParticipant);
                 });
-    }
+        conversationEntity.setParticipants(participants);    }
 }

@@ -12,6 +12,7 @@ public interface ConversationParticipantMapper {
     @Mapping(target = "user.emailVerified", source = "user.emailVerified", ignore = true)
     @Mapping(target = "user.phoneVerified", source = "user.phoneVerified", ignore = true)
     @Mapping(target = "user.phone", source = "user.phone", ignore = true)
+    @Mapping(target = "messageId", source = "messageId")
     ConversationParticipantResponse toConversationParticipantResponse(ConversationParticipant conversationParticipant);
 
 }

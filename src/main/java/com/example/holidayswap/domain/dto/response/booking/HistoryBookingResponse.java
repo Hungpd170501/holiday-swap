@@ -12,6 +12,7 @@ public class HistoryBookingResponse {
     private Date checkInDate;
     private Date checkOutDate;
     private String propertyName;
+
     private String roomId;
     private String resortName;
     private String status;
@@ -21,4 +22,6 @@ public class HistoryBookingResponse {
     //    private boolean isRating;
     private Long availableTimeId;
     private boolean canCancel;
+    private String userNameBooking;
+    private String userNameOwner;
 }

@@ -22,5 +22,6 @@ public class HistoryBookingDetailResponse {
     private Long availableTimeId;
     private String propertyImage;
     private String createdDate;
+    private String qrcode;
 
 }
