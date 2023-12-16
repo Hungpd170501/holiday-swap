@@ -91,9 +91,9 @@ public class BookingServiceImpl implements IBookingService {
 
 //                 TODO: check booking of this apartment
                 checkBookingOverlap = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(bookingRequest.getAvailableTimeId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
-                checkBooking = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getAvailableTimeId());
+//                checkBooking = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getAvailableTimeId());
 
-                if (!checkBookingOverlap.isEmpty() || checkBooking != null)
+                if (!checkBookingOverlap.isEmpty())
                     throw new EntityNotFoundException("This apartment is not available in this time");
 
 
