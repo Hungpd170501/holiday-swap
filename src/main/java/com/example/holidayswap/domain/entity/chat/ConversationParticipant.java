@@ -42,7 +42,7 @@ public class ConversationParticipant extends BaseEntityAudit {
         }
         List<Message> allMessages = conversation.getMessages();
         if (messageId == null || messageId == 0) {
-            if (!allMessages.isEmpty()) {
+            if (allMessages != null && !allMessages.isEmpty()) {
                 return allMessages.size();
             } else {
                 return messageId == null ? 1 : 0;
