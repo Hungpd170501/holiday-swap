@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class ConversationController {
     }
 
     @PostMapping("/current-user/contact/{userId}")
-    public ResponseEntity<ConversationResponse> createConversationWithUser(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Optional<ConversationResponse>> createConversationWithUser(@PathVariable("userId") Long userId) {
         var conversation = conversationService.createCurrentConversationWithUserId(userId);
         return ResponseEntity.ok(conversation);
     }

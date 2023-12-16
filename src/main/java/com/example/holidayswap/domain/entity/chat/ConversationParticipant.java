@@ -24,7 +24,7 @@ public class ConversationParticipant extends BaseEntityAudit {
     private boolean leftChat = false;
 
     @Column(name = "message_id")
-    private Long messageId  = 0L;
+    private Long messageId;
 
     @MapsId("conversationId")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,15 +37,19 @@ public class ConversationParticipant extends BaseEntityAudit {
     private User user;
 
     public long countUnreadMessages() {
-        if (messageId == null) {
-            return 1;
-        }
-        if (leftChat || messageId == 0) {
+        if (leftChat) {
             return 0;
         }
         List<Message> allMessages = conversation.getMessages();
+        if (messageId == null || messageId == 0) {
+            if (allMessages != null && !allMessages.isEmpty()) {
+                return allMessages.size();
+            } else {
+                return messageId == null ? 1 : 0;
+            }
+        }
         return allMessages.stream()
-                .filter(message -> (message!=null) && message.getMessageId() > messageId)
+                .filter(message -> (message != null) && message.getMessageId() > messageId)
                 .count();
     }
 }
