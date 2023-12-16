@@ -12,4 +12,8 @@ public interface MessageService {
     List<MessageResponse> getConversationMessages(Long conversationId);
 
     MessageResponse createMessage(MessageRequest messageRequest, String conversationId) throws IOException;
+
+    void markAllAsRead(Long userId, Long conversationId);
+
+    void markReadByMessageId(long userId, long conversationId, long messageId);
 }

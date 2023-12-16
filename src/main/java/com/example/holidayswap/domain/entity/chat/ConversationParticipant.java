@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +23,9 @@ public class ConversationParticipant extends BaseEntityAudit {
     @Column(name = "left_chat", columnDefinition = "boolean default false")
     private boolean leftChat = false;
 
+    @Column(name = "message_id")
+    private Long messageId  = 0L;
+
     @MapsId("conversationId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id")
@@ -30,4 +35,17 @@ public class ConversationParticipant extends BaseEntityAudit {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public long countUnreadMessages() {
+        if (messageId == null) {
+            return 1;
+        }
+        if (leftChat || messageId == 0) {
+            return 0;
+        }
+        List<Message> allMessages = conversation.getMessages();
+        return allMessages.stream()
+                .filter(message -> (message!=null) && message.getMessageId() > messageId)
+                .count();
+    }
 }

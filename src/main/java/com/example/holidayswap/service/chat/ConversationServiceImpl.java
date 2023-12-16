@@ -16,12 +16,14 @@ import com.example.holidayswap.repository.chat.ConversationRepository;
 import com.example.holidayswap.repository.chat.MessageRepository;
 import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static com.example.holidayswap.constants.ErrorMessage.USER_NOT_FOUND;
 
@@ -35,6 +37,7 @@ public class ConversationServiceImpl implements ConversationService {
     private final UserRepository userRepository;
     private final AuthUtils authUtils;
     private final MessageMapper messageMapper;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public List<ConversationResponse> getUserConversations() {
@@ -54,7 +57,12 @@ public class ConversationServiceImpl implements ConversationService {
                 .conversationName(conversation.getConversationName())
                 .participants(conversation.getParticipants()
                         .stream()
-                        .map(ConversationParticipantMapper.INSTANCE::toConversationParticipantResponse)
+                        .map(conversationParticipant -> {
+                            var conversationParticipantResponse = ConversationParticipantMapper.INSTANCE
+                                    .toConversationParticipantResponse(conversationParticipant);
+                            conversationParticipantResponse.setCountUnreadMessages(conversationParticipant.countUnreadMessages());
+                            return conversationParticipantResponse;
+                        })
                         .toList())
                 .message(latestMessage.map(messageMapper::toMessageResponse).orElse(null))
                 .build();
@@ -73,13 +81,18 @@ public class ConversationServiceImpl implements ConversationService {
         } else if (userIds.size() == 2 && conversationRepository.findConversationByUserIds(userIds.get(0), userIds.get(1)).isPresent()) {
             throw new DataIntegrityViolationException("Conversation already exists");
         }
-
         Conversation conversation = Conversation.builder()
                 .conversationName(conversationRequest.getConversationName())
                 .build();
         conversationRepository.save(conversation);
-
         createConversationParticipants(conversation, userIds);
+        CompletableFuture.runAsync(() -> {
+            var conversationResponse = mapToConversationResponse(conversation);
+            userIds.forEach(id ->
+                    messagingTemplate.convertAndSend("/queue/new-conversation-" + id,
+                            conversationResponse
+                    ));
+        });
     }
 
     @Override
@@ -113,9 +126,11 @@ public class ConversationServiceImpl implements ConversationService {
         conversationRepository.save(conversationEntity);
         var userIds = List.of(currentUser.getUserId(), userId);
         createConversationParticipants(conversationEntity, userIds);
-        return ConversationResponse.builder()
-                .conversationId(conversationEntity.getConversationId())
-                .build();
+        var conversationResponse = mapToConversationResponse(conversationEntity);
+        CompletableFuture.runAsync(() -> userIds.forEach(id ->
+                messagingTemplate.convertAndSend("/queue/new-conversation-" + id,
+                        conversationResponse)));
+        return conversationResponse;
     }
 
     private void createConversationParticipants(Conversation conversationEntity, List<Long> userIds) {
