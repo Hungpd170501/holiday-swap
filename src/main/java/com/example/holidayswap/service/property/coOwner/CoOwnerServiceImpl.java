@@ -1,5 +1,6 @@
 package com.example.holidayswap.service.property.coOwner;
 
+import com.example.holidayswap.domain.dto.request.notification.NotificationRequest;
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
@@ -17,6 +18,7 @@ import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.EmailService;
 import com.example.holidayswap.service.auth.UserService;
+import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.property.PropertyService;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import com.example.holidayswap.service.resort.ResortService;
@@ -49,6 +51,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final ResortService resortService;
     private final PropertyService propertyService;
     private final AuthUtils authUtils;
+    private final PushNotificationService pushNotificationService;
 
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
@@ -136,6 +139,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     @Override
     @Transactional
     public CoOwnerResponse update(CoOwnerId coOwnerId, CoOwnerStatus coOwnerStatus) {
+        var notification= new NotificationRequest();
         TimeFrameStatus timeFrameStatus;
         if (coOwnerStatus.equals(CoOwnerStatus.ACCEPTED)) timeFrameStatus = TimeFrameStatus.ACCEPTED;
         else if (coOwnerStatus.equals(CoOwnerStatus.REJECTED)) timeFrameStatus = TimeFrameStatus.REJECTED;
@@ -161,6 +165,10 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found to accept co-Owner in apartment!."));
             //send mail
             try {
+                notification.setSubject("Apartment register co-owner accepted");
+                notification.setContent("Your register co-owner in apartment " + entity.getProperty().getPropertyName() + "is now accepted");
+                notification.setToUserId(coOwnerId.getUserId());
+                pushNotificationService.createNotification(notification);
                 emailService.sendNotificationRegisterCoOwnerSuccessEmail(user.getEmail(), user.getUsername());
             } catch (Exception e) {
                 log.error("Error sending verification email", e);
@@ -170,6 +178,10 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             var user = userRepository.findById(coOwnerId.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found to accept co-Owner in apartment!."));
             //send mail
             try {
+                notification.setSubject("Apartment register co-owner rejected");
+                notification.setContent("Your register co-owner in apartment " + entity.getProperty().getPropertyName() + "is now rejected. Check your apartment and contract again");
+                notification.setToUserId(coOwnerId.getUserId());
+                pushNotificationService.createNotification(notification);
                 emailService.sendNotificationRegisterCoOwnerDeclineEmail(user.getEmail(), user.getUsername());
             } catch (Exception e) {
                 log.error("Error sending verification email", e);

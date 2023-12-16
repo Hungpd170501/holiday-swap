@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/holiday-swap
+    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/hehe
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
   jpa:

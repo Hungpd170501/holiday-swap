@@ -1,7 +1,9 @@
 package com.example.holidayswap.service;
 
 import com.example.holidayswap.domain.dto.request.EmailRequest;
+import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.rabbitmq.MQProducer;
+import com.example.holidayswap.utils.Helper;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -118,4 +120,23 @@ public class EmailService {
         helper.setText(htmlBody, true);
         mailSender.send(message);
     }
+
+    public void sendConfirmBookedHtml(Booking booking, String email) throws MessagingException {
+        ;
+        Map<String, Object> attribute = new HashMap<>();
+        attribute.put("qrCode", booking.getQrcode());
+        attribute.put("propertyName", booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
+        attribute.put("resortName", booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName());
+        attribute.put("owner", booking.getAvailableTime().getTimeFrame().getCoOwner().getUser().getUsername());
+        attribute.put("checkInDate", Helper.convertDateToString(booking.getCheckInDate()));
+        attribute.put("checkOutDate", Helper.convertDateToString(booking.getCheckOutDate()));
+        attribute.put("bookingDate", booking.getDateBooking());
+        sendMessage(EmailRequest
+                .builder()
+                .to(email)
+                .subject("Confirmed Booking")
+                .template("booking-response")
+                .attributes(attribute).build());
+    }
 }
+
