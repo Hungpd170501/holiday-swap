@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.service.FileService;
 import com.example.holidayswap.service.booking.IBookingService;
 import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class BookingController {
     private final IBookingService bookingService;
 
     @PostMapping("/create")
-    public ResponseEntity<EnumBookingStatus.BookingStatus> createBooking(@RequestBody BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException {
+    public ResponseEntity<EnumBookingStatus.BookingStatus> createBooking(@RequestBody BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException, MessagingException {
         return ResponseEntity.ok(bookingService.createBooking(bookingRequest));
     }
     @GetMapping("/historybooking")
