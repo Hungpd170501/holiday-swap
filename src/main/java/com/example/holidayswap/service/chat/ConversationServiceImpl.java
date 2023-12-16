@@ -123,10 +123,10 @@ public class ConversationServiceImpl implements ConversationService {
                 });
         Conversation conversationEntity = Conversation.builder()
                 .build();
-        conversationRepository.save(conversationEntity);
+        var conversation = conversationRepository.save(conversationEntity);
         var userIds = List.of(currentUser.getUserId(), userId);
         createConversationParticipants(conversationEntity, userIds);
-        var conversationResponse = mapToConversationResponse(conversationEntity);
+        var conversationResponse = mapToConversationResponse(conversation);
         CompletableFuture.runAsync(() -> userIds.forEach(id ->
                 messagingTemplate.convertAndSend("/queue/new-conversation-" + id,
                         conversationResponse)));
