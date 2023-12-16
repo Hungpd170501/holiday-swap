@@ -19,9 +19,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 @Query(value = """
         SELECT* FROM booking b
                         WHERE (
-                            (?2 > date (check_in_date) AND ?2 < date (check_out_date))
-                            OR (?3 > date (check_in_date) AND ?3 < date (check_out_date))
-                            OR(?2 <= date (check_in_date) AND ?3 >= date (check_out_date) ))
+                            ( date (?2) > date (check_in_date) AND date (?2) < date (check_out_date))
+                            OR (date (?3) > date (check_in_date) AND date (?3) < date (check_out_date))
+                            OR( date  (?2) <= date (check_in_date) AND date (?3) >= date (check_out_date) ))
                         
                           and available_time_id = ?1
                           and b.status = 5
