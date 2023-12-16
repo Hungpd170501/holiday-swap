@@ -160,8 +160,9 @@ public class ReportDashBoardServiceImpl implements IReportDashBoardService {
             monday = monday.plusWeeks(1);
             sunday = monday.plusDays(6);
         }
-        String mondayWithOutTime = Helper.convertDateToString(monday.toDate());
-        String sundayWithOutTime = Helper.convertDateToString(sunday.toDate());
+        String mondayWithOutTime = Helper.convertDateToString(monday.toDate()) + " 00:00:00";
+        String sundayWithOutTime = Helper.convertDateToString(sunday.toDate())+ " 23:59:59";
+
         var listBookingWeek = bookingRepository.findAllByDateBookingBetween(mondayWithOutTime, sundayWithOutTime);
         Map<String, Double> totalBookingsByDay = new HashMap<>();
         for (var item : listBookingWeek) {
