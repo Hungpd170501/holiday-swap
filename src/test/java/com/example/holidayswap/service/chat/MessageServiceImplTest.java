@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.chat.Conversation;
 import com.example.holidayswap.domain.entity.chat.Message;
 import com.example.holidayswap.domain.entity.chat.MessageType;
 import com.example.holidayswap.domain.mapper.chat.MessageMapper;
+import com.example.holidayswap.repository.chat.ConversationParticipantRepository;
 import com.example.holidayswap.repository.chat.ConversationRepository;
 import com.example.holidayswap.repository.chat.MessageRepository;
 import com.example.holidayswap.service.FileService;
@@ -41,12 +42,15 @@ class MessageServiceImplTest {
     @Mock
     private FileService mockFileService;
 
+    @Mock
+    private ConversationParticipantRepository mockConversationParticipantRepository;
+
     private MessageServiceImpl messageServiceImplUnderTest;
 
     @BeforeEach
     void setUp() {
         messageServiceImplUnderTest = new MessageServiceImpl(mockMessageRepository, mockConversationRepository,
-                mockMessageMapper, mockFileService);
+                mockMessageMapper, mockFileService, mockConversationParticipantRepository);
     }
 
     @Test

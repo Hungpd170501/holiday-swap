@@ -32,7 +32,8 @@ public class MessageController {
     private final AuthUtils authUtils;
 
     @GetMapping("/{conversationId}/messages")
-    public ResponseEntity<List<MessageResponse>> getConversationMessages(@PathVariable("conversationId") Long conversationId) {
+    public ResponseEntity<List<MessageResponse>> getConversationMessages(
+            @PathVariable("conversationId") Long conversationId) {
         var messages = messageService.getConversationMessages(conversationId);
         return ResponseEntity.ok(messages);
     }
@@ -43,7 +44,8 @@ public class MessageController {
             @ModelAttribute MessageRequest messageRequest
     ) throws IOException {
         var user = authUtils.getAuthenticatedUser();
-        if (chatUtils.isUserNotInConversation(Long.parseLong(user.getUserId().toString()), Long.parseLong(String.valueOf(conversationId)))) {
+        if (chatUtils.isUserNotInConversation(Long.parseLong(user.getUserId().toString()),
+                Long.parseLong(String.valueOf(conversationId)))) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
         var message =messageService.createMessage(messageRequest, String.valueOf(conversationId));
@@ -58,7 +60,8 @@ public class MessageController {
             SimpMessageHeaderAccessor headerAccessor
     ) throws IOException {
         String userId = String.valueOf(Objects.requireNonNull(headerAccessor.getUser()).getName());
-        if (chatUtils.isUserNotInConversation(Long.parseLong(userId), Long.parseLong(conversationId))) {
+        if (chatUtils.isUserNotInConversation(Long.parseLong(userId),
+                Long.parseLong(conversationId))) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
         var message = messageService.createMessage(messageRequest, conversationId);
@@ -70,9 +73,38 @@ public class MessageController {
             @DestinationVariable String conversationId,
             @Payload String userId
     ) {
-        if (chatUtils.isUserNotInConversation(Long.parseLong(userId), Long.parseLong(String.valueOf(conversationId)))) {
+        if (chatUtils.isUserNotInConversation(Long.parseLong(userId),
+                Long.parseLong(String.valueOf(conversationId)))) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
         messagingTemplate.convertAndSend("/queue/typing-" + conversationId, userId);
+    }
+
+    @PatchMapping("/{conversationId}/read-all")
+    public void sendMarkAllAsRead(
+            @PathVariable("conversationId") Long conversationId
+    ) {
+        var user = authUtils.getAuthenticatedUser();
+        if (chatUtils.isUserNotInConversation(Long.parseLong(user.getUserId().toString()),
+                Long.parseLong(String.valueOf(conversationId)))) {
+            throw new VerificationException(USER_NOT_IN_CONVERSATION);
+        }
+        messageService.markAllAsRead(Long.parseLong(user.getUserId().toString()),
+                Long.parseLong(String.valueOf(conversationId)));
+    }
+
+    @PatchMapping("/{conversationId}/{messageId}/read")
+    public void sendMarkAllAsRead(
+            @PathVariable("conversationId") Long conversationId,
+            @PathVariable("messageId") Long messageId
+    ) {
+        var user = authUtils.getAuthenticatedUser();
+        if (chatUtils.isUserNotInConversation(Long.parseLong(user.getUserId().toString()),
+                Long.parseLong(String.valueOf(conversationId)))) {
+            throw new VerificationException(USER_NOT_IN_CONVERSATION);
+        }
+        messageService.markReadByMessageId(Long.parseLong(user.getUserId().toString()),
+                Long.parseLong(String.valueOf(conversationId)),
+                Long.parseLong(String.valueOf(messageId)));
     }
 }

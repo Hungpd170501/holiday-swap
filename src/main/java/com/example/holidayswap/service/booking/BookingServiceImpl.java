@@ -339,7 +339,7 @@ public class BookingServiceImpl implements IBookingService {
 
         long threeDaysAgoMillis = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000);
         Date threeDaysAgo = new Date(threeDaysAgoMillis);
-        if(booking.getCheckOutDate().after(threeDaysAgo)) {
+        if(booking.getCheckOutDate().before(threeDaysAgo)) {
             booking.setStatusCheckReturn(false);
             bookingRepository.save(booking);
             throw new EntityNotFoundException("Can not return point because check out date is before 3 days ago");
