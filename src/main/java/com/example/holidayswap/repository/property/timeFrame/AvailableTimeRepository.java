@@ -141,7 +141,8 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and (:userId is null or co.id.userId  != :userId)
                and u.status = 'ACTIVE'
                and (
-                    case when bk.status = 5 then (
+                    case when bk.status = 5 and p.status = 'ACTIVE'
+                 and r.status = 'ACTIVE'  then (
                            (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
                            >
                            (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk
