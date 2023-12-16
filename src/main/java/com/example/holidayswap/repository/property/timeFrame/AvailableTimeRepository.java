@@ -46,7 +46,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     @Query("select t from AvailableTime t where t.id = ?1 and t.isDeleted = false")
     Optional<AvailableTime> findByIdAndDeletedFalse(Long id);
 
-    @Query(value = "SELECT * FROM available_time t WHERE t.available_time_id = ?1 AND t.is_deleted = false AND (?2 BETWEEN t.start_time AND t.end_time) AND ( ?3 BETWEEN t.start_time AND t.end_time) ", nativeQuery = true)
+    @Query(value = "SELECT * FROM available_time t WHERE t.available_time_id = ?1 AND t.is_deleted = false AND ( date (?2) BETWEEN date (t.start_time) AND date (t.end_time)) AND ( date (?3) BETWEEN date( t.start_time) AND date ( t.end_time)) ", nativeQuery = true)
     Optional<AvailableTime> findAvailableTimeByIdAndStartTimeAndEndTime(Long timeFrameId,Date startTime, Date endTime);
 
     @Query(value = """
@@ -141,7 +141,8 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and (:userId is null or co.id.userId  != :userId)
                and u.status = 'ACTIVE'
                and (
-                    case when bk.status = 5 then (
+                    case when bk.status = 5 and p.status = 'ACTIVE'
+                 and r.status = 'ACTIVE'  then (
                            (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
                            >
                            (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk

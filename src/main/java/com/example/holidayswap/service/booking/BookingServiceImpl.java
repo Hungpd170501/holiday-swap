@@ -2,6 +2,7 @@ package com.example.holidayswap.service.booking;
 
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.request.notification.NotificationRequest;
+import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
@@ -16,12 +17,15 @@ import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.booking.UserOfBookingRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
+import com.example.holidayswap.service.EmailService;
 import com.example.holidayswap.service.FileService;
+import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.payment.ITransferPointService;
 import com.example.holidayswap.utils.Helper;
 import com.example.holidayswap.utils.RedissonLockUtils;
 import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.redisson.api.RLock;
 import org.springframework.security.core.Authentication;
@@ -53,20 +57,22 @@ public class BookingServiceImpl implements IBookingService {
     private final PushNotificationService pushNotificationService;
 
     private final CoOwnerRepository coOwnerRepository;
+    private final EmailService emailService;
+    private final UserService userService;
 
 
     @Override
     @Transactional
-    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException {
+    public EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException, MessagingException {
 
         if (bookingRequest.getCheckInDate().compareTo(bookingRequest.getCheckOutDate()) >= 0)
             throw new EntityNotFoundException("Check in date must be before check out date");
-        var booki = availableTimeRepository.findById(bookingRequest.getAvailableTimeId()).get();
-        if(booki != null){
-            if(booki.getTimeFrame().getUserId() == bookingRequest.getUserId())
+        var booki = availableTimeRepository.findByIdAndDeletedFalse(bookingRequest.getAvailableTimeId());
+        if(booki.isPresent()){
+            if(booki.get().getTimeFrame().getUserId() == bookingRequest.getUserId())
                 throw new EntityNotFoundException("You can't book your own apartment");
         }
-
+        UserProfileResponse user = userService.getUserById(bookingRequest.getUserId());
         List<Booking> checkBookingOverlap;
         Booking checkBooking;
         UUID uuid = UUID.randomUUID();
@@ -85,9 +91,9 @@ public class BookingServiceImpl implements IBookingService {
 
 //                 TODO: check booking of this apartment
                 checkBookingOverlap = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(bookingRequest.getAvailableTimeId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
-                checkBooking = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getAvailableTimeId());
+//                checkBooking = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getAvailableTimeId());
 
-                if (!checkBookingOverlap.isEmpty() || checkBooking != null)
+                if (!checkBookingOverlap.isEmpty())
                     throw new EntityNotFoundException("This apartment is not available in this time");
 
 
@@ -132,6 +138,7 @@ public class BookingServiceImpl implements IBookingService {
                 notificationRequestForOwner.setContent("Booking Apartment " + booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getRoomId() + " of resort " + booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForOwner.setToUserId(booking.getAvailableTime().getTimeFrame().getCoOwner().getId().getUserId());
                 pushNotificationService.createNotification(notificationRequestForOwner);
+                emailService.sendConfirmBookedHtml(booking, user.getEmail());
                 return EnumBookingStatus.BookingStatus.SUCCESS;
             } finally {
                 fairLock.unlock();
@@ -332,8 +339,11 @@ public class BookingServiceImpl implements IBookingService {
 
         long threeDaysAgoMillis = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000);
         Date threeDaysAgo = new Date(threeDaysAgoMillis);
-        if(booking.getCheckOutDate().before(threeDaysAgo))
+        if(booking.getCheckOutDate().before(threeDaysAgo)) {
+            booking.setStatusCheckReturn(false);
+            bookingRepository.save(booking);
             throw new EntityNotFoundException("Can not return point because check out date is before 3 days ago");
+        }
         if (booking.getStatusCheckReturn()) {
             booking.setStatus(EnumBookingStatus.BookingStatus.CANCELLED);
             booking.setStatusCheckReturn(false);

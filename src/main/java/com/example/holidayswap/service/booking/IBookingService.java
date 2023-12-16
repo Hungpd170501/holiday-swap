@@ -8,12 +8,13 @@ import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingO
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface IBookingService {
-    EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException;
+    EnumBookingStatus.BookingStatus createBooking(BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException, MessagingException;
 
     List<HistoryBookingResponse> historyBookingUserLogin();
 
