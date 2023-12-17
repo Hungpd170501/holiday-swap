@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/prod4
+    url: jdbc:postgresql://awseb-e-kyttteimxk-stack-awsebrdsdatabase-rrrv2yxqlfaw.cyspfa2bcawq.ap-southeast-1.rds.amazonaws.com:5432/hehe
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -53,7 +53,7 @@ spring:
             client-id: ${OAUTH2_GITHUB_CLIENT_ID}
             client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:/db/postgres/migrations
 
 logging:

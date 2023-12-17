@@ -38,6 +38,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByDateBookingContaining(String date);
 
+    @Query("select b from Booking b where ?1 <= b.dateBooking and ?2 >= b.dateBooking and b.status = 5")
     List<Booking> findAllByDateBookingBetween(String startDate, String endDate);
     @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
             "from Booking b where b.availableTimeId = ?1 and b.status = ?2")

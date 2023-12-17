@@ -98,7 +98,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .value(jwtService.generateToken(new HashMap<>(), user))
                     .build());
             emailService.sendVerificationEmail(user.getEmail(), token.getValue());
-            emailService.sendRegistrationReceipt(user.getEmail(), user.getUsername());
+//            emailService.sendRegistrationReceipt(user.getEmail(), user.getUsername());
         } catch (Exception e) {
             log.error("Error sending verification email", e);
         }
