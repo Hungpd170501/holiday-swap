@@ -74,18 +74,19 @@ public class BookingServiceImpl implements IBookingService {
         }
         UserProfileResponse user = userService.getUserById(bookingRequest.getUserId());
         List<Booking> checkBookingOverlap;
-        Booking checkBooking;
         UUID uuid = UUID.randomUUID();
         String uuidString = uuid.toString();
         var notificationRequestForOwner = new NotificationRequest();
         var notificationRequestForUserBooking = new NotificationRequest();
         LocalDate localDateCheckin;
         LocalDate localDateCheckout;
+        Booking booking = new Booking();
         String qrCode;
         long days;
         RLock fairLock = RedissonLockUtils.getFairLock("booking-" + bookingRequest.getAvailableTimeId());
         boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
         if (tryLock) {
+            Thread.sleep(3000);
             try {
                 AvailableTime availableTime = availableTimeRepository.findAvailableTimeByIdAndStartTimeAndEndTime(bookingRequest.getAvailableTimeId(),bookingRequest.getCheckInDate(),bookingRequest.getCheckOutDate()).orElseThrow(() -> new EntityNotFoundException("This availableTime not available in this time"));
 
@@ -104,7 +105,7 @@ public class BookingServiceImpl implements IBookingService {
 
                 //thêm đường dẫn vào trước uuidString
                 qrCode= fileService.createQRCode("https://holiday-swap.vercel.app/informationBooking/"+uuidString);
-                Booking booking = new Booking();
+
                 booking.setUuid(uuidString);
                 booking.setQrcode(qrCode);
                 booking.setCheckInDate(bookingRequest.getCheckInDate());
