@@ -218,13 +218,14 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 }
 
                 fromWallet.withdraw(amount);
+                total = amount + commision;
                 adminWallet.setTotalPoint(adminWallet.getTotalPoint() - commision);
-                toWallet.setTotalPoint(toWallet.getTotalPoint() + amount + commision);
+                toWallet.setTotalPoint(toWallet.getTotalPoint() + total);
 
                 walletRepository.save(toWallet);
                 loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Refund", fromWallet.getTotalPoint(), toWallet.getTotalPoint(),commision );
                 walletRepository.save(fromWallet);
-                total = amount + commision;
+
                 var notificationRequestForUserBooking = new NotificationRequest();
                 notificationRequestForUserBooking.setSubject("Refund point cancelled booking" + total + "point");
                 notificationRequestForUserBooking.setContent(fromWallet.getUser().getUsername() + "refund point for you" + total + "point");

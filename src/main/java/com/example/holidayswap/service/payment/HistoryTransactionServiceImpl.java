@@ -64,9 +64,9 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 if(transferPoint.getStatusPointTransfer() == EnumPaymentStatus.StatusPointTransfer.POINT_RECEIVE){
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.RECIVED);
                     if(transferPoint.getDetail().equals("Refund")){
-                        Double amountTotal = Double.parseDouble(transferPoint.getAmount())  + transferPoint.getCommission();
+                        Double amountTotal = Double.parseDouble(transferPoint.getAmount())  + 2*transferPoint.getCommission();
                         historyTransaction.setAmount("+"+amountTotal);
-                        historyTransaction.setMessage(transferPoint.getFrom() + " refund to " + transferPoint.getTo() + " " + transferPoint.getAmount() + " point");
+                        historyTransaction.setMessage(transferPoint.getFrom() + " refund to " + transferPoint.getTo() + " " + amountTotal + " point");
                     }
                 }else {
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.SEND);
