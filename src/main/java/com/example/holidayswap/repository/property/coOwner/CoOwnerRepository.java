@@ -19,15 +19,7 @@ import java.util.Optional;
 public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     @Query(value = """
             select
-            	co.property_id,
-            	co.room_id,
-            	co.user_id,
-            	co.end_time,
-            	co.is_deleted,
-            	co.start_time,
-            	co.status,
-            	co.type,
-            	co.create_date
+            	co.*
             from
             	co_owner co
             inner join property p on
@@ -66,14 +58,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     Optional<CoOwner> findByPropertyIdAndUserIdAndIdRoomId(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId);
 
     @Query(value = """
-                   SELECT PROPERTY_ID,
-                   ROOM_ID,
-                   USER_ID,
-                   END_TIME,
-                   IS_DELETED,
-                   START_TIME,
-                   STATUS,
-                   TYPE
+                   SELECT O.*
             FROM CO_OWNER O
             WHERE UPPER(O.ROOM_ID) = UPPER(:roomId)
               AND O.PROPERTY_ID = :propertyId
@@ -94,7 +79,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, CoOwnerId> {
     List<OwnerShipResponseDTO> getAllDistinctOwnerShipWithoutUserId();
 
     @Query(value = """
-            select property_id, room_id, user_id, end_time, is_deleted, start_time, status, type, create_date from co_owner co where co.property_id = :propertyId and co.user_id = :userId and co.room_id = :roomId and case when co.type = 'DEEDED' then(   ((:coOwnerStatus is null) or (co.status = :coOwnerStatus))) else ( ((:coOwnerStatus is null) or (co.status = :coOwnerStatus)) and extract(year from date(:startTime)) >= extract(year from date(co.start_time)) and extract(year from date(:endTime)) <= extract(year from date(co.end_time)) ) end
+            select co.* from co_owner co where co.property_id = :propertyId and co.user_id = :userId and co.room_id = :roomId and case when co.type = 'DEEDED' then(   ((:coOwnerStatus is null) or (co.status = :coOwnerStatus))) else ( ((:coOwnerStatus is null) or (co.status = :coOwnerStatus)) and extract(year from date(:startTime)) >= extract(year from date(co.start_time)) and extract(year from date(:endTime)) <= extract(year from date(co.end_time)) ) end
             """, nativeQuery = true)
     Optional<CoOwner> isMatchingCoOwner(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("startTime") Date startTime, @Param("endTime") Date endTime, @Param("coOwnerStatus") String coOwnerStatus);
 
