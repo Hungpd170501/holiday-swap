@@ -55,7 +55,7 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 historyTransaction.setFrom(transferPoint.getFrom());
                 historyTransaction.setTo(transferPoint.getTo());
                 historyTransaction.setDateConvert(transferPoint.getDate());
-                historyTransaction.setAmount(transferPoint.getAmount());
+                historyTransaction.setAmount(""+transferPoint.getAmount());
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Date date = dateFormat.parse(transferPoint.getDate());
                 historyTransaction.setCreatedOn(date);
@@ -63,6 +63,11 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 historyTransaction.setTotalPoint(transferPoint.getTotalPoint());
                 if(transferPoint.getStatusPointTransfer() == EnumPaymentStatus.StatusPointTransfer.POINT_RECEIVE){
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.RECIVED);
+                    if(transferPoint.getDetail().equals("Refund")){
+                        Double amountTotal = Double.parseDouble(transferPoint.getAmount())  + 2*transferPoint.getCommission();
+                        historyTransaction.setAmount("+"+amountTotal);
+                        historyTransaction.setMessage(transferPoint.getFrom() + " refund to " + transferPoint.getTo() + " " + amountTotal + " point");
+                    }
                 }else {
                     historyTransaction.setType(EnumPaymentStatus.TransactionStatus.SEND);
                 }
@@ -71,7 +76,11 @@ public class HistoryTransactionServiceImpl implements IHistoryTransactionService
                 }else {
                     historyTransaction.setStatus(EnumPaymentStatus.StatusMoneyTranfer.FAILED);
                 }
-                listHistoryTransaction.add(historyTransaction);
+                if(transferPoint.getStatusPointTransfer() == EnumPaymentStatus.StatusPointTransfer.POINT_RECEIVE && !transferPoint.getStatus().equals("SUCCESS")){}
+                else {
+                    listHistoryTransaction.add(historyTransaction);
+                }
+
             }
         }
         if(listDepositePoint != null){

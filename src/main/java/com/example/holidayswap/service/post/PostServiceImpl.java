@@ -97,7 +97,7 @@ public class PostServiceImpl implements IPostService{
 
                 PostResponse postResponse1 = new PostResponse();
                 postResponse1.setTitle(p.getTitle());
-                postResponse1.setContent(p.getContent());
+//                postResponse1.setContent(p.getContent());
                 postResponse1.setDatePosted(p.getDatePosted());
                 postResponse1.setId(p.getId());
                 postResponse1.setUserName(p.getUser().getUsername());

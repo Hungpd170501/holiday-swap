@@ -26,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -35,6 +36,7 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 @Service
 @Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
+    public static final int OPT_EXP_MINUTES = 30;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final RoleRepository roleRepository;
@@ -74,10 +76,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserProfileResponse register(RegisterRequest request) {
         var role = roleRepository.findById(request.getRole().getRoleId())
                 .orElseThrow(() -> new EntityNotFoundException(ROLE_NOT_FOUND));
-        userRepository.getUserByEmailEquals(request.getEmail())
-                .ifPresent(user -> {
-                    throw new DataIntegrityViolationException(EMAIL_HAS_ALREADY_BEEN_TAKEN);
-                });
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new DataIntegrityViolationException(EMAIL_HAS_ALREADY_BEEN_TAKEN);
+        }
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new DataIntegrityViolationException(USERNAME_HAS_ALREADY_BEEN_TAKEN);
+        }
         var user = UserMapper.INSTANCE.toUserEntity(request);
         user.setStatus(UserStatus.PENDING);
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
@@ -85,7 +89,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var userRes = userRepository.save(user);
         walletService.CreateWallet(user.getUserId());
         try {
-            emailService.sendRegistrationReceipt(user.getEmail(), user.getUsername());
             var token = tokenRepository.save(Token
                     .builder()
                     .user(user)
@@ -95,8 +98,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .value(jwtService.generateToken(new HashMap<>(), user))
                     .build());
             emailService.sendVerificationEmail(user.getEmail(), token.getValue());
+//            emailService.sendRegistrationReceipt(user.getEmail(), user.getUsername());
         } catch (Exception e) {
-
             log.error("Error sending verification email", e);
         }
         return UserMapper.INSTANCE.toUserProfileResponse(userRes);
@@ -172,21 +175,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenRepository.findByValueEquals(resetPasswordRequest.getToken())
                 .ifPresent(token -> {
                     if (token.getStatus().equals(TokenStatus.VALID)) {
-                        token.setStatus(TokenStatus.REVOKED);
-                        tokenRepository.save(token);
-                        user.setPasswordHash(passwordEncoder.encode(resetPasswordRequest.getPassword()));
-                        userRepository.save(user);
-                        CompletableFuture.runAsync(() -> {
-                            var validUserPasswordResetTokens = tokenRepository.findAllValidTokenByUser(user.getUserId())
-                                    .stream()
-                                    .filter(t -> t.getTokenType().equals(TokenType.PASSWORD_RESET))
-                                    .map(t -> {
-                                        t.setStatus(TokenStatus.REVOKED);
-                                        return t;
-                                    })
-                                    .toList();
-                            tokenRepository.saveAll(validUserPasswordResetTokens);
-                        });
+                        changePasswordAndRevokeTokens(resetPasswordRequest, user, token, TokenType.PASSWORD_RESET);
                     } else if (token.getStatus().equals(TokenStatus.REVOKED)) {
                         throw new VerificationException(TOKEN_REVOKED);
                     } else if (token.getStatus().equals(TokenStatus.EXPIRED)) {
@@ -229,6 +218,65 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    private String getRandomNumber() {
+        int number = new SecureRandom().nextInt(999999);
+        return String.format("%06d", number);
+    }
+
+    @Override
+    public void sendVerificationCodeViaGoogle(String email) {
+        var user = userRepository.getUserByEmailEquals(email)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        var token = tokenRepository.save(Token
+                .builder()
+                .user(user)
+                .tokenType(TokenType.OTP)
+                .expirationTime(LocalDateTime.now().plusMinutes(OPT_EXP_MINUTES))
+                .status(TokenStatus.VALID)
+                .value(getRandomNumber())
+                .build());
+        emailService.sendVerificationCode(user.getEmail(), user.getUsername(), token.getValue());
+    }
+
+    @Override
+    public void resetPasswordByOtp(ResetPasswordRequest resetPasswordRequest) {
+        var user = this.userRepository.getUserByEmailEquals(resetPasswordRequest.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        tokenRepository.findByValueEqualsAndAndUserIdEqualsAndTypeEqualsOtp(resetPasswordRequest.getEmail(), resetPasswordRequest.getToken())
+                .ifPresentOrElse(token -> changePasswordAndRevokeTokens(resetPasswordRequest, user, token, TokenType.OTP),
+                        () -> {
+                            throw new VerificationException(PASSWORD_RESET_TOKEN_INVALID);
+                        }
+                );
+    }
+
+    @Override
+    public void verifyOtp(String otp, String email) {
+        tokenRepository.findByValueEqualsAndAndUserIdEqualsAndTypeEqualsOtp(email, otp)
+                .ifPresentOrElse(
+                        token -> {},
+                        () -> { throw new VerificationException(OTP_INVALID); }
+                );
+    }
+
+    private void changePasswordAndRevokeTokens(ResetPasswordRequest resetPasswordRequest, User user, Token token, TokenType tokenType) {
+        token.setStatus(TokenStatus.REVOKED);
+        tokenRepository.save(token);
+        user.setPasswordHash(passwordEncoder.encode(resetPasswordRequest.getPassword()));
+        userRepository.save(user);
+        CompletableFuture.runAsync(() -> {
+            var validUserPasswordResetTokens = tokenRepository.findAllValidTokenByUser(user.getUserId())
+                    .stream()
+                    .filter(t -> t.getTokenType().equals(tokenType))
+                    .map(t -> {
+                        t.setStatus(TokenStatus.REVOKED);
+                        return t;
+                    })
+                    .toList();
+            tokenRepository.saveAll(validUserPasswordResetTokens);
+        });
     }
 
     private void revokeAllUserAuthTokens(User user) {

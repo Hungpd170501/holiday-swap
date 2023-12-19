@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -30,5 +31,5 @@ public interface ResortService {
 
     void delete(Long id, LocalDate startDate);
 
-    void updateStatus(Long id, ResortStatus resortStatus, LocalDate startDate, LocalDate endDate);
+    void updateStatus(Long id, ResortStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate);
 }

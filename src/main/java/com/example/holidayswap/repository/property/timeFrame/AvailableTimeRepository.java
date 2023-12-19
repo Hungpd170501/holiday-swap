@@ -46,7 +46,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     @Query("select t from AvailableTime t where t.id = ?1 and t.isDeleted = false")
     Optional<AvailableTime> findByIdAndDeletedFalse(Long id);
 
-    @Query(value = "SELECT * FROM available_time t WHERE t.available_time_id = ?1 AND t.is_deleted = false AND (?2 BETWEEN t.start_time AND t.end_time) AND ( ?3 BETWEEN t.start_time AND t.end_time) ", nativeQuery = true)
+    @Query(value = "SELECT * FROM available_time t WHERE t.available_time_id = ?1 AND t.is_deleted = false AND ( date (?2) BETWEEN date (t.start_time) AND date (t.end_time)) AND ( date (?3) BETWEEN date( t.start_time) AND date ( t.end_time)) ", nativeQuery = true)
     Optional<AvailableTime> findAvailableTimeByIdAndStartTimeAndEndTime(Long timeFrameId,Date startTime, Date endTime);
 
     @Query(value = """
@@ -108,7 +108,9 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  and ((:max is null) or at.pricePerNight <= cast(:max as double)))
                  and (
                     ((cast(:checkIn as date ) is null) and (cast(:checkOut as date) is null))
-                        or ((date(:checkOut) between date(at.startTime) and date(at.endTime))
+                     or ((date(at.startTime) between date(:checkIn) and date(:checkOut))
+                        and (date(at.endTime)) between date(:checkIn) and date(:checkOut))
+                     or ((date(:checkOut) between date(at.startTime) and date(at.endTime))
                         and (date(:checkIn)) between date(at.startTime) and date(at.endTime))
                      )
                  and co.status = 'ACCEPTED'
@@ -122,7 +124,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  and at.isDeleted = false
                  and p.isDeleted = false
                  and r.isDeleted = false
-               
                and ((:#{#listOfInRoomAmenity == null} = true) or (ira.id in :listOfInRoomAmenity))
                and ((:#{#listOfPropertyView == null} = true) or (pv.id in :listOfPropertyView))
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
@@ -138,13 +139,20 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                and p.numberBathRoom >= :numberBathRoom
                AND (:locationName = '' OR unaccent(upper(r.locationFormattedName)) LIKE %:locationName%)
                and (:userId is null or co.id.userId  != :userId)
+               and u.status = 'ACTIVE'
                and (
-                   (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
-                   >
-                   (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk where bk.availableTimeId = at.id)
-                   or bk.id is null
-               )
-               and (at.startTime > current_date and (at.endTime) > current_date   )
+                    case when bk.status = 5 and p.status = 'ACTIVE'
+                 and r.status = 'ACTIVE'  then (
+                           (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
+                           >
+                           (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk
+                           where bk.availableTimeId = at.id))
+                       else (
+                            bk.id is null or bk.status != 5
+                       ) 
+                       end 
+                    )
+               and (at.startTime > current_date and (at.endTime) > current_date)
             """)
     Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
                                                    @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,

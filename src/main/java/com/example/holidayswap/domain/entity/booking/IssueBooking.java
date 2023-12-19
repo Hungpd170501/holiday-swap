@@ -19,10 +19,10 @@ public class IssueBooking extends BaseEntityAudit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "issue_id")
     private Long id;
-    @Column(name = "booking_id", nullable = false)
+    @Column(name = "book_id", nullable = false)
     private Long bookingId;
     @ManyToOne
-    @JoinColumn(name = "booking_id", referencedColumnName = "available_time_id", nullable = false,
+    @JoinColumn(name = "book_id", referencedColumnName = "book_id", nullable = false,
             insertable = false,
             updatable = false)
     private Booking booking;
@@ -31,7 +31,7 @@ public class IssueBooking extends BaseEntityAudit {
     private EnumBookingStatus.IssueBookingStatus status;
     @Column(name = "description", nullable = false)
     private String description;
-    @Column(name = "note", nullable = false)
+    @Column(name = "note")
     private String note;
 
 }

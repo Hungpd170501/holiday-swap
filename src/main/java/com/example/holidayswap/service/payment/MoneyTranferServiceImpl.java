@@ -76,6 +76,11 @@ public class MoneyTranferServiceImpl implements IMoneyTranferService {
     }
 
     @Override
+    public void Save(MoneyTranfer moneyTranfer) {
+        transactionRepository.save(moneyTranfer);
+    }
+
+    @Override
     public boolean UpdateStatusMoneyTranferTransaction(Long id, EnumPaymentStatus.StatusMoneyTranfer status) {
         Optional<MoneyTranfer> moneyTranfer = transactionRepository.findById(id);
         if(moneyTranfer.isEmpty() || !moneyTranfer.get().getStatus().name().equals(EnumPaymentStatus.StatusMoneyTranfer.WAITING.name())){

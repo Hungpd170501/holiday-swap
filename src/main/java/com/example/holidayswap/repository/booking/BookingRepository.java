@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
@@ -19,13 +20,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 //    List<Booking> checkListBookingByCheckinDateAndCheckoutDateAndRoomIdAndPropertyId(Date checkInDate, Date checkOutDate, String roomId, Long propertyId);
 @Query(value = """
         SELECT* FROM booking b
-        WHERE ((?2 > check_in_date AND ?2 < check_out_date)
-        OR (?3 > check_in_date AND ?3 < check_out_date) 
-        OR(?2 <= check_in_date AND ?3 >= check_out_date )) 
-        and available_time_id = ?1""", nativeQuery = true)
+                        WHERE (
+                            ( date (?2) > date (check_in_date) AND date (?2) < date (check_out_date))
+                            OR (date (?3) > date (check_in_date) AND date (?3) < date (check_out_date))
+                            OR( date  (?2) <= date (check_in_date) AND date (?3) >= date (check_out_date) ))
+                        
+                          and available_time_id = ?1
+                          and b.status = 5
+        """, nativeQuery = true)
     List<Booking> checkBookingIsAvailableByCheckinDateAndCheckoutDate(Long availableTimeId, Date checkInDate, Date checkOutDate);
 
-    @Query(value = "SELECT* FROM booking b WHERE ?1 = check_in_date AND ?2 = check_out_date AND available_time_id = ?3", nativeQuery = true)
+    @Query(value = "SELECT* FROM booking b WHERE ?1 = check_in_date AND ?2 = check_out_date AND available_time_id = ?3 and b.status = 5", nativeQuery = true)
     Booking checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(Date checkInDate, Date checkOutDate, Long availableTimeId);
     @Query("select b from Booking b where b.userBookingId = ?1")
     List<Booking>findAllByUserId (Long userId);
@@ -35,6 +40,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByDateBookingContaining(String date);
 
+    @Query("select b from Booking b where ?1 <= b.dateBooking and ?2 >= b.dateBooking and b.status = 5")
     List<Booking> findAllByDateBookingBetween(String startDate, String endDate);
     @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
             "from Booking b where b.availableTimeId = ?1 and b.status = ?2")
@@ -96,20 +102,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = """
 
-            select b.book_id,
-                           b.check_in_date,
-                           b.check_out_date,
-                           b.price,
-                           b.status,
-                           b.actual_price,
-                           b.available_time_id,
-                           b.commission,
-                           b.owner_id,
-                           b.total_days,
-                           b.user_booking_id,
-                           b.date_booking,
-                           b.status_check_return,
-                           b.total_member
+            select b.*
                     from booking b
                              inner join available_time at on
                         at.available_time_id = b.available_time_id
@@ -128,22 +121,32 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
                                             time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
                                             join resort ON resort.resort_id = property.resort_id
-                                            where property.resort_id = ?1 and b.check_in_date > date(?2) and resort.resort_status= 'ACTIVE' and b.status = 5
+                                            where property.resort_id = ?1 and resort.resort_status != 'DEACTIVE' and b.status = 5 and  (( date (?2) > date (check_in_date) AND date (?2) < date (check_out_date))
+                            OR (date (?3) > date (check_in_date) AND date (?3) < date (check_out_date))
+                            OR( date  (?2) <= date (check_in_date) AND date (?3) >= date (check_out_date) ))
                     """, nativeQuery = true)
-    List<Booking> getListBookingByResortIdAndDate(Long resortId, ZonedDateTime date);
+    List<Booking> getListBookingByResortIdAndDate(Long resortId, LocalDateTime startDate, LocalDateTime endDate);
 
     @Query(value = """
         SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
         time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
-        where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > date(?2) and property.status = 'ACTIVE' and b.status = 5
+                    where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > date(?2) and property.status = 'ACTIVE' and b.status = 5
         """, nativeQuery = true)
     List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,ZonedDateTime date);
-
-
-    @Query(value = """
-       SELECT b.* FROM booking b where date (b.check_in_date) = date(?1) and status = ?2 and transfer_status = ?3 
+    @Query("select b from Booking b where b.uuid = ?1")
+    Booking findByUuid(String uuid);
+     @Query(value = """
+       SELECT b.* FROM booking b where date (b.check_out_date) <= date(?1) and status = ?2 and transfer_status = ?3 
         """, nativeQuery = true)
     List<Booking> getListBookingByDateAndStatusAndTransferStatus(LocalDate date, EnumBookingStatus.BookingStatus status, EnumBookingStatus.TransferStatus transferStatus);
 
-                    
+     @Query(value = """
+      SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
+                                            time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
+                                            join resort ON resort.resort_id = property.resort_id
+                                            where property.resort_id = ?1 and resort.resort_status != 'DEACTIVE' and b.status = 5 and  ( date (?2) <= date (check_in_date))
+        """, nativeQuery = true)
+     List<Booking> getListBookingHasCheckinAfterDeactiveDate(Long resortId, LocalDateTime startDate);
+
+      
 }

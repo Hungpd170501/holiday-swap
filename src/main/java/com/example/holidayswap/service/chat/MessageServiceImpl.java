@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.chat.Message;
 import com.example.holidayswap.domain.entity.chat.MessageType;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.mapper.chat.MessageMapper;
+import com.example.holidayswap.repository.chat.ConversationParticipantRepository;
 import com.example.holidayswap.repository.chat.ConversationRepository;
 import com.example.holidayswap.repository.chat.MessageRepository;
 import com.example.holidayswap.service.FileService;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,6 +24,7 @@ public class MessageServiceImpl implements MessageService {
     private final ConversationRepository conversationRepository;
     private final MessageMapper messageMapper;
     private final FileService fileService;
+    private final ConversationParticipantRepository conversationParticipantRepository;
 
     @Override
     public List<MessageResponse> getConversationMessages(Long conversationId) {
@@ -47,5 +48,24 @@ public class MessageServiceImpl implements MessageService {
         }
         messageRepository.save(message);
         return messageMapper.toMessageResponse(message);
+    }
+
+    @Override
+    public void markAllAsRead(Long userId, Long conversationId) {
+        var message = messageRepository.findLatestMessageByConversation(conversationId);
+        var conversationParticipant = conversationParticipantRepository.findByUserIdAndConversationId(userId, conversationId);
+        conversationParticipant.ifPresent(participant -> {
+            participant.setMessageId(message.map(Message::getMessageId).orElse(0L));
+            conversationParticipantRepository.save(participant);
+        });
+    }
+
+    @Override
+    public void markReadByMessageId(long userId, long conversationId, long messageId) {
+        var conversationParticipant = conversationParticipantRepository.findByUserIdAndConversationId(userId, conversationId);
+        conversationParticipant.ifPresent(participant -> {
+            participant.setMessageId(messageId);
+            conversationParticipantRepository.save(participant);
+        });
     }
 }

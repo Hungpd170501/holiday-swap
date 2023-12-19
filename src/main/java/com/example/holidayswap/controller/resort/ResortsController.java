@@ -1,6 +1,7 @@
 package com.example.holidayswap.controller.resort;
 
 import com.example.holidayswap.domain.dto.request.resort.ResortRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortRequestUpdate;
 import com.example.holidayswap.domain.dto.request.resort.ResortUpdateRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortImageResponse;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -120,6 +122,11 @@ public class ResortsController {
     @DeleteMapping("/{resortId}")
     public ResponseEntity<Void> delete(@PathVariable("resortId") Long resortId) {
         resortService.delete(resortId, new java.util.Date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
+        return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/updateStatus")
+    public  ResponseEntity<Void> updateStatusResort(@RequestBody ResortRequestUpdate resortUpdateRequest){
+        resortService.updateStatus(resortUpdateRequest.getResortId(), resortUpdateRequest.getResortStatus(), resortUpdateRequest.getStartDate(), resortUpdateRequest.getEndDate());
         return ResponseEntity.noContent().build();
     }
 }

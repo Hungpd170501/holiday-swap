@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResortMaintaince {
+public class ResortMaintance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maintaince_id")
@@ -28,4 +28,9 @@ public class ResortMaintaince {
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ResortStatus type;
+    @ManyToOne
+    @JoinColumn(name = "resort_id", referencedColumnName = "resort_id", nullable = false,
+            insertable = false,
+            updatable = false)
+    private Resort resort;
 }

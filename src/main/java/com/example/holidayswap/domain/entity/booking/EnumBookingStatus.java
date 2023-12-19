@@ -10,13 +10,14 @@ public class EnumBookingStatus {
         SUCCESS,
         FAILED,
     }
-    public enum TransferStatus{
-        WAITING,
-        SUCCESS,
-        REFUND_USER
-    }
-    public enum IssueBookingStatus{
-        OPEN,
-        RESOLVE
-    }
+     public enum TransferStatus{
+         WAITING,
+         SUCCESS,
+         REFUND_USER
+     }
+     public enum IssueBookingStatus{
+         OPEN,
+         RESOLVE,
+         REFUND
+     }
 }

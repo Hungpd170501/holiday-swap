@@ -78,14 +78,14 @@ public class TransferPointServiceImpl implements ITransferPointService {
                     throw new BankException("Account not found");
                 }
                 if (fromWallet.getTotalPoint() < amount) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " + fromWallet.getUser().getUsername() + " does not have enough balance";
                     loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
                     throw new BankException(detail);
                 }
 
                 boolean check = fromWallet.withdraw(amount);
                 if (!check) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " + fromWallet.getUser().getUsername() + " does not have enough balance";
                     loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
                     throw new BankException(detail);
                 }
@@ -102,6 +102,16 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 walletRepository.save(fromWallet);
                 walletRepository.save(toWallet);
                 transactLogRepository.save(transactLog);
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Transfer point");
+                notificationRequestForUserBooking.setContent("transfer from" + fromWallet.getUser().getUsername() + amount + "point");
+                notificationRequestForUserBooking.setToUserId(to);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
+                notificationRequestForUserBooking.setSubject("Transfer success");
+                notificationRequestForUserBooking.setContent("transfer to" + toWallet.getUser().getUsername() + amount + "point");
+                notificationRequestForUserBooking.setToUserId(from);
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
+
 
                 loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
             } finally {
@@ -124,7 +134,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
             transactionTranferPointResponse.setId(allLog.getId());
             transactionTranferPointResponse.setFrom(userService.getUserById(allLog.getFromId()).getUsername());
             transactionTranferPointResponse.setTo(userService.getUserById(allLog.getToId()).getUsername());
-
+            transactionTranferPointResponse.setDetail(allLog.getDetail());
             if (allLog.getFromId() == userId) {
                 transactionTranferPointResponse.setTotalPoint(allLog.getFromBalance());
                 transactionTranferPointResponse.setAmount("-" + allLog.getAmount());
@@ -158,7 +168,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
             try {
                 fromWallet = walletService.GetWalletByUserId(booking.getUserBookingId());
                 if (fromWallet.getTotalPoint() < booking.getPrice()) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " + fromWallet.getUser().getUsername() + " does not have enough balance";
                     allLogPayBookingService.saveLog(booking.getUserBookingId(), booking.getId(), booking.getPrice(), EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, Helper.getCurrentDate(), fromWallet.getTotalPoint());
                     throw new BankException(detail);
                 }
@@ -192,19 +202,20 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 fromWallet = walletService.GetWalletByUserId(from);
                 toWallet = walletService.GetWalletByUserId(to);
                 if (fromWallet.getTotalPoint() < amount) {
-                    String detail = "Account " + fromWallet.getId() + " of user has id " + fromWallet.getUser().getUserId() + " does not have enough balance";
+                    String detail = "Account " + fromWallet.getUser().getUsername() + " does not have enough balance";
                     loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.BALANCE_NOT_ENOUGH, detail, fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
                     throw new BankException(detail);
                 }
 
                 fromWallet.withdraw(amount);
+                total = amount + commision;
                 adminWallet.setTotalPoint(adminWallet.getTotalPoint() - commision);
-                toWallet.setTotalPoint(toWallet.getTotalPoint() + amount + commision);
+                toWallet.setTotalPoint(toWallet.getTotalPoint() + total);
 
                 walletRepository.save(toWallet);
-                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Success", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), 0D);
+                loggingService.saveLog(from, to, amount, EnumPaymentStatus.BankCodeError.SUCCESS, "Refund", fromWallet.getTotalPoint(), toWallet.getTotalPoint(), commision);
                 walletRepository.save(fromWallet);
-                total = amount + commision;
+
                 var notificationRequestForUserBooking = new NotificationRequest();
                 notificationRequestForUserBooking.setSubject("Refund point cancelled booking" + total + "point");
                 notificationRequestForUserBooking.setContent(fromWallet.getUser().getUsername() + "refund point for you" + total + "point");
@@ -216,6 +227,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
         }
         return new TransferResponse(EnumPaymentStatus.BankCodeError.SUCCESS, "Success", Helper.getCurrentDate());
     }
+
     @Override
     @Transactional
     public void refundPointBookingToOwner(Long bookingId) throws InterruptedException {
@@ -236,7 +248,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
         if (tryLock) {
             try {
                 ownerWallet = walletService.GetWalletByUserId(booking.getOwnerId());
-                if (ownerWallet == null ) {
+                if (ownerWallet == null) {
                     throw new BankException("Account not found");
                 }
 
@@ -247,7 +259,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 walletRepository.save(ownerWallet);
                 var notificationRequestForUserBooking = new NotificationRequest();
                 notificationRequestForUserBooking.setSubject("Refund point booking" + booking.getActualPrice() + "point");
-                notificationRequestForUserBooking.setContent(booking.getId()+ "refund point for you" +  booking.getActualPrice() + "point");
+                notificationRequestForUserBooking.setContent(booking.getId() + "refund point for you" + booking.getActualPrice() + "point");
                 notificationRequestForUserBooking.setToUserId(booking.getOwnerId());
                 pushNotificationService.createNotification(notificationRequestForUserBooking);
                 loggingService.saveLog(bookingId, booking.getOwnerId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "Success", 0D, ownerWallet.getTotalPoint(), booking.getCommission());
@@ -259,5 +271,38 @@ public class TransferPointServiceImpl implements ITransferPointService {
         }
 
 
+    }
+
+    @Override
+    public void refundPointBookingToUser(Long bookingId) throws InterruptedException {
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) {
+            throw new BankException("Booking not found");
+        }
+        Wallet userWallet;
+        RLock fairLock = RedissonLockUtils.getFairLock("wallet-" + booking.getOwnerId());
+        boolean tryLock = fairLock.tryLock(10, 10, TimeUnit.SECONDS);
+        if (tryLock) {
+            try {
+                userWallet = walletService.GetWalletByUserId(booking.getUserBookingId());
+                if (userWallet == null) {
+                    throw new BankException("Account not found");
+                }
+                userWallet.setTotalPoint(userWallet.getTotalPoint() + booking.getPrice());
+                transactionBookingRefundOwnerService.saveLog(booking.getId(), booking.getUserBookingId(), booking.getPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "booking " + booking.getCheckInDate() + " to " + booking.getCheckOutDate(), Helper.getCurrentDate(), userWallet.getTotalPoint());
+                walletRepository.save(userWallet);
+                var notificationRequestForUserBooking = new NotificationRequest();
+                notificationRequestForUserBooking.setSubject("Refund point booking" + booking.getPrice() + "point");
+                notificationRequestForUserBooking.setContent(booking.getId() + "refund point for you" + booking.getPrice() + "point");
+                notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
+//                loggingService.saveLog(bookingId, booking.getUserBookingId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "Success", 0D, ownerWallet.getTotalPoint(), 0D);
+                booking.setTransferStatus(EnumBookingStatus.TransferStatus.REFUND_USER);
+                booking.setStatus(EnumBookingStatus.BookingStatus.CANCELLED);
+                bookingRepository.save(booking);
+            } finally {
+                fairLock.unlock();
+            }
+        }
     }
 }

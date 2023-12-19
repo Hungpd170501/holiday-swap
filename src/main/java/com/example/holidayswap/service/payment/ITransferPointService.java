@@ -18,4 +18,6 @@ public interface ITransferPointService {
     TransferResponse returnPoint(long from, long to, Double amount,Double commision) throws InterruptedException;
 
     void refundPointBookingToOwner(Long bookingId) throws InterruptedException;
+
+    void refundPointBookingToUser(Long bookingId) throws InterruptedException;
 }

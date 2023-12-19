@@ -23,6 +23,10 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
     private Long id;
+    @Column(name = "uuid", nullable = false)
+    private String uuid;
+    @Column(name = "qrcode", nullable = false)
+    private String qrcode;
 
     @Column(name = "available_time_id", nullable = false)
     private Long availableTimeId;
@@ -83,11 +87,11 @@ public class Booking {
     @Column(name = "status", nullable = false)
     private EnumBookingStatus.BookingStatus status;
 
-    @Column(name ="transfer_status")
-    private EnumBookingStatus.TransferStatus transferStatus;
+     @Column(name ="transfer_status")
+     private EnumBookingStatus.TransferStatus transferStatus;
 
-    @OneToMany(mappedBy = "booking")
-    private Set<IssueBooking> issueBookings;
+     @OneToMany(mappedBy = "booking")
+     private Set<IssueBooking> issueBookings;
     @OneToOne(mappedBy = "booking")
     private Rating rating;
 

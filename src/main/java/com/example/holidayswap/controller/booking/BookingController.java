@@ -3,11 +3,15 @@ package com.example.holidayswap.controller.booking;
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.example.holidayswap.service.FileService;
 import com.example.holidayswap.service.booking.IBookingService;
+import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -15,8 +19,9 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingController {
     private final IBookingService bookingService;
+
     @PostMapping("/create")
-    public ResponseEntity<EnumBookingStatus.BookingStatus> createBooking(@RequestBody BookingRequest bookingRequest) throws InterruptedException {
+    public ResponseEntity<EnumBookingStatus.BookingStatus> createBooking(@RequestBody BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException, MessagingException {
         return ResponseEntity.ok(bookingService.createBooking(bookingRequest));
     }
     @GetMapping("/historybooking")
@@ -53,5 +58,11 @@ public class BookingController {
     public ResponseEntity<?> cancelBooking(@PathVariable Long bookingId) throws InterruptedException {
         var cancelBooking = bookingService.returnPointBooking(bookingId);
         return cancelBooking != null ? ResponseEntity.ok(cancelBooking) : ResponseEntity.badRequest().body("Can not cancel booking");
+    }
+    @GetMapping("/getqrcode/{uuid}")
+    public ResponseEntity<?> generateQr(@PathVariable String uuid) throws IOException, WriterException {
+        var history = bookingService.historyBookingByUUID(uuid);
+        return history != null ? ResponseEntity.ok(history) : ResponseEntity.badRequest().body("Not Found");
+
     }
 }
