@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.entity.booking;
 
 import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,8 @@ public class IssueBooking extends BaseEntityAudit {
     private Long id;
     @Column(name = "book_id", nullable = false)
     private Long bookingId;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "book_id", referencedColumnName = "book_id", nullable = false,
             insertable = false,

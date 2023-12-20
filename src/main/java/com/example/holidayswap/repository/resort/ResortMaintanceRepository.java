@@ -16,15 +16,15 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
     List<ResortMaintance> findAllByTypeAndResortId(ResortStatus resortStatus, Long resortId);
 
     @Query(value = """
-            select r from resort_maintaince r
+            select r.* from resort_maintaince r
             where r.resort_id = ?1 and r.type = ?4 and (( date (?2) > date (r.start_date) AND date (?2) < date (r.end_date))
                             OR (date (?3) > date (r.start_date) AND date (?3) < date (r.end_date))
                             OR( date  (?2) <= date (r.start_date) AND date (?3) >= date (r.end_date) ))
                          """, nativeQuery = true)
-    ResortMaintance findByResortIdAndStartDateAndEndDateAndType(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus);
+    ResortMaintance findByResortIdAndStartDateAndEndDateAndType(Long resortId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
 
     @Query(value = """
-            select r from resort_maintaince r
+            select r.* from resort_maintaince r
             where r.resort_id = ?1 and (( date (?2) >= date (r.start_date) AND date (?2) <= date (r.end_date)))
                          """, nativeQuery = true)
     ResortMaintance findByResortIdAndStartDate(Long resortId, LocalDateTime startDate);

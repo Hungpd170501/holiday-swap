@@ -3,6 +3,7 @@ package com.example.holidayswap.domain.entity.booking;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.rating.Rating;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -90,8 +91,10 @@ public class Booking {
      @Column(name ="transfer_status")
      private EnumBookingStatus.TransferStatus transferStatus;
 
+     @JsonIgnore
      @OneToMany(mappedBy = "booking")
      private Set<IssueBooking> issueBookings;
+
     @OneToOne(mappedBy = "booking")
     private Rating rating;
 
