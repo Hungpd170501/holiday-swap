@@ -9,4 +9,5 @@ public interface IIssueBookingService {
     void createIssueBooking(Long bookingId, String issue);
     void updateIssueBooking(Long issuedId, String note, EnumBookingStatus.IssueBookingStatus status) throws InterruptedException;
     List<IssueBooking> getAllIssueBooking();
+    IssueBooking getIssueBookingById(Long issueId);
 }

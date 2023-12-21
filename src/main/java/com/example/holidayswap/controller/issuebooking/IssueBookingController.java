@@ -20,4 +20,8 @@ public class IssueBookingController {
     public ResponseEntity<?> getAllIssueBooking(){
        return ResponseEntity.ok().body(issueBookingService.getAllIssueBooking());
     }
+    @GetMapping("/get-issue-booking-by-id/{issueId}")
+    public ResponseEntity<?> getIssueBookingById(@PathVariable("issueId") Long issueId){
+        return ResponseEntity.ok().body(issueBookingService.getIssueBookingById(issueId));
+    }
 }
