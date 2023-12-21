@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.dto.request.resort.ResortUpdateRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.Resort;
+import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
@@ -19,6 +20,7 @@ import com.example.holidayswap.repository.address.CountryRepository;
 import com.example.holidayswap.repository.address.DistrictRepository;
 import com.example.holidayswap.repository.address.StateOrProvinceRepository;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
+import com.example.holidayswap.repository.resort.ResortMaintanceRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
 import com.example.holidayswap.service.address.LocationService;
@@ -32,6 +34,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +58,7 @@ public class ResortServiceImpl implements ResortService {
     private final CountryRepository countryRepository;
     private final IBookingService bookingService;
     private final ResortMapper resortMapper;
+    private final IResortMaintanceService resortMaintanceService;
 
     @Override
     public Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
@@ -192,17 +197,29 @@ public class ResortServiceImpl implements ResortService {
     public void update(Long id, ResortStatus resortStatus) {
         var entity = resortRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         if (resortStatus == ResortStatus.DEACTIVATE) {
-            bookingService.deactiveResortNotifyBookingUser(id);
+//            bookingService.deactiveResortNotifyBookingUser(id, LocalDate.now());
         }
         entity.setStatus(resortStatus);
         Long i = resortRepository.save(entity).getId();
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id, LocalDate startDate ) {
         var inRoomAmenityTypeFound = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
-        bookingService.deactiveResortNotifyBookingUser(id);
+//        bookingService.deactiveResortNotifyBookingUser(id, startDate);
         inRoomAmenityTypeFound.setDeleted(true);
         resortRepository.save(inRoomAmenityTypeFound);
+    }
+
+    @Override
+    public void updateStatus(Long id, ResortStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate) {
+        if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
+        if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
+        var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Resort not available now"));
+        resortMaintanceService.CreateResortMaintance(id, startDate, endDate, resortStatus);
+ // TODO: create issue and notification
+        bookingService.deactiveResortNotifyBookingUser(id, startDate, endDate, resortStatus);
+
+//        resortRepository.save(entity);
     }
 }

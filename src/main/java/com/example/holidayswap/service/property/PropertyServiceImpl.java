@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,16 +159,6 @@ public class PropertyServiceImpl implements PropertyService {
         });
         property.setInRoomAmenities(amenities);
 
-//        Map<Long,String> listOldImage = new HashMap<>();
-//        dtoRequest.getListImageOld().forEach(e -> {
-//            listOldImage.put(e,"image");
-//        });
-//        propertyImageService.gets(id).forEach(e -> {
-//            if (!listOldImage.containsKey(e.getId())){
-//                propertyImageService.delete(e.getId());
-//            }
-//        });
-
         //Delete image
         dtoRequest.getListImageDelete().forEach(propertyImageService::delete);
         //Create image
@@ -184,16 +175,16 @@ public class PropertyServiceImpl implements PropertyService {
     public void update(Long id, PropertyStatus propertyStatus) {
         var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
         if (propertyStatus == PropertyStatus.DEACTIVATE) {
-            bookingService.deactivePropertyNotifyBookingUser(id);
+            bookingService.deactivePropertyNotifyBookingUser(id, LocalDate.now());
         }
         property.setStatus(propertyStatus);
         propertyRepository.save(property);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id, LocalDate startDate) {
         var propertyFound = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
-        bookingService.deactivePropertyNotifyBookingUser(id);
+        bookingService.deactivePropertyNotifyBookingUser(id, startDate);
         propertyFound.setIsDeleted(true);
         propertyRepository.save(propertyFound);
     }

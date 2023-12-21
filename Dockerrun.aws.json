@@ -26,10 +26,7 @@
           "value": "rabbitmq"
         }
       ],
-      "links": [
-        "rabbitmq",
-        "redis"
-      ]
+      "links": ["rabbitmq", "redis"]
     },
     {
       "name": "rabbitmq",

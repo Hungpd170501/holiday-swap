@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PropertyService {
@@ -29,6 +30,5 @@ public interface PropertyService {
 
     void update(Long id, PropertyStatus propertyStatus);
 
-    void delete(Long id);
-
+    void delete(Long id, LocalDate startDate);
 }
