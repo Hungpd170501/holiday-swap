@@ -46,8 +46,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                                           EnumBookingStatus.BookingStatus bookingStatus);
 
     @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
-            "from Booking b inner join b.availableTime at inner join  at.timeFrame tf" +
-            " where tf.id = ?1  and b.status = ?2 and tf.isDeleted = false ")
+            "from Booking b inner join b.availableTime at inner join  at.coOwner co inner join co.timeFrames tf" +
+            " where tf.id = ?1  and b.status = ?2 ")
     List<TimeHasBooked> findAllByTimeFrameIdAndStatus(Long timeFrameId,
                                                           EnumBookingStatus.BookingStatus bookingStatus);
 
@@ -55,14 +55,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)
             from Booking b
             inner join b.availableTime at
-            inner join at.timeFrame tf 
-             where at.timeFrameId = :timeFameId and extract(year from b.checkInDate) = :year """)
-    List<TimeHasBooked> getTimeHasBooked(@Param("timeFameId") Long availableTimeId,
+            inner join at.coOwner co
+            where at.coOwnerId = :coOwnerId and extract(year from b.checkInDate) = :year""")
+    List<TimeHasBooked> getTimeHasBooked(@Param("coOwnerId") Long coOwnerId,
                                          @Param("year") int year);
     @Query("select " +
             "CASE WHEN count(b) > 0 THEN TRUE ELSE FALSE END" +
-            " from Booking b inner join b.availableTime at inner join at.timeFrame tf inner join tf" +
-            ".coOwner co" +
+            " from Booking b inner join b.availableTime at inner join at.coOwner co inner join co" +
+            ".timeFrames tf" +
             " where b.userBookingId = :userId and at.id = :availableTimeId")
     boolean IsUserBooKed(
             @Param("availableTimeId") Long availableTimeId, @Param("userId") Long userId
@@ -70,8 +70,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select " +
             "CASE WHEN date(:now) > date(b.checkOutDate) THEN TRUE ELSE FALSE END" +
-            " from Booking b inner join b.availableTime at inner join at.timeFrame tf inner join tf" +
-            ".coOwner co" +
+            " from Booking b inner join b.availableTime at inner join at.coOwner co inner join co.timeFrames tf" +
             " where b.id = :bookingId")
     boolean isDoneTraveled(
             @Param("bookingId") Long bookingId, @Param("now") Date now
