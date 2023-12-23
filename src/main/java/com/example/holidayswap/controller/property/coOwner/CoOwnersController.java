@@ -46,7 +46,7 @@ public class CoOwnersController {
 
     @PostMapping
     public ResponseEntity<?> create(
-            @RequestBody @Valid CoOwnerRequest dtoRequest,
+            @RequestPart @Valid CoOwnerRequest dtoRequest,
             @RequestPart List<MultipartFile> contractImages
     ) {
         if (contractImages.isEmpty()) throw new DataIntegrityViolationException("Contract image can not be empty!.");
