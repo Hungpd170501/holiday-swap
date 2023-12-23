@@ -15,8 +15,10 @@ public interface CoOwnerMapper {
     CoOwnerResponse toDtoResponse(CoOwner entity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "timeFrames", ignore = true)
     CoOwner toEntity(CoOwnerRequest propertyContractRequest);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "timeFrames", ignore = true)
     void updateEntityFromDTO(CoOwnerRequest dto, @MappingTarget CoOwner entity);
 }

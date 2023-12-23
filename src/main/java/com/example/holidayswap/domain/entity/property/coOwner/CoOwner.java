@@ -2,13 +2,17 @@ package com.example.holidayswap.domain.entity.property.coOwner;
 
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.Property;
+import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.Collection;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,13 +22,15 @@ import java.util.Date;
 @Builder
 @Table(name = "co_owner")
 public class CoOwner {
-    @EmbeddedId
-    private CoOwnerId id;
-    @Column(name = "start_time")
-    private Date startTime;
+    @Id
+    @Column(name = "co_owner_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "start_time", columnDefinition = "date")
+    private LocalDate startTime;
 
-    @Column(name = "end_time")
-    private Date endTime;
+    @Column(name = "end_time", columnDefinition = "date")
+    private LocalDate endTime;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
@@ -39,21 +45,43 @@ public class CoOwner {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "coOwner", fetch = FetchType.LAZY)
-    private Collection<ContractImage> contractImages;
+    @Column(name = "property_id")
+    @NotNull
+    private Long propertyId;
 
-    @OneToMany(mappedBy = "coOwner", fetch = FetchType.LAZY)
-    private Collection<TimeFrame> timeFrames;
-
-    @MapsId("propertyId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "property_id", nullable = false)
+    @JoinColumn(name = "property_id",
+            referencedColumnName = "property_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
     private Property property;
 
-    @MapsId("userId")
+    @Column(name = "user_id")
+    @NotNull
+    private Long userId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
     private User user;
-    @Column(name = "create_date")
-    private Date createDate;
+
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "room_id", nullable = false)
+    private String roomId;
+
+    @Column(name = "create_date", columnDefinition = "date")
+    private LocalDate createDate;
+
+    @OneToMany(mappedBy = "coOwner")
+    private Set<ContractImage> contractImages = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "coOwner")
+    private Set<TimeFrame> timeFrames = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "coOwner")
+    private List<AvailableTime> availableTimes;
 }

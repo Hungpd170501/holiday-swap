@@ -4,14 +4,14 @@ import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 public class AvailableTimeResponse {
     private Long id;
-    private Date startTime;
-    private Date endTime;
+    private LocalDate startTime;
+    private LocalDate endTime;
     private double pricePerNight;
     private boolean isDeleted;
     private AvailableTimeStatus status;

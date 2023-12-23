@@ -47,7 +47,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
 //            e.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
             var propertyImages = propertyImageService.gets(e.getProperty().getId());
             e.getProperty().setPropertyImage(propertyImages);
-            e.getProperty().setRating(ratingService.getRatingOfProperty(e.getProperty().getId(), e.getCoOwnerId().getRoomId()));
+            e.getProperty().setRating(ratingService.getRatingOfProperty(e.getProperty().getId(), e.getCoOwner().getRoomId()));
         });
         return response;
     }
@@ -77,7 +77,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
             response.getProperty().setPropertyImage(propertyImages);
             response.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
 //            response.getProperty().setRating(ratingRepository.calculateRating(dto.getProperty().getId(), dto.getCoOwnerId().getRoomId()));
-            response.getProperty().setRating(ratingService.getRatingOfProperty(response.getProperty().getId(), response.getCoOwnerId().getRoomId()));
+            response.getProperty().setRating(ratingService.getRatingOfProperty(response.getProperty().getId(), response.getCoOwner().getRoomId()));
         }
         return response;
     }

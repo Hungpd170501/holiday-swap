@@ -7,8 +7,4 @@ public class ContractImageResponse {
     private Long id;
     private String link;
     private boolean isDeleted;
-    private Long propertyId;
-    private Long userId;
-    private String roomId;
-
 }
