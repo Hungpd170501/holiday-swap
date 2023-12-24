@@ -1,24 +1,31 @@
 package com.example.holidayswap.service.resort;
 
 import com.example.holidayswap.domain.entity.resort.ResortMaintance;
+import com.example.holidayswap.domain.entity.resort.ResortMaintanceImage;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.exception.ResourceNotFoundException;
 import com.example.holidayswap.repository.resort.ResortMaintanceRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
+import com.example.holidayswap.service.FileService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
-public class ResortMaintanceServiceImpl implements IResortMaintanceService {
+public class ResortMaintanceServiceImpl implements IResortMaintanceService  {
 
+    private final FileService fileService;
     private final ResortMaintanceRepository resortMaintanceRepository;
     private final ResortRepository resortRepository;
 
     @Override
-    public void CreateResortMaintance(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus) {
+    public List<String>  CreateResortMaintance(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus, List<MultipartFile> resortImage) {
         var checkResort = resortRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Resort not found"));
         var checkIsDeactivate = resortMaintanceRepository.findAllByTypeAndResortId(ResortStatus.DEACTIVATE,resortId);
         ResortMaintance checkIsMaintance = null;
@@ -32,6 +39,16 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService {
         if(checkIsMaintance != null) {
             throw new RuntimeException("Resort is already in maintenance");
         }
+        Set<ResortMaintanceImage> listimage = new HashSet<>();
+        resortImage.forEach(image -> {
+            try {
+                ResortMaintanceImage resortMaintanceImage = new ResortMaintanceImage();
+                 resortMaintanceImage.setImageUrl(fileService.uploadFile(image));
+                    listimage.add(resortMaintanceImage);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         ResortMaintance resortMaintance = new ResortMaintance();
 
@@ -40,7 +57,9 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService {
             resortMaintance.setType(resortStatus);
             resortMaintance.setResortId(resortId);
             resortMaintance.setResort(checkResort);
+            resortMaintance.setResortMaintanceImage(listimage);
             resortMaintanceRepository.save(resortMaintance);
+            return listimage.stream().map(ResortMaintanceImage::getImageUrl).toList().stream().toList();
     }
 
     @Override
@@ -67,6 +86,11 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService {
             checkResort.setStatus(ResortStatus.ACTIVE);
         }else return;
         resortRepository.save(checkResort);
+    }
+
+    @Override
+    public List<ResortMaintance> getResortMaintanceByResortId(Long resortId) {
+        return resortMaintanceRepository.findAllByResortId(resortId);
     }
 
 

@@ -12,6 +12,7 @@ import com.example.holidayswap.service.resort.ResortImageService;
 import com.example.holidayswap.service.resort.ResortService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -125,8 +127,9 @@ public class ResortsController {
         return ResponseEntity.noContent().build();
     }
     @PutMapping("/updateStatus")
-    public  ResponseEntity<Void> updateStatusResort(@RequestBody ResortRequestUpdate resortUpdateRequest){
-        resortService.updateStatus(resortUpdateRequest.getResortId(), resortUpdateRequest.getResortStatus(), resortUpdateRequest.getStartDate(), resortUpdateRequest.getEndDate());
+    public  ResponseEntity<Void> updateStatusResort(@RequestPart ResortRequestUpdate resortUpdateRequest,
+                                                    @RequestPart(required = false) List<MultipartFile> resortImage) throws MessagingException, IOException {
+        resortService.updateStatus(resortUpdateRequest.getResortId(), resortUpdateRequest.getResortStatus(), resortUpdateRequest.getStartDate(), resortUpdateRequest.getEndDate(), resortImage);
         return ResponseEntity.noContent().build();
     }
 }
