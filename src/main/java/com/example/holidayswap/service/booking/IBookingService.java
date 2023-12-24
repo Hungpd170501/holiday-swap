@@ -7,10 +7,13 @@ import com.example.holidayswap.domain.dto.response.booking.HistoryBookingRespons
 import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.google.zxing.WriterException;
 import jakarta.mail.MessagingException;
 
+import java.time.LocalDate;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IBookingService {
@@ -26,12 +29,12 @@ public interface IBookingService {
 
     List<TimeHasBooked> getTimeHasBooked(Long timeFrameId, int year);
 
-    void deactiveResortNotifyBookingUser(Long resortId);
+    void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus);
 
-    void deactivePropertyNotifyBookingUser(Long propertyId);
+    void deactivePropertyNotifyBookingUser(Long propertyId, LocalDate startDate);
 
     String returnPointBooking(Long bookingId) throws InterruptedException;
 
+    void refundPointBookingToOwner(LocalDate date);
     HistoryBookingDetailResponse historyBookingByUUID(String uuid);
-
 }

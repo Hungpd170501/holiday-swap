@@ -6,7 +6,7 @@ import com.example.holidayswap.domain.entity.payment.TransactionBookingRefundOwn
 import java.util.List;
 
 public interface ITransactionBookingRefundOwnerService {
-    public void saveLog(long fromBookingId, long toMemberId, Double amount, EnumPaymentStatus.BankCodeError resultCode, String detail, String createdOn, Double memberBalance);
+    void saveLog(long fromBookingId, long toMemberId, Double amount, EnumPaymentStatus.BankCodeError resultCode, String detail, String createdOn, Double memberBalance);
 
     List<TransactionBookingRefundOwner> getTransactionBookingRefundOwnerByUserId(long id);
 
