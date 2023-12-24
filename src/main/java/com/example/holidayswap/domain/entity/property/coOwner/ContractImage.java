@@ -25,7 +25,6 @@ public class ContractImage {
     @Column(name = "co_owner_id")
     @NotNull
     private Long coOwnerId;
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "co_owner_id", referencedColumnName = "co_owner_id",
             nullable = false,
