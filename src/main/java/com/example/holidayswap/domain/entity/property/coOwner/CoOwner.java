@@ -10,9 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -77,10 +75,10 @@ public class CoOwner {
     private LocalDate createDate;
 
     @OneToMany(mappedBy = "coOwner")
-    private Set<ContractImage> contractImages = new LinkedHashSet<>();
+    private List<ContractImage> contractImages;
 
     @OneToMany(mappedBy = "coOwner")
-    private Set<TimeFrame> timeFrames = new LinkedHashSet<>();
+    private List<TimeFrame> timeFrames;
 
     @OneToMany(mappedBy = "coOwner")
     private List<AvailableTime> availableTimes;

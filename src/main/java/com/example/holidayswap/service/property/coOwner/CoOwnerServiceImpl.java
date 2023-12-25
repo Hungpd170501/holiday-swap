@@ -33,7 +33,6 @@ import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.example.holidayswap.constants.ErrorMessage.*;
 
@@ -67,7 +66,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     public CoOwnerResponse get(Long coOwnerId) {
         var coOwner = coOwnerRepository.findById(coOwnerId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         coOwner.setAvailableTimes(coOwner.getAvailableTimes().stream().filter(a -> !a.isDeleted() && a.getStatus() == AvailableTimeStatus.OPEN).toList());
-        coOwner.setContractImages(coOwner.getContractImages().stream().filter(e -> !e.getIsDeleted()).collect(Collectors.toSet()));
+        coOwner.setContractImages(coOwner.getContractImages().stream().filter(e -> !e.getIsDeleted()).toList());
         var rs = CoOwnerMapper.INSTANCE.toDtoResponse(coOwner);
         var resort = resortService.get(coOwner.getPropertyId());
 //        var listTimeFrame = timeFrameRepository.findAllByPropertyIdAAndUserIdAndRoomId(propertyId, userId, roomId);
