@@ -2,11 +2,11 @@ package com.example.holidayswap.domain.dto.request.property.timeFrame;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 public class AvailableTimeRequest {
-    private Date startTime;
-    private Date endTime;
+    private LocalDate startTime;
+    private LocalDate endTime;
     private double pricePerNight;
 }

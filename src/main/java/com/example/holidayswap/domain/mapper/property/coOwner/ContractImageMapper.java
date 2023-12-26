@@ -2,7 +2,6 @@ package com.example.holidayswap.domain.mapper.property.coOwner;
 
 import com.example.holidayswap.domain.dto.request.property.coOwner.ContractImageRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.ContractImageResponse;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractImage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,7 +16,7 @@ public interface ContractImageMapper {
 
     ContractImage toEntity(ContractImageRequest dtoRequest);
 
-    ContractImage toEntityFromEmbeddedId(CoOwnerId coOwnerId);
+//    ContractImage toEntityFromEmbeddedId(CoOwnerId coOwnerId);
 
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(ContractImageRequest dto, @MappingTarget ContractImage entity);

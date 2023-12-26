@@ -30,6 +30,6 @@ public class PropertyResponse {
     private PropertyTypeResponse propertyType;
     private PropertyViewResponse propertyView;
     private List<InRoomAmenityTypeResponse> inRoomAmenityType;
-    private List<PropertyImageResponse> propertyImage;
+    private List<PropertyImageResponse> propertyImages;
     private Double rating;
 }
