@@ -43,6 +43,8 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final PropertyRepository propertyRepository;
 
     List<Integer> numberOfWeeks(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isBefore(LocalDate.now()))
+            throw new DataIntegrityViolationException("Date must greater than now!.");
         int addWeek = 0;
 //        if (startDate.get(WeekFields.ISO.weekOfYear()) < endDate.get(WeekFields.ISO.weekOfYear())) {
 //            addWeek = 1;
