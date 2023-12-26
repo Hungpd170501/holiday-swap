@@ -231,4 +231,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = "select a.* from available_time  a where a.co_owner_id  = :coOwnerId and EXTRACT (YEAR FROM A.start_time) = :year", nativeQuery = true)
     List<AvailableTime> findByCoOwnerIdAndYear(@Param("coOwnerId") Long coOwnerId, @Param("year") int year);
+
+    Page<AvailableTime> findAllByCoOwnerId(Long coOwnerId, Pageable pageable);
 }

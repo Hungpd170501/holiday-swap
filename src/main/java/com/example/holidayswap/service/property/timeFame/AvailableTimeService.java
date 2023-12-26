@@ -20,7 +20,7 @@ public interface AvailableTimeService {
 
     Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable);
 
-    List<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId);
+    Page<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId, Pageable pageable);
 
     AvailableTimeResponse get(Long id);
 

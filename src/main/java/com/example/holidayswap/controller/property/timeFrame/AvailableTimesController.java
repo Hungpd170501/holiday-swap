@@ -20,15 +20,15 @@ import java.util.List;
 public class AvailableTimesController {
     private final AvailableTimeService availableTimeService;
 
-    @GetMapping("/time-frames")
-    public ResponseEntity<Page<AvailableTimeResponse>> getAllByTimeFrameId(
-            @RequestParam(value = "timeFrameId") Long timeFrameId,
+    @GetMapping("/co-owner/{CoOwnerId}")
+    public ResponseEntity<Page<AvailableTimeResponse>> getAllByCoOwnerId(
+            @PathVariable(value = "CoOwnerId") Long CoOwnerId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        var dtoResponses = availableTimeService.getAllByVacationUnitId(timeFrameId, pageable);
+        var dtoResponses = availableTimeService.getAllByCoOwnerId(CoOwnerId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
