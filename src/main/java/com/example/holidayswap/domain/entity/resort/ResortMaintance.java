@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.resort;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class ResortMaintance {
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ResortStatus type;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "resort_id", referencedColumnName = "resort_id", nullable = false,
             insertable = false,
