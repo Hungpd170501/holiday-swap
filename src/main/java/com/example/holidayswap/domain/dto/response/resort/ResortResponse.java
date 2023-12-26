@@ -2,6 +2,7 @@ package com.example.holidayswap.domain.dto.response.resort;
 
 import com.example.holidayswap.domain.dto.response.property.PropertyTypeResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
+import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import lombok.Data;
 
@@ -24,4 +25,5 @@ public class ResortResponse {
     private String postalCode;
     private Float latitude;
     private Float longitude;
+    private List<ResortMaintance> resortMaintances;
 }

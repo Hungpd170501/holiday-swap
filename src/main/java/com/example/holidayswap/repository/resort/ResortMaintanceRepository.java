@@ -31,4 +31,7 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
 
     @Query("select r from ResortMaintance r where r.resortId = ?1 and r.type = ?2")
     ResortMaintance findByResortIdAndType(Long resortId, ResortStatus resortStatus);
+
+    @Query("select r from ResortMaintance r where r.resortId = ?1")
+    List<ResortMaintance> findAllByResortId(Long resortId);
 }

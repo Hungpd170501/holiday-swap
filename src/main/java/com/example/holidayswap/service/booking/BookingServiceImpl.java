@@ -280,7 +280,7 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus) {
+    public void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus,List<String> listImage) throws IOException, MessagingException {
         ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         List<Booking> bookingList = new ArrayList<>();
         //get list booking of resort and date booking is after current date

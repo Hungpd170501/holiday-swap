@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "resort_maintaince")
@@ -33,4 +34,6 @@ public class ResortMaintance {
             insertable = false,
             updatable = false)
     private Resort resort;
+    @OneToMany(mappedBy = "resortMaintance", cascade = CascadeType.ALL)
+    private Set<ResortMaintanceImage> resortMaintanceImage;
 }
