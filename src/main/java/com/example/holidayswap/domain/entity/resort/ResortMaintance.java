@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -37,5 +38,5 @@ public class ResortMaintance {
             updatable = false)
     private Resort resort;
     @OneToMany(mappedBy = "resortMaintance", cascade = CascadeType.ALL)
-    private Set<ResortMaintanceImage> resortMaintanceImage;
+    private List<ResortMaintanceImage> resortMaintanceImage;
 }
