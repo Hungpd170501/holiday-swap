@@ -26,6 +26,7 @@ import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository
 import com.example.holidayswap.service.address.LocationService;
 import com.example.holidayswap.service.booking.IBookingService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityTypeService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class ResortServiceImpl implements ResortService {
     private final ResortMapper resortMapper;
     private final IResortMaintanceService resortMaintanceService;
 
+
     @Override
     public Page<ResortResponse> gets(String locationName, String name, Set<Long> listOfResortAmenity, ResortStatus resortStatus, Pageable pageable) {
         Page<Resort> entities = null;
@@ -82,6 +85,7 @@ public class ResortServiceImpl implements ResortService {
     public ResortResponse get(Long id) {
         var entity = resortRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
+        dtoResponse.setResortMaintances(resortMaintanceService.getResortMaintanceByResortId(id));
 
         dtoResponse.setResortImages(resortImageService.gets(id));
         dtoResponse.setResortAmenityTypes(resortAmenityTypeService.gets(entity.getId()));
@@ -211,14 +215,15 @@ public class ResortServiceImpl implements ResortService {
         resortRepository.save(inRoomAmenityTypeFound);
     }
 
+    @Transactional
     @Override
-    public void updateStatus(Long id, ResortStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate) {
+    public void updateStatus(Long id, ResortStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException {
         if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
         if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
         var entity = resortRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Resort not available now"));
-        resortMaintanceService.CreateResortMaintance(id, startDate, endDate, resortStatus);
+        List<String> listImage = resortMaintanceService.CreateResortMaintance(id, startDate, endDate, resortStatus, resortImage);
  // TODO: create issue and notification
-        bookingService.deactiveResortNotifyBookingUser(id, startDate, endDate, resortStatus);
+        bookingService.deactiveResortNotifyBookingUser(id, startDate, endDate, resortStatus, listImage);
 
 //        resortRepository.save(entity);
     }

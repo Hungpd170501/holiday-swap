@@ -122,12 +122,11 @@ public class EmailService {
     }
 
     public void sendConfirmBookedHtml(Booking booking, String email) throws MessagingException {
-        ;
         Map<String, Object> attribute = new HashMap<>();
         attribute.put("qrCode", booking.getQrcode());
-        attribute.put("propertyName", booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getPropertyName());
-        attribute.put("resortName", booking.getAvailableTime().getTimeFrame().getCoOwner().getProperty().getResort().getResortName());
-        attribute.put("owner", booking.getAvailableTime().getTimeFrame().getCoOwner().getUser().getUsername());
+        attribute.put("propertyName", booking.getAvailableTime().getCoOwner().getProperty().getPropertyName());
+        attribute.put("resortName", booking.getAvailableTime().getCoOwner().getProperty().getResort().getResortName());
+        attribute.put("owner", booking.getAvailableTime().getCoOwner().getUser().getUsername());
         attribute.put("checkInDate", Helper.convertDateToString(booking.getCheckInDate()));
         attribute.put("checkOutDate", Helper.convertDateToString(booking.getCheckOutDate()));
         attribute.put("bookingDate", booking.getDateBooking());

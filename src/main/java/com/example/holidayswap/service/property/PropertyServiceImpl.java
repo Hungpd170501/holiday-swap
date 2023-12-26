@@ -57,7 +57,7 @@ public class PropertyServiceImpl implements PropertyService {
         var dtoResponse = entities.map(propertyMapper::toDtoResponse);
         dtoResponse.forEach(e -> {
             var propertyImages = propertyImageService.gets(e.getId());
-            e.setPropertyImage(propertyImages);
+            e.setPropertyImages(propertyImages);
 //            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getId());
 //            e.setInRoomAmenityType(inRoomAmenityTypeResponses);
 //            e.setRating(ratingRepository.calculateRating(e.getId()));
@@ -79,7 +79,7 @@ public class PropertyServiceImpl implements PropertyService {
         var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(entity.getId());
         var propertyImages = propertyImageService.gets(entity.getId());
         dtoResponse.setInRoomAmenityType(inRoomAmenityTypeResponses);
-        dtoResponse.setPropertyImage(propertyImages);
+        dtoResponse.setPropertyImages(propertyImages);
         return dtoResponse;
     }
 
@@ -93,7 +93,7 @@ public class PropertyServiceImpl implements PropertyService {
             var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getId());
             var propertyImages = propertyImageService.gets(e.getId());
             e.setInRoomAmenityType(inRoomAmenityTypeResponses);
-            e.setPropertyImage(propertyImages);
+            e.setPropertyImages(propertyImages);
         });
         return dtoResponse;
     }

@@ -29,7 +29,7 @@ public interface IBookingService {
 
     List<TimeHasBooked> getTimeHasBooked(Long timeFrameId, int year);
 
-    void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus);
+    void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus,List<String> listImage) throws IOException, MessagingException;
 
     void deactivePropertyNotifyBookingUser(Long propertyId, LocalDate startDate);
 
