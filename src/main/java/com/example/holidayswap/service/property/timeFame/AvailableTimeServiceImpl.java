@@ -4,10 +4,9 @@ import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTi
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
+import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -16,65 +15,86 @@ import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
-import com.example.holidayswap.repository.property.timeFrame.TimeFrameRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
-import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.holidayswap.constants.ErrorMessage.*;
+import static com.example.holidayswap.constants.ErrorMessage.AVAILABLE_TIME_NOT_FOUND;
+import static com.example.holidayswap.constants.ErrorMessage.CO_OWNER_NOT_FOUND;
+import static java.time.temporal.ChronoUnit.WEEKS;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final AvailableTimeRepository availableTimeRepository;
-    private final TimeFrameRepository timeFrameRepository;
-    private final AuthUtils authUtils;
     private final CoOwnerRepository coOwnerRepository;
-    private final AvailableTimeMapper availableTimeMapper;
     private final BookingRepository bookingRepository;
     private final ResortRepository resortRepository;
     private final PropertyRepository propertyRepository;
 
+    List<Integer> numberOfWeeks(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isBefore(LocalDate.now()))
+            throw new DataIntegrityViolationException("Date must greater than now!.");
+        int addWeek = 0;
+//        if (startDate.get(WeekFields.ISO.weekOfYear()) < endDate.get(WeekFields.ISO.weekOfYear())) {
+//            addWeek = 1;
+//        }
+        long weeks = WEEKS.between(startDate, endDate) + addWeek;//Get the number of weeks in your case (52)
+        List<Integer> numberWeeks = new ArrayList<>();
+        if (weeks >= 0) {
+            int week = 0;
+            do {
+                //Get the number of week
+                LocalDate dt = startDate.plusWeeks(week);
+                int weekNumber = dt.get(WeekFields.ISO.weekOfYear());
+//                numberWeeks.add(String.format("%d-W%d", dt.getYear(), weekNumber));
+                numberWeeks.add(weekNumber);
+                week++;
+            } while (week <= weeks);
+        }
+        return numberWeeks;
+    }
+
+    void isOverlaps(LocalDate startTime, LocalDate endTime) {
+        var overlaps = availableTimeRepository.isOverlaps(startTime, endTime);
+        if (overlaps.isPresent()) throw new DataIntegrityViolationException("Overlaps with other public time!.");
+    }
+
     @Override
-    public Page<AvailableTimeResponse> getAllByVacationUnitId(Long timeFrameId, Pageable pageable) {
-        var availableTimePage = availableTimeRepository.findAllByVacationUnitIdAndDeletedIsFalse(timeFrameId, pageable);
-        Page<AvailableTimeResponse> availableTimePageResponse = availableTimePage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
-        return availableTimePageResponse;
+    public Page<AvailableTimeResponse> getAllByVacationUnitId(Long vacationId, Pageable pageable) {
+        return null;
     }
 
     @Override
     public Page<AvailableTimeResponse> getAllByPropertyId(Long propertyId, Pageable pageable) {
-        var availableTimePage = availableTimeRepository.findAllByPropertyIdAndDeletedFalse(propertyId, pageable);
-        Page<AvailableTimeResponse> availableTimePageResponse = availableTimePage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
-        return availableTimePageResponse;
+        return null;
     }
 
     @Override
-    public List<AvailableTimeResponse> getAllByTimeFrameIdAndYear(Long timeFrameId, int year) {
-        var list = availableTimeRepository.findAllByTimeFrameIdAndYear(timeFrameId, year);
-
-        return list.stream().map(availableTimeMapper::toDtoResponse).collect(Collectors.toList());
+    public List<AvailableTimeResponse> getAllByCoOwnerIdAndYear(Long coOwnerId, int year) {
+        var list = availableTimeRepository.findByCoOwnerIdAndYear(coOwnerId, year);
+        return list.stream().map(AvailableTimeMapper.INSTANCE::toDtoResponse).collect(Collectors.toList());
     }
 
     @Override
     public Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable) {
-        var availableTimePage = availableTimeRepository.findAllByResortIdAndDeletedFalse(resortId, pageable);
-        Page<AvailableTimeResponse> availableTimePageResponse = availableTimePage.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
-        return availableTimePageResponse;
+        return null;
     }
 
     @Override
-    public List<AvailableTimeResponse> getAllByCoOwnerId(CoOwnerId coOwnerId) {
-        var availableTimeList = availableTimeRepository.findAllByCoOwnerId(coOwnerId.getPropertyId(), coOwnerId.getUserId(), coOwnerId.getRoomId());
-        List<AvailableTimeResponse> responses = availableTimeList.stream().map(availableTimeMapper::toDtoResponse).collect(Collectors.toList());
+    public Page<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId, Pageable pageable) {
+        var availableTimeList = availableTimeRepository.findAllByCoOwnerId(coOwnerId, pageable);
+        Page<AvailableTimeResponse> responses = availableTimeList.map(AvailableTimeMapper.INSTANCE::toDtoResponse);
         return responses;
     }
 
@@ -87,20 +107,12 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     }
 
     @Override
-    public AvailableTimeResponse create(Long timeFrameId, AvailableTimeRequest dtoRequest) {
-        Date currentDate = new Date();
-        if (dtoRequest.getStartTime().after(dtoRequest.getEndTime()))
-            throw new DataIntegrityViolationException("Start time must be before end time");
-        if (dtoRequest.getStartTime().before(currentDate) || dtoRequest.getEndTime().before(currentDate)) {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            throw new DataIntegrityViolationException("Date must after " + formatter.format(currentDate));
+    public void create(Long coOwnerId, AvailableTimeRequest rq) {
+        var co = coOwnerRepository.findById(coOwnerId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        if (co.getStatus() != CoOwnerStatus.ACCEPTED) {
+            throw new DataIntegrityViolationException("This Co-Owner is not accepted! Please contact for Staff!");
         }
-        var timeFrame = timeFrameRepository.findByIdAndIsDeletedIsFalse(timeFrameId).orElseThrow(() -> new EntityNotFoundException(TIME_FRAME_NOT_FOUND));
-        authUtils.isBelongToMember(timeFrame.getUserId());
-        if (timeFrame.getStatus() == TimeFrameStatus.PENDING)
-            throw new DataIntegrityViolationException("TIME-FRAME is not accepted. Please contact to staff.");
-        //check proeprty
-        var property = propertyRepository.findById(timeFrame.getPropertyId()).orElseThrow(() -> new EntityNotFoundException("Apartment not found"));
+        var property = propertyRepository.findById(co.getPropertyId()).orElseThrow(() -> new EntityNotFoundException("Apartment not found"));
         if (property.getIsDeleted())
             throw new DataIntegrityViolationException("Apartment is deleted!. Please contact to Holiday Swap to more information!.");
         if (property.getStatus() != PropertyStatus.ACTIVE)
@@ -111,43 +123,33 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
             throw new DataIntegrityViolationException("Resort is deleted!. Please contact to Holiday Swap to more information!.");
         if (resort.getStatus() != ResortStatus.ACTIVE)
             throw new DataIntegrityViolationException("Resort is DEACTIVATE!. Please contact to Holiday Swap to more information!.");
-        //check is in Time-frame
-        var isInTimeFrame = timeFrameRepository.isMatchingTimeFrames(timeFrameId, dtoRequest.getStartTime(), dtoRequest.getEndTime(), TimeFrameStatus.ACCEPTED.name()).orElseThrow(() -> new EntityNotFoundException("Date input is not in range of timeframe"));
-        var isInCoOwnerTime = coOwnerRepository.isMatchingCoOwner(isInTimeFrame.getPropertyId(), isInTimeFrame.getUserId(), isInTimeFrame.getRoomId(), dtoRequest.getStartTime(), dtoRequest.getEndTime(), CoOwnerStatus.ACCEPTED.name()).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
-        var checkDuplicateWhichAny = availableTimeRepository.findOverlapsWhichAnyTimeDeposit(timeFrameId, dtoRequest.getStartTime(), dtoRequest.getEndTime(), AvailableTimeStatus.OPEN.name());
-        if (!checkDuplicateWhichAny.isEmpty())
-            throw new DataIntegrityViolationException("Duplicate with another time!.");
-        //check if have any booking on its time.
-        var checkIsHaveAnyBookingYet = bookingRepository.checkTimeFrameIsHaveAnyBookingYetInTheTimeYet(dtoRequest.getStartTime(), dtoRequest.getEndTime(), timeFrameId);
-        if (!checkIsHaveAnyBookingYet.isEmpty())
-            throw new DataIntegrityViolationException("This time have a booking already, Please create in another date");
-        var availableTime = AvailableTimeMapper.INSTANCE.toEntity(dtoRequest);
-        availableTime.setStatus(AvailableTimeStatus.OPEN);
-        availableTime.setTimeFrameId(timeFrameId);
-        var availableTimeCreated = availableTimeRepository.save(availableTime);
-        return AvailableTimeMapper.INSTANCE.toDtoResponse(availableTimeCreated);
+        var listWeek = numberOfWeeks(rq.getStartTime(), rq.getEndTime());
+        List<Integer> listWeekInCo = co.getTimeFrames().stream().map(TimeFrame::getWeekNumber).toList();
+        for (Integer w : listWeek) {
+            boolean flagIsBelongInCoO = listWeekInCo.contains(w);
+            if (!flagIsBelongInCoO) throw new DataIntegrityViolationException("Date is not in range!.");
+        }
+        var at = AvailableTimeMapper.INSTANCE.toEntity(rq);
+        isOverlaps(rq.getStartTime(), rq.getEndTime());
+        at.setStatus(AvailableTimeStatus.OPEN);
+        at.setCoOwnerId(coOwnerId);
+        availableTimeRepository.save(at);
     }
 
     @Override
-    public AvailableTimeResponse update(Long id, AvailableTimeRequest availableTimeRequest) {
-        var availableTime = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
-        AvailableTimeMapper.INSTANCE.updateEntityFromDTO(availableTimeRequest, availableTime);
-        var availableTimeCreated = availableTimeRepository.save(availableTime);
-        return AvailableTimeMapper.INSTANCE.toDtoResponse(availableTimeCreated);
+    public void update(Long id, AvailableTimeRequest timeOffDepositRequest) {
+
     }
 
     @Override
-    public AvailableTimeResponse update(Long id, AvailableTimeStatus availableTimeStatus) {
-        var availableTime = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
-        availableTime.setStatus(availableTimeStatus);
-        var availableTimeCreated = availableTimeRepository.save(availableTime);
-        return AvailableTimeMapper.INSTANCE.toDtoResponse(availableTime);
+    public void update(Long id, AvailableTimeStatus availableTimeStatus) {
+
     }
 
     @Override
     public void delete(Long id) {
-        var availableTime = availableTimeRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
-        availableTime.setDeleted(true);
-        availableTimeRepository.save(availableTime);
+        var av = availableTimeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(AVAILABLE_TIME_NOT_FOUND));
+        av.setDeleted(true);
+        availableTimeRepository.save(av);
     }
 }

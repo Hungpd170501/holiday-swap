@@ -1,10 +1,6 @@
 package com.example.holidayswap.repository.resort;
 
 import com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentDTO;
-import com.example.holidayswap.domain.entity.property.PropertyStatus;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
-import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrameStatus;
 import com.example.holidayswap.domain.entity.resort.Resort;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.domain.Page;
@@ -28,45 +24,6 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
     Optional<Resort> findByIdAndIsDeletedIsFalse(@Param(("resortId")) Long id);
 
     @Query("""
-            select  r  from Resort r
-            left join r.propertyTypes pt
-            left join r.amenities ra
-            left join Property p on p.resortId = r.id
-            left join p.inRoomAmenities pa
-            left join CoOwner o on p.id = o.id.propertyId
-            left join TimeFrame v on v.propertyId = p.id
-            left join AvailableTime at on at.timeFrameId = v.id
-            where upper(r.resortName) like upper(concat('%', :name, '%'))
-            and r.isDeleted = false and (:resortStatus is null or r.status = :resortStatus)
-            and p.isDeleted = false and (:propertyStatus is null or p.status = :propertyStatus)
-            and o.isDeleted = false and (:coOwnerStatus is null or o.status = :coOwnerStatus)
-            and v.isDeleted = false and (:timeFrameStatus is null or v.status = :timeFrameStatus)
-            and at.isDeleted = false and (:availableTimeStatus is null or at.status = :availableTimeStatus)
-            and ((cast(:startDate as date ) is null or cast(:endDate as date) is null )
-            or (
-             (at.startTime BETWEEN :startDate AND :endDate)
-                 OR
-                 (at.endTime BETWEEN :startDate AND :endDate)
-                 OR
-                 (at.startTime < :startDate AND at.endTime > :endDate)
-                 OR
-                 (at.endTime > :startDate AND at.endTime < :endDate)
-                 ))
-            and (p.numberKingBeds * 2
-            + p.numberQueenBeds * 2
-            + p.numberSingleBeds
-            + p.numberDoubleBeds * 2
-            + p.numberFullBeds * 2
-            + p.numberMurphyBeds
-            + p.numberSofaBeds
-            + p.numberTwinBeds * 2) >= :numberGuests
-            and ((:#{#listOfResortAmenity == null} = true) or (ra.id in :listOfResortAmenity))
-            and ((:#{#listOfInRoomAmenity == null} = true) or (pa.id in :listOfInRoomAmenity))
-            group by r.id, at.id
-            """)
-    Page<Resort> findAllByFilter(@Param("name") String name, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("numberGuests") int numberGuests, @Param("listOfResortAmenity") Set<Long> listOfResortAmenity, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("resortStatus") ResortStatus resortStatus, @Param("propertyStatus") PropertyStatus propertyStatus, @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus, @Param("timeFrameStatus") TimeFrameStatus timeFrameStatus, @Param("availableTimeStatus") AvailableTimeStatus availableTimeStatus, Pageable pageable);
-
-    @Query("""
             select DISTINCT r  from Resort r
             left join r.propertyTypes pt
             left join r.amenities ra
@@ -83,17 +40,17 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
     @Query("select r from Resort r where upper(r.resortName) = upper(?1) and r.isDeleted = false")
     Optional<Resort> findByResortNameEqualsIgnoreCaseAndIsDeletedFalse(String name);
 
-    @Query(value = """
-            select r from Resort r
-            left  join r.properties p
-            left  join  p.coOwners co
-            where co.user.userId = :userId
-            and r.isDeleted = false 
-            and p.isDeleted = false 
-            and co.isDeleted = false 
-            and co.status = :coOwnerStatus
-            """)
-    Page<Resort> findAllResortHaveUserOwner(@Param("userId") Long userId, @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus, Pageable pageable);
+//    @Query(value = """
+//            select r from Resort r
+//            left  join r.properties p
+//            left  join  p.coOwners co
+//            where co.user.userId = :userId
+//            and r.isDeleted = false
+//            and p.isDeleted = false
+//            and co.isDeleted = false
+//            and co.status = :coOwnerStatus
+//            """)
+//    Page<Resort> findAllResortHaveUserOwner(@Param("userId") Long userId, @Param("coOwnerStatus") CoOwnerStatus coOwnerStatus, Pageable pageable);
 
     @Query(value = """
             select distinct new com.example.holidayswap.domain.dto.response.property.ResortApartmentForRentDTO (
@@ -103,7 +60,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             left join r.properties p
             left join p.coOwners co
             left join  co.timeFrames tf
-            left join  tf.availableTimes at
+            left join  co.availableTimes at
                  left join co.user u
                  left join p.inRoomAmenities ira
                  left join p.propertyType pt
@@ -119,7 +76,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                         and (date(:checkIn)) between date(at.startTime) and date(at.endTime))
                      )
                  and co.status = 'ACCEPTED'
-                 and tf.status = 'ACCEPTED'
+               
                  and at.status = 'OPEN'
                  and p.status = 'ACTIVE'
                  and r.status = 'ACTIVE'

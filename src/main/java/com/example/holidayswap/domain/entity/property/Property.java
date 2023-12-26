@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -119,6 +121,6 @@ public class Property {
     @OneToMany(mappedBy = "property")
     private List<PropertyImage> propertyImages;
     @OneToMany(mappedBy = "property")
-    private List<CoOwner> coOwners;
+    private Set<CoOwner> coOwners = new LinkedHashSet<>();
 
 }

@@ -10,8 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
@@ -28,39 +26,14 @@ public class TimeFrame {
     @Min(value = 1)
     @Max(value = 52)
     private int weekNumber;
-
-    @Column(name = "is_deleted", columnDefinition = "boolean default false")
-    private boolean isDeleted = false;
-    @Column(name = "status")
+    @Column(name = "co_owner_id")
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private TimeFrameStatus status;
-    @NotNull
-    @Column(name = "property_id")
-    private Long propertyId;
-    @Column(name = "user_id")
-    @NotNull
-    private Long userId;
-    @Column(name = "room_id")
-    private String roomId;
-    @ManyToOne
-    @JoinColumn(name = "property_id",
-            referencedColumnName = "property_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-    @JoinColumn(name = "user_id",
-            referencedColumnName = "user_id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-    @JoinColumn(name = "room_id",
-            referencedColumnName = "room_id",
+    private Long coOwnerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "co_owner_id",
+            referencedColumnName = "co_owner_id",
             nullable = false,
             insertable = false,
             updatable = false)
     private CoOwner coOwner;
-    @OneToMany(mappedBy = "timeFrame")
-    private List<AvailableTime> availableTimes;
-
 }

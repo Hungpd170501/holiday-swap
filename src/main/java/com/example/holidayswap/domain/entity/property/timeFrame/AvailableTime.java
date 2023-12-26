@@ -1,7 +1,7 @@
 package com.example.holidayswap.domain.entity.property.timeFrame;
 
 import com.example.holidayswap.domain.entity.booking.Booking;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -25,11 +25,11 @@ public class  AvailableTime {
     @Column(name = "available_time_id", nullable = false)
     private Long id;
     @NotNull
-    @Column(name = "start_time")
-    private Date startTime;
+    @Column(name = "start_time", columnDefinition = "date")
+    private LocalDate startTime;
     @NotNull
-    @Column(name = "end_time")
-    private Date endTime;
+    @Column(name = "end_time", columnDefinition = "date")
+    private LocalDate endTime;
     @Column(name = "price_per_night")
     @NotNull
     @Positive(message = "Price can not be negative value")
@@ -42,16 +42,15 @@ public class  AvailableTime {
     @NotNull
     private AvailableTimeStatus status;
     @NotNull
-    @Column(name = "time_frame_id")
-    private Long timeFrameId;
+    @Column(name = "co_owner_id")
+    private Long coOwnerId;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinColumn(name = "time_frame_id",
-            referencedColumnName = "time_frame_id",
+    @JoinColumn(name = "co_owner_id",
+            referencedColumnName = "co_owner_id",
             nullable = false,
             insertable = false,
             updatable = false)
-    private TimeFrame timeFrame;
+    private CoOwner coOwner;
 
     @OneToMany(mappedBy = "availableTime")
     private List<Booking> bookings;
