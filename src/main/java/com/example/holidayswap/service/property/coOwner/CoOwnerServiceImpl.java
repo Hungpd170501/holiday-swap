@@ -158,7 +158,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         var notification = new NotificationRequest();
         var co = coOwnerRepository.findById(coOwnerId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         var coIsCreatedBf = coOwnerRepository.findByPropertyIdAndUserIdAndRoomIdAndType(co.getPropertyId(), co.getUserId(), co.getRoomId(), co.getType().toString(), co.getStartTime(), co.getEndTime());
-        if (coIsCreatedBf.isPresent()) {
+        if (coIsCreatedBf.isPresent() && !coIsCreatedBf.get().getId().equals(co.getId())) {
             //Append to co
             co.getTimeFrames().forEach(tf -> {
                 timeFrameService.appendToCo(coIsCreatedBf.get().getId(), tf);
@@ -171,7 +171,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
             if (co.getStatus() != CoOwnerStatus.PENDING)
                 throw new DataIntegrityViolationException("Can not perform this action!.");
             co.setStatus(coOwnerStatus);
-            coOwnerRepository.save(co);
+
             if (coOwnerStatus == CoOwnerStatus.ACCEPTED) {
                 co.getTimeFrames().forEach((tf) -> {
                     timeFrameService.update(tf.getId(), coOwnerStatus);
@@ -202,6 +202,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
                     log.error("Error sending verification email", e);
                 }
             }
+            coOwnerRepository.save(co);
         }
     }
 
