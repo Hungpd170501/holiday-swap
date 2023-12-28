@@ -24,7 +24,7 @@ public class RatingController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam(defaultValue = "id") String sortBy) {
+            @RequestParam(defaultValue = "rating_id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         var inRoomAmenityTypeResponses = ratingService.getListRatingByPropertyId(propertyId, roomId, pageable);
         return ResponseEntity.ok(inRoomAmenityTypeResponses);

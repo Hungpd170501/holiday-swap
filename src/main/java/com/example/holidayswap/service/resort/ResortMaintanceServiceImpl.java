@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,26 +40,30 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService  {
         if(checkIsMaintance != null) {
             throw new RuntimeException("Resort is already in maintenance");
         }
-        Set<ResortMaintanceImage> listimage = new HashSet<>();
+        List<ResortMaintanceImage> listimage = new ArrayList<>();
+        ResortMaintance resortMaintance = new ResortMaintance();
+        resortMaintance.setStartDate(startDate);
+        resortMaintance.setEndDate(endDate);
+        resortMaintance.setType(resortStatus);
+        resortMaintance.setResortId(resortId);
+        resortMaintance.setResort(checkResort);
+
+        var re = resortMaintanceRepository.save(resortMaintance);
         resortImage.forEach(image -> {
             try {
                 ResortMaintanceImage resortMaintanceImage = new ResortMaintanceImage();
                  resortMaintanceImage.setImageUrl(fileService.uploadFile(image));
+                 resortMaintanceImage.setResortMaintance(re);
                     listimage.add(resortMaintanceImage);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
+        re.setResortMaintanceImage(listimage);
+        resortMaintanceRepository.save(re);
 
-        ResortMaintance resortMaintance = new ResortMaintance();
 
-        resortMaintance.setStartDate(startDate);
-            resortMaintance.setEndDate(endDate);
-            resortMaintance.setType(resortStatus);
-            resortMaintance.setResortId(resortId);
-            resortMaintance.setResort(checkResort);
-            resortMaintance.setResortMaintanceImage(listimage);
-            resortMaintanceRepository.save(resortMaintance);
+
             return listimage.stream().map(ResortMaintanceImage::getImageUrl).toList().stream().toList();
     }
 

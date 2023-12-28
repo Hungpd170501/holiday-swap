@@ -1,5 +1,6 @@
 package com.example.holidayswap.domain.entity.resort;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,11 +31,12 @@ public class ResortMaintance {
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ResortStatus type;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "resort_id", referencedColumnName = "resort_id", nullable = false,
             insertable = false,
             updatable = false)
     private Resort resort;
     @OneToMany(mappedBy = "resortMaintance", cascade = CascadeType.ALL)
-    private Set<ResortMaintanceImage> resortMaintanceImage;
+    private List<ResortMaintanceImage> resortMaintanceImage;
 }
