@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -17,6 +18,8 @@ public interface AvailableTimeService {
     Page<AvailableTimeResponse> getAllByPropertyId(Long propertyId, Pageable pageable);
 
     List<AvailableTimeResponse> getAllByCoOwnerIdAndYear(Long timeFrameId, int year);
+
+    List<AvailableTimeResponse> getAllByCoOwnerIdAndBetweenTimeAndTime(Long coOwnerId, LocalDate start, LocalDate end);
 
     Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable);
 
