@@ -15,4 +15,6 @@ public interface IResortMaintanceService {
 
     void ChangeStatusResortAtEndDate(Long resortId, LocalDateTime endDate);
     List<ResortMaintance> getResortMaintanceByResortId(Long resortId);
+
+    void deactiveResort(LocalDateTime now);
 }

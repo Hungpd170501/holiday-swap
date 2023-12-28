@@ -129,9 +129,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = """
         SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
         time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
-                    where property.property_id = ?1 and property.is_deleted = false and b.check_in_date > date(?2) and property.status = 'ACTIVE' and b.status = 5
-        """, nativeQuery = true)
-    List<Booking> getListBookingByPropertyIdAndDate(Long propertyId,ZonedDateTime date);
+                    where property.property_id = ?1 and property.is_deleted = false and property.status = 'ACTIVE' and b.status = 5 and  (( date (?2) > date (check_in_date) AND date (?2) < date (check_out_date))
+                            OR (date (?3) > date (check_in_date) AND date (?3) < date (check_out_date))
+                            OR( date  (?2) <= date (check_in_date) AND date (?3) >= date (check_out_date) ))
+                    """, nativeQuery = true)
+    List<Booking> getListBookingByPropertyIdAndDate(Long propertyId, LocalDateTime startDate, LocalDateTime endDate);
     @Query("select b from Booking b where b.uuid = ?1")
     Booking findByUuid(String uuid);
      @Query(value = """
@@ -146,6 +148,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                             where property.resort_id = ?1 and resort.resort_status != 'DEACTIVE' and b.status = 5 and  ( date (?2) <= date (check_in_date))
         """, nativeQuery = true)
      List<Booking> getListBookingHasCheckinAfterDeactiveDate(Long resortId, LocalDateTime startDate);
+
+    @Query(value = """
+     SELECT b.* FROM booking b join available_time a on b.available_time_id = a.available_time_id join
+        time_frame ON time_frame.time_frame_id = a.time_frame_id join property on property.property_id = time_frame.property_id
+                    where property.property_id = ?1 and property.is_deleted = false and property.status = 'ACTIVE' and b.status = 5 and  ( date (?2) <= date (check_in_date))
+        """, nativeQuery = true)
+    List<Booking> getListBookingPropertyHasCheckinAfterDeactiveDate(Long property, LocalDateTime startDate);
 
       
 }

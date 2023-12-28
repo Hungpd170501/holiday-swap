@@ -31,7 +31,7 @@ public interface IBookingService {
 
     void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus,List<String> listImage) throws IOException, MessagingException;
 
-    void deactivePropertyNotifyBookingUser(Long propertyId, LocalDate startDate);
+    void deactivePropertyNotifyBookingUser(Long property, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus,List<String> listImage) throws IOException, MessagingException;
 
     String returnPointBooking(Long bookingId) throws InterruptedException;
 
