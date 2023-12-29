@@ -68,7 +68,11 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
 
     void isOverlaps(LocalDate startTime, LocalDate endTime, Long coOwnerId) {
         var overlaps = availableTimeRepository.isOverlaps(startTime, endTime, coOwnerId);
-        if (overlaps.isPresent()) throw new DataIntegrityViolationException("Overlaps with other public time!.");
+        if (!overlaps.isEmpty()) throw new DataIntegrityViolationException("Overlaps with other public time!.");
+    }
+
+    void isValidDate(LocalDate startTime, LocalDate endTime) {
+        if (startTime.isEqual(endTime)) throw new DataIntegrityViolationException("Start time can not equal end Time");
     }
 
     @Override
@@ -115,6 +119,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
 
     @Override
     public void create(Long coOwnerId, AvailableTimeRequest rq) {
+        isValidDate(rq.getStartTime(), rq.getEndTime());
         var co = coOwnerRepository.findById(coOwnerId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         if (co.getStatus() != CoOwnerStatus.ACCEPTED) {
             throw new DataIntegrityViolationException("This Co-Owner is not accepted! Please contact for Staff!");
@@ -159,4 +164,5 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         av.setDeleted(true);
         availableTimeRepository.save(av);
     }
+
 }
