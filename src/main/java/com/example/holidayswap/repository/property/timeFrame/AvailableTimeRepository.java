@@ -233,4 +233,13 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     List<AvailableTime> findByCoOwnerIdAndYear(@Param("coOwnerId") Long coOwnerId, @Param("year") int year);
 
     Page<AvailableTime> findAllByCoOwnerIdAndIsDeletedIsFalse(Long coOwnerId, Pageable pageable);
+
+    @Query(value = """      
+            select a.*
+            from available_time a
+                     inner join public.co_owner co on a.co_owner_id = co.co_owner_id
+            where co.co_owner_id = :co_owner_id
+            and a.is_deleted = false
+            """, nativeQuery = true)
+    List<AvailableTime> findByCoOwnerId(@Param("co_owner_id") Long coOwnerId);
 }

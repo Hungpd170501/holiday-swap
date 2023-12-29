@@ -3,7 +3,6 @@ package com.example.holidayswap.controller.booking;
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-import com.example.holidayswap.service.FileService;
 import com.example.holidayswap.service.booking.IBookingService;
 import com.google.zxing.WriterException;
 import jakarta.mail.MessagingException;
@@ -49,8 +48,14 @@ public class BookingController {
     }
 
     @GetMapping("/timeHasBooked")
-    public ResponseEntity<List<TimeHasBooked>> getTimeHasBooked(@RequestParam Long timeFrameId, @RequestParam int year) {
-        var listTimeHasBooked = bookingService.getTimeHasBooked(timeFrameId, year);
+    public ResponseEntity<List<TimeHasBooked>> getTimeHasBooked(@RequestParam Long coOwnerId, @RequestParam int year) {
+        var listTimeHasBooked = bookingService.getTimeHasBooked(coOwnerId, year);
+        return ResponseEntity.ok(listTimeHasBooked);
+    }
+
+    @GetMapping("/timeHasBooked/{coOwnerId}")
+    public ResponseEntity<List<TimeHasBooked>> getTimeHasBooked(@PathVariable("coOwnerId") Long coOwnerId) {
+        var listTimeHasBooked = bookingService.getTimeHasBookedByCoOwnerId(coOwnerId);
         return ResponseEntity.ok(listTimeHasBooked);
     }
 

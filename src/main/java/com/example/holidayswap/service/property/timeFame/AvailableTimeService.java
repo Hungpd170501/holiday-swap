@@ -18,6 +18,8 @@ public interface AvailableTimeService {
 
     List<AvailableTimeResponse> getAllByCoOwnerIdAndYear(Long timeFrameId, int year);
 
+    List<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId);
+
     Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable);
 
     Page<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId, Pageable pageable);

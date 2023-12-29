@@ -51,6 +51,14 @@ public class AvailableTimesController {
         return ResponseEntity.ok(dtoResponses);
     }
 
+    @GetMapping("/getAllByCoOwnerId")
+    public ResponseEntity<List<AvailableTimeResponse>> getAllByCoOwnerIdAndBetweenTimeAndTime(
+            @RequestParam("coOwnerId") Long coOwnerId
+    ) {
+        var dtoResponses = availableTimeService.getAllByCoOwnerId(coOwnerId);
+        return ResponseEntity.ok(dtoResponses);
+    }
+
     @GetMapping("/user/resort/properties")
     public ResponseEntity<Page<AvailableTimeResponse>> getAllViaPropertyId(
             @RequestParam("timeFrameId") Long timeFrameId,

@@ -42,6 +42,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b from Booking b where ?1 <= b.dateBooking and ?2 >= b.dateBooking and b.status = 5")
     List<Booking> findAllByDateBookingBetween(String startDate, String endDate);
+
     @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
             "from Booking b where b.availableTimeId = ?1 and b.status = ?2")
     List<TimeHasBooked> findAllByAvailableTimeIdAndStatus(Long availableTimeId,
@@ -156,5 +157,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         """, nativeQuery = true)
     List<Booking> getListBookingPropertyHasCheckinAfterDeactiveDate(Long property, LocalDateTime startDate);
 
-      
+
+    @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
+            "from Booking b " +
+            "inner join b.availableTime at " +
+            " where at.coOwnerId = :co_owner_id  and b.status = 5 ")
+    List<TimeHasBooked> getTimeHasBookedByCoOwnerId(@Param("co_owner_id") Long coOwnerId);
 }

@@ -87,6 +87,12 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     }
 
     @Override
+    public List<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId) {
+        var list = availableTimeRepository.findByCoOwnerId(coOwnerId);
+        return list.stream().map(AvailableTimeMapper.INSTANCE::toDtoResponse).collect(Collectors.toList());
+    }
+
+    @Override
     public Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable) {
         return null;
     }
