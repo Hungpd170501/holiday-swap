@@ -239,6 +239,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             from available_time a
                      inner join public.co_owner co on a.co_owner_id = co.co_owner_id
             where co.co_owner_id = :co_owner_id
+            and a.is_deleted = false
             """, nativeQuery = true)
     List<AvailableTime> findByCoOwnerId(@Param("co_owner_id") Long coOwnerId);
 }
