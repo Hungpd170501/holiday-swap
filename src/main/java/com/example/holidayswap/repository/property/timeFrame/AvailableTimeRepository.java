@@ -239,9 +239,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             from available_time a
                      inner join public.co_owner co on a.co_owner_id = co.co_owner_id
             where co.co_owner_id = :co_owner_id
-              and (:start, :end) overlaps (a.start_time, a.end_time)
             """, nativeQuery = true)
-    List<AvailableTime> findByCoOwnerIdAndBetweenTimeAndTime(@Param("co_owner_id") Long coOwnerId,
-                                                             @Param("start") LocalDate start,
-                                                             @Param("end") LocalDate end);
+    List<AvailableTime> findByCoOwnerId(@Param("co_owner_id") Long coOwnerId);
 }

@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -52,13 +51,11 @@ public class AvailableTimesController {
         return ResponseEntity.ok(dtoResponses);
     }
 
-    @GetMapping("/getAllByCoOwnerIdAndBetweenTimeAndTime")
+    @GetMapping("/getAllByCoOwnerId")
     public ResponseEntity<List<AvailableTimeResponse>> getAllByCoOwnerIdAndBetweenTimeAndTime(
-            @RequestParam("coOwnerId") Long coOwnerId,
-            @RequestParam("start") LocalDate start,
-            @RequestParam("end") LocalDate end
+            @RequestParam("coOwnerId") Long coOwnerId
     ) {
-        var dtoResponses = availableTimeService.getAllByCoOwnerIdAndBetweenTimeAndTime(coOwnerId, start, end);
+        var dtoResponses = availableTimeService.getAllByCoOwnerId(coOwnerId);
         return ResponseEntity.ok(dtoResponses);
     }
 
