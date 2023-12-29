@@ -228,7 +228,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
               and (at.start_time, at.end_time) overlaps (:startTime, :endTime)
               and at.co_owner_id = :coOwnerId
             """, nativeQuery = true)
-    Optional<AvailableTime> isOverlaps(LocalDate startTime, LocalDate endTime, Long coOwnerId);
+    List<AvailableTime> isOverlaps(LocalDate startTime, LocalDate endTime, Long coOwnerId);
 
     @Query(value = "select a.* from available_time  a where a.co_owner_id  = :coOwnerId and EXTRACT (YEAR FROM A.start_time) = :year", nativeQuery = true)
     List<AvailableTime> findByCoOwnerIdAndYear(@Param("coOwnerId") Long coOwnerId, @Param("year") int year);
