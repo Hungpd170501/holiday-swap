@@ -65,8 +65,8 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         return numberWeeks;
     }
 
-    void isOverlaps(LocalDate startTime, LocalDate endTime) {
-        var overlaps = availableTimeRepository.isOverlaps(startTime, endTime);
+    void isOverlaps(LocalDate startTime, LocalDate endTime, Long coOwnerId) {
+        var overlaps = availableTimeRepository.isOverlaps(startTime, endTime, coOwnerId);
         if (overlaps.isPresent()) throw new DataIntegrityViolationException("Overlaps with other public time!.");
     }
 
@@ -135,8 +135,8 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
             boolean flagIsBelongInCoO = listWeekInCo.contains(w);
             if (!flagIsBelongInCoO) throw new DataIntegrityViolationException("Date is not in range!.");
         }
+        isOverlaps(rq.getStartTime(), rq.getEndTime(), coOwnerId);
         var at = AvailableTimeMapper.INSTANCE.toEntity(rq);
-        isOverlaps(rq.getStartTime(), rq.getEndTime());
         at.setStatus(AvailableTimeStatus.OPEN);
         at.setCoOwnerId(coOwnerId);
         availableTimeRepository.save(at);
