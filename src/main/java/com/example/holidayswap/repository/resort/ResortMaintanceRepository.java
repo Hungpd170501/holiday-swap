@@ -34,4 +34,7 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
 
     @Query("select r from ResortMaintance r where r.resortId = ?1")
     List<ResortMaintance> findAllByResortId(Long resortId);
+
+    @Query(value = "select r.* from resort_maintaince r where r.type = ?1 and date (r.start_date) = date (?2)", nativeQuery = true)
+    List<ResortMaintance> findByTypeAndStartDate(String type, LocalDateTime startDate);
 }
