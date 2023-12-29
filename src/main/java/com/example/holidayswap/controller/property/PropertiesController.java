@@ -1,7 +1,9 @@
 package com.example.holidayswap.controller.property;
 
 import com.example.holidayswap.domain.dto.request.property.PropertyRegisterRequest;
+import com.example.holidayswap.domain.dto.request.property.PropertyRequestUpdate;
 import com.example.holidayswap.domain.dto.request.property.PropertyUpdateRequest;
+import com.example.holidayswap.domain.dto.request.resort.ResortRequestUpdate;
 import com.example.holidayswap.domain.dto.response.property.PropertyImageResponse;
 import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.dto.response.property.amenity.InRoomAmenityResponse;
@@ -11,6 +13,7 @@ import com.example.holidayswap.service.property.PropertyImageService;
 import com.example.holidayswap.service.property.PropertyService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -103,6 +107,13 @@ public class PropertiesController {
     @DeleteMapping("/{propertyId}")
     public ResponseEntity<Void> delete(@PathVariable("propertyId") Long propertyId) {
         propertyService.delete(propertyId, new Date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/updateStatus")
+    public  ResponseEntity<Void> updateStatusProperty(@RequestPart PropertyRequestUpdate resortUpdateRequest,
+                                                    @RequestPart(required = false) List<MultipartFile> resortImage) throws MessagingException, IOException {
+        propertyService.updateStatus(resortUpdateRequest.getPropertyId(), resortUpdateRequest.getResortStatus(), resortUpdateRequest.getStartDate(), resortUpdateRequest.getEndDate(), resortImage);
         return ResponseEntity.noContent().build();
     }
 

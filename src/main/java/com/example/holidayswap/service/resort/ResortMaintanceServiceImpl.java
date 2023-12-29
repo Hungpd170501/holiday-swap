@@ -98,5 +98,15 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService  {
         return resortMaintanceRepository.findAllByResortId(resortId);
     }
 
+    @Override
+    public void deactiveResort(LocalDateTime now) {
+        List<ResortMaintance> resortMaintance = resortMaintanceRepository.findByTypeAndStartDate(ResortStatus.DEACTIVATE.name(), now);
+        if(resortMaintance.size() == 0) return;
+        resortMaintance.forEach(resort -> {
+            resort.getResort().setStatus(ResortStatus.DEACTIVATE);
+            resortRepository.save(resort.getResort());
+        });
+    }
+
 
 }

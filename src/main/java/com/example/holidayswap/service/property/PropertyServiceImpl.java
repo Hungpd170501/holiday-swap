@@ -19,6 +19,7 @@ import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.auth.UserService;
 import com.example.holidayswap.service.booking.IBookingService;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +51,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final UserService userService;
     private final RatingRepository ratingRepository;
     private final IBookingService bookingService;
+    private final IPropertyMaintenanceService propertyMaintenanceService;
 
     @Override
     public Page<PropertyResponse> gets(Long[] resortId, String propertyName, PropertyStatus[] propertyStatus,
@@ -173,19 +177,30 @@ public class PropertyServiceImpl implements PropertyService {
     //update status
     @Override
     public void update(Long id, PropertyStatus propertyStatus) {
-        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
-        if (propertyStatus == PropertyStatus.DEACTIVATE) {
-            bookingService.deactivePropertyNotifyBookingUser(id, LocalDate.now());
-        }
-        property.setStatus(propertyStatus);
-        propertyRepository.save(property);
+//        var property = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+//        if (propertyStatus == PropertyStatus.DEACTIVATE) {
+//            bookingService.deactivePropertyNotifyBookingUser(id, LocalDate.now());
+//        }
+//        property.setStatus(propertyStatus);
+//        propertyRepository.save(property);
     }
 
     @Override
     public void delete(Long id, LocalDate startDate) {
-        var propertyFound = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
-        bookingService.deactivePropertyNotifyBookingUser(id, startDate);
-        propertyFound.setIsDeleted(true);
-        propertyRepository.save(propertyFound);
+//        var propertyFound = propertyRepository.findPropertyByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(PROPERTY_NOT_FOUND));
+//        bookingService.deactivePropertyNotifyBookingUser(id, startDate);
+//        propertyFound.setIsDeleted(true);
+//        propertyRepository.save(propertyFound);
+    }
+
+    @Override
+    public void updateStatus(Long id, ResortStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException {
+        if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
+        if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
+
+        var entity = propertyRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Property not available now"));
+        List<String> listImage = propertyMaintenanceService.CreatePropertyMaintance(id, startDate, endDate, resortStatus, resortImage);
+        // TODO: create issue and notification
+        bookingService.deactivePropertyNotifyBookingUser(id, startDate, endDate, resortStatus, listImage);
     }
 }

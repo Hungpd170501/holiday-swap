@@ -2,6 +2,8 @@ package com.example.holidayswap.repository.property;
 
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
+import com.example.holidayswap.domain.entity.resort.Resort;
+import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -50,4 +52,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     Optional<Property> findPropertyByIdAndIsDeletedIsFalse(Long propertyId);
 
     Optional<Property> findPropertyByIdAndIsDeletedIsFalseAndStatus(Long propertyId, PropertyStatus propertyStatus);
+
+    @Query("select r from Property r where r.id = :resortId and r.isDeleted = false and r.status = :resortStatus")
+    Optional<Property> findByIdAndDeletedFalseAndResortStatus(@Param(("resortId")) Long id, @Param(("resortStatus")) ResortStatus resortStatus);
 }

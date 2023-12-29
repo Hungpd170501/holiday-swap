@@ -34,4 +34,6 @@ public interface ResortService {
     void delete(Long id, LocalDate startDate);
 
     void updateStatus(Long id, ResortStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException;
+
+
 }
