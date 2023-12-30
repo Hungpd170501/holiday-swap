@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "holiday-swap",
-      "image": "hungpd170501/holiday-swap:29.12.2023.05.06.33",
+      "image": "hungpd170501/holiday-swap:30.12.2023.09.26.28",
       "essential": true,
       "memory": 1024,
       "portMappings": [
