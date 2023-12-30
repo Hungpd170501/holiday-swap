@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Set;
 
@@ -97,13 +96,13 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     void checkValidNextUse(LocalDate start, Set<Integer> timeFrames) {
         if (start.getYear() < LocalDate.now().getYear())
             throw new DataIntegrityViolationException("Next use year can not less than current year!.");
-        if (start.getYear() == LocalDate.now().getYear()) {
-            int currentWeekIso = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-            timeFrames.forEach(w -> {
-                if (w < currentWeekIso)
-                    throw new DataIntegrityViolationException("Week input is out of week current date!.");
-            });
-        }
+//        if (start.getYear() == LocalDate.now().getYear()) {
+//            int currentWeekIso = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+//            timeFrames.forEach(w -> {
+//                if (w < currentWeekIso)
+//                    throw new DataIntegrityViolationException("Week input is out of week current date!.");
+//            });
+//        }
     }
 
     @Override
