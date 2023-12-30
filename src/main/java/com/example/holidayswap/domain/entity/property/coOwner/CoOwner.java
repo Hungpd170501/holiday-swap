@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -71,8 +72,8 @@ public class CoOwner {
     @Column(name = "room_id", nullable = false)
     private String roomId;
 
-    @Column(name = "create_date", columnDefinition = "date")
-    private LocalDate createDate;
+    @Column(name = "create_date")
+    private Date createDate;
 
     @OneToMany(mappedBy = "coOwner")
     private List<ContractImage> contractImages;

@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -120,7 +121,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         }
         var newCoOwner = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
         newCoOwner.setStatus(CoOwnerStatus.PENDING);
-        newCoOwner.setCreateDate(LocalDate.now());
+        newCoOwner.setCreateDate(new Date());
         var co = coOwnerRepository.save(newCoOwner);
         dtoRequest.getTimeFrames().forEach((wN -> {
             timeFrameService.create(co.getId(), wN);
@@ -142,7 +143,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         }
         var newCoOwner = CoOwnerMapper.INSTANCE.toEntity(dtoRequest);
         newCoOwner.setStatus(CoOwnerStatus.PENDING);
-        newCoOwner.setCreateDate(LocalDate.now());
+        newCoOwner.setCreateDate(new Date());
         var co = coOwnerRepository.save(newCoOwner);
         dtoRequest.getTimeFrames().forEach((wN -> {
             timeFrameService.create(co.getId(), wN);
@@ -166,6 +167,8 @@ public class CoOwnerServiceImpl implements CoOwnerService {
                 contractImageService.appendToCo(coIsCreatedBf.get().getId(), image);
             });
             deleteHard(coOwnerId);
+            coIsCreatedBf.get().setCreateDate(new Date());
+            coOwnerRepository.save(coIsCreatedBf.get());
         } else {
             if (co.getStatus() != CoOwnerStatus.PENDING)
                 throw new DataIntegrityViolationException("Can not perform this action!.");
@@ -201,6 +204,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
                     log.error("Error sending verification email", e);
                 }
             }
+            co.setCreateDate(new Date());
             coOwnerRepository.save(co);
         }
     }
