@@ -45,10 +45,11 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     List<Integer> numberOfWeeks(LocalDate startDate, LocalDate endDate) {
         if (startDate.isBefore(LocalDate.now()))
             throw new DataIntegrityViolationException("Date must greater than now!.");
+        endDate = endDate.minusDays(1);
         int addWeek = 0;
-        if (startDate.get(WeekFields.ISO.weekOfYear()) < endDate.get(WeekFields.ISO.weekOfYear())) {
-            addWeek = 1;
-        }
+//        if (startDate.get(WeekFields.ISO.weekOfYear()) < endDate.get(WeekFields.ISO.weekOfYear())) {
+//            addWeek = 1;
+//        }
         long weeks = WEEKS.between(startDate, endDate) + addWeek;//Get the number of weeks in your case (52)
         List<Integer> numberWeeks = new ArrayList<>();
         if (weeks >= 0) {
