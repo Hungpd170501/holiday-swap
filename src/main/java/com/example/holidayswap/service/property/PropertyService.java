@@ -35,5 +35,5 @@ public interface PropertyService {
     void update(Long id, PropertyStatus propertyStatus);
 
     void delete(Long id, LocalDate startDate);
-    void updateStatus(Long id, ResortStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException;
+    void updateStatus(Long id, PropertyStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException;
 }

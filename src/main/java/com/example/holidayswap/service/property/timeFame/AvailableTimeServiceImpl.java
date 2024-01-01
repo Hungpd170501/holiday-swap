@@ -45,6 +45,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     List<Integer> numberOfWeeks(LocalDate startDate, LocalDate endDate) {
         if (startDate.isBefore(LocalDate.now()))
             throw new DataIntegrityViolationException("Date must greater than now!.");
+        endDate = endDate.minusDays(1);
         int addWeek = 0;
 //        if (startDate.get(WeekFields.ISO.weekOfYear()) < endDate.get(WeekFields.ISO.weekOfYear())) {
 //            addWeek = 1;
@@ -58,6 +59,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
                 LocalDate dt = startDate.plusWeeks(week);
                 int weekNumber = dt.get(WeekFields.ISO.weekOfYear());
 //                numberWeeks.add(String.format("%d-W%d", dt.getYear(), weekNumber));
+                if (weekNumber > 52) weekNumber = 1;
                 numberWeeks.add(weekNumber);
                 week++;
             } while (week <= weeks);
@@ -65,9 +67,13 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         return numberWeeks;
     }
 
-    void isOverlaps(LocalDate startTime, LocalDate endTime) {
-        var overlaps = availableTimeRepository.isOverlaps(startTime, endTime);
-        if (overlaps.isPresent()) throw new DataIntegrityViolationException("Overlaps with other public time!.");
+    void isOverlaps(LocalDate startTime, LocalDate endTime, Long coOwnerId) {
+        var overlaps = availableTimeRepository.isOverlaps(startTime, endTime, coOwnerId);
+        if (!overlaps.isEmpty()) throw new DataIntegrityViolationException("Overlaps with other public time!.");
+    }
+
+    void isValidDate(LocalDate startTime, LocalDate endTime) {
+        if (startTime.isEqual(endTime)) throw new DataIntegrityViolationException("Start time can not equal end Time");
     }
 
     @Override
@@ -83,6 +89,12 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     @Override
     public List<AvailableTimeResponse> getAllByCoOwnerIdAndYear(Long coOwnerId, int year) {
         var list = availableTimeRepository.findByCoOwnerIdAndYear(coOwnerId, year);
+        return list.stream().map(AvailableTimeMapper.INSTANCE::toDtoResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId) {
+        var list = availableTimeRepository.findByCoOwnerId(coOwnerId);
         return list.stream().map(AvailableTimeMapper.INSTANCE::toDtoResponse).collect(Collectors.toList());
     }
 
@@ -108,6 +120,7 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
 
     @Override
     public void create(Long coOwnerId, AvailableTimeRequest rq) {
+        isValidDate(rq.getStartTime(), rq.getEndTime());
         var co = coOwnerRepository.findById(coOwnerId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
         if (co.getStatus() != CoOwnerStatus.ACCEPTED) {
             throw new DataIntegrityViolationException("This Co-Owner is not accepted! Please contact for Staff!");
@@ -129,8 +142,8 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
             boolean flagIsBelongInCoO = listWeekInCo.contains(w);
             if (!flagIsBelongInCoO) throw new DataIntegrityViolationException("Date is not in range!.");
         }
+        isOverlaps(rq.getStartTime(), rq.getEndTime(), coOwnerId);
         var at = AvailableTimeMapper.INSTANCE.toEntity(rq);
-        isOverlaps(rq.getStartTime(), rq.getEndTime());
         at.setStatus(AvailableTimeStatus.OPEN);
         at.setCoOwnerId(coOwnerId);
         availableTimeRepository.save(at);
@@ -152,4 +165,5 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         av.setDeleted(true);
         availableTimeRepository.save(av);
     }
+
 }

@@ -10,6 +10,7 @@ import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
@@ -250,7 +251,14 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus,List<String> listImage) throws IOException, MessagingException {
+    public List<TimeHasBooked> getTimeHasBookedByCoOwnerId(Long coOwnerId) {
+        var listTimeHasBooked = bookingRepository.getTimeHasBookedByCoOwnerId(coOwnerId);
+
+        return listTimeHasBooked;
+    }
+
+    @Override
+    public void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus, List<String> listImage) throws IOException, MessagingException {
         ZonedDateTime hcmZonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         List<Booking> bookingList = new ArrayList<>();
         //get list booking of resort and date booking is after current date
@@ -300,7 +308,7 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public void deactivePropertyNotifyBookingUser(Long propertyId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus,List<String> listImage) throws IOException, MessagingException {
+    public void deactivePropertyNotifyBookingUser(Long propertyId, LocalDateTime startDate, LocalDateTime endDate, PropertyStatus resortStatus, List<String> listImage) throws IOException, MessagingException {
 //        String currentDate = Helper.getCurrentDateWithoutTime();
 
         List<Booking> bookingList = new ArrayList<>();

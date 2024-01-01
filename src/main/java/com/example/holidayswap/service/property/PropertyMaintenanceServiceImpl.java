@@ -24,7 +24,7 @@ public class PropertyMaintenanceServiceImpl implements IPropertyMaintenanceServi
     private final FileService fileService;
 
     @Override
-    public List<String> CreatePropertyMaintance(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus, List<MultipartFile> resortImage) {
+    public List<String> CreatePropertyMaintance(Long resortId, LocalDateTime startDate, LocalDateTime endDate, PropertyStatus resortStatus, List<MultipartFile> resortImage) {
         var checkResort = propertyRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Property not found"));
         var checkIsDeactivate = propertyMaintenanceRepository.findAllByTypeAndProperty(ResortStatus.DEACTIVATE,resortId);
         PropertyMaintenance checkIsMaintance = null;
@@ -32,7 +32,7 @@ public class PropertyMaintenanceServiceImpl implements IPropertyMaintenanceServi
         if(checkIsDeactivate.size()>0) {
             throw new RuntimeException("Resort is deactivated");
         }
-        if(resortStatus != ResortStatus.DEACTIVATE) {
+        if(resortStatus != PropertyStatus.DEACTIVATE) {
             checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, ResortStatus.MAINTENANCE.name());
         }
         if(checkIsMaintance != null) {
