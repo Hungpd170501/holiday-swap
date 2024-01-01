@@ -109,6 +109,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
             select distinct r from Resort r
             inner join r.properties p
             where r.status = 'ACTIVE' and p.status = 'ACTIVE'
+            and r.isDeleted = false and p.isDeleted = false
                 """)
     List<Resort> getsListResortHaveProperty();
 }

@@ -4,6 +4,7 @@ package com.example.holidayswap.domain.entity.property;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.resort.Resort;
+import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -122,5 +123,8 @@ public class Property {
     private List<PropertyImage> propertyImages;
     @OneToMany(mappedBy = "property")
     private Set<CoOwner> coOwners = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy="property")
+    private Set<PropertyMaintenance> propertyMaintenance;
 
 }
