@@ -44,4 +44,16 @@ public class ConversationController {
         var conversation = conversationService.createCurrentConversationWithUserId(userId);
         return ResponseEntity.ok(conversation);
     }
+
+    @GetMapping("/current-user/support")
+    public ResponseEntity<ConversationResponse> getConversationTypeEqualsSupportByUserId() {
+        var conversation = conversationService.getConversationTypeEqualsSupportByCurrentUser();
+        return ResponseEntity.ok(conversation);
+    }
+
+    @PostMapping("/current-user/support")
+    public ResponseEntity<Optional<ConversationResponse>> createConversationTypeEqualsSupportByUserId() {
+        var conversation = conversationService.createConversationTypeEqualsSupportByCurrentUser();
+        return ResponseEntity.ok(conversation);
+    }
 }

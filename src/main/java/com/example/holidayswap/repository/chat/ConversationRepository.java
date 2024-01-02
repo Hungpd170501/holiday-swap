@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
-    @Query("SELECT c FROM Conversation c JOIN c.participants p WHERE p.conversationParticipantId.userId = :userId and p.leftChat = false")
+    @Query("SELECT c FROM Conversation c JOIN c.participants p WHERE p.conversationParticipantId.userId = :userId and p.leftChat = false and (c.conversationType is null or c.conversationType != 'SUPPORT')")
     List<Conversation> findByUserId(@Param("userId") Long userId);
     @Query("SELECT c FROM Conversation c JOIN c.participants p WHERE p.conversationParticipantId.conversationId = :conversationId and p.leftChat = false")
 
@@ -31,4 +31,10 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
         HAVING COUNT(DISTINCT p.conversationParticipantId.userId) = 2
     """)
     Optional<Conversation> findConversationByUserIds(Long currentUserId, Long userId);
+
+    @Query("SELECT c FROM Conversation c JOIN c.participants p WHERE p.conversationParticipantId.userId = :userId and p.leftChat = false and c.conversationType = 'SUPPORT'")
+    Optional<Conversation> findByUserIdEqualsAndTypeEqualsSupport(@Param("userId") Long userId);
+
+    @Query("SELECT c FROM Conversation c JOIN c.participants p WHERE c.conversationType = 'SUPPORT'")
+    List<Conversation> getAllSupportConversations();
 }
