@@ -2,7 +2,6 @@ package com.example.holidayswap.service.property.timeFame;
 
 import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTimeRequest;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
-import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerId;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,19 +16,21 @@ public interface AvailableTimeService {
     //    Page<TimeOffDepositResponse> getAllBy(Long propertyId, Pageable pageable);
     Page<AvailableTimeResponse> getAllByPropertyId(Long propertyId, Pageable pageable);
 
-    List<AvailableTimeResponse> getAllByTimeFrameIdAndYear(Long timeFrameId, int year);
+    List<AvailableTimeResponse> getAllByCoOwnerIdAndYear(Long timeFrameId, int year);
+
+    List<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId);
 
     Page<AvailableTimeResponse> getAllByResortId(Long resortId, Pageable pageable);
 
-    List<AvailableTimeResponse> getAllByCoOwnerId(CoOwnerId coOwnerId);
+    Page<AvailableTimeResponse> getAllByCoOwnerId(Long coOwnerId, Pageable pageable);
 
     AvailableTimeResponse get(Long id);
 
-    AvailableTimeResponse create(Long vacationId, AvailableTimeRequest timeOffDepositRequest);
+    void create(Long vacationId, AvailableTimeRequest timeOffDepositRequest);
 
-    AvailableTimeResponse update(Long id, AvailableTimeRequest timeOffDepositRequest);
+    void update(Long id, AvailableTimeRequest timeOffDepositRequest);
 
-    AvailableTimeResponse update(Long id, AvailableTimeStatus availableTimeStatus);
+    void update(Long id, AvailableTimeStatus availableTimeStatus);
 
     void delete(Long id);
 }

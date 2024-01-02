@@ -4,8 +4,5 @@ import lombok.Data;
 
 @Data
 public class ContractImageRequest {
-    private Long propertyId;
-    private Long userId;
-    private String roomId;
-
+    private Long coOwnerId;
 }

@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -68,4 +69,13 @@ public class Resort {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "district")
     private District district;
+
+//    @Column(name = "close_date")
+//    private LocalDate closeDate;
+//
+//    @Column(name = "open_date")
+//    private LocalDate openDate;
+
+    @OneToMany(mappedBy="resort")
+    private Set<ResortMaintance> resortMaintainces;
 }

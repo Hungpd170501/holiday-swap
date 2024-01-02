@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "holiday-swap",
-      "image": "hungpd170501/holiday-swap:17.12.2023.01.20.31",
+      "image": "hungpd170501/holiday-swap:02.01.2024.01.37.42",
       "essential": true,
       "memory": 1024,
       "portMappings": [
@@ -26,10 +26,7 @@
           "value": "rabbitmq"
         }
       ],
-      "links": [
-        "rabbitmq",
-        "redis"
-      ]
+      "links": ["rabbitmq", "redis"]
     },
     {
       "name": "rabbitmq",

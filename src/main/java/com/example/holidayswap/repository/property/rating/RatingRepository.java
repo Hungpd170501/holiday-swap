@@ -12,16 +12,31 @@ import java.util.Optional;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
-    @Query("""
-              select r from Rating r inner join r.booking b
-            inner join   b.availableTime at inner join at.timeFrame tf inner join  tf.coOwner co
-            where co.id.propertyId = :propertyId and co.id.roomId  = :roomId""")
+    @Query(value = """
+            SELECT r.*
+            FROM Rating r
+                     INNER JOIN booking b ON
+                b.book_id = r.rating_id
+                     INNER JOIN available_time a ON
+                b.available_time_id = a.available_time_id
+                     INNER JOIN co_owner co ON
+                co.co_owner_id = a.co_owner_id
+            WHERE co.property_id = :propertyId
+              AND co.room_id = :roomId""", nativeQuery = true)
     Page<Rating> findAllByPropertyIdAndRoomId(@Param("propertyId") Long propertyId, @Param("roomId") String roomId, Pageable pageable);
 
-    @Query("""
-            select avg(r.rating) from Rating r inner join r.booking b inner join b.availableTime at inner join at.timeFrame tf inner join  tf.coOwner co
-            where co.id.propertyId = :propertyId and co.id.roomId  = :roomId
-            """)
+    @Query(value = """
+            SELECT avg(r.rating)
+            FROM rating r
+            INNER JOIN booking b ON
+            b.book_id = r.rating_id
+            INNER JOIN available_time a ON
+            b.available_time_id = a.available_time_id
+            INNER JOIN co_owner co ON
+            co.co_owner_id = a.co_owner_id
+            WHERE co.property_id = :propertyId
+            AND co.room_id = :roomId
+            """, nativeQuery = true)
     Double calculateRating(@Param("propertyId") Long propertyId, @Param("roomId") String roomId);
 
     @Query("select r from Rating r where r.booking.id = :bookingId")

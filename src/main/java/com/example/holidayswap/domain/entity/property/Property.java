@@ -4,6 +4,7 @@ package com.example.holidayswap.domain.entity.property;
 import com.example.holidayswap.domain.entity.property.amenity.InRoomAmenity;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.resort.Resort;
+import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -119,6 +122,9 @@ public class Property {
     @OneToMany(mappedBy = "property")
     private List<PropertyImage> propertyImages;
     @OneToMany(mappedBy = "property")
-    private List<CoOwner> coOwners;
+    private Set<CoOwner> coOwners = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy="property")
+    private Set<PropertyMaintenance> propertyMaintenance;
 
 }

@@ -1,17 +1,28 @@
 package com.example.holidayswap.domain.dto.request.property.coOwner;
 
-import com.example.holidayswap.domain.dto.request.property.timeFrame.TimeFrameRequest;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class CoOwnerRequest {
-    private Date endTime;
-    private Date startTime;
+    private Long propertyId;
+    private Long userId;
+    private String roomId;
+    private LocalDate startTime;
+    private LocalDate endTime;
     private ContractType type;
-    private List<TimeFrameRequest> timeFrames;
-
+    @NotNull
+    @NotEmpty(message = "Time frames can not be null!.")
+    private Set<
+            @Min(1)
+            @Max(value = 52, message = "Max week is 52")
+            @NotNull
+                    Integer> timeFrames;
 }

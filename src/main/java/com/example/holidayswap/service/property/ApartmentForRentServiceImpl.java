@@ -43,11 +43,12 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
                 listOfPropertyView, listOfPropertyType, userId, pageable);
         var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
         response.forEach(e -> {
-//            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getProperty().getId());
-//            e.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
-            var propertyImages = propertyImageService.gets(e.getProperty().getId());
-            e.getProperty().setPropertyImage(propertyImages);
-            e.getProperty().setRating(ratingService.getRatingOfProperty(e.getProperty().getId(), e.getCoOwnerId().getRoomId()));
+            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getAvailableTime().getCoOwner().getProperty().getId());
+            e.getAvailableTime().getCoOwner().getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
+//            var propertyImages = propertyImageService.gets(e.getProperty().getId());
+//            e.getProperty().setPropertyImage(propertyImages);
+            e.getAvailableTime().getCoOwner().getProperty().getPropertyImages().stream().filter((img) -> !img.isDeleted());
+            e.getAvailableTime().getCoOwner().getProperty().setRating(ratingService.getRatingOfProperty(e.getAvailableTime().getCoOwner().getProperty().getId(), e.getAvailableTime().getCoOwner().getRoomId()));
         });
         return response;
     }
@@ -72,12 +73,12 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
         {
             var timeHasBooking = bookingRepository.findAllByAvailableTimeIdAndStatus(dto.getAvailableTime().getId(), EnumBookingStatus.BookingStatus.SUCCESS);
             response.setTimeHasBooked(timeHasBooking);
-            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(response.getProperty().getId());
-            var propertyImages = propertyImageService.gets(response.getProperty().getId());
-            response.getProperty().setPropertyImage(propertyImages);
-            response.getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
+            var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(response.getAvailableTime().getCoOwner().getProperty().getId());
+//            var propertyImages = propertyImageService.gets(response.getAvailableTime().getCoOwner().getProperty().getId());
+            response.getAvailableTime().getCoOwner().getProperty().getPropertyImages().stream().filter((img) -> !img.isDeleted());
+            response.getAvailableTime().getCoOwner().getProperty().setInRoomAmenityType(inRoomAmenityTypeResponses);
 //            response.getProperty().setRating(ratingRepository.calculateRating(dto.getProperty().getId(), dto.getCoOwnerId().getRoomId()));
-            response.getProperty().setRating(ratingService.getRatingOfProperty(response.getProperty().getId(), response.getCoOwnerId().getRoomId()));
+            response.getAvailableTime().getCoOwner().getProperty().setRating(ratingService.getRatingOfProperty(response.getAvailableTime().getCoOwner().getProperty().getId(), response.getAvailableTime().getCoOwner().getRoomId()));
         }
         return response;
     }

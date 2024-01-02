@@ -11,9 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -22,15 +20,15 @@ import java.util.List;
 public class AvailableTimesController {
     private final AvailableTimeService availableTimeService;
 
-    @GetMapping("/time-frames")
-    public ResponseEntity<Page<AvailableTimeResponse>> getAllByTimeFrameId(
-            @RequestParam(value = "timeFrameId") Long timeFrameId,
+    @GetMapping("/co-owner/{CoOwnerId}")
+    public ResponseEntity<Page<AvailableTimeResponse>> getAllByCoOwnerId(
+            @PathVariable(value = "CoOwnerId") Long CoOwnerId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        var dtoResponses = availableTimeService.getAllByVacationUnitId(timeFrameId, pageable);
+        var dtoResponses = availableTimeService.getAllByCoOwnerId(CoOwnerId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }
 
@@ -47,9 +45,17 @@ public class AvailableTimesController {
 
     @GetMapping("/getAvailableTimeCreated")
     public ResponseEntity<List<AvailableTimeResponse>> getAvailableTimeCreated(
-            @RequestParam("timeFrameId") Long timeFrameId,
+            @RequestParam("coOwnerId") Long coOwnerId,
             @RequestParam int year) {
-        var dtoResponses = availableTimeService.getAllByTimeFrameIdAndYear(timeFrameId, year);
+        var dtoResponses = availableTimeService.getAllByCoOwnerIdAndYear(coOwnerId, year);
+        return ResponseEntity.ok(dtoResponses);
+    }
+
+    @GetMapping("/getAllByCoOwnerId")
+    public ResponseEntity<List<AvailableTimeResponse>> getAllByCoOwnerIdAndBetweenTimeAndTime(
+            @RequestParam("coOwnerId") Long coOwnerId
+    ) {
+        var dtoResponses = availableTimeService.getAllByCoOwnerId(coOwnerId);
         return ResponseEntity.ok(dtoResponses);
     }
 
@@ -75,37 +81,24 @@ public class AvailableTimesController {
     public ResponseEntity<AvailableTimeResponse> create(
             @PathVariable("timeFrameId") Long timeFrameId,
             @RequestBody AvailableTimeRequest dtoRequest) {
-        var dtoResponse = availableTimeService.create(timeFrameId, dtoRequest);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(dtoResponse.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(dtoResponse);
+        availableTimeService.create(timeFrameId, dtoRequest);
+
+        return ResponseEntity.created(null).build();
     }
 
     @PutMapping(value = "/{availableTimeId}")
     public ResponseEntity<Void> update(@PathVariable("availableTimeId") Long timeFrameId,
                                        @RequestBody AvailableTimeRequest dtoRequest) {
         availableTimeService.update(timeFrameId, dtoRequest);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(timeFrameId)
-                .toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(null).build();
     }
 
     @PutMapping(value = "/{availableTimeId}/status")
     public ResponseEntity<Void> update(@PathVariable("availableTimeId") Long availableTimeId,
                                        @RequestBody AvailableTimeStatus availableTimeStatus) {
         availableTimeService.update(availableTimeId, availableTimeStatus);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(availableTimeId)
-                .toUri();
-        return ResponseEntity.created(location).build();
+
+        return ResponseEntity.created(null).build();
     }
 
     @DeleteMapping("/{id}")
