@@ -2,6 +2,9 @@ package com.example.holidayswap.service.chat;
 
 import com.example.holidayswap.domain.dto.request.chat.MessageRequest;
 import com.example.holidayswap.domain.dto.response.chat.MessageResponse;
+import com.example.holidayswap.domain.entity.auth.User;
+import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
+import com.example.holidayswap.domain.entity.chat.ConversationParticipantPK;
 import com.example.holidayswap.domain.entity.chat.Message;
 import com.example.holidayswap.domain.entity.chat.MessageType;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
@@ -58,6 +61,21 @@ public class MessageServiceImpl implements MessageService {
             participant.setMessageId(message.map(Message::getMessageId).orElse(0L));
             conversationParticipantRepository.save(participant);
         });
+    }
+
+    @Override
+    public void createConversationParticipantIfNotExist(User user, Long conversationId) {
+        var conversationParticipant = conversationParticipantRepository.findByUserIdAndConversationId(user.getUserId(), conversationId);
+        if(conversationParticipant.isEmpty()) {
+            var conversationParticipantPK = new ConversationParticipantPK();
+            conversationParticipantPK.setUserId(user.getUserId());
+            conversationParticipantPK.setConversationId(conversationId);
+            conversationParticipantRepository.save(ConversationParticipant.builder()
+                    .conversationParticipantId(conversationParticipantPK)
+                            .user(user)
+                            .conversation(conversationRepository.findById(conversationId).orElse(null))
+                    .build());
+        }
     }
 
     @Override
