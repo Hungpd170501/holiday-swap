@@ -2,6 +2,7 @@ package com.example.holidayswap.controller.chat;
 
 import com.example.holidayswap.domain.dto.request.chat.MessageRequest;
 import com.example.holidayswap.domain.dto.response.chat.MessageResponse;
+import com.example.holidayswap.domain.entity.auth.RoleName;
 import com.example.holidayswap.domain.exception.VerificationException;
 import com.example.holidayswap.service.chat.MessageService;
 import com.example.holidayswap.utils.AuthUtils;
@@ -14,6 +15,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -44,8 +46,13 @@ public class MessageController {
             @ModelAttribute MessageRequest messageRequest
     ) throws IOException {
         var user = authUtils.getAuthenticatedUser();
-        if (chatUtils.isUserNotInConversation(Long.parseLong(user.getUserId().toString()),
-                Long.parseLong(String.valueOf(conversationId)))) {
+        var userId = Long.parseLong(user.getUserId().toString());
+        var conversationIdLong = Long.parseLong(String.valueOf(conversationId));
+        var isUserNotInConversation = chatUtils.isUserNotInConversation(userId, conversationIdLong);
+        if (chatUtils.isStaff(user) && isUserNotInConversation) {
+            messageService.createConversationParticipantIfNotExist(user, conversationIdLong);
+        }
+        if(!chatUtils.isStaff(user) && isUserNotInConversation) {
             throw new VerificationException(USER_NOT_IN_CONVERSATION);
         }
         var message =messageService.createMessage(messageRequest, String.valueOf(conversationId));

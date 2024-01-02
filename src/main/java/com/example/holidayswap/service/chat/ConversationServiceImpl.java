@@ -3,9 +3,11 @@ package com.example.holidayswap.service.chat;
 import com.example.holidayswap.domain.dto.request.chat.ConversationRequest;
 import com.example.holidayswap.domain.dto.response.chat.ConversationParticipantResponse;
 import com.example.holidayswap.domain.dto.response.chat.ConversationResponse;
+import com.example.holidayswap.domain.entity.auth.RoleName;
 import com.example.holidayswap.domain.entity.chat.Conversation;
 import com.example.holidayswap.domain.entity.chat.ConversationParticipant;
 import com.example.holidayswap.domain.entity.chat.ConversationParticipantPK;
+import com.example.holidayswap.domain.entity.chat.ConversationType;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.chat.ConversationMapper;
@@ -46,8 +48,10 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public List<ConversationResponse> getUserConversations() {
         var user = authUtils.getAuthenticatedUser();
-        return conversationRepository.findByUserId(user.getUserId())
-                .stream()
+        var conversations = (user.getRole().getName().equals(RoleName.Staff.name()))
+                ? conversationRepository.getAllSupportConversations()
+                : conversationRepository.findByUserId(user.getUserId());
+        return conversations.stream()
                 .map(this::mapToConversationResponse)
                 .sorted(Comparator.comparing(this::getSortDate).reversed())
                 .toList();
@@ -132,6 +136,34 @@ public class ConversationServiceImpl implements ConversationService {
         var conversation =conversationRepository.save(Conversation.builder()
                 .build());
         var userIds = List.of(currentUser.getUserId(), userId);
+        return createConversationParticipantsAndGetConversationResponse(conversation, userIds);
+    }
+
+    @Override
+    public ConversationResponse getConversationTypeEqualsSupportByCurrentUser() {
+        var user = authUtils.getAuthenticatedUser();
+        var conversation = conversationRepository.findByUserIdEqualsAndTypeEqualsSupport(user.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("No support found with this user."));
+        return ConversationResponse.builder()
+                .conversationId(conversation.getConversationId())
+                .build();
+    }
+
+    @Override
+    public Optional<ConversationResponse> createConversationTypeEqualsSupportByCurrentUser() {
+        var currentUser = authUtils.getAuthenticatedUser();
+        conversationRepository.findByUserIdEqualsAndTypeEqualsSupport(currentUser.getUserId())
+                .ifPresent(conversation -> {
+                    throw new DataIntegrityViolationException("Conversation already exists");
+                });
+        var conversation =conversationRepository.save(Conversation.builder()
+                .conversationType(ConversationType.SUPPORT)
+                .build());
+        var userIds = List.of(currentUser.getUserId());
+        return createConversationParticipantsAndGetConversationResponse(conversation, userIds);
+    }
+
+    private Optional<ConversationResponse> createConversationParticipantsAndGetConversationResponse(Conversation conversation, List<Long> userIds) {
         createConversationParticipants(conversation, userIds);
         var updatedConversation = conversationRepository.findByConversationId(conversation.getConversationId());
         if (updatedConversation.isEmpty()) {

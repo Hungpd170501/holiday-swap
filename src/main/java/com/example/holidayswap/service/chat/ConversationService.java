@@ -17,4 +17,8 @@ public interface ConversationService {
     ConversationResponse getCurrentConverastionWithUserId(Long userId);
 
     Optional<ConversationResponse> createCurrentConversationWithUserId(Long userId);
+
+    ConversationResponse getConversationTypeEqualsSupportByCurrentUser();
+
+    Optional<ConversationResponse> createConversationTypeEqualsSupportByCurrentUser();
 }
