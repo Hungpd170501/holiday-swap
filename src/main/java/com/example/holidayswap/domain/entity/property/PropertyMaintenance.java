@@ -32,7 +32,7 @@ public class PropertyMaintenance {
     private LocalDateTime endDate;
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ResortStatus type;
+    private PropertyStatus type;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "property_id", referencedColumnName = "property_id", nullable = false,

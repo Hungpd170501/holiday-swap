@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +26,10 @@ public class Conversation extends BaseEntityAudit {
 
     @Column
     private String conversationName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "conversation_type")
+    private ConversationType conversationType;
 
     @OneToMany(mappedBy = "conversation")
     private List<ConversationParticipant> participants = new ArrayList<>();
