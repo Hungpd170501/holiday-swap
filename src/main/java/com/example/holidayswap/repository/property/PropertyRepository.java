@@ -54,5 +54,5 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     Optional<Property> findPropertyByIdAndIsDeletedIsFalseAndStatus(Long propertyId, PropertyStatus propertyStatus);
 
     @Query("select r from Property r where r.id = :resortId and r.isDeleted = false and r.status = :resortStatus")
-    Optional<Property> findByIdAndDeletedFalseAndResortStatus(@Param(("resortId")) Long id, @Param(("resortStatus")) ResortStatus resortStatus);
+    Optional<Property> findByIdAndDeletedFalseAndResortStatus(@Param(("resortId")) Long id, @Param(("resortStatus")) PropertyStatus resortStatus);
 }

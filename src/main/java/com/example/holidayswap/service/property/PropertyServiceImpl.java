@@ -198,7 +198,7 @@ public class PropertyServiceImpl implements PropertyService {
         if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
         if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
 
-        var entity = propertyRepository.findByIdAndDeletedFalseAndResortStatus(id, ResortStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Property not available now"));
+        var entity = propertyRepository.findByIdAndDeletedFalseAndResortStatus(id, PropertyStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Property not available now"));
         List<String> listImage = propertyMaintenanceService.CreatePropertyMaintance(id, startDate, endDate, resortStatus, resortImage);
         // TODO: create issue and notification
         bookingService.deactivePropertyNotifyBookingUser(id, startDate, endDate, resortStatus, listImage);

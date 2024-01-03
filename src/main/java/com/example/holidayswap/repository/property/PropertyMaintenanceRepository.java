@@ -1,6 +1,7 @@
 package com.example.holidayswap.repository.property;
 
 import com.example.holidayswap.domain.entity.property.PropertyMaintenance;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,7 @@ import java.util.List;
 @Repository
 public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMaintenance,Long> {
     @Query("select r from PropertyMaintenance r where r.type = ?1 AND r.property.id = ?2")
-    List<PropertyMaintenance> findAllByTypeAndProperty(ResortStatus resortStatus, Long resortId);
+    List<PropertyMaintenance> findAllByTypeAndProperty(PropertyStatus resortStatus, Long resortId);
 
     @Query(value = """
             select r.* from property_maintaince r
