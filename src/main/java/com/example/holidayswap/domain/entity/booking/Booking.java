@@ -32,7 +32,7 @@ public class Booking {
     @Column(name = "available_time_id", nullable = false)
     private Long availableTimeId;
     @ManyToOne
-    @JoinColumn(name = "available_time_id", referencedColumnName = "available_time_id", nullable = false,
+    @JoinColumn(name = "available_time_id", referencedColumnName = "available_time_id",
             insertable = false,
             updatable = false)
     private AvailableTime availableTime;
@@ -97,5 +97,9 @@ public class Booking {
 
     @OneToOne(mappedBy = "booking")
     private Rating rating;
+
+    @Column(name = "type_of_booking", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EnumBookingStatus.TypeOfBooking typeOfBooking;
 
 }

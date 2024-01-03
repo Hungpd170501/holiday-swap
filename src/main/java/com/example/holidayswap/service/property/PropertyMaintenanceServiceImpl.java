@@ -26,17 +26,17 @@ public class PropertyMaintenanceServiceImpl implements IPropertyMaintenanceServi
     @Override
     public List<String> CreatePropertyMaintance(Long resortId, LocalDateTime startDate, LocalDateTime endDate, PropertyStatus resortStatus, List<MultipartFile> resortImage) {
         var checkResort = propertyRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Property not found"));
-        var checkIsDeactivate = propertyMaintenanceRepository.findAllByTypeAndProperty(ResortStatus.DEACTIVATE,resortId);
+        var checkIsDeactivate = propertyMaintenanceRepository.findAllByTypeAndProperty(PropertyStatus.DEACTIVATE,resortId);
         PropertyMaintenance checkIsMaintance = null;
-        checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, ResortStatus.MAINTENANCE.name());
+        checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, PropertyStatus.MAINTENANCE.name());
         if(checkIsDeactivate.size()>0) {
-            throw new RuntimeException("Resort is deactivated");
+            throw new RuntimeException("Property is deactivated");
         }
         if(resortStatus != PropertyStatus.DEACTIVATE) {
-            checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, ResortStatus.MAINTENANCE.name());
+            checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, PropertyStatus.MAINTENANCE.name());
         }
         if(checkIsMaintance != null) {
-            throw new RuntimeException("Resort is already in maintenance");
+            throw new RuntimeException("Property is already in maintenance");
         }
         List<PropertyMaintenanceImage> listimage = new ArrayList<>();
         PropertyMaintenance resortMaintance = new PropertyMaintenance();
