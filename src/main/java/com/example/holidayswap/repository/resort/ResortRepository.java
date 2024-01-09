@@ -67,7 +67,6 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                  left join p.propertyView pv
                  left join at.bookings bk
                  where
-              
                    ((:min is null) or ( at.pricePerNight >= cast(:min as double))
                  and ((:max is null) or at.pricePerNight <= cast(:max as double)))
                  and (
@@ -75,8 +74,11 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                         or ((date(:checkOut) between date(at.startTime) and date(at.endTime))
                         and (date(:checkIn)) between date(at.startTime) and date(at.endTime))
                      )
+                 and co.isDeleted = false
+                 and at.isDeleted = false
+                 and p.isDeleted = false
+                 and r.isDeleted = false
                  and co.status = 'ACCEPTED'
-               
                  and at.status = 'OPEN'
                  and p.status = 'ACTIVE'
                  and r.status = 'ACTIVE'
@@ -86,7 +88,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
                and (p.numberKingBeds * 2
                + p.numberQueenBeds * 2
-               + p. numberSingleBeds
+               + p.numberSingleBeds
                + p.numberDoubleBeds * 2
                + p.numberTwinBeds * 2
                + p.numberFullBeds * 2
@@ -102,6 +104,7 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                    (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk where bk.availableTimeId = at.id)
                    or bk.id is null
                )
+               and at.endTime > current date
             """)
     Page<ResortApartmentForRentDTO> findResort(@Param("locationName") String locationName, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, @Param("userId") Long userId, Pageable pageable);
 

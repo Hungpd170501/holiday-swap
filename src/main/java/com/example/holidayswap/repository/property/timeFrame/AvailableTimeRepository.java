@@ -90,7 +90,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
 
     @Query(value = """
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
-                            at 
+                            at
                          )
             from AvailableTime at
                      left join at.coOwner co
@@ -120,7 +120,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
               and r.status = 'ACTIVE'
               and u.status = 'ACTIVE'
               and co.isDeleted = false
-                        
               and at.isDeleted = false
               and p.isDeleted = false
               and r.isDeleted = false
@@ -129,7 +128,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
               and ((:#{#listOfPropertyType == null} = true) or (pt.id in :listOfPropertyType))
               and (p.numberKingBeds * 2
                 + p.numberQueenBeds * 2
-                + p. numberSingleBeds
+                + p.numberSingleBeds
                 + p.numberDoubleBeds * 2
                 + p.numberTwinBeds * 2
                 + p.numberFullBeds * 2
@@ -152,7 +151,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                          )
                     end
                 )
-              and (at.startTime > current_date and (at.endTime) > current_date)
+              and (  (at.endTime) > current_date)
               """)
     Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
                                                    @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,
