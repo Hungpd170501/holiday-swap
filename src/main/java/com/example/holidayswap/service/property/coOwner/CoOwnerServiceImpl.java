@@ -68,7 +68,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         coOwner.setAvailableTimes(coOwner.getAvailableTimes().stream().filter(a -> !a.isDeleted() && a.getStatus() == AvailableTimeStatus.OPEN).toList());
         coOwner.setContractImages(coOwner.getContractImages().stream().filter(e -> !e.getIsDeleted()).toList());
         var rs = CoOwnerMapper.INSTANCE.toDtoResponse(coOwner);
-        var resort = resortService.get(coOwner.getPropertyId());
+//        var resort = resortService.get(coOwner.getProperty().getResortId());
 //        var listTimeFrame = timeFrameRepository.findAllByPropertyIdAAndUserIdAndRoomId(propertyId, userId, roomId);
 //        List<TimeFrameResponse> listTimeFrameRsp = listTimeFrame.stream().map(TimeFrameMapper.INSTANCE::toDtoResponse).toList();
 //        dtoResponse.setTimeFrames(listTimeFrameRsp);
