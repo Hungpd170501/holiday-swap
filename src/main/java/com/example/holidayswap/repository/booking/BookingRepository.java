@@ -23,7 +23,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                 OR( date  (?2) <= date (check_in_date) AND date (?3) >= date (check_out_date) ))
                             
                               and available_time_id = ?1
-                              and b.status = 5
+                              and (b.status = 5 OR b.status = 6)
+                              
             """, nativeQuery = true)
     List<Booking> checkBookingIsAvailableByCheckinDateAndCheckoutDate(Long availableTimeId, Date checkInDate, Date checkOutDate);
 
@@ -104,6 +105,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                     where property.resort_id = ?1
                       and resort.resort_status != 'DEACTIVE'
                       and b.status = 5
+                      and b.type_of_booking = 'RENT'
                       and ((date(?2) > date(check_in_date) AND date(?2) < date(check_out_date))
                         OR (date(?3) > date(check_in_date) AND date(?3) < date(check_out_date))
                         OR (date(?2) <= date(check_in_date) AND date(?3) >= date(check_out_date)))
@@ -120,6 +122,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
               and property.is_deleted = false
               and property.status = 'ACTIVE'
               and b.status = 5
+              and b.type_of_booking = 'RENT'
               and ((date(?2) > date(check_in_date) AND date(?2) < date(check_out_date))
                 OR (date(?3) > date(check_in_date) AND date(?3) < date(check_out_date))
                 OR (date(?2) <= date(check_in_date) AND date(?3) >= date(check_out_date)))
@@ -144,6 +147,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             where property.resort_id = ?1
               and resort.resort_status != 'DEACTIVE'
               and b.status = 5
+              and b.type_of_booking = 'RENT'
               and (date(?2) <= date(check_in_date))
             """, nativeQuery = true)
     List<Booking> getListBookingHasCheckinAfterDeactiveDate(Long resortId, LocalDateTime startDate);
@@ -158,6 +162,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
               and property.is_deleted = false
               and property.status = 'ACTIVE'
               and b.status = 5
+              and b.type_of_booking = 'RENT'
               and (date(?2) <= date(check_in_date))
             """, nativeQuery = true)
     List<Booking> getListBookingPropertyHasCheckinAfterDeactiveDate(Long property, LocalDateTime startDate);

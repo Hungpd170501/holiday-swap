@@ -6,7 +6,9 @@ import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailR
 import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
 import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
+import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
+import com.example.holidayswap.domain.entity.exchange.Exchange;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.google.zxing.WriterException;
@@ -40,4 +42,7 @@ public interface IBookingService {
 
     void refundPointBookingToOwner(LocalDate date);
     HistoryBookingDetailResponse historyBookingByUUID(String uuid);
+
+    ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException;
+    void updateExchange(Exchange exchange, EnumBookingStatus.BookingStatus bookingStatus);
 }

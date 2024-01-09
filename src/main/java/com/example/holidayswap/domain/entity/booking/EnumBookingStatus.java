@@ -9,6 +9,7 @@ public class EnumBookingStatus {
         EXPIRED,
         SUCCESS,
         FAILED,
+        WAITING_EXCHANGE
     }
      public enum TransferStatus{
          WAITING,
@@ -19,5 +20,9 @@ public class EnumBookingStatus {
          OPEN,
          RESOLVE,
          REFUND
+     }
+     public enum TypeOfBooking{
+         EXCHANGE,
+         RENT
      }
 }
