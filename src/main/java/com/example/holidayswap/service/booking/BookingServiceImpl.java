@@ -381,7 +381,7 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     @Transactional
     public void refundPointBookingToOwner(LocalDate endDate) {
-        List<Booking> bookingList = bookingRepository.getListBookingByDateAndStatusAndTransferStatus(endDate, EnumBookingStatus.BookingStatus.SUCCESS, EnumBookingStatus.TransferStatus.WAITING);
+        List<Booking> bookingList = bookingRepository.getListBookingByDateAndStatusAndTransferStatus(endDate, 5, 0);
         if (bookingList.size() > 0) {
             bookingList.forEach(booking -> {
                 try {
