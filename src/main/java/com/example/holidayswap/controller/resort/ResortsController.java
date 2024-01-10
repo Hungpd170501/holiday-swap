@@ -8,6 +8,7 @@ import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
+import com.example.holidayswap.service.resort.IResortMaintanceService;
 import com.example.holidayswap.service.resort.ResortImageService;
 import com.example.holidayswap.service.resort.ResortService;
 import com.example.holidayswap.service.resort.amenity.ResortAmenityService;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +39,7 @@ public class ResortsController {
     private final ResortImageService resortImageService;
     private final ResortAmenityTypeService resortAmenityTypeService;
     private final ResortAmenityService resortAmenityService;
+    private final IResortMaintanceService resortServiceMaintance;
 
     @GetMapping
     public ResponseEntity<Page<ResortResponse>> gets(
@@ -130,6 +133,14 @@ public class ResortsController {
     public  ResponseEntity<Void> updateStatusResort(@RequestPart ResortRequestUpdate resortUpdateRequest,
                                                     @RequestPart(required = false) List<MultipartFile> resortImage) throws MessagingException, IOException {
         resortService.updateStatus(resortUpdateRequest.getResortId(), resortUpdateRequest.getResortStatus(), resortUpdateRequest.getStartDate(), resortUpdateRequest.getEndDate(), resortImage);
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/deactiveResortAtStartDate")
+    public ResponseEntity<Void> deactiveResortAtStartDate() {
+        LocalDateTime dateNowTime = LocalDateTime.now();
+
+        resortServiceMaintance.deactiveResort(dateNowTime);
+//        resortService.DeactiveResortAtStartDate(LocalDateTime.now());
         return ResponseEntity.noContent().build();
     }
 }

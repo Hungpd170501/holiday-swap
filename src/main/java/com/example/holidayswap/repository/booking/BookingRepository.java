@@ -135,7 +135,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = """
             SELECT b.* FROM booking b where date (b.check_out_date) <= date(?1) and status = ?2 and transfer_status = ?3 
              """, nativeQuery = true)
-    List<Booking> getListBookingByDateAndStatusAndTransferStatus(LocalDate date, EnumBookingStatus.BookingStatus status, EnumBookingStatus.TransferStatus transferStatus);
+    List<Booking> getListBookingByDateAndStatusAndTransferStatus(LocalDate date, int status, int transferStatus);
 
     @Query(value = """
             SELECT b.*
