@@ -2,10 +2,7 @@ package com.example.holidayswap.service.booking;
 
 
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
-import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
-import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
-import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
-import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
+import com.example.holidayswap.domain.dto.response.booking.*;
 import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.exchange.Exchange;
@@ -45,4 +42,6 @@ public interface IBookingService {
 
     ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException;
     void updateExchange(Exchange exchange, EnumBookingStatus.BookingStatus bookingStatus);
+
+    List<BookingCoOwnerResponse> historyBookingByCoOwnerId(Long coOwnerId);
 }
