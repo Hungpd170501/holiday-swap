@@ -71,6 +71,13 @@ public class BookingController {
 
     }
 
+    @GetMapping("/co-owner/{co-owner-id}")
+    public ResponseEntity<?> getHistoryBookingByCoOwnerId(@PathVariable("co-owner-id") Long coOwnerId
+    ) {
+        var history = bookingService.historyBookingByCoOwnerId(coOwnerId);
+        return ResponseEntity.ok(history);
+    }
+
     @GetMapping("/refund")
     public ResponseEntity<?> refundPointBookingToOwner() {
         bookingService.refundPointBookingToOwner(java.time.LocalDate.now());

@@ -3,10 +3,7 @@ package com.example.holidayswap.service.booking;
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.request.notification.NotificationRequest;
 import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
-import com.example.holidayswap.domain.dto.response.booking.HistoryBookingDetailResponse;
-import com.example.holidayswap.domain.dto.response.booking.HistoryBookingResponse;
-import com.example.holidayswap.domain.dto.response.booking.HistoryDetailBookingOwnerResponse;
-import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
+import com.example.holidayswap.domain.dto.response.booking.*;
 import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
@@ -17,6 +14,7 @@ import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
+import com.example.holidayswap.domain.mapper.booking.BookingMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.booking.IssueBookingRepository;
 import com.example.holidayswap.repository.booking.UserOfBookingRepository;
@@ -49,6 +47,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -67,6 +66,7 @@ public class BookingServiceImpl implements IBookingService {
     private final UserService userService;
     private final IssueBookingRepository issueBookingRepository;
     private final IIssueBookingService issueBookingService;
+    private final BookingMapper bookingMapper;
 
 
     @Override
@@ -550,6 +550,13 @@ public class BookingServiceImpl implements IBookingService {
         bookingRepository.save(booking1);
         bookingRepository.save(booking2);
 
+    }
+
+    @Override
+    public List<BookingCoOwnerResponse> historyBookingByCoOwnerId(Long coOwnerId) {
+        List<HistoryBookingResponse> historyBookingResponses = new ArrayList<>();
+        var bookingList = bookingRepository.findAllByUserIdAndCoOwnerId(coOwnerId);
+        return bookingList.stream().map(bookingMapper::toDtoResponse).collect(Collectors.toList());
     }
 
 
