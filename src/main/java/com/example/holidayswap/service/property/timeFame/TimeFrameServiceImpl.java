@@ -60,25 +60,25 @@ public class TimeFrameServiceImpl implements TimeFrameService {
 //                    co.getUserId(),
                     co.getRoomId(), co.getStartTime(), weekNumber);
             if (!listTimeFrameDEEDEDDuplicate.isEmpty())
-                throw new DataIntegrityViolationException("Duplicate with other user!. DEEDED");
+                throw new DataIntegrityViolationException("Duplicate!.");
             var listTimeFrameDEEDEDDuplicate2 = timeFrameRepository.findByPropertyIdAndRoomIdAndWeekNumberDEEDEDDuplicate(co.getPropertyId(),
 //                    co.getUserId(),
                     co.getRoomId(),
                     weekNumber);
             if (!listTimeFrameDEEDEDDuplicate2.isEmpty())
-                throw new DataIntegrityViolationException("Duplicate with other user!. DEEDED");
+                throw new DataIntegrityViolationException("Duplicate!.");
         } else {
             var listTimeFrameRIGHTTOUSEDuplicate = timeFrameRepository.findByPropertyIdAndRoomIdAndWeekNumberRIGHTTOUSEDuplicate(co.getPropertyId(),
 //                    co.getUserId(),
                     co.getRoomId(), co.getStartTime(), co.getEndTime(), weekNumber);
             if (!listTimeFrameRIGHTTOUSEDuplicate.isEmpty())
-                throw new DataIntegrityViolationException("Duplicate with other user!. RIGHT_TO_USE");
+                throw new DataIntegrityViolationException("Duplicate!.");
         }
     }
 
     void checkUserIsCreateThisWeek(CoOwner co, ContractType contractType, Integer weekNumber) {
         var tf = timeFrameRepository.findByPropertyIdAndUserIdAndRoomIdAndCoOwnerTypeAndWeekNumber(co.getPropertyId(),
-                co.getUserId(), co.getRoomId(), co.getType().toString(), weekNumber);
+                co.getUserId(), co.getRoomId(), co.getType().toString(), weekNumber, co.getStartTime(), co.getEndTime());
         if (tf.isPresent()) throw new DataIntegrityViolationException("User already created this week!.");
     }
 

@@ -166,26 +166,31 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
                                                                               @Param("weekNumber") Integer weekNumber);
 
     @Query(value = """
-            SELECT
-                TF.*
-            FROM
-                TIME_FRAME TF
-                    INNER JOIN
-                CO_OWNER CO
-                ON  CO.CO_OWNER_ID = TF.CO_OWNER_ID
-            WHERE
-                CO.PROPERTY_ID = :propertyId
+            SELECT TF.*
+            FROM TIME_FRAME TF
+                     INNER JOIN
+                 CO_OWNER CO
+                 ON CO.CO_OWNER_ID = TF.CO_OWNER_ID
+            WHERE CO.PROPERTY_ID = :propertyId
               AND CO.ROOM_ID = :roomId
               AND CO.USER_ID = :userId
               AND CO.TYPE = :type
               AND TF.WEEK_NUMBER = :weekNumber
+              AND CASE
+                      WHEN :type = 'DEEDED'
+                          THEN CO.TYPE = 'DEEDED' AND :startDate = CO.START_TIME
+                      ELSE (DATE(:startDate) BETWEEN DATE(CO.START_TIME) AND DATE(CO.END_TIME) OR
+                            DATE(:endDate) BETWEEN DATE(CO.START_TIME) AND DATE(CO.END_TIME))
+                END
             """, nativeQuery = true)
     Optional<TimeFrame> findByPropertyIdAndUserIdAndRoomIdAndCoOwnerTypeAndWeekNumber(
             @Param("propertyId") Long propertyId,
             @Param("userId") Long userId,
             @Param("roomId") String roomId,
             @Param("type") String type,
-            @Param("weekNumber") Integer weekNumber);
+            @Param("weekNumber") Integer weekNumber,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 //    @Query(value = """
 //            select tf from TimeFrame tf
 //            where tf.roomId = :roomId
