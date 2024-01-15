@@ -2,17 +2,16 @@ package com.example.holidayswap.repository.property;
 
 import com.example.holidayswap.domain.entity.property.PropertyMaintenance;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
-import com.example.holidayswap.domain.entity.resort.ResortMaintance;
-import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Repository
-public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMaintenance,Long> {
+public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMaintenance, Long> {
     @Query("select r from PropertyMaintenance r where r.type = ?1 AND r.property.id = ?2")
     List<PropertyMaintenance> findAllByTypeAndProperty(PropertyStatus resortStatus, Long resortId);
 
@@ -26,4 +25,9 @@ public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMai
 
     @Query(value = "select r.* from property_maintaince r where r.type = ?1 and date (r.start_date) = date (?2)", nativeQuery = true)
     List<PropertyMaintenance> findByTypeAndStartDate(String type, LocalDateTime startDate);
+
+    @Query(value = """
+            select pm.property_id from property_maintaince pm where current_date between pm.start_date and pm.end_date
+             """, nativeQuery = true)
+    Set<Long> findCanNotUse();
 }

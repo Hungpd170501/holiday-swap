@@ -105,8 +105,11 @@ public interface ResortRepository extends JpaRepository<Resort, Long> {
                    or bk.id is null
                )
                and at.endTime > current date
+               and ((:#{#listPropertyCanNotUse == null} = true) or (co.propertyId not in :listPropertyCanNotUse))
+               and ((:#{#listResortCanNotUse == null} = true) or (p.resortId not in :listResortCanNotUse))
             """)
-    Page<ResortApartmentForRentDTO> findResort(@Param("locationName") String locationName, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, @Param("userId") Long userId, Pageable pageable);
+    Page<ResortApartmentForRentDTO> findResort(@Param("locationName") String locationName, @Param("checkIn") Date checkIn, @Param("checkOut") Date checkOut, @Param("min") Long min, @Param("max") Long max, @Param("guest") int guest, @Param("numberBedsRoom") int numberBedsRoom, @Param("numberBathRoom") int numberBathRoom, @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity, @Param("listOfPropertyView") Set<Long> listOfPropertyView, @Param("listOfPropertyType") Set<Long> listOfPropertyType, @Param("listResortCanNotUse") Set<Long> listResortCanNotUse,
+                                               @Param("listPropertyCanNotUse") Set<Long> listPropertyCanNotUse, @Param("userId") Long userId, Pageable pageable);
 
     @Query(value = """
             select distinct r from Resort r
