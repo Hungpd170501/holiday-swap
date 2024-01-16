@@ -135,7 +135,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = """
             SELECT b.* FROM booking b where date (b.check_out_date) <= date(?1) and status = ?2 and transfer_status = ?3 
              """, nativeQuery = true)
-    List<Booking> getListBookingByDateAndStatusAndTransferStatus(LocalDate date, EnumBookingStatus.BookingStatus status, EnumBookingStatus.TransferStatus transferStatus);
+    List<Booking> getListBookingByDateAndStatusAndTransferStatus(LocalDate date, int status, int transferStatus);
 
     @Query(value = """
             SELECT b.*
@@ -173,4 +173,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "inner join b.availableTime at " +
             " where at.coOwnerId = :co_owner_id  and b.status = 5 ")
     List<TimeHasBooked> getTimeHasBookedByCoOwnerId(@Param("co_owner_id") Long coOwnerId);
+
+    @Query(value = """
+            select booking.*
+            from booking
+                     inner join available_time on booking.available_time_id = available_time.available_time_id
+                     inner join public.co_owner co on co.co_owner_id = available_time.co_owner_id
+            where co.co_owner_id = :coOwnerId
+            order by (booking.date_booking, book_id)
+            """, nativeQuery = true)
+    List<Booking> findAllByUserIdAndCoOwnerId(Long coOwnerId);
 }

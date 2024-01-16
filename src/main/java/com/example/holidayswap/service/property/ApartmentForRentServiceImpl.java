@@ -7,7 +7,9 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
 import com.example.holidayswap.domain.mapper.property.ResortApartmentForRentMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
+import com.example.holidayswap.repository.property.PropertyMaintenanceRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
+import com.example.holidayswap.repository.resort.ResortMaintanceRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.amenity.InRoomAmenityTypeServiceImpl;
 import com.example.holidayswap.service.property.rating.RatingServiceImpl;
@@ -32,15 +34,21 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final ResortApartmentForRentMapper resortApartmentForRentMapper;
     private final AuthUtils authUtils;
     private final RatingServiceImpl ratingService;
+    private final ResortMaintanceRepository resortMaintanceRepository;
+    private final PropertyMaintenanceRepository propertyMaintenanceRepository;
 
     @Override
     public Page<ApartmentForRentResponse> gets(String locationName, Long resortId, Date checkIn, Date checkOut, Long min, Long max, int guest, int numberBedsRoom, int numberBathRoom, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
         var user = authUtils.GetUser();
         Long userId = null;
         if (user.isPresent()) userId = user.get().getUserId();
+        var listResortMaintain = resortMaintanceRepository.findCanNotUse();
+        var listPropertyMaintain = propertyMaintenanceRepository.findCanNotUse();
+        if (listResortMaintain.isEmpty()) listResortMaintain = null;
+        if (listPropertyMaintain.isEmpty()) listPropertyMaintain = null;
         var dto = availableTimeRepository.findApartmentForRent(StringUtils.stripAccents(locationName).toUpperCase(),
                 resortId, checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity,
-                listOfPropertyView, listOfPropertyType, userId, pageable);
+                listOfPropertyView, listOfPropertyType, listResortMaintain, listPropertyMaintain, userId, pageable);
         var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
         response.forEach(e -> {
             var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getAvailableTime().getCoOwner().getProperty().getId());
@@ -58,10 +66,13 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
         var user = authUtils.GetUser();
         Long userId = null;
         if (user.isPresent()) userId = user.get().getUserId();
-        var dto = resortRepository.findResort(StringUtils.stripAccents(locationName).toUpperCase(), checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, userId, pageable);
+        var listResortMaintain = resortMaintanceRepository.findCanNotUse();
+        var listPropertyMaintain = propertyMaintenanceRepository.findCanNotUse();
+        if (listResortMaintain.isEmpty()) listResortMaintain = null;
+        if (listPropertyMaintain.isEmpty()) listPropertyMaintain = null;
+        var dto = resortRepository.findResort(StringUtils.stripAccents(locationName).toUpperCase(), checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity, listOfPropertyView, listOfPropertyType, listResortMaintain, listPropertyMaintain, userId, pageable);
         var response = dto.map(resortApartmentForRentMapper::toDtoResponse);
         response.forEach(e -> {
-
         });
         return response;
     }

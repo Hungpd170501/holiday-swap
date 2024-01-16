@@ -1,13 +1,10 @@
 package com.example.holidayswap.services.impl;
 
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO;
-import com.example.holidayswap.domain.dto.response.property.ApartmentForRentResponse;
-import com.example.holidayswap.domain.entity.auth.User;
-import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
 import com.example.holidayswap.domain.mapper.property.ResortApartmentForRentMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
-import com.example.holidayswap.repository.property.rating.RatingRepository;
+import com.example.holidayswap.repository.property.PropertyMaintenanceRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
+import com.example.holidayswap.repository.resort.ResortMaintanceRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.property.ApartmentForRentServiceImpl;
 import com.example.holidayswap.service.property.PropertyImageServiceImpl;
@@ -16,13 +13,8 @@ import com.example.holidayswap.service.property.rating.RatingServiceImpl;
 import com.example.holidayswap.utils.AuthUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-
-import java.util.List;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class ApartmentForRentServiceImplTest {
     ApartmentForRentServiceImpl apartmentForRentServiceImplUnderTest;
@@ -34,9 +26,11 @@ public class ApartmentForRentServiceImplTest {
     ResortApartmentForRentMapper resortApartmentForRentMapper;
     AuthUtils authUtils;
     RatingServiceImpl ratingRepository;
+    ResortMaintanceRepository resortMaintanceRepository;
+    PropertyMaintenanceRepository propertyMaintenanceRepository;
 
     @BeforeEach
-    void beforeEach(){
+    void beforeEach() {
 
         inRoomAmenityTypeServiceImplUnderTest = mock(InRoomAmenityTypeServiceImpl.class);
         propertyImageServiceImplUnderTest = mock(PropertyImageServiceImpl.class);
@@ -46,11 +40,11 @@ public class ApartmentForRentServiceImplTest {
         resortApartmentForRentMapper = mock(ResortApartmentForRentMapper.class);
         authUtils = mock(AuthUtils.class);
         ratingRepository = mock(RatingServiceImpl.class);
-        apartmentForRentServiceImplUnderTest = new ApartmentForRentServiceImpl(inRoomAmenityTypeServiceImplUnderTest, propertyImageServiceImplUnderTest, availableTimeRepository, bookingRepository, resortRepository, resortApartmentForRentMapper, authUtils, ratingRepository);
+        apartmentForRentServiceImplUnderTest = new ApartmentForRentServiceImpl(inRoomAmenityTypeServiceImplUnderTest, propertyImageServiceImplUnderTest, availableTimeRepository, bookingRepository, resortRepository, resortApartmentForRentMapper, authUtils, ratingRepository, resortMaintanceRepository, propertyMaintenanceRepository);
     }
 
     @Test
-    void gets_ShouldReturnPage_WhenInputIsValid(){
+    void gets_ShouldReturnPage_WhenInputIsValid() {
 //        var apartmentForRentDTO1 = ApartmentForRentDTO.builder().build();
 //        var apartmentForRentDTO2 = ApartmentForRentDTO.builder().build();
 //        Page<ApartmentForRentDTO> page = new PageImpl<>(List.of(apartmentForRentDTO1, apartmentForRentDTO2));

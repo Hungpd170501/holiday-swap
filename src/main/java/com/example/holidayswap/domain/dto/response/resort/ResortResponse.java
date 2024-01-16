@@ -2,11 +2,11 @@ package com.example.holidayswap.domain.dto.response.resort;
 
 import com.example.holidayswap.domain.dto.response.property.PropertyTypeResponse;
 import com.example.holidayswap.domain.dto.response.resort.amenity.ResortAmenityTypeResponse;
-import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class ResortResponse {
@@ -25,5 +25,5 @@ public class ResortResponse {
     private String postalCode;
     private Float latitude;
     private Float longitude;
-    private List<ResortMaintance> resortMaintances;
+    private Set<ResortMaintanceResponse> resortMaintainces;
 }

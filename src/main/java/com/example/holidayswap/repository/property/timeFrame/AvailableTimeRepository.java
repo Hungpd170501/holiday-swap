@@ -101,7 +101,8 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                      left join p.inRoomAmenities ira
                      left join p.propertyType pt
                      left join p.propertyView pv
-                     left join  at.bookings bk
+                     left join at.bookings bk
+                     left join r.resortMaintainces rM
             where
                 ((:resortId is null) or (r.id = :resortId))
               and ((:min is null) or ( at.pricePerNight >= cast(:min as double))
@@ -114,7 +115,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     and (date(:checkIn)) between date(at.startTime) and date(at.endTime))
                 )
               and co.status = 'ACCEPTED'
-                        
               and at.status = 'OPEN'
               and p.status = 'ACTIVE'
               and r.status = 'ACTIVE'
@@ -151,7 +151,9 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                          )
                     end
                 )
-              and (  (at.endTime) > current_date)
+              and ((at.endTime) > current_date)
+              and ((:#{#listPropertyCanNotUse == null} = true) or (co.propertyId not in :listPropertyCanNotUse))
+              and ((:#{#listResortCanNotUse == null} = true) or (p.resortId not in :listResortCanNotUse))
               """)
     Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
                                                    @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,
@@ -162,6 +164,8 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                                                    @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
                                                    @Param("listOfPropertyView") Set<Long> listOfPropertyView,
                                                    @Param("listOfPropertyType") Set<Long> listOfPropertyType,
+                                                   @Param("listResortCanNotUse") Set<Long> listResortCanNotUse,
+                                                   @Param("listPropertyCanNotUse") Set<Long> listPropertyCanNotUse,
                                                    @Param("userId") Long userId, Pageable pageable);
 
     @Query(value = """

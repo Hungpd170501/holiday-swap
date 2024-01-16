@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance, Long> {
@@ -37,4 +38,9 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
 
     @Query(value = "select r.* from resort_maintaince r where r.type = ?1 and date (r.start_date) <= date (?2)", nativeQuery = true)
     List<ResortMaintance> findByTypeAndStartDate(String type, LocalDateTime startDate);
+
+    @Query(value = """
+            select rm.resort_id from resort_maintaince rm where current_date between rm.start_date and rm.end_date
+            """, nativeQuery = true)
+    Set<Long> findCanNotUse();
 }

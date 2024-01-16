@@ -6,6 +6,7 @@ import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class PropertyResponse {
@@ -32,4 +33,5 @@ public class PropertyResponse {
     private List<InRoomAmenityTypeResponse> inRoomAmenityType;
     private List<PropertyImageResponse> propertyImages;
     private Double rating;
+    private Set<PropertyMaintenanceResponse> propertyMaintenance;
 }

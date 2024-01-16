@@ -70,4 +70,17 @@ public class BookingController {
         return history != null ? ResponseEntity.ok(history) : ResponseEntity.badRequest().body("Not Found");
 
     }
+
+    @GetMapping("/co-owner/{co-owner-id}")
+    public ResponseEntity<?> getHistoryBookingByCoOwnerId(@PathVariable("co-owner-id") Long coOwnerId
+    ) {
+        var history = bookingService.historyBookingByCoOwnerId(coOwnerId);
+        return ResponseEntity.ok(history);
+    }
+
+    @GetMapping("/refund")
+    public ResponseEntity<?> refundPointBookingToOwner() {
+        bookingService.refundPointBookingToOwner(java.time.LocalDate.now());
+        return ResponseEntity.ok("Success");
+    }
 }
