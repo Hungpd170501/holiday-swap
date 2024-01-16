@@ -40,8 +40,8 @@ public interface IBookingService {
     void refundPointBookingToOwner(LocalDate date);
     HistoryBookingDetailResponse historyBookingByUUID(String uuid);
 
-    ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException;
-    void updateExchange(Exchange exchange, EnumBookingStatus.BookingStatus bookingStatus);
+//    ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException;
+//    void updateExchange(Exchange exchange, EnumBookingStatus.BookingStatus bookingStatus);
 
     List<BookingCoOwnerResponse> historyBookingByCoOwnerId(Long coOwnerId);
 }

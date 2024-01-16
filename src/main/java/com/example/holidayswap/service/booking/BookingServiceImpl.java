@@ -419,138 +419,138 @@ public class BookingServiceImpl implements IBookingService {
         return historyBookingDetailResponse;
     }
 
-    @Override
-    @Transactional
-    public ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException {
-        if(exchange.getCheckInDateOfUser1().after(exchange.getCheckOutDateOfUser1()) || exchange.getCheckInDateOfUser2().after(exchange.getCheckOutDateOfUser2()))
-            throw new RuntimeException("Check in date must be before check out date");
-        UserProfileResponse user1 = userService.getUserById(exchange.getUserIdOfUser1());
-        UserProfileResponse user2 = userService.getUserById(exchange.getUserIdOfUser2());
-        List<Booking> checkBookingOverlap1, checkBookingOverlap2;
-        UUID uuid = UUID.randomUUID();
-        String uuidString1 = uuid.toString();
-        String uuidString2 = uuid.toString();
-        var notificationRequestForOwner = new NotificationRequest();
-        var notificationRequestForUserBooking = new NotificationRequest();
-        LocalDate localDateCheckin1, localDateCheckout1, localDateCheckin2, localDateCheckout2;
-//        LocalDate localDateCheckout;
-        Booking booking1 = new Booking();
-        Booking booking2 = new Booking();
-        String qrCode1, qrCode2;
-        AvailableTime availableTime1, availableTime2;
-        long days1, days2;
-        RLock fairLock1 = RedissonLockUtils.getFairLock("booking-" + exchange.getAvailableTimeIdOfUser1());
-        boolean tryLock = fairLock1.tryLock(10, 10, TimeUnit.SECONDS);
-        RLock fairLock2 = RedissonLockUtils.getFairLock("booking-" + exchange.getAvailableTimeIdOfUser2());
-        boolean tryLock2 = fairLock2.tryLock(10, 10, TimeUnit.SECONDS);
-        if (tryLock && tryLock2) {
-            try {
-                availableTime1 = availableTimeRepository.findAvailableTimeByIdAndStartTimeAndEndTime(exchange.getAvailableTimeIdOfUser1(), exchange.getCheckInDateOfUser2(), exchange.getCheckOutDateOfUser2()).orElseThrow(() -> new EntityNotFoundException("Apartment of "+ user1.getUsername() +"not available in this time"));
-                availableTime2 = availableTimeRepository.findAvailableTimeByIdAndStartTimeAndEndTime(exchange.getAvailableTimeIdOfUser2(), exchange.getCheckInDateOfUser1(), exchange.getCheckOutDateOfUser1()).orElseThrow(() -> new EntityNotFoundException("Apartment of "+ user2.getUsername() +"not available in this time"));
-//                 TODO: check booking of this apartment
-                checkBookingOverlap1 = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(exchange.getAvailableTimeIdOfUser1(), exchange.getCheckInDateOfUser2(), exchange.getCheckInDateOfUser2());
-                checkBookingOverlap2 = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(exchange.getAvailableTimeIdOfUser2(), exchange.getCheckInDateOfUser1(), exchange.getCheckInDateOfUser1());
-
-                //                checkBooking = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getAvailableTimeId());
-
-                if (!checkBookingOverlap1.isEmpty() && !checkBookingOverlap2.isEmpty())
-                    throw new EntityNotFoundException("This apartment is not available in this time");
-
-
-                // TODO: create booking
-                localDateCheckin1 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckInDateOfUser1()));
-                localDateCheckout1 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckOutDateOfUser1()));
-                localDateCheckin2 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckInDateOfUser2()));
-                localDateCheckout2 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckOutDateOfUser2()));
-
-                days1 = ChronoUnit.DAYS.between(localDateCheckin1, localDateCheckout1);
-                days2 = ChronoUnit.DAYS.between(localDateCheckin2, localDateCheckout2);
-
-                //thêm đường dẫn vào trước uuidString
-                qrCode1 = fileService.createQRCode("https://holiday-swap.vercel.app/informationBooking/" + uuidString1);
-                qrCode2 = fileService.createQRCode("https://holiday-swap.vercel.app/informationBooking/" + uuidString2);
-
-                booking1.setUuid(uuidString1);
-                booking1.setQrcode(qrCode1);
-                booking1.setCheckInDate(exchange.getCheckInDateOfUser1());
-                booking1.setCheckOutDate(exchange.getCheckOutDateOfUser1());
-                booking1.setUserBookingId(exchange.getUserIdOfUser1());
-                booking1.setOwnerId(exchange.getUserIdOfUser2());
-                booking1.setAvailableTimeId(exchange.getAvailableTimeIdOfUser2());
-//                booking1.setAvailableTime(availableTime);
-                booking1.setTotalDays(days1);
-                booking1.setTotalMember(exchange.getTotalMemberOfUser1());
-                booking1.setStatusCheckReturn(false);
-                booking1.setPrice(exchange.getPriceOfUser1());
-                booking1.setCommission(0D);
-                booking1.setDateBooking(Helper.getCurrentDate());
-                booking1.setActualPrice(exchange.getPriceOfUser1());
-                booking1.setStatus(EnumBookingStatus.BookingStatus.WAITING_EXCHANGE);
-                booking1.setTransferStatus(EnumBookingStatus.TransferStatus.WAITING);
-                booking1.setTypeOfBooking(EnumBookingStatus.TypeOfBooking.EXCHANGE);
-                booking1 = bookingRepository.save(booking1);
-
-                booking2.setUuid(uuidString2);
-                booking2.setQrcode(qrCode2);
-                booking2.setCheckInDate(exchange.getCheckInDateOfUser2());
-                booking2.setCheckOutDate(exchange.getCheckOutDateOfUser2());
-                booking2.setUserBookingId(exchange.getUserIdOfUser2());
-                booking2.setOwnerId(exchange.getUserIdOfUser1());
-                booking2.setAvailableTimeId(exchange.getAvailableTimeIdOfUser1());
-//                booking2.setAvailableTime(availableTime);
-                booking2.setTotalDays(days2);
-                booking2.setTotalMember(exchange.getTotalMemberOfUser2());
-                booking2.setStatusCheckReturn(false);
-                booking2.setPrice(exchange.getPriceOfUser2());
-                booking2.setCommission(0D);
-                booking2.setDateBooking(Helper.getCurrentDate());
-                booking2.setActualPrice(exchange.getPriceOfUser2());
-                booking2.setStatus(EnumBookingStatus.BookingStatus.WAITING_EXCHANGE);
-                booking2.setTransferStatus(EnumBookingStatus.TransferStatus.WAITING);
-                booking2.setTypeOfBooking(EnumBookingStatus.TypeOfBooking.EXCHANGE);
-                booking2 = bookingRepository.save(booking2);
-
-
-                //TODO trừ point trong ví
-
-//                transferPointService.payBooking(booking);
-                //create notification for user booking
-                notificationRequestForUserBooking.setSubject("Complete phase 1");
-                notificationRequestForUserBooking.setContent("Booking Apartment " + booking1.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking1.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking1.getCheckInDate() + " to " + booking1.getCheckOutDate());
-                notificationRequestForUserBooking.setToUserId(exchange.getUserIdOfUser1());
-                pushNotificationService.createNotification(notificationRequestForUserBooking);
-                //create notification for owner
-                notificationRequestForOwner.setSubject("Complete phase 1");
-                notificationRequestForUserBooking.setContent("Booking Apartment " + booking2.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking2.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking2.getCheckInDate() + " to " + booking2.getCheckOutDate());
-                notificationRequestForOwner.setToUserId(exchange.getUserIdOfUser2());
-                pushNotificationService.createNotification(notificationRequestForOwner);
-                emailService.sendConfirmBookedHtml(booking1, user1.getEmail());
-                emailService.sendConfirmBookedHtml(booking2, user2.getEmail());
-                ExchangeResponse exchangeResponse = new ExchangeResponse();
-                exchangeResponse.setBookingIdOfUser1(booking1.getId());
-                exchangeResponse.setBookingIdOfUser2(booking2.getId());
-                return exchangeResponse;
-            } catch (MessagingException e) {
-                throw new RuntimeException(e);
-            } finally {
-                fairLock1.unlock();
-                fairLock2.unlock();
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void updateExchange(Exchange exchange,EnumBookingStatus.BookingStatus bookingStatus) {
-        Booking booking1 = bookingRepository.findById(exchange.getBookingIdOfUser1()).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
-        Booking booking2 = bookingRepository.findById(exchange.getBookingIdOfUser2()).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
-
-        booking1.setStatus(bookingStatus);
-        booking2.setStatus(bookingStatus);
-        bookingRepository.save(booking1);
-        bookingRepository.save(booking2);
-
-    }
+//    @Override
+//    @Transactional
+//    public ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException {
+//        if(exchange.getCheckInDateOfUser1().after(exchange.getCheckOutDateOfUser1()) || exchange.getCheckInDateOfUser2().after(exchange.getCheckOutDateOfUser2()))
+//            throw new RuntimeException("Check in date must be before check out date");
+//        UserProfileResponse user1 = userService.getUserById(exchange.getUserIdOfUser1());
+//        UserProfileResponse user2 = userService.getUserById(exchange.getUserIdOfUser2());
+//        List<Booking> checkBookingOverlap1, checkBookingOverlap2;
+//        UUID uuid = UUID.randomUUID();
+//        String uuidString1 = uuid.toString();
+//        String uuidString2 = uuid.toString();
+//        var notificationRequestForOwner = new NotificationRequest();
+//        var notificationRequestForUserBooking = new NotificationRequest();
+//        LocalDate localDateCheckin1, localDateCheckout1, localDateCheckin2, localDateCheckout2;
+////        LocalDate localDateCheckout;
+//        Booking booking1 = new Booking();
+//        Booking booking2 = new Booking();
+//        String qrCode1, qrCode2;
+//        AvailableTime availableTime1, availableTime2;
+//        long days1, days2;
+//        RLock fairLock1 = RedissonLockUtils.getFairLock("booking-" + exchange.getAvailableTimeIdOfUser1());
+//        boolean tryLock = fairLock1.tryLock(10, 10, TimeUnit.SECONDS);
+//        RLock fairLock2 = RedissonLockUtils.getFairLock("booking-" + exchange.getAvailableTimeIdOfUser2());
+//        boolean tryLock2 = fairLock2.tryLock(10, 10, TimeUnit.SECONDS);
+//        if (tryLock && tryLock2) {
+//            try {
+//                availableTime1 = availableTimeRepository.findAvailableTimeByIdAndStartTimeAndEndTime(exchange.getAvailableTimeIdOfUser1(), exchange.getCheckInDateOfUser2(), exchange.getCheckOutDateOfUser2()).orElseThrow(() -> new EntityNotFoundException("Apartment of "+ user1.getUsername() +"not available in this time"));
+//                availableTime2 = availableTimeRepository.findAvailableTimeByIdAndStartTimeAndEndTime(exchange.getAvailableTimeIdOfUser2(), exchange.getCheckInDateOfUser1(), exchange.getCheckOutDateOfUser1()).orElseThrow(() -> new EntityNotFoundException("Apartment of "+ user2.getUsername() +"not available in this time"));
+////                 TODO: check booking of this apartment
+//                checkBookingOverlap1 = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(exchange.getAvailableTimeIdOfUser1(), exchange.getCheckInDateOfUser2(), exchange.getCheckInDateOfUser2());
+//                checkBookingOverlap2 = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDate(exchange.getAvailableTimeIdOfUser2(), exchange.getCheckInDateOfUser1(), exchange.getCheckInDateOfUser1());
+//
+//                //                checkBooking = bookingRepository.checkBookingIsAvailableByCheckinDateAndCheckoutDateAndAvailableId(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getAvailableTimeId());
+//
+//                if (!checkBookingOverlap1.isEmpty() && !checkBookingOverlap2.isEmpty())
+//                    throw new EntityNotFoundException("This apartment is not available in this time");
+//
+//
+//                // TODO: create booking
+//                localDateCheckin1 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckInDateOfUser1()));
+//                localDateCheckout1 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckOutDateOfUser1()));
+//                localDateCheckin2 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckInDateOfUser2()));
+//                localDateCheckout2 = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(exchange.getCheckOutDateOfUser2()));
+//
+//                days1 = ChronoUnit.DAYS.between(localDateCheckin1, localDateCheckout1);
+//                days2 = ChronoUnit.DAYS.between(localDateCheckin2, localDateCheckout2);
+//
+//                //thêm đường dẫn vào trước uuidString
+//                qrCode1 = fileService.createQRCode("https://holiday-swap.vercel.app/informationBooking/" + uuidString1);
+//                qrCode2 = fileService.createQRCode("https://holiday-swap.vercel.app/informationBooking/" + uuidString2);
+//
+//                booking1.setUuid(uuidString1);
+//                booking1.setQrcode(qrCode1);
+//                booking1.setCheckInDate(exchange.getCheckInDateOfUser1());
+//                booking1.setCheckOutDate(exchange.getCheckOutDateOfUser1());
+//                booking1.setUserBookingId(exchange.getUserIdOfUser1());
+//                booking1.setOwnerId(exchange.getUserIdOfUser2());
+//                booking1.setAvailableTimeId(exchange.getAvailableTimeIdOfUser2());
+////                booking1.setAvailableTime(availableTime);
+//                booking1.setTotalDays(days1);
+//                booking1.setTotalMember(exchange.getTotalMemberOfUser1());
+//                booking1.setStatusCheckReturn(false);
+//                booking1.setPrice(exchange.getPriceOfUser1());
+//                booking1.setCommission(0D);
+//                booking1.setDateBooking(Helper.getCurrentDate());
+//                booking1.setActualPrice(exchange.getPriceOfUser1());
+//                booking1.setStatus(EnumBookingStatus.BookingStatus.WAITING_EXCHANGE);
+//                booking1.setTransferStatus(EnumBookingStatus.TransferStatus.WAITING);
+//                booking1.setTypeOfBooking(EnumBookingStatus.TypeOfBooking.EXCHANGE);
+//                booking1 = bookingRepository.save(booking1);
+//
+//                booking2.setUuid(uuidString2);
+//                booking2.setQrcode(qrCode2);
+//                booking2.setCheckInDate(exchange.getCheckInDateOfUser2());
+//                booking2.setCheckOutDate(exchange.getCheckOutDateOfUser2());
+//                booking2.setUserBookingId(exchange.getUserIdOfUser2());
+//                booking2.setOwnerId(exchange.getUserIdOfUser1());
+//                booking2.setAvailableTimeId(exchange.getAvailableTimeIdOfUser1());
+////                booking2.setAvailableTime(availableTime);
+//                booking2.setTotalDays(days2);
+//                booking2.setTotalMember(exchange.getTotalMemberOfUser2());
+//                booking2.setStatusCheckReturn(false);
+//                booking2.setPrice(exchange.getPriceOfUser2());
+//                booking2.setCommission(0D);
+//                booking2.setDateBooking(Helper.getCurrentDate());
+//                booking2.setActualPrice(exchange.getPriceOfUser2());
+//                booking2.setStatus(EnumBookingStatus.BookingStatus.WAITING_EXCHANGE);
+//                booking2.setTransferStatus(EnumBookingStatus.TransferStatus.WAITING);
+//                booking2.setTypeOfBooking(EnumBookingStatus.TypeOfBooking.EXCHANGE);
+//                booking2 = bookingRepository.save(booking2);
+//
+//
+//                //TODO trừ point trong ví
+//
+////                transferPointService.payBooking(booking);
+//                //create notification for user booking
+//                notificationRequestForUserBooking.setSubject("Complete phase 1");
+//                notificationRequestForUserBooking.setContent("Booking Apartment " + booking1.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking1.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking1.getCheckInDate() + " to " + booking1.getCheckOutDate());
+//                notificationRequestForUserBooking.setToUserId(exchange.getUserIdOfUser1());
+//                pushNotificationService.createNotification(notificationRequestForUserBooking);
+//                //create notification for owner
+//                notificationRequestForOwner.setSubject("Complete phase 1");
+//                notificationRequestForUserBooking.setContent("Booking Apartment " + booking2.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking2.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking2.getCheckInDate() + " to " + booking2.getCheckOutDate());
+//                notificationRequestForOwner.setToUserId(exchange.getUserIdOfUser2());
+//                pushNotificationService.createNotification(notificationRequestForOwner);
+//                emailService.sendConfirmBookedHtml(booking1, user1.getEmail());
+//                emailService.sendConfirmBookedHtml(booking2, user2.getEmail());
+//                ExchangeResponse exchangeResponse = new ExchangeResponse();
+//                exchangeResponse.setBookingIdOfUser1(booking1.getId());
+//                exchangeResponse.setBookingIdOfUser2(booking2.getId());
+//                return exchangeResponse;
+//            } catch (MessagingException e) {
+//                throw new RuntimeException(e);
+//            } finally {
+//                fairLock1.unlock();
+//                fairLock2.unlock();
+//            }
+//        }
+//        return null;
+//    }
+//
+//    @Override
+//    public void updateExchange(Exchange exchange,EnumBookingStatus.BookingStatus bookingStatus) {
+//        Booking booking1 = bookingRepository.findById(exchange.getBookingIdOfUser1()).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+//        Booking booking2 = bookingRepository.findById(exchange.getBookingIdOfUser2()).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+//
+//        booking1.setStatus(bookingStatus);
+//        booking2.setStatus(bookingStatus);
+//        bookingRepository.save(booking1);
+//        bookingRepository.save(booking2);
+//
+//    }
 
     @Override
     public List<BookingCoOwnerResponse> historyBookingByCoOwnerId(Long coOwnerId) {
