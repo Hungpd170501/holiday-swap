@@ -1,10 +1,13 @@
 package com.example.holidayswap.controller.property.coOwner;
 
+import com.example.holidayswap.domain.dto.request.property.PropertyRequestUpdate;
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
+import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerUpdateRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.service.property.coOwner.CoOwnerService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,6 +26,7 @@ import java.util.List;
 @RequestMapping("/api/co-owners")
 public class CoOwnersController {
     private final CoOwnerService coOwnerService;
+
 
     @GetMapping
     public ResponseEntity<Page<CoOwnerResponse>> get(
@@ -60,6 +65,13 @@ public class CoOwnersController {
             @PathVariable("coOwnerId") Long coOwnerId,
             @RequestParam("coOwnerStatus") CoOwnerStatus coOwnerStatus) {
         coOwnerService.update(coOwnerId, coOwnerStatus);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/update-status")
+    public ResponseEntity<CoOwnerResponse> updateStatus(
+            @RequestPart CoOwnerUpdateRequest resortUpdateRequest,
+            @RequestPart(required = false) List<MultipartFile> resortImage) throws MessagingException, IOException {
+        coOwnerService.updateStatus(resortUpdateRequest.getPropertyId(), resortUpdateRequest.getRoomId(), resortUpdateRequest.getResortStatus(),resortUpdateRequest.getStartDate(),resortUpdateRequest.getEndDate(),  resortImage);
         return ResponseEntity.ok().build();
     }
 //

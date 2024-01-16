@@ -5,6 +5,7 @@ import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerReques
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
 import com.example.holidayswap.domain.entity.auth.UserStatus;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
@@ -18,9 +19,11 @@ import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.EmailService;
 import com.example.holidayswap.service.auth.UserService;
+import com.example.holidayswap.service.booking.IBookingService;
 import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import com.example.holidayswap.service.resort.ResortService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,7 +32,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +54,9 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final ContractImageService contractImageService;
     private final PushNotificationService pushNotificationService;
     private final EmailService emailService;
+    private final IBookingService bookingService;
+
+    private final IOwnerShipMaintenanceService ownerShipMaintenanceService;
 
     private final PropertyRepository propertyRepository;
     private final ResortRepository resortRepository;
@@ -219,5 +227,14 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     @Override
     public void deleteHard(Long coOwnerId) {
         coOwnerRepository.deleteById(coOwnerId);
+    }
+
+    @Override
+    public void updateStatus(Long propertyId, String apartmentId, CoOwnerMaintenanceStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException {
+        if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
+        if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
+//        var entity = propertyRepository.findByIdAndDeletedFalseAndResortStatus(id, PropertyStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Property not available now"));
+        List<String> listImage = ownerShipMaintenanceService.CreateOwnerShipMaintenance(propertyId,apartmentId, startDate, endDate, resortStatus, resortImage);
+        bookingService.deactiveApartmentNotifyBookingUser(propertyId,apartmentId, startDate, endDate, resortStatus, listImage);
     }
 }

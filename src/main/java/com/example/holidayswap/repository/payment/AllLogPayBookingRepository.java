@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AllLogPayBookingRepository extends JpaRepository<AllLogPayBooking, Long> {
+public interface    AllLogPayBookingRepository extends JpaRepository<AllLogPayBooking, Long> {
     List<AllLogPayBooking> findAllByFromMemberId(long fromMemberId);
 }

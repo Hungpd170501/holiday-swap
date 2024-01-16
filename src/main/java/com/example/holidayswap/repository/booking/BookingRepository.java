@@ -167,6 +167,39 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             """, nativeQuery = true)
     List<Booking> getListBookingPropertyHasCheckinAfterDeactiveDate(Long property, LocalDateTime startDate);
 
+    @Query(value = """
+            SELECT b.*
+            FROM booking b
+                     join available_time a on b.available_time_id = a.available_time_id
+                     join co_owner co on a.co_owner_id = co.co_owner_id
+                     join property on property.property_id = co.property_id
+            where property.property_id = ?1
+              and property.is_deleted = false
+              and property.status = 'ACTIVE'
+              and b.status = 5
+              and co.room_id = ?2
+              and b.type_of_booking = 'RENT'
+              and ((date(?3) > date(check_in_date) AND date(?3) < date(check_out_date))
+                OR (date(?4) > date(check_in_date) AND date(?4) < date(check_out_date))
+                OR (date(?3) <= date(check_in_date) AND date(?4) >= date(check_out_date)))
+            """, nativeQuery = true)
+    List<Booking> getListBookingByPropertyIdAndApartmentIdAndDate(Long propertyId, String apartmentId, LocalDateTime startDate, LocalDateTime endDate);
+
+    @Query(value = """
+            SELECT b.*
+            FROM booking b
+                     join available_time a on b.available_time_id = a.available_time_id
+                     join co_owner co on a.co_owner_id = co.co_owner_id
+                     join property on property.property_id = co.property_id
+            where property.property_id = ?1
+              and property.is_deleted = false
+              and property.status = 'ACTIVE'
+              and b.status = 5
+              and co.room_id = ?2
+              and b.type_of_booking = 'RENT'
+              and (date(?3) <= date(check_in_date))
+            """, nativeQuery = true)
+    List<Booking> getListBookingApartmentHasCheckinAfterDeactiveDate(Long propertyId, String apartmentId, LocalDateTime startDate);
 
     @Query("select new com.example.holidayswap.domain.dto.response.booking.TimeHasBooked(b.checkInDate, b.checkOutDate)" +
             "from Booking b " +
