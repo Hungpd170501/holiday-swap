@@ -176,7 +176,6 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 fromWallet.withdraw(booking.getPrice());
                 //TODO get list Bookingdetail by booking id
 
-
                 allLogPayBookingService.saveLog(booking.getUserBookingId(), booking.getId(), booking.getPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "booking from " + booking.getCheckInDate() + " to " + booking.getCheckOutDate(), Helper.getCurrentDate(), fromWallet.getTotalPoint());
 
                 walletRepository.save(fromWallet);
