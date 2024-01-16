@@ -5,7 +5,6 @@ import com.example.holidayswap.domain.dto.request.resort.ResortUpdateRequest;
 import com.example.holidayswap.domain.dto.response.resort.ResortResponse;
 import com.example.holidayswap.domain.entity.property.PropertyType;
 import com.example.holidayswap.domain.entity.resort.Resort;
-import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.entity.resort.amentity.ResortAmenity;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
@@ -20,7 +19,6 @@ import com.example.holidayswap.repository.address.CountryRepository;
 import com.example.holidayswap.repository.address.DistrictRepository;
 import com.example.holidayswap.repository.address.StateOrProvinceRepository;
 import com.example.holidayswap.repository.property.PropertyTypeRespository;
-import com.example.holidayswap.repository.resort.ResortMaintanceRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.repository.resort.amenity.ResortAmenityRepository;
 import com.example.holidayswap.service.address.LocationService;
@@ -85,7 +83,7 @@ public class ResortServiceImpl implements ResortService {
     public ResortResponse get(Long id) {
         var entity = resortRepository.findByIdAndIsDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(RESORT_NOT_FOUND));
         var dtoResponse = ResortMapper.INSTANCE.toResortResponse(entity);
-        dtoResponse.setResortMaintances(resortMaintanceService.getResortMaintanceByResortId(id));
+//        dtoResponse.setResortMaintances(resortMaintanceService.getResortMaintanceByResortId(id));
 
         dtoResponse.setResortImages(resortImageService.gets(id));
         dtoResponse.setResortAmenityTypes(resortAmenityTypeService.gets(entity.getId()));
