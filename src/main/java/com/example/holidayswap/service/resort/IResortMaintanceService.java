@@ -1,6 +1,5 @@
 package com.example.holidayswap.service.resort;
 
-import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked2;
 import com.example.holidayswap.domain.entity.resort.ResortMaintance;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +16,4 @@ public interface IResortMaintanceService {
     List<ResortMaintance> getResortMaintanceByResortId(Long resortId);
 
     void deactiveResort(LocalDateTime now);
-
-    List<TimeHasBooked2> getTimeMaintain(Long resortId);
 }
