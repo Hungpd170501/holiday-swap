@@ -2,11 +2,16 @@ package com.example.holidayswap.service.property.coOwner;
 
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
+import com.example.holidayswap.domain.entity.property.PropertyStatus;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
+import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CoOwnerService {
@@ -23,4 +28,5 @@ public interface CoOwnerService {
     void delete(Long coOwnerId);
 
     void deleteHard(Long coOwnerId);
+    void updateStatus(Long propertyId, String apartmentId , CoOwnerMaintenanceStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException;
 }
