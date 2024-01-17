@@ -1,15 +1,14 @@
 package com.example.holidayswap.domain.entity.exchange;
 
-import com.example.holidayswap.domain.entity.booking.UserOfBooking;
+import com.example.holidayswap.domain.entity.common.BaseEntityAudit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Date;
-import java.util.Set;
 
 @Entity
 @Table(name = "exchange")
@@ -17,53 +16,57 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Exchange {
+public class Exchange extends BaseEntityAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exchange_id")
     private Long exchangeId;
 
-    @Column(name = "available_time_id_of_user1", nullable = false)
-    private Long availableTimeIdOfUser1;
+    @Column(name = "request_user_id", nullable = false)
+    private Long requestUserId;
 
-    @Column(name = "total_member_of_user1", nullable = false)
-    private int totalMemberOfUser1;
+    @Column(name = "request_available_time_id", nullable = false)
+    private Long requestAvailableTimeId;
 
-    @Column(name = "check_in_date_of_user1", nullable = false)
-    private Date checkInDateOfUser1;
+    @Column(name = "request_check_in_date", nullable = false)
+    private LocalDate requestCheckInDate;
 
-    @Column(name = "check_out_date_of_user1", nullable = false)
-    private Date checkOutDateOfUser1;
-    @Column(name = "price_of_user1", nullable = false)
-    private Double priceOfUser1;
-    @Column(name = "available_time_id_of_user2", nullable = false)
-    private Long availableTimeIdOfUser2;
+    @Column(name = "request_check_out_date", nullable = false)
+    private LocalDate requestCheckOutDate;
 
-    @Column(name = "total_member_of_user2", nullable = false)
-    private int totalMemberOfUser2;
+    @Column(name = "request_total_member", nullable = false)
+    private int requestTotalMember;
 
-    @Column(name = "check_in_date_of_user2", nullable = false)
-    private Date checkInDateOfUser2;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "request_status", nullable = false)
+    private ExchangeStatus requestStatus;
 
-    @Column(name = "check_out_date_of_user2", nullable = false)
-    private Date checkOutDateOfUser2;
-    @Column(name = "price_of_user2", nullable = false)
-    private Double priceOfUser2;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "available_time_id", nullable = false)
+    private Long availableTimeId;
+
+    @Column(name = "check_in_date")
+    private LocalDate checkInDate;
+
+    @Column(name = "check_out_date")
+    private LocalDate checkOutDate;
+
+    @Column(name = "total_member")
+    private int totalMember;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
-    @Column(name = "booking_id_of_user1")
-    private Long bookingIdOfUser1;
-    @Column(name = "booking_id_of_user2")
-    private Long bookingIdOfUser2;
-    @Column(name = "user_id_of_user1")
-    private Long userIdOfUser1;
-    @Column(name = "user_id_of_user2")
-    private Long userIdOfUser2;
+    private ExchangeStatus status;
 
-    @Column(name = "status_user1")
-    private String statusUser1;
-    @Column(name = "status_user1")
-    private String statusUser2;
+    @Column(name = "request_booking_id")
+    private Long requestBookingId;
 
+    @Column(name = "booking_id")
+    private Long bookingId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "overall_status", nullable = false)
+    private ExchangeStatus overallStatus;
 }

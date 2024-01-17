@@ -1,13 +1,16 @@
 package com.example.holidayswap.service.exchange;
 
-import com.google.zxing.WriterException;
-
-import java.io.IOException;
-import java.util.Date;
+import com.example.holidayswap.domain.dto.request.exchange.ExchangeCreatingRequest;
+import com.example.holidayswap.domain.dto.request.exchange.ExchangeUpdatingRequest;
+import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
 
 public interface IExchangeService {
-    void CreateExchange(Long availableTimeIdOfUser1, int totalMemberOfUser1, Long availableTimeIdOfUser2, int totalMemberOfUser2, Long userIdOfUser1, Long userIdOfUser2, Double priceOfUser1, Double priceOfUser2, Date startDate1, Date endDate1, Date startDate2, Date endDate2);
-    void UpdateStatus(Long exchangeId, String status) throws IOException, InterruptedException, WriterException;
-    void UpdateExchange(Long exchangeId, Long availableTimeIdOfUser1, int totalMemberOfUser1, Long availableTimeIdOfUser2, int totalMemberOfUser2, Double priceOfUser1, Double priceOfUser2, Date startDate1, Date endDate1, Date startDate2, Date endDate2);
+    ExchangeResponse create(ExchangeCreatingRequest exchangeCreatingRequest);
+    void updateBaseData(Long exchangeId, ExchangeUpdatingRequest exchangeUpdatingRequest);
 
+    void updateNextStatus(Long exchangeId) throws InterruptedException;
+
+    void updatePreviousStatus(Long exchangeId) throws InterruptedException;
+
+    void cancel(Long exchangeId) throws InterruptedException;
 }

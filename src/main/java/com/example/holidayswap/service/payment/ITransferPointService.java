@@ -20,4 +20,5 @@ public interface ITransferPointService {
     void refundPointBookingToOwner(Long bookingId) throws InterruptedException;
 
     void refundPointBookingToUser(Long bookingId) throws InterruptedException;
+
 }
