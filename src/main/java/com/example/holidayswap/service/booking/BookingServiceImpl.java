@@ -557,29 +557,29 @@ public class BookingServiceImpl implements IBookingService {
                 booking2.setTypeOfBooking(EnumBookingStatus.TypeOfBooking.EXCHANGE);
                 booking2 = bookingRepository.save(booking2);
 
-
-                //TODO trừ point trong ví
-
-//                transferPointService.payBooking(booking);
-                //create notification for user booking
-                notificationRequestForUserBooking.setSubject("Complete phase 1");
-                notificationRequestForUserBooking.setContent("Booking Apartment " + booking1.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking1.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking1.getCheckInDate() + " to " + booking1.getCheckOutDate());
-                notificationRequestForUserBooking.setToUserId(exchange.getUserIdOfUser1());
-                pushNotificationService.createNotification(notificationRequestForUserBooking);
-                //create notification for owner
-                notificationRequestForOwner.setSubject("Complete phase 1");
-                notificationRequestForUserBooking.setContent("Booking Apartment " + booking2.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking2.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking2.getCheckInDate() + " to " + booking2.getCheckOutDate());
-                notificationRequestForOwner.setToUserId(exchange.getUserIdOfUser2());
-                pushNotificationService.createNotification(notificationRequestForOwner);
-                emailService.sendConfirmBookedHtml(booking1, user1.getEmail());
-                emailService.sendConfirmBookedHtml(booking2, user2.getEmail());
+//
+//                //TODO trừ point trong ví
+//
+////                transferPointService.payBooking(booking);
+//                //create notification for user booking
+//                notificationRequestForUserBooking.setSubject("Complete phase 1");
+//                notificationRequestForUserBooking.setContent("Booking Apartment " + booking1.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking1.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking1.getCheckInDate() + " to " + booking1.getCheckOutDate());
+//                notificationRequestForUserBooking.setToUserId(exchange.getUserIdOfUser1());
+//                pushNotificationService.createNotification(notificationRequestForUserBooking);
+//                //create notification for owner
+//                notificationRequestForOwner.setSubject("Complete phase 1");
+//                notificationRequestForUserBooking.setContent("Booking Apartment " + booking2.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking2.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking2.getCheckInDate() + " to " + booking2.getCheckOutDate());
+//                notificationRequestForOwner.setToUserId(exchange.getUserIdOfUser2());
+//                pushNotificationService.createNotification(notificationRequestForOwner);
+//                emailService.sendConfirmBookedHtml(booking1, user1.getEmail());
+//                emailService.sendConfirmBookedHtml(booking2, user2.getEmail());
                 ExchangeResponse exchangeResponse = new ExchangeResponse();
                 exchangeResponse.setBookingIdOfUser1(booking1.getId());
                 exchangeResponse.setBookingIdOfUser2(booking2.getId());
                 return exchangeResponse;
-            } catch (MessagingException e) {
+          } catch (Exception e) {
                 throw new RuntimeException(e);
-            } finally {
+       } finally {
                 fairLock1.unlock();
                 fairLock2.unlock();
             }
