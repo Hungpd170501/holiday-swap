@@ -152,8 +152,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     end
                 )
               and ((at.endTime) > current_date)
-              and ((:#{#listPropertyCanNotUse == null} = true) or (co.propertyId not in :listPropertyCanNotUse))
-              and ((:#{#listResortCanNotUse == null} = true) or (p.resortId not in :listResortCanNotUse))
+              and ((:#{#listOut == null} = true) or (co.propertyId not in :listOut))
               """)
     Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
                                                    @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,
@@ -164,8 +163,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                                                    @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
                                                    @Param("listOfPropertyView") Set<Long> listOfPropertyView,
                                                    @Param("listOfPropertyType") Set<Long> listOfPropertyType,
-                                                   @Param("listResortCanNotUse") Set<Long> listResortCanNotUse,
-                                                   @Param("listPropertyCanNotUse") Set<Long> listPropertyCanNotUse,
+                                                   @Param("listOut") Set<Long> listOut,
                                                    @Param("userId") Long userId, Pageable pageable);
 
     @Query(value = """

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -41,14 +42,17 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     public Page<ApartmentForRentResponse> gets(String locationName, Long resortId, Date checkIn, Date checkOut, Long min, Long max, int guest, int numberBedsRoom, int numberBathRoom, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
         var user = authUtils.GetUser();
         Long userId = null;
+        Set<Long> listOut = new HashSet<>();
         if (user.isPresent()) userId = user.get().getUserId();
         var listResortMaintain = resortMaintanceRepository.findCanNotUse();
         var listPropertyMaintain = propertyMaintenanceRepository.findCanNotUse();
-        if (listResortMaintain.isEmpty()) listResortMaintain = null;
-        if (listPropertyMaintain.isEmpty()) listPropertyMaintain = null;
+        listOut.addAll(listResortMaintain);
+        listOut.addAll(listPropertyMaintain);
+        if (listOut.isEmpty()) listOut = null;
+
         var dto = availableTimeRepository.findApartmentForRent(StringUtils.stripAccents(locationName).toUpperCase(),
                 resortId, checkIn, checkOut, min, max, guest, numberBedsRoom, numberBathRoom, listOfInRoomAmenity,
-                listOfPropertyView, listOfPropertyType, listResortMaintain, listPropertyMaintain, userId, pageable);
+                listOfPropertyView, listOfPropertyType, listOut, userId, pageable);
         var response = dto.map(ApartmentForRentMapper.INSTANCE::toDtoResponse);
         response.forEach(e -> {
             var inRoomAmenityTypeResponses = inRoomAmenityTypeService.gets(e.getAvailableTime().getCoOwner().getProperty().getId());
