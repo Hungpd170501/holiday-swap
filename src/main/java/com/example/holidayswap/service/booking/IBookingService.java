@@ -7,6 +7,7 @@ import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.exchange.Exchange;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.google.zxing.WriterException;
 import jakarta.mail.MessagingException;
@@ -34,6 +35,8 @@ public interface IBookingService {
     void deactiveResortNotifyBookingUser(Long resortId, LocalDateTime startDate, LocalDateTime endDate, ResortStatus resortStatus,List<String> listImage) throws IOException, MessagingException;
 
     void deactivePropertyNotifyBookingUser(Long property, LocalDateTime startDate, LocalDateTime endDate, PropertyStatus resortStatus, List<String> listImage) throws IOException, MessagingException;
+
+    void deactiveApartmentNotifyBookingUser(Long property, String apartmentId, LocalDateTime startDate, LocalDateTime endDate, CoOwnerMaintenanceStatus resortStatus, List<String> listImage) throws IOException, MessagingException;
 
     String returnPointBooking(Long bookingId) throws InterruptedException;
 

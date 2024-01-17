@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.dto.request.property.timeFrame.AvailableTi
 import com.example.holidayswap.domain.dto.response.property.timeFrame.AvailableTimeResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,6 +127,8 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         if (co.getStatus() != CoOwnerStatus.ACCEPTED) {
             throw new DataIntegrityViolationException("This Co-Owner is not accepted! Please contact for Staff!");
         }
+        isInMaintain(rq.getStartTime(), rq.getEndTime(), co);
+        checkIsInDeactivate(rq.getStartTime(), rq.getEndTime(), co);
         var property = propertyRepository.findById(co.getPropertyId()).orElseThrow(() -> new EntityNotFoundException("Apartment not found"));
         if (property.getIsDeleted())
             throw new DataIntegrityViolationException("Apartment is deleted!. Please contact to Holiday Swap to more information!.");
@@ -147,6 +151,50 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         at.setStatus(AvailableTimeStatus.OPEN);
         at.setCoOwnerId(coOwnerId);
         availableTimeRepository.save(at);
+    }
+
+    private void isInMaintain(LocalDate start, LocalDate end, CoOwner coOwner) {
+        //parse time
+        LocalDateTime startD = start.atStartOfDay();
+        LocalDateTime endD = end.atStartOfDay();
+        var resMaintain = coOwner.getProperty().getResort().getResortMaintainces().stream().filter(e -> e.getType() == ResortStatus.MAINTENANCE);
+        var propMaintain = coOwner.getProperty().getPropertyMaintenance().stream().filter(e -> e.getType() == PropertyStatus.MAINTENANCE);
+        resMaintain.forEach(e -> {
+            if ((startD.isAfter(e.getStartDate()) || startD.isEqual(e.getStartDate())) && (startD.isBefore(e.getEndDate()) || startD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+            }
+            if ((endD.isAfter(e.getStartDate()) || endD.isEqual(e.getStartDate())) && (endD.isBefore(e.getEndDate()) || endD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+            }
+        });
+        propMaintain.forEach(e -> {
+            if ((startD.isAfter(e.getStartDate()) || startD.isEqual(e.getStartDate())) && (startD.isBefore(e.getEndDate()) || startD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+            }
+            if ((endD.isAfter(e.getStartDate()) || endD.isEqual(e.getStartDate())) && (endD.isBefore(e.getEndDate()) || endD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+            }
+        });
+    }
+
+    private void checkIsInDeactivate(LocalDate start, LocalDate end, CoOwner coOwner) {
+        LocalDateTime startD = start.atStartOfDay();
+        LocalDateTime endD = end.atStartOfDay();
+        var resDeactivate = coOwner.getProperty().getResort().getResortMaintainces().stream().filter(e -> e.getType() == ResortStatus.DEACTIVATE).toList();
+        var propDeactivate = coOwner.getProperty().getPropertyMaintenance().stream().filter(e -> e.getType() == PropertyStatus.DEACTIVATE).toList();
+        if (!resDeactivate.isEmpty()) {
+            if ((resDeactivate.get(0).getStartDate().isAfter(startD) || resDeactivate.get(0).getStartDate().isEqual(startD)) && (resDeactivate.get(0).getStartDate().isBefore(endD) || resDeactivate.get(0).getStartDate().isEqual(endD))) {
+                throw new DataIntegrityViolationException("Resort is deactivate this time. Try to another time!.");
+            }
+        }
+        if (!propDeactivate.isEmpty()) {
+            if ((propDeactivate.get(0).getStartDate().isAfter(startD) || propDeactivate.get(0).getStartDate().isEqual(startD)) && (propDeactivate.get(0).getStartDate().isBefore(endD) || propDeactivate.get(0).getStartDate().isEqual(endD))) {
+                throw new DataIntegrityViolationException("Property is deactivate this time. Try to another time!.");
+            }
+        }
+    }
+
+    private void checkIsInDeactivateTime(LocalDate start, LocalDate end, CoOwner coOwner) {
     }
 
     @Override
