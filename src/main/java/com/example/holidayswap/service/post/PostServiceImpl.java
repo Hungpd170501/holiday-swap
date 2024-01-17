@@ -101,6 +101,7 @@ public class PostServiceImpl implements IPostService{
                 postResponse1.setDatePosted(p.getDatePosted());
                 postResponse1.setId(p.getId());
                 postResponse1.setUserName(p.getUser().getUsername());
+                postResponse1.setFullName(p.getUser().getFullName());
                 postResponse1.setAvatar(p.getUser().getAvatar());
                 postResponse1.setLikes(userLike.size());
                 postResponse1.setDislikes(userDislike.size());
@@ -134,6 +135,7 @@ public class PostServiceImpl implements IPostService{
             postResponse.setId(post.getId());
             postResponse.setUserName(post.getUser().getUsername());
             postResponse.setAvatar(post.getUser().getAvatar());
+            postResponse.setFullName(post.getUser().getFullName());
             postResponse.setLiked(userReactPost == null ? false : userReactPost.isLike());
             postResponse.setDisliked(userReactPost == null ? false : userReactPost.isDislike());
             postResponse.setLikes(userLike.size());

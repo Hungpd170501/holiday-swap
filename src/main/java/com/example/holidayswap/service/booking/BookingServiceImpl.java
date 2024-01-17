@@ -11,6 +11,7 @@ import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.domain.entity.exchange.Exchange;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
+import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
@@ -355,6 +356,52 @@ public class BookingServiceImpl implements IBookingService {
                 });
             }
         }
+    }
+
+    @Override
+    public void deactiveApartmentNotifyBookingUser(Long property, String apartmentId, LocalDateTime startDate, LocalDateTime endDate, CoOwnerMaintenanceStatus resortStatus, List<String> listImage) throws IOException, MessagingException {
+        List<Booking> bookingList = new ArrayList<>();
+        if (resortStatus.name().equals(ResortStatus.DEACTIVATE.name())) {
+            bookingList = bookingRepository.getListBookingByPropertyIdAndApartmentIdAndDate(property,apartmentId, startDate, endDate);
+            bookingList.addAll(bookingRepository.getListBookingApartmentHasCheckinAfterDeactiveDate(property,apartmentId, startDate));
+        } else if (resortStatus.name().equals(ResortStatus.MAINTENANCE.name())) {
+            bookingList = bookingRepository.getListBookingByPropertyIdAndApartmentIdAndDate(property,apartmentId, startDate, endDate);
+        }
+        //get list booking of resort and date booking is after current date
+//        List<Booking> bookingList =
+        if (bookingList.size() > 0) {
+            bookingList.forEach(booking -> {
+                //create notification for user booking
+                issueBookingService.createIssueBooking(booking.getId(), "Booking Id: " + booking.getId() + " has been issue because apartment is " + resortStatus.name());
+
+                var notificationRequestForUserBooking = new NotificationRequest();
+                if (resortStatus.name().equals(ResortStatus.DEACTIVATE.name()))
+                    notificationRequestForUserBooking.setSubject("Resort of your booking is deactive date: " + startDate);
+                else if (resortStatus.name().equals(ResortStatus.MAINTENANCE.name()))
+                    notificationRequestForUserBooking.setSubject("Resort of your booking is maintenance date: " + startDate + " to " + endDate);
+                notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getCoOwner().getRoomId() + " of property " + booking.getAvailableTime().getCoOwner().getProperty().getPropertyName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate() + " can be cancel, contact owner for more details");
+                notificationRequestForUserBooking.setToUserId(booking.getUserBookingId());
+                pushNotificationService.createNotification(notificationRequestForUserBooking);
+                booking.setStatusCheckReturn(true);
+                bookingRepository.save(booking);
+            });
+            //     get list cowner of resort
+            List<CoOwner> coOwnerList = coOwnerRepository.getListCoOwnerByPropertyIdAndApartmentId(property,apartmentId);
+            if (coOwnerList.size() > 0) {
+                coOwnerList.forEach(coOwner -> {
+                    //create notification for user booking
+                    var notificationRequestForUserBooking = new NotificationRequest();
+                    if (resortStatus.name().equals(ResortStatus.DEACTIVATE.name()))
+                        notificationRequestForUserBooking.setSubject("Apartment of your ownership is deactive date: " + startDate);
+                    else if (resortStatus.name().equals(ResortStatus.MAINTENANCE.name()))
+                        notificationRequestForUserBooking.setSubject("Apartment of your ownership is maintenance date: " + startDate + " to " + endDate);
+                    notificationRequestForUserBooking.setContent("Booking Apartment " + coOwner.getRoomId() + " of resort " + coOwner.getProperty().getResort().getResortName() + " can't post or book anymore");
+                    notificationRequestForUserBooking.setToUserId(coOwner.getUserId());
+                    pushNotificationService.createNotification(notificationRequestForUserBooking);
+                });
+            }
+        }
+        //get list booking of resort and date booking is after current date
     }
 
     @Override

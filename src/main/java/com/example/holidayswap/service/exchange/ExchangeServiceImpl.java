@@ -47,19 +47,19 @@ public class ExchangeServiceImpl implements IExchangeService{
     @Transactional
     public void UpdateStatus(Long exchangeId, String status) throws IOException, InterruptedException, WriterException {
         var exchange = exchangeRepository.findById(exchangeId).orElseThrow(() -> new RuntimeException("Exchange not found"));
-if(status == "Phase 2") {
+if(status.equals("Phase 2")) {
     ExchangeResponse response = bookingService.createExchange(exchange);
     exchange.setBookingIdOfUser1(response.getBookingIdOfUser1());
     exchange.setBookingIdOfUser2(response.getBookingIdOfUser2());
 
 }
-if(status == "Phase 3") {
+if(status.equals("Phase 3")) {
     Long bookingId = exchange.getPriceOfUser1() > exchange.getPriceOfUser2() ? exchange.getBookingIdOfUser1() : exchange.getBookingIdOfUser2();
     Booking checkBooking = bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
     transferPointService.payBooking(checkBooking);
     bookingService.updateExchange(exchange, EnumBookingStatus.BookingStatus.SUCCESS);
 }
-if(status == "Cancel"){
+if(status.equals("Cancel")){
     bookingService.updateExchange(exchange, EnumBookingStatus.BookingStatus.CANCELLED);
 }
         exchange.setStatus(status);
@@ -70,7 +70,7 @@ if(status == "Cancel"){
     @Transactional
     public void UpdateExchange(Long exchangeId, Long availableTimeIdOfUser1, int totalMemberOfUser1, Long availableTimeIdOfUser2, int totalMemberOfUser2, Double priceOfUser1, Double priceOfUser2,Date startDate1, Date endDate1, Date startDate2, Date endDate2) {
         var exchange = exchangeRepository.findById(exchangeId).orElseThrow(() -> new RuntimeException("Exchange not found"));
-        if(exchange.getStatus() != "Phase 1") {
+        if(!exchange.getStatus().equals("Phase 1")) {
             throw new RuntimeException("Exchange is not in phase 1");
         }
         exchange.setAvailableTimeIdOfUser1(availableTimeIdOfUser1);
