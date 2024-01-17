@@ -47,4 +47,7 @@ public interface IBookingService {
     void updateExchange(Exchange exchange, EnumBookingStatus.BookingStatus bookingStatus);
 
     List<BookingCoOwnerResponse> historyBookingByCoOwnerId(Long coOwnerId);
+
+
+    
 }

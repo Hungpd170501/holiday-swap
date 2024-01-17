@@ -60,5 +60,10 @@ public class Exchange {
     @Column(name = "user_id_of_user2")
     private Long userIdOfUser2;
 
+    @Column(name = "status_user1")
+    private String statusUser1;
+    @Column(name = "status_user1")
+    private String statusUser2;
+
 
 }
