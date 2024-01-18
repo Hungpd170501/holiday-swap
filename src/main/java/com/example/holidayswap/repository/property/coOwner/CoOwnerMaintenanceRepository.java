@@ -7,13 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 
 @Repository
 public interface CoOwnerMaintenanceRepository extends JpaRepository<OwnerShipMaintenance,Long> {
     @Query("select o from OwnerShipMaintenance o where o.propertyId = ?1 and o.apartmentId = ?2")
-    Optional <OwnerShipMaintenance> findByPropertyIdAndApartmentId(Long propertyId, String apartmentId);
+    Set<OwnerShipMaintenance> findByPropertyIdAndApartmentId(Long propertyId, String apartmentId);
     @Query("select o from OwnerShipMaintenance o where o.propertyId = ?1 and o.apartmentId = ?2 and o.type = ?3")
     OwnerShipMaintenance findByPropertyIdAndApartmentIdAndType(Long propertyId, String apartmentId, CoOwnerMaintenanceStatus type);
 
