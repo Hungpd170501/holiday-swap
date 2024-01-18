@@ -3,9 +3,7 @@ package com.example.holidayswap.service.booking;
 
 import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.response.booking.*;
-import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-import com.example.holidayswap.domain.entity.exchange.Exchange;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
@@ -43,8 +41,16 @@ public interface IBookingService {
     void refundPointBookingToOwner(LocalDate date);
     HistoryBookingDetailResponse historyBookingByUUID(String uuid);
 
-    ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException;
-    void updateExchange(Exchange exchange, EnumBookingStatus.BookingStatus bookingStatus);
+//    ExchangeResponse createExchange(Exchange exchange) throws InterruptedException, IOException, WriterException;
+//    void updateExchange(Exchange exchange, EnumBookingStatus.BookingStatus bookingStatus);
 
     List<BookingCoOwnerResponse> historyBookingByCoOwnerId(Long coOwnerId);
+
+
+    Long createBookingExchange(BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException, MessagingException;
+
+    void payBookingExchange(Long bookingId) throws InterruptedException, IOException, WriterException, MessagingException;
+
+    void cancelBookingExchange(Long bookingId) throws InterruptedException;
+
 }

@@ -23,7 +23,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                 OR( date  (?2) <= date (check_in_date) AND date (?3) >= date (check_out_date) ))
                             
                               and available_time_id = ?1
-                              and (b.status = 5 OR b.status = 6)
+                              and (b.status = 5 OR b.status = 7)
                               
             """, nativeQuery = true)
     List<Booking> checkBookingIsAvailableByCheckinDateAndCheckoutDate(Long availableTimeId, Date checkInDate, Date checkOutDate);

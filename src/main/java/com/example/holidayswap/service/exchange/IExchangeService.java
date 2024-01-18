@@ -1,13 +1,26 @@
 package com.example.holidayswap.service.exchange;
 
+import com.example.holidayswap.domain.dto.request.exchange.ExchangeCreatingRequest;
+import com.example.holidayswap.domain.dto.request.exchange.ExchangeUpdatingRequest;
+import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
+import com.example.holidayswap.domain.dto.response.exchange.ExchangeWithDetailResponse;
 import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Page;
 
 import java.io.IOException;
-import java.util.Date;
 
 public interface IExchangeService {
-    void CreateExchange(Long availableTimeIdOfUser1, int totalMemberOfUser1, Long availableTimeIdOfUser2, int totalMemberOfUser2, Long userIdOfUser1, Long userIdOfUser2, Double priceOfUser1, Double priceOfUser2, Date startDate1, Date endDate1, Date startDate2, Date endDate2);
-    void UpdateStatus(Long exchangeId, String status) throws IOException, InterruptedException, WriterException;
-    void UpdateExchange(Long exchangeId, Long availableTimeIdOfUser1, int totalMemberOfUser1, Long availableTimeIdOfUser2, int totalMemberOfUser2, Double priceOfUser1, Double priceOfUser2, Date startDate1, Date endDate1, Date startDate2, Date endDate2);
+    ExchangeResponse create(ExchangeCreatingRequest exchangeCreatingRequest);
+    void updateBaseData(Long exchangeId, ExchangeUpdatingRequest exchangeUpdatingRequest);
 
+    void updateNextStatus(Long exchangeId) throws InterruptedException, MessagingException, IOException, WriterException;
+
+    void updatePreviousStatus(Long exchangeId) throws InterruptedException;
+
+    void cancel(Long exchangeId) throws InterruptedException;
+
+    ExchangeResponse getExchangeById(Long exchangeId);
+
+    Page<ExchangeWithDetailResponse> getExchangesByUserId(Integer limit, Integer offset, String sortProps, String sortDirection);
 }
