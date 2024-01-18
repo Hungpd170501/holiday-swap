@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/exchange")
+@RequestMapping("/api/v1/exchange")
 @AllArgsConstructor
 public class ExchangeController {
     private final IExchangeService exchangeService;
