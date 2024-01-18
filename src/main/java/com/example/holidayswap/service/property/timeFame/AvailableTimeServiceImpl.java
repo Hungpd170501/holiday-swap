@@ -173,10 +173,10 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         });
         propMaintain.forEach(e -> {
             if ((startD.isAfter(e.getStartDate()) || startD.isEqual(e.getStartDate())) && (startD.isBefore(e.getEndDate()) || startD.isEqual(e.getEndDate()))) {
-                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+                throw new DataIntegrityViolationException("Property in maintain this time. Try to another time!.");
             }
             if ((endD.isAfter(e.getStartDate()) || endD.isEqual(e.getStartDate())) && (endD.isBefore(e.getEndDate()) || endD.isEqual(e.getEndDate()))) {
-                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+                throw new DataIntegrityViolationException("Property in maintain this time. Try to another time!.");
             }
         });
         apartmentMaintain.forEach(e -> {
@@ -196,17 +196,20 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         var propDeactivate = coOwner.getProperty().getPropertyMaintenance().stream().filter(e -> e.getType() == PropertyStatus.DEACTIVATE).toList();
         var apartmentMaintain = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentId(coOwner.getPropertyId(), coOwner.getRoomId()).stream().filter(e -> e.getType() == CoOwnerMaintenanceStatus.DEACTIVATE).toList();
         if (!resDeactivate.isEmpty()) {
-            if ((resDeactivate.get(0).getStartDate().isAfter(startD) || resDeactivate.get(0).getStartDate().isEqual(startD)) && (resDeactivate.get(0).getStartDate().isBefore(endD) || resDeactivate.get(0).getStartDate().isEqual(endD))) {
+            if ((resDeactivate.get(0).getStartDate().isBefore(startD) || resDeactivate.get(0).getStartDate().isEqual(startD))
+                    || (resDeactivate.get(0).getStartDate().isBefore(endD) || resDeactivate.get(0).getStartDate().isEqual(endD))) {
                 throw new DataIntegrityViolationException("Resort is deactivate this time. Try to another time!.");
             }
         }
         if (!propDeactivate.isEmpty()) {
-            if ((propDeactivate.get(0).getStartDate().isAfter(startD) || propDeactivate.get(0).getStartDate().isEqual(startD)) && (propDeactivate.get(0).getStartDate().isBefore(endD) || propDeactivate.get(0).getStartDate().isEqual(endD))) {
+            if ((propDeactivate.get(0).getStartDate().isBefore(startD) || propDeactivate.get(0).getStartDate().isEqual(startD))
+                    || (propDeactivate.get(0).getStartDate().isBefore(endD) || propDeactivate.get(0).getStartDate().isEqual(endD))) {
                 throw new DataIntegrityViolationException("Property is deactivate this time. Try to another time!.");
             }
         }
         if (!apartmentMaintain.isEmpty()) {
-            if ((apartmentMaintain.get(0).getStartDate().isAfter(startD) || apartmentMaintain.get(0).getStartDate().isEqual(startD)) && (apartmentMaintain.get(0).getStartDate().isBefore(endD) || apartmentMaintain.get(0).getStartDate().isEqual(endD))) {
+            if ((apartmentMaintain.get(0).getStartDate().isBefore(startD) || apartmentMaintain.get(0).getStartDate().isEqual(startD))
+                    || (apartmentMaintain.get(0).getStartDate().isBefore(endD) || apartmentMaintain.get(0).getStartDate().isEqual(endD))) {
                 throw new DataIntegrityViolationException("Apartment is deactivate this time. Try to another time!.");
             }
         }
