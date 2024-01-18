@@ -8,6 +8,7 @@ import com.example.holidayswap.domain.mapper.property.ApartmentForRentMapper;
 import com.example.holidayswap.domain.mapper.property.ResortApartmentForRentMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.property.PropertyMaintenanceRepository;
+import com.example.holidayswap.repository.property.coOwner.CoOwnerMaintenanceRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortMaintanceRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
@@ -37,6 +38,7 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
     private final RatingServiceImpl ratingService;
     private final ResortMaintanceRepository resortMaintanceRepository;
     private final PropertyMaintenanceRepository propertyMaintenanceRepository;
+    private final CoOwnerMaintenanceRepository coOwnerMaintenanceRepository;
 
     @Override
     public Page<ApartmentForRentResponse> gets(String locationName, Long resortId, Date checkIn, Date checkOut, Long min, Long max, int guest, int numberBedsRoom, int numberBathRoom, Set<Long> listOfInRoomAmenity, Set<Long> listOfPropertyView, Set<Long> listOfPropertyType, Pageable pageable) {
@@ -46,8 +48,10 @@ public class ApartmentForRentServiceImpl implements ApartmentForRentService {
         if (user.isPresent()) userId = user.get().getUserId();
         var listResortMaintain = resortMaintanceRepository.findCanNotUse();
         var listPropertyMaintain = propertyMaintenanceRepository.findCanNotUse();
+        var listApartmentIdMaintain = coOwnerMaintenanceRepository.findCanNotUse();
         listOut.addAll(listResortMaintain);
         listOut.addAll(listPropertyMaintain);
+        listOut.addAll(listApartmentIdMaintain);
         if (listOut.isEmpty()) listOut = null;
 
         var dto = availableTimeRepository.findApartmentForRent(StringUtils.stripAccents(locationName).toUpperCase(),

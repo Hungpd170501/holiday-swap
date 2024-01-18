@@ -3,6 +3,7 @@ package com.example.holidayswap.services.impl;
 import com.example.holidayswap.domain.mapper.property.ResortApartmentForRentMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
 import com.example.holidayswap.repository.property.PropertyMaintenanceRepository;
+import com.example.holidayswap.repository.property.coOwner.CoOwnerMaintenanceRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortMaintanceRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
@@ -28,6 +29,7 @@ public class ApartmentForRentServiceImplTest {
     RatingServiceImpl ratingRepository;
     ResortMaintanceRepository resortMaintanceRepository;
     PropertyMaintenanceRepository propertyMaintenanceRepository;
+    CoOwnerMaintenanceRepository coOwnerMaintenanceRepository;
 
     @BeforeEach
     void beforeEach() {
@@ -40,7 +42,7 @@ public class ApartmentForRentServiceImplTest {
         resortApartmentForRentMapper = mock(ResortApartmentForRentMapper.class);
         authUtils = mock(AuthUtils.class);
         ratingRepository = mock(RatingServiceImpl.class);
-        apartmentForRentServiceImplUnderTest = new ApartmentForRentServiceImpl(inRoomAmenityTypeServiceImplUnderTest, propertyImageServiceImplUnderTest, availableTimeRepository, bookingRepository, resortRepository, resortApartmentForRentMapper, authUtils, ratingRepository, resortMaintanceRepository, propertyMaintenanceRepository);
+        apartmentForRentServiceImplUnderTest = new ApartmentForRentServiceImpl(inRoomAmenityTypeServiceImplUnderTest, propertyImageServiceImplUnderTest, availableTimeRepository, bookingRepository, resortRepository, resortApartmentForRentMapper, authUtils, ratingRepository, resortMaintanceRepository, propertyMaintenanceRepository, coOwnerMaintenanceRepository);
     }
 
     @Test

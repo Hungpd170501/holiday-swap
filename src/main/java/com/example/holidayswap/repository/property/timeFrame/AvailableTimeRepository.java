@@ -152,7 +152,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                     end
                 )
               and ((at.endTime) > current_date)
-              and ((:#{#listOut == null} = true) or (co.propertyId not in :listOut))
+              and ((:#{#listOut == null} = true) or (at.id not in :listOut))
               """)
     Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
                                                    @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,
