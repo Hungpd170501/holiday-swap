@@ -40,7 +40,23 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
     List<ResortMaintance> findByTypeAndStartDate(String type, LocalDateTime startDate);
 
     @Query(value = """
-            select rm.resort_id from resort_maintaince rm where current_date between rm.start_date and rm.end_date
+            SELECT at2.available_time_id
+            FROM resort_maintaince rm
+                     INNER JOIN resort r ON r.resort_id = rm.resort_id
+                     INNER JOIN property p ON p.resort_id = r.resort_id
+                     INNER JOIN co_owner co ON co.property_id = p.property_id
+                     INNER JOIN available_time at2 ON at2.co_owner_id = co.co_owner_id
+            WHERE CASE
+                      WHEN rm."type" = 'MAINTENANCE'
+                          THEN
+                          (date(rm.start_date) <= date(at2.start_time)) AND
+                          (date(rm.end_date) >= date(at2.end_time))
+                      ELSE
+                          (
+                              date(rm.start_date) <= date(at2.start_time)
+                              )
+                      END
+            group by at2.available_time_id
             """, nativeQuery = true)
     Set<Long> findCanNotUse();
 }
