@@ -12,6 +12,7 @@ import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
+import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
 import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.booking.BookingMapper;
 import com.example.holidayswap.repository.booking.BookingRepository;
@@ -43,6 +44,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -73,11 +75,10 @@ public class BookingServiceImpl implements IBookingService {
 
         if (bookingRequest.getCheckInDate().compareTo(bookingRequest.getCheckOutDate()) >= 0)
             throw new EntityNotFoundException("Check in date must be before check out date");
-        var booki = availableTimeRepository.findByIdAndDeletedFalse(bookingRequest.getAvailableTimeId());
-        if (booki.isPresent()) {
-            if (booki.get().getCoOwner().getUserId() == bookingRequest.getUserId())
-                throw new EntityNotFoundException("You can't book your own apartment");
-        }
+        var booki = availableTimeRepository.findByIdAndDeletedFalse(bookingRequest.getAvailableTimeId()).orElseThrow(() -> new DataIntegrityViolationException("Not found!."));
+        var co = coOwnerRepository.findById(booki.getCoOwnerId()).orElseThrow();
+        if (Objects.equals(co.getUserId(), bookingRequest.getUserId()))
+            throw new EntityNotFoundException("You can't book your own apartment");
         UserProfileResponse user = userService.getUserById(bookingRequest.getUserId());
         List<Booking> checkBookingOverlap;
         UUID uuid = UUID.randomUUID();
@@ -661,7 +662,7 @@ public class BookingServiceImpl implements IBookingService {
                 booking.setTransferStatus(EnumBookingStatus.TransferStatus.WAITING);
                 booking.setTypeOfBooking(EnumBookingStatus.TypeOfBooking.RENT);
                 bookingRepository.save(booking);
-                if (bookingRequest.getUserOfBookingRequests()!=null){
+                if (bookingRequest.getUserOfBookingRequests() != null) {
                     userOfBookingService.saveUserOfBooking(booking.getId(), bookingRequest.getUserOfBookingRequests());
                 }
             } finally {
