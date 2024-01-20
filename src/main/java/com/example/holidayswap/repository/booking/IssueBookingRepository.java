@@ -12,4 +12,7 @@ public interface IssueBookingRepository extends JpaRepository<IssueBooking, Long
     @Query(value = "SELECT * FROM public.issue_booking\n" +
             "ORDER BY issue_id ASC ", nativeQuery = true)
     List<IssueBooking> findAll(Long bookingId);
+
+    @Query("select i from IssueBooking i where i.bookingId = ?1")
+    IssueBooking findByBookingId(Long bookingId);
 }

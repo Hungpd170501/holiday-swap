@@ -19,6 +19,7 @@ import com.example.holidayswap.repository.property.coOwner.CoOwnerMaintenanceRep
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.property.timeFrame.AvailableTimeRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
+import com.example.holidayswap.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -46,6 +47,8 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
     private final ResortRepository resortRepository;
     private final PropertyRepository propertyRepository;
     private final CoOwnerMaintenanceRepository coOwnerMaintenanceRepository;
+
+    private final AuthUtils authUtils;
 
     List<Integer> numberOfWeeks(LocalDate startDate, LocalDate endDate) {
         if (startDate.isBefore(LocalDate.now()))
@@ -123,10 +126,12 @@ public class AvailableTimeServiceImpl implements AvailableTimeService {
         return availableTimeResponse;
     }
 
+
     @Override
     public void create(Long coOwnerId, AvailableTimeRequest rq) {
         isValidDate(rq.getStartTime(), rq.getEndTime());
         var co = coOwnerRepository.findById(coOwnerId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        authUtils.checkOwn(co);
         if (co.getStatus() != CoOwnerStatus.ACCEPTED) {
             throw new DataIntegrityViolationException("This Co-Owner is not accepted! Please contact for Staff!");
         }

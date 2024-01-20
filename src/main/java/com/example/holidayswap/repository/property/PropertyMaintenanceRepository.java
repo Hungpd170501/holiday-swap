@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -21,7 +22,7 @@ public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMai
                             OR (date (?3) > date (r.start_date) AND date (?3) < date (r.end_date))
                             OR( date  (?2) <= date (r.start_date) AND date (?3) >= date (r.end_date) ))
                          """, nativeQuery = true)
-    PropertyMaintenance findByPropertyIdAndStartDateAndEndDateAndType(Long propertyId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
+    Optional <PropertyMaintenance> findByPropertyIdAndStartDateAndEndDateAndType(Long propertyId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
 
     @Query(value = "select r.* from property_maintaince r where r.type = ?1 and date (r.start_date) = date (?2)", nativeQuery = true)
     List<PropertyMaintenance> findByTypeAndStartDate(String type, LocalDateTime startDate);
@@ -45,4 +46,11 @@ public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMai
              group by at2.available_time_id;
              """, nativeQuery = true)
     Set<Long> findCanNotUse();
+
+    @Query(value = """
+            select r.* from property_maintaince r
+            where r.property_id = ?3 and r.type = ?4 and ((r.start_date BETWEEN date (?1) AND date (?2)) OR r.start_date = date (?1) OR r.start_date = date (?2))
+                         """, nativeQuery = true)
+
+    PropertyMaintenance findPropertyMaintenanceByStartDateAndEndDateAndPropertyIdAndType(LocalDateTime startDate, LocalDateTime endDate, Long propertyId, String type);
 }

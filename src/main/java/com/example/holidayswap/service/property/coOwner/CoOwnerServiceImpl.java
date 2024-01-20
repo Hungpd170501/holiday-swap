@@ -25,6 +25,7 @@ import com.example.holidayswap.service.booking.IBookingService;
 import com.example.holidayswap.service.notification.PushNotificationService;
 import com.example.holidayswap.service.property.timeFame.TimeFrameService;
 import com.example.holidayswap.service.resort.ResortService;
+import com.example.holidayswap.utils.AuthUtils;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final PropertyRepository propertyRepository;
     private final ResortRepository resortRepository;
     private final UserRepository userRepository;
-
+    private final AuthUtils authUtils;
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
         String status = null;
@@ -76,6 +77,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     @Override
     public CoOwnerResponse get(Long coOwnerId) {
         var coOwner = coOwnerRepository.findById(coOwnerId).orElseThrow(() -> new EntityNotFoundException(CO_OWNER_NOT_FOUND));
+        authUtils.checkOwn(coOwner);
         coOwner.setAvailableTimes(coOwner.getAvailableTimes().stream().filter(a -> !a.isDeleted() && a.getStatus() == AvailableTimeStatus.OPEN).toList());
         coOwner.setContractImages(coOwner.getContractImages().stream().filter(e -> !e.getIsDeleted()).toList());
         var rs = CoOwnerMapper.INSTANCE.toDtoResponse(coOwner);
@@ -120,6 +122,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     @Override
     @Transactional
     public void create(CoOwnerRequest dtoRequest) {
+
         checkValid(dtoRequest.getPropertyId(), dtoRequest.getUserId());
         //Deeded
         if (dtoRequest.getType() == ContractType.DEEDED) {
@@ -236,9 +239,12 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     public void updateStatus(Long propertyId, String apartmentId, CoOwnerMaintenanceStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException {
         if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
         if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
-//        var entity = propertyRepository.findByIdAndDeletedFalseAndResortStatus(id, PropertyStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Property not available now"));
+        var entity = coOwnerRepository.findByPropertyIdAndRoomId(propertyId,apartmentId);
+
         List<String> listImage = ownerShipMaintenanceService.CreateOwnerShipMaintenance(propertyId,apartmentId, startDate, endDate, resortStatus, resortImage);
-        bookingService.deactiveApartmentNotifyBookingUser(propertyId,apartmentId, startDate, endDate, resortStatus, listImage);
+        if(entity.size() >0){
+            bookingService.deactiveApartmentNotifyBookingUser(propertyId,apartmentId, startDate, endDate, resortStatus, listImage);
+        }
     }
 
     @Override

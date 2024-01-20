@@ -13,6 +13,7 @@ import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public interface IBookingService {
@@ -52,5 +53,7 @@ public interface IBookingService {
     void payBookingExchange(Long bookingId) throws InterruptedException, IOException, WriterException, MessagingException;
 
     void cancelBookingExchange(Long bookingId) throws InterruptedException;
+
+    void checkValidBooking(Long availableTimeId, Date checkInDate, Date checkOutDate);
 
 }
