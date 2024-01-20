@@ -143,7 +143,7 @@ public class BookingServiceImpl implements IBookingService {
 
                 transferPointService.payBooking(booking);
                 //create notification for user booking
-                notificationRequestForUserBooking.setSubject("Booking Success");
+                 notificationRequestForUserBooking.setSubject("Booking Success");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForUserBooking.setToUserId(bookingRequest.getUserId());
                 pushNotificationService.createNotification(notificationRequestForUserBooking);
@@ -680,7 +680,7 @@ public class BookingServiceImpl implements IBookingService {
         checkValidBooking(bookingRequest.getAvailableTimeId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
         var booki = availableTimeRepository.findByIdAndDeletedFalse(bookingRequest.getAvailableTimeId());
         if (booki.isPresent()) {
-            if (booki.get().getCoOwner().getUserId() == bookingRequest.getUserId())
+            if (Objects.equals(booki.get().getCoOwner().getUserId(), bookingRequest.getUserId()))
                 throw new EntityNotFoundException("You can't book your own apartment");
         }
         List<Booking> checkBookingOverlap;

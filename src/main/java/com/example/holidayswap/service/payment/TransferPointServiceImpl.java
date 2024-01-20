@@ -263,7 +263,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 notificationRequestForUserBooking.setContent(booking.getId() + "refund point for you" + booking.getActualPrice() + "point");
                 notificationRequestForUserBooking.setToUserId(booking.getOwnerId());
                 pushNotificationService.createNotification(notificationRequestForUserBooking);
-                //loggingService.saveLog(bookingId, booking.getOwnerId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "Success", 0D, ownerWallet.getTotalPoint(), booking.getCommission());
+                loggingService.saveLog(bookingId, booking.getOwnerId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "Success", 0D, ownerWallet.getTotalPoint(), booking.getCommission());
                 booking.setTransferStatus(EnumBookingStatus.TransferStatus.SUCCESS);
                 bookingRepository.save(booking);
             } finally {
