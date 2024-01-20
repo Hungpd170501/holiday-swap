@@ -82,6 +82,7 @@ public class BookingServiceImpl implements IBookingService {
             throw new EntityNotFoundException("Check in date must be before check out date");
         var booki = availableTimeRepository.findByIdAndDeletedFalse(bookingRequest.getAvailableTimeId()).orElseThrow(() -> new DataIntegrityViolationException("Not found!."));
         var co = coOwnerRepository.findById(booki.getCoOwnerId()).orElseThrow();
+        checkValidBooking(bookingRequest.getAvailableTimeId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
         if (Objects.equals(co.getUserId(), bookingRequest.getUserId()))
             throw new EntityNotFoundException("You can't book your own apartment");
         UserProfileResponse user = userService.getUserById(bookingRequest.getUserId());
@@ -716,45 +717,46 @@ public class BookingServiceImpl implements IBookingService {
         var availableTime = availableTimeRepository.findByIdAndDeletedFalse(availableTimeId).orElseThrow(() -> new EntityNotFoundException("Available time not found"));
         LocalDateTime checkinDate = checkInDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime checkoutDate = checkOutDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        var co = coOwnerRepository.findByIdAndDeleted(availableTime.getCoOwnerId()).get();
 
         propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
-                availableTime.getCoOwner().getPropertyId(),
+                co.getPropertyId(),
                         checkinDate, checkoutDate, PropertyStatus.MAINTENANCE.name())
                 .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
         propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
-                availableTime.getCoOwner().getPropertyId(),
+                        co.getPropertyId(),
                         checkinDate, checkinDate, PropertyStatus.MAINTENANCE.name())
                 .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
 
 
         resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
-                availableTime.getCoOwner().getProperty().getResortId(), checkinDate, checkinDate, ResortStatus.MAINTENANCE.name())
+                        co.getProperty().getResortId(), checkinDate, checkinDate, ResortStatus.MAINTENANCE.name())
                 .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});;
         resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
-                availableTime.getCoOwner().getProperty().getResortId(), checkinDate, checkoutDate, ResortStatus.MAINTENANCE.name())
+                        co.getProperty().getResortId(), checkinDate, checkoutDate, ResortStatus.MAINTENANCE.name())
                 .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});;
 
         var checkCoOwner = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentIdAndStartDateAndEndDateAndType(
-                availableTime.getCoOwner().getPropertyId(), checkinDate,
-                checkoutDate , availableTime.getCoOwner().getRoomId(),
+                co.getPropertyId(), checkinDate,
+                checkoutDate , co.getRoomId(),
                 CoOwnerMaintenanceStatus.MAINTENANCE.name().toString());
         if(checkCoOwner.size() >0) throw new RuntimeException("This apartment is maintenance at date : " + checkCoOwner.get(0).getStartDate() + " to "+ checkCoOwner.get(0).getEndDate());
         checkCoOwner = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentIdAndStartDateAndEndDateAndType(
-                availableTime.getCoOwner().getPropertyId(), checkinDate,
-                checkinDate , availableTime.getCoOwner().getRoomId(),
+                co.getPropertyId(), checkinDate,
+                checkinDate , co.getRoomId(),
                 CoOwnerMaintenanceStatus.MAINTENANCE.name().toString());
         if(checkCoOwner.size() >0) throw new RuntimeException("This apartment is maintenance at date : " + checkCoOwner.get(0).getStartDate() + " to "+ checkCoOwner.get(0).getEndDate());
 
        var checkValidDeactiveProperty = propertyMaintenanceRepository.findPropertyMaintenanceByStartDateAndEndDateAndPropertyIdAndType(
-                 checkinDate, checkoutDate,availableTime.getCoOwner().getPropertyId(), PropertyStatus.DEACTIVATE.name().toString());
+                 checkinDate, checkoutDate,co.getPropertyId(), PropertyStatus.DEACTIVATE.name().toString());
        if(checkValidDeactiveProperty != null) throw new RuntimeException("This apartment is deactive at date : " + checkValidDeactiveProperty.getStartDate() );
 
        var checkValidDeactiveResort = resortMaintanceRepository.findResortMaintanceByStartDateAndEndDateAndResortIdAndType(
-               checkinDate, checkoutDate,availableTime.getCoOwner().getProperty().getResortId(), ResortStatus.DEACTIVATE.name().toString());
+               checkinDate, checkoutDate,co.getProperty().getResortId(), ResortStatus.DEACTIVATE.name().toString());
        if(checkValidDeactiveResort != null) throw new RuntimeException("This apartment is deactive at date : " + checkValidDeactiveResort.getStartDate() );
 
          var checkValidDeactiveApartment = coOwnerMaintenanceRepository.findCoOwnerMaintenanceByStartDateAndEndDateAndPropertyIdAndApartmentIdAndType(
-                checkinDate, checkoutDate,availableTime.getCoOwner().getPropertyId(), availableTime.getCoOwner().getRoomId(), CoOwnerMaintenanceStatus.DEACTIVATE.name().toString());
+                checkinDate, checkoutDate,co.getPropertyId(), co.getRoomId(), CoOwnerMaintenanceStatus.DEACTIVATE.name().toString());
         if(checkValidDeactiveApartment != null) throw new RuntimeException("This apartment is deactive at date : " + checkValidDeactiveApartment.getStartDate() );
 
         }
