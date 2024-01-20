@@ -44,4 +44,9 @@ public class IssueBookingServiceImpl implements IIssueBookingService {
     public IssueBooking getIssueBookingById(Long issueId) {
         return issueBookingRepository.findById(issueId).orElseThrow(() -> new RuntimeException("Issue not found"));
     }
+
+    @Override
+    public IssueBooking getIssueBookingByBookingId(Long bookingId) {
+        return issueBookingRepository.findByBookingId(bookingId);
+    }
 }

@@ -48,7 +48,7 @@ public class ExchangeController {
     }
 
     @PutMapping("/{exchangeId}/next-step")
-    public ResponseEntity<Void> approveExchange(@PathVariable Long exchangeId) throws InterruptedException, MessagingException, IOException, WriterException {
+    public ResponseEntity<Void> approveExchange(@PathVariable Long exchangeId) throws InterruptedException, MessagingException, IOException, WriterException, IOException {
         exchangeService.updateNextStatus(exchangeId);
         return ResponseEntity.noContent().build();
     }
