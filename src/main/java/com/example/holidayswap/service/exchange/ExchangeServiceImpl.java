@@ -73,7 +73,7 @@ public class ExchangeServiceImpl implements IExchangeService {
                 NotificationRequest.builder()
                         .subject("New exchange.")
                         .toUserId(exchange.getUserId())
-                        .content("Received new exchange request from " + user.getUserId() + ".").build()
+                        .content("Received new exchange request from " + user.getUsername() + ".").build()
         ));
         return ExchangeMapper.INSTANCE.toExchangeResponse(savedExchange);
     }
@@ -177,8 +177,8 @@ public class ExchangeServiceImpl implements IExchangeService {
                         pushNotificationService.createNotification(
                                 NotificationRequest.builder()
                                         .subject("Exchange success.")
-                                        .toUserId(exchange.getUserId())
-                                        .content("Your exchange with "+ recipient.getUsername() + "has been success.").build());
+                                        .toUserId(recipient.getUserId())
+                                        .content("Your exchange with "+ recipient.getUsername() + " has been success.").build());
                         try {
                             emailService.sendConfirmBookedHtml(booking, recipient.getEmail());
                         } catch (MessagingException e) {
@@ -193,8 +193,8 @@ public class ExchangeServiceImpl implements IExchangeService {
                         pushNotificationService.createNotification(
                                 NotificationRequest.builder()
                                         .subject("Exchange success.")
-                                        .toUserId(exchange.getUserId())
-                                        .content("Your exchange with "+ recipient.getUsername() + "has been success.").build());
+                                        .toUserId(recipient.getUserId())
+                                        .content("Your exchange with "+ recipient.getUsername() + " has been success.").build());
                         try {
                             emailService.sendConfirmBookedHtml(booking, recipient.getEmail());
                         } catch (MessagingException e) {
