@@ -475,17 +475,10 @@ public class BookingServiceImpl implements IBookingService {
     public String returnPointBooking(Long bookingId) throws InterruptedException {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
 
-//        long threeDaysAgoMillis = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000);
-//        Date threeDaysAgo = new Date(threeDaysAgoMillis);
-//        if (booking.getCheckOutDate().before(threeDaysAgo)) {
-//            booking.setStatusCheckReturn(false);
-//            bookingRepository.save(booking);
-//            throw new EntityNotFoundException("Can not return point because check out date is before 3 days ago");
-//        }
         if (booking.getStatusCheckReturn()) {
             booking.setStatus(EnumBookingStatus.BookingStatus.CANCELLED);
             booking.setStatusCheckReturn(false);
-            transferPointService.returnPoint(booking.getOwnerId(), booking.getUserBookingId(), booking.getActualPrice(), booking.getCommission());
+            transferPointService.refundPointBookingToUser(bookingId);
             bookingRepository.save(booking);
             return "Refund point success";
         }
