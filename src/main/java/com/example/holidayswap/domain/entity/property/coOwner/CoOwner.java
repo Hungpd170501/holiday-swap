@@ -4,6 +4,7 @@ import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.property.Property;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTime;
 import com.example.holidayswap.domain.entity.property.timeFrame.TimeFrame;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -75,12 +76,15 @@ public class CoOwner {
     @Column(name = "create_date")
     private Date createDate;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "coOwner")
     private List<ContractImage> contractImages;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "coOwner")
     private List<TimeFrame> timeFrames;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "coOwner")
     private List<AvailableTime> availableTimes;
 }
