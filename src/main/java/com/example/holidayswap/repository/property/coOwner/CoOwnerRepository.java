@@ -17,6 +17,8 @@ import java.util.Optional;
 @Repository
 
 public interface CoOwnerRepository extends JpaRepository<CoOwner, Long> {
+    @Query(value = "select c.* from co_owner c where c.co_owner_id = :co_owner_id and c.is_deleted = false", nativeQuery = true)
+    Optional<CoOwner> findByIdAndIsDeletedIsFalse(@Param("co_owner_id") Long coOwnerId);
     @Query(value = """
             select
             	co.*
