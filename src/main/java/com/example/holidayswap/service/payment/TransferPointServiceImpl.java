@@ -129,10 +129,12 @@ public class TransferPointServiceImpl implements ITransferPointService {
 
     @Override
     public List<TransactionTranferPointResponse> convertAllLogToTransactionTranferPointResponse(List<AllLog> allLogs, Long userId) {
-        return allLogs.stream().map(allLog -> {
+        return allLogs.stream()
+                .filter(allLog -> !userService.getUserName(allLog.getFromId(), allLog.getFromId()).equals("booking"))
+                .map(allLog -> {
             TransactionTranferPointResponse transactionTranferPointResponse = new TransactionTranferPointResponse();
             transactionTranferPointResponse.setId(allLog.getId());
-            transactionTranferPointResponse.setFrom(userService.getUserById(allLog.getFromId()).getUsername());
+            transactionTranferPointResponse.setFrom(userService.getUserName(allLog.getFromId(),allLog.getFromId()));
             transactionTranferPointResponse.setTo(userService.getUserById(allLog.getToId()).getUsername());
             transactionTranferPointResponse.setDetail(allLog.getDetail());
             if (allLog.getFromId() == userId) {
@@ -261,7 +263,7 @@ public class TransferPointServiceImpl implements ITransferPointService {
                 notificationRequestForUserBooking.setContent(booking.getId() + "refund point for you" + booking.getActualPrice() + "point");
                 notificationRequestForUserBooking.setToUserId(booking.getOwnerId());
                 pushNotificationService.createNotification(notificationRequestForUserBooking);
-                loggingService.saveLog(bookingId, booking.getOwnerId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "Success", 0D, ownerWallet.getTotalPoint(), booking.getCommission());
+                //loggingService.saveLog(bookingId, booking.getOwnerId(), booking.getActualPrice(), EnumPaymentStatus.BankCodeError.SUCCESS, "Success", 0D, ownerWallet.getTotalPoint(), booking.getCommission());
                 booking.setTransferStatus(EnumBookingStatus.TransferStatus.SUCCESS);
                 bookingRepository.save(booking);
             } finally {

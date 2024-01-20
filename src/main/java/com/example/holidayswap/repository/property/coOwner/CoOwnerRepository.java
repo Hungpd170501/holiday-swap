@@ -2,6 +2,7 @@ package com.example.holidayswap.repository.property.coOwner;
 
 import com.example.holidayswap.domain.dto.response.resort.OwnerShipResponseDTO;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -166,7 +167,12 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, Long> {
                           co.type = :type
                 end
             """, nativeQuery = true)
-    Optional<CoOwner> findByPropertyIdAndUserIdAndRoomIdAndType(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("type") String type, @Param("startTime") LocalDate startTime, @Param("endTime") LocalDate endTime);
+    Optional<CoOwner> findByPropertyIdAndUserIdAndRoomIdAndType(@Param("propertyId") Long propertyId,
+                                                                @Param("userId") Long userId,
+                                                                @Param("roomId") String roomId,
+                                                                @Param("type") String type,
+                                                                @Param("startTime") LocalDate startTime,
+                                                                @Param("endTime") LocalDate endTime);
 
     @Query(value = "select c.* from co_owner c where c.co_owner_id = ?1 and c.is_deleted = false", nativeQuery = true)
     Optional<CoOwner> findByIdAndDeleted(Long id);
