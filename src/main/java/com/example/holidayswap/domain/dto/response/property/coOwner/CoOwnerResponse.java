@@ -5,10 +5,12 @@ import com.example.holidayswap.domain.dto.response.property.PropertyResponse;
 import com.example.holidayswap.domain.dto.response.property.timeFrame.TimeFrameResponse;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
+import com.example.holidayswap.domain.entity.property.coOwner.OwnerShipMaintenance;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class CoOwnerResponse {
@@ -24,4 +26,5 @@ public class CoOwnerResponse {
     private Date createDate;
     private PropertyResponse property;
     private UserProfileResponse user;
+    private Set<OwnerShipMaintenance> ownerShipMaintenance;
 }
