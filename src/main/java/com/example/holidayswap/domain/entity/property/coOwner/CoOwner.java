@@ -87,4 +87,10 @@ public class CoOwner {
     @JsonIgnore
     @OneToMany(mappedBy = "coOwner")
     private List<AvailableTime> availableTimes;
+
+    public CoOwner(Long propertyId, Property property, String roomId) {
+        this.propertyId = propertyId;
+        this.property = property;
+        this.roomId = roomId;
+    }
 }
