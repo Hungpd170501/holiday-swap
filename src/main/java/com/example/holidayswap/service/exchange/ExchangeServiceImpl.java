@@ -64,6 +64,10 @@ public class ExchangeServiceImpl implements IExchangeService {
     public ExchangeResponse create(ExchangeCreatingRequest exchangeCreatingRequest) {
         var exchange = ExchangeMapper.INSTANCE.toExchangeEntity(exchangeCreatingRequest);
         var user = authUtils.getAuthenticatedUser();
+        availableTimeRepository.findById(exchange.getRequestAvailableTimeId())
+                        .orElseThrow(()->new EntityNotFoundException("Available Time not found"));
+        availableTimeRepository.findById(exchange.getAvailableTimeId())
+                .orElseThrow(()->new EntityNotFoundException("Available Time not found"));
         exchange.setRequestUserId(user.getUserId());
         exchange.setRequestStatus(ExchangeStatus.CONVERSATION);
         exchange.setStatus(ExchangeStatus.CONVERSATION);
@@ -153,10 +157,14 @@ public class ExchangeServiceImpl implements IExchangeService {
     private void handleStatusUpdate(Exchange exchange, User user, ExchangeStatus nextStatus, String step) throws MessagingException, IOException, InterruptedException, WriterException {
         if (exchange.getUserId().equals(user.getUserId())) {
             exchange.setStatus(nextStatus);
-            handleBookingUpdate(exchange, user, nextStatus, exchange.getAvailableTimeId(), exchange.getCheckInDate(), exchange.getCheckOutDate(), exchange.getTotalMember());
+            handleBookingUpdate(exchange, user, nextStatus, exchange.getAvailableTimeId(),
+                    exchange.getCheckInDate(), exchange.getCheckOutDate(),
+                    exchange.getTotalMember(), exchange.getStatus());
         } else {
             exchange.setRequestStatus(nextStatus);
-            handleBookingUpdate(exchange, user, nextStatus, exchange.getRequestAvailableTimeId(), exchange.getRequestCheckInDate(), exchange.getRequestCheckOutDate(), exchange.getRequestTotalMember());
+            handleBookingUpdate(exchange, user, nextStatus, exchange.getRequestAvailableTimeId(),
+                    exchange.getRequestCheckInDate(), exchange.getRequestCheckOutDate(),
+                    exchange.getRequestTotalMember(), exchange.getRequestStatus());
         }
 
         if (exchange.getStatus().equals(exchange.getRequestStatus())) {
@@ -210,8 +218,10 @@ public class ExchangeServiceImpl implements IExchangeService {
         exchangeRepository.save(exchange);
     }
 
-    private void handleBookingUpdate(Exchange exchange, User user, ExchangeStatus nextStatus, Long availableTimeId, LocalDate checkInDate, LocalDate checkOutDate, int numberOfGuest) throws MessagingException, IOException, InterruptedException, WriterException {
-        if (nextStatus.equals(ExchangeStatus.PRE_CONFIRMATION)) {
+    private void handleBookingUpdate(Exchange exchange, User user, ExchangeStatus nextStatus, Long availableTimeId,
+                                     LocalDate checkInDate, LocalDate checkOutDate,
+                                     int numberOfGuest, ExchangeStatus currentStatus) throws MessagingException, IOException, InterruptedException, WriterException {
+        if (nextStatus.equals(ExchangeStatus.PRE_CONFIRMATION) && !currentStatus.equals(ExchangeStatus.PRE_CONFIRMATION)) {
             Long bookingId = bookingService.createBookingExchange(
                     BookingRequest.builder()
                             .userId(user.getUserId())
@@ -229,7 +239,7 @@ public class ExchangeServiceImpl implements IExchangeService {
             }
             exchangeRepository.save(exchange);
         }
-        if (nextStatus.equals(ExchangeStatus.SUCCESS)) {
+        if (nextStatus.equals(ExchangeStatus.SUCCESS) && !currentStatus.equals(ExchangeStatus.SUCCESS)) {
             bookingService.payBookingExchange(exchange.getBookingId());
         }
     }

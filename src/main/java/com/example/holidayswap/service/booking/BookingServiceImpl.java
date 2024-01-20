@@ -680,7 +680,7 @@ public class BookingServiceImpl implements IBookingService {
         checkValidBooking(bookingRequest.getAvailableTimeId(), bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
         var booki = availableTimeRepository.findByIdAndDeletedFalse(bookingRequest.getAvailableTimeId());
         if (booki.isPresent()) {
-            if (booki.get().getCoOwner().getUserId() == bookingRequest.getUserId())
+            if (Objects.equals(booki.get().getCoOwner().getUserId(), bookingRequest.getUserId()))
                 throw new EntityNotFoundException("You can't book your own apartment");
         }
         List<Booking> checkBookingOverlap;
