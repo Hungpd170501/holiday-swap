@@ -4,6 +4,8 @@ import com.example.holidayswap.domain.dto.request.booking.BookingRequest;
 import com.example.holidayswap.domain.dto.response.booking.TimeHasBooked;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
 import com.example.holidayswap.service.booking.IBookingService;
+import com.example.holidayswap.service.property.IPropertyMaintenanceService;
+import com.example.holidayswap.service.resort.IResortMaintanceService;
 import com.google.zxing.WriterException;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -18,6 +22,10 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingController {
     private final IBookingService bookingService;
+
+    private final IPropertyMaintenanceService propertyMaintenanceService;
+
+    private final IResortMaintanceService resortService;
 
     @PostMapping("/create")
     public ResponseEntity<EnumBookingStatus.BookingStatus> createBooking(@RequestBody BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException, MessagingException {
@@ -98,5 +106,16 @@ public class BookingController {
     public ResponseEntity<?> cancelBookingExchange(@PathVariable Long bookingId) throws InterruptedException {
         bookingService.cancelBookingExchange(bookingId);
         return ResponseEntity.ok("Success");
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<?> cte() throws InterruptedException {
+        LocalDate dateNow = LocalDate.now();
+        LocalDateTime dateNowTime = LocalDateTime.now();
+        bookingService.refundPointBookingToOwner(dateNow);
+        resortService.deactiveResort(dateNowTime);
+        propertyMaintenanceService.DeactivePropertyAtStartDate(dateNowTime);
+        return ResponseEntity.ok("Success");
+
     }
 }

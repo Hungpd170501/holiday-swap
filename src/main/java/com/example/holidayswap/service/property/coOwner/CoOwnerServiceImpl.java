@@ -233,8 +233,11 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     public void updateStatus(Long propertyId, String apartmentId, CoOwnerMaintenanceStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException {
         if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
         if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
-//        var entity = propertyRepository.findByIdAndDeletedFalseAndResortStatus(id, PropertyStatus.ACTIVE).orElseThrow(() -> new EntityNotFoundException("Property not available now"));
+        var entity = coOwnerRepository.findByPropertyIdAndRoomId(propertyId,apartmentId);
+
         List<String> listImage = ownerShipMaintenanceService.CreateOwnerShipMaintenance(propertyId,apartmentId, startDate, endDate, resortStatus, resortImage);
-        bookingService.deactiveApartmentNotifyBookingUser(propertyId,apartmentId, startDate, endDate, resortStatus, listImage);
+        if(entity.size() >0){
+            bookingService.deactiveApartmentNotifyBookingUser(propertyId,apartmentId, startDate, endDate, resortStatus, listImage);
+        }
     }
 }

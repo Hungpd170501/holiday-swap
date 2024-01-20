@@ -30,12 +30,12 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService  {
         var checkResort = resortRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Resort not found"));
         var checkIsDeactivate = resortMaintanceRepository.findAllByTypeAndResortId(ResortStatus.DEACTIVATE,resortId);
         ResortMaintance checkIsMaintance = null;
-        checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, ResortStatus.MAINTENANCE.name());
+        checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, ResortStatus.MAINTENANCE.name()).orElse(null);
         if(checkIsDeactivate.size()>0) {
             throw new RuntimeException("Resort is deactivated");
         }
         if(resortStatus != ResortStatus.DEACTIVATE) {
-            checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, ResortStatus.MAINTENANCE.name());
+            checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, ResortStatus.MAINTENANCE.name()).orElse(null);
         }
         if(checkIsMaintance != null) {
             throw new RuntimeException("Resort is already in maintenance");
@@ -70,8 +70,8 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService  {
     @Override
     public void ChangeStatusResortAtStartDate(Long resortId, LocalDateTime startDate) {
         var checkResort = resortRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Resort not found"));
-        var checkIsDeactivate = resortMaintanceRepository.findByResortIdAndType(resortId,ResortStatus.DEACTIVATE);
-        var checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, ResortStatus.MAINTENANCE.name());
+        var checkIsDeactivate = resortMaintanceRepository.findByResortIdAndType(resortId,ResortStatus.DEACTIVATE).orElse(null);
+        var checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, ResortStatus.MAINTENANCE.name()).orElse(null);
 
         if(checkIsDeactivate != null && checkIsDeactivate.getStartDate().isEqual(startDate)) {
             checkResort.setStatus(ResortStatus.DEACTIVATE);
@@ -84,8 +84,8 @@ public class ResortMaintanceServiceImpl implements IResortMaintanceService  {
     @Override
     public void ChangeStatusResortAtEndDate(Long resortId, LocalDateTime endDate) {
         var checkResort = resortRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Resort not found"));
-        var checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, endDate, endDate, ResortStatus.MAINTENANCE.name());
-        var checkIsDeactivate = resortMaintanceRepository.findByResortIdAndType(resortId,ResortStatus.DEACTIVATE);
+        var checkIsMaintance = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(resortId, endDate, endDate, ResortStatus.MAINTENANCE.name()).orElse(null);
+        var checkIsDeactivate = resortMaintanceRepository.findByResortIdAndType(resortId,ResortStatus.DEACTIVATE).orElse(null);
 
          if (checkIsMaintance != null && checkIsMaintance.getEndDate().isEqual(endDate) && !checkIsDeactivate.getStartDate().isBefore(endDate)) {
             checkResort.setStatus(ResortStatus.ACTIVE);

@@ -28,12 +28,12 @@ public class PropertyMaintenanceServiceImpl implements IPropertyMaintenanceServi
         var checkResort = propertyRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Property not found"));
         var checkIsDeactivate = propertyMaintenanceRepository.findAllByTypeAndProperty(PropertyStatus.DEACTIVATE,resortId);
         PropertyMaintenance checkIsMaintance = null;
-        checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, PropertyStatus.MAINTENANCE.name());
+        checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, PropertyStatus.MAINTENANCE.name()).orElse(null);
         if(checkIsDeactivate.size()>0) {
             throw new RuntimeException("Property is deactivated");
         }
         if(resortStatus != PropertyStatus.DEACTIVATE) {
-            checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, PropertyStatus.MAINTENANCE.name());
+            checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, PropertyStatus.MAINTENANCE.name()).orElse(null);
         }
         if(checkIsMaintance != null) {
             throw new RuntimeException("Property is already in maintenance");

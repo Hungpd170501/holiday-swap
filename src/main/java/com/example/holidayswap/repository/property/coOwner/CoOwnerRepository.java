@@ -102,7 +102,7 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, Long> {
     List<CoOwner> checkOverlapsTimeOwnership(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
     @Query(value = "select c.* from co_owner c where c.property_id = ?1 and c.room_id = ?2", nativeQuery = true)
-    Optional<CoOwner> findByPropertyIdAndRoomId(Long propertyId, String apartmentId);
+   List<CoOwner> findByPropertyIdAndRoomId(Long propertyId, String apartmentId);
     @Query(value = "SELECT Distinct o.property_id, o.room_id from co_owner o", nativeQuery = true)
     List<OwnerShipResponseDTO> getAllDistinctOwnerShipWithoutUserId();
 

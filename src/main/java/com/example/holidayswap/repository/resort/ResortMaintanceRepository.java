@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -22,7 +23,7 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
                             OR (date (?3) > date (r.start_date) AND date (?3) < date (r.end_date))
                             OR( date  (?2) <= date (r.start_date) AND date (?3) >= date (r.end_date) ))
                          """, nativeQuery = true)
-    ResortMaintance findByResortIdAndStartDateAndEndDateAndType(Long resortId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
+    Optional <ResortMaintance> findByResortIdAndStartDateAndEndDateAndType(Long resortId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
 
     @Query(value = """
             select r.* from resort_maintaince r
@@ -31,7 +32,7 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
     ResortMaintance findByResortIdAndStartDate(Long resortId, LocalDateTime startDate);
 
     @Query("select r from ResortMaintance r where r.resortId = ?1 and r.type = ?2")
-    ResortMaintance findByResortIdAndType(Long resortId, ResortStatus resortStatus);
+    Optional <ResortMaintance> findByResortIdAndType(Long resortId, ResortStatus resortStatus);
 
     @Query("select r from ResortMaintance r where r.resortId = ?1")
     List<ResortMaintance> findAllByResortId(Long resortId);
@@ -43,4 +44,10 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
             select rm.resort_id from resort_maintaince rm where current_date between rm.start_date and rm.end_date
             """, nativeQuery = true)
     Set<Long> findCanNotUse();
+
+    @Query(value = """
+            select r.* from resort_maintaince r
+            where r.resort_id = ?3 and r.type = ?4 and ((r.start_date BETWEEN date (?1) AND date (?2)) OR r.start_date = date (?1) OR r.start_date = date (?2))
+                         """, nativeQuery = true)
+    ResortMaintance findResortMaintanceByStartDateAndEndDateAndResortIdAndType(LocalDateTime startDate, LocalDateTime endDate, Long resortId, String type);
 }

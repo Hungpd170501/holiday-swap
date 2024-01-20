@@ -26,17 +26,16 @@ public class OwnerShipMaintenanceServiceImpl implements IOwnerShipMaintenanceSer
     @Override
     public List<String> CreateOwnerShipMaintenance(Long propertyId, String roomId, LocalDateTime startDate, LocalDateTime endDate, CoOwnerMaintenanceStatus resortStatus, List<MultipartFile> resortImage) {
 
-         coOwnerRepository.findByPropertyIdAndRoomId(propertyId,roomId).orElseThrow(() -> new RuntimeException("Apartment of property not found"));
         var checkIsDeactivate = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentIdAndType(propertyId,roomId,CoOwnerMaintenanceStatus.DEACTIVATE);
-        OwnerShipMaintenance checkIsMaintance = null;
+        List <OwnerShipMaintenance> checkIsMaintance;
         checkIsMaintance = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentIdAndStartDateAndEndDateAndType(propertyId, startDate, startDate ,roomId,CoOwnerMaintenanceStatus.MAINTENANCE.name().toString());
-        if(checkIsDeactivate != null) {
+        if(checkIsDeactivate.size() > 0) {
             throw new RuntimeException("Apartment is deactivated");
         }
         if(resortStatus != CoOwnerMaintenanceStatus.DEACTIVATE) {
             checkIsMaintance = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentIdAndStartDateAndEndDateAndType(propertyId, startDate, endDate ,roomId,   CoOwnerMaintenanceStatus.MAINTENANCE.name().toString());
         }
-        if(checkIsMaintance != null) {
+        if(checkIsMaintance.size() > 0) {
             throw new RuntimeException("Apartment is already in maintenance");
         }
         List<OwnerShipMaintenanceImage> listimage = new ArrayList<>();
