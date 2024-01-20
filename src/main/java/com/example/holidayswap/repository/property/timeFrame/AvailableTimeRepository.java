@@ -180,11 +180,14 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  where
                  at.id = :availableId
                  and co.status = 'ACCEPTED'
-                
                  and at.status = 'OPEN'
                  and p.status = 'ACTIVE'
                  and r.status = 'ACTIVE'
                  and u.status = 'ACTIVE'
+                 and co.isDeleted = false
+                 and at.isDeleted = false
+                 and p.isDeleted = false
+                 and r.isDeleted = false
             """)
     Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerId(@Param("availableId") Long availableId);
 
