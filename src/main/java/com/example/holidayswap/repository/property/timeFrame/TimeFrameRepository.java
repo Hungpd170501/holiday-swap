@@ -179,7 +179,7 @@ public interface TimeFrameRepository extends JpaRepository<TimeFrame, Long> {
               AND CASE
                       WHEN :type = 'DEEDED'
                           THEN CO.TYPE = 'DEEDED' AND :startDate = CO.START_TIME
-                      ELSE CO.TYPE = 'RIGHT_TO_USE' AND (DATE(:startDate) = DATE(CO.START_TIME) OR
+                      ELSE CO.TYPE = 'RIGHT_TO_USE' AND (DATE(:startDate) = DATE(CO.START_TIME) AND
                                                          DATE(:endDate) = DATE(CO.END_TIME))
                 END
             """, nativeQuery = true)

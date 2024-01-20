@@ -26,7 +26,6 @@ import java.util.List;
 public class CoOwnersController {
     private final CoOwnerService coOwnerService;
 
-
     @GetMapping
     public ResponseEntity<Page<CoOwnerResponse>> get(
             @RequestParam(required = false) Long resortId,
@@ -40,6 +39,18 @@ public class CoOwnersController {
             @RequestParam(defaultValue = "create_date") String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
         return ResponseEntity.ok(coOwnerService.gets(resortId, propertyId, userId, roomId, coOwnerStatus, pageable));
+    }
+
+    @GetMapping("/propertyAndRoomId")
+    public ResponseEntity<Page<CoOwnerResponse>> getPropertyAndRoomId(
+            @RequestParam(required = false) Long propertyId,
+            @RequestParam(required = false) String roomId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(defaultValue = "propertyId") String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        return ResponseEntity.ok(coOwnerService.getsByPropertyAndRoomId(propertyId, roomId, pageable));
     }
 
     @GetMapping("/{coOwnerId}")

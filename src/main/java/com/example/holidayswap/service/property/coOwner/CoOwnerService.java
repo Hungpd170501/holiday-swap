@@ -17,6 +17,8 @@ import java.util.List;
 public interface CoOwnerService {
     Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable);
 
+    Page<CoOwnerResponse> getsByPropertyAndRoomId(Long propertyId, String roomId, Pageable pageable);
+
     CoOwnerResponse get(Long coOwnerId);
 
     void create(CoOwnerRequest dtoRequest);

@@ -66,11 +66,22 @@ public class CoOwnerServiceImpl implements CoOwnerService {
     private final ResortRepository resortRepository;
     private final UserRepository userRepository;
     private final AuthUtils authUtils;
+
     @Override
     public Page<CoOwnerResponse> gets(Long resortId, Long propertyId, Long userId, String roomId, CoOwnerStatus coOwnerStatus, Pageable pageable) {
         String status = null;
         if (coOwnerStatus != null) status = coOwnerStatus.toString();
         var entities = coOwnerRepository.findAllByResortIdAndPropertyIdAndUserIdAndRoomIdAndStatus(resortId, propertyId, userId, roomId, status, pageable).map(CoOwnerMapper.INSTANCE::toDtoResponse);
+        return entities;
+    }
+
+    @Override
+    public Page<CoOwnerResponse> getsByPropertyAndRoomId(Long propertyId, String roomId, Pageable pageable) {
+        var entities = coOwnerRepository.findAllByPropertyAndRoomId(propertyId, roomId, pageable).map(CoOwnerMapper.INSTANCE::toDtoResponse);
+        entities.forEach((e) -> {
+            var x = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentId(e.getProperty().getId(), e.getRoomId());
+            e.setOwnerShipMaintenance(x);
+        });
         return entities;
     }
 
@@ -237,13 +248,15 @@ public class CoOwnerServiceImpl implements CoOwnerService {
 
     @Override
     public void updateStatus(Long propertyId, String apartmentId, CoOwnerMaintenanceStatus resortStatus, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> resortImage) throws MessagingException, IOException {
-        if(startDate.isBefore(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
-        if(startDate.isEqual(LocalDateTime.now())) throw new DataIntegrityViolationException("Start date must be after today");
-        var entity = coOwnerRepository.findByPropertyIdAndRoomId(propertyId,apartmentId);
+        if (startDate.isBefore(LocalDateTime.now()))
+            throw new DataIntegrityViolationException("Start date must be after today");
+        if (startDate.isEqual(LocalDateTime.now()))
+            throw new DataIntegrityViolationException("Start date must be after today");
+        var entity = coOwnerRepository.findByPropertyIdAndRoomId(propertyId, apartmentId);
 
-        List<String> listImage = ownerShipMaintenanceService.CreateOwnerShipMaintenance(propertyId,apartmentId, startDate, endDate, resortStatus, resortImage);
-        if(entity.size() >0){
-            bookingService.deactiveApartmentNotifyBookingUser(propertyId,apartmentId, startDate, endDate, resortStatus, listImage);
+        List<String> listImage = ownerShipMaintenanceService.CreateOwnerShipMaintenance(propertyId, apartmentId, startDate, endDate, resortStatus, resortImage);
+        if (entity.size() > 0) {
+            bookingService.deactiveApartmentNotifyBookingUser(propertyId, apartmentId, startDate, endDate, resortStatus, listImage);
         }
     }
 
