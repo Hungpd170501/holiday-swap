@@ -37,4 +37,6 @@ public interface UserService {
     void upgradeUserToMember(Long userId);
 
     void changePassword(ChangePasswordRequest changePasswordRequest);
+
+    String getUserName(Long userId,Long bookingId);
 }

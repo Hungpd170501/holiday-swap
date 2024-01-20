@@ -163,4 +163,9 @@ public class UserServiceImpl implements UserService {
         user.setPasswordHash(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
     }
+
+    @Override
+    public String getUserName(Long userId,Long bookingId) {
+        return userRepository.findById(userId).map(User::getUsername).orElse( "booking");
+    }
 }

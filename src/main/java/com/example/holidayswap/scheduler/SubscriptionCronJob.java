@@ -42,7 +42,7 @@ public class SubscriptionCronJob {
             }
         });
     }
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 46 16 * * ?")
     public void scheduleTaskTransferPointToOwner() {
         log.info("Cron Task :: Execution Time - {}", System.currentTimeMillis());
 //        subscriptionRepository.findAll().forEach(subscription -> {
