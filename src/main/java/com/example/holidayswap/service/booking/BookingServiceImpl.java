@@ -7,8 +7,6 @@ import com.example.holidayswap.domain.dto.response.booking.*;
 import com.example.holidayswap.domain.entity.auth.User;
 import com.example.holidayswap.domain.entity.booking.Booking;
 import com.example.holidayswap.domain.entity.booking.EnumBookingStatus;
-import com.example.holidayswap.domain.entity.exchange.Exchange;
-import com.example.holidayswap.domain.entity.property.PropertyMaintenance;
 import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwner;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
@@ -145,7 +143,7 @@ public class BookingServiceImpl implements IBookingService {
 
                 transferPointService.payBooking(booking);
                 //create notification for user booking
-                 notificationRequestForUserBooking.setSubject("Booking Success");
+                notificationRequestForUserBooking.setSubject("Booking Success");
                 notificationRequestForUserBooking.setContent("Booking Apartment " + booking.getAvailableTime().getCoOwner().getRoomId() + " of resort " + booking.getAvailableTime().getCoOwner().getProperty().getResort().getResortName() + " book from" + booking.getCheckInDate() + " to " + booking.getCheckOutDate());
                 notificationRequestForUserBooking.setToUserId(bookingRequest.getUserId());
                 pushNotificationService.createNotification(notificationRequestForUserBooking);
@@ -161,6 +159,62 @@ public class BookingServiceImpl implements IBookingService {
             }
         }
         return EnumBookingStatus.BookingStatus.FAILED;
+    }
+
+    private void isInMaintain(LocalDate start, LocalDate end, CoOwner coOwner) {
+        //parse time
+        LocalDateTime startD = start.atStartOfDay();
+        LocalDateTime endD = end.atStartOfDay();
+        var resMaintain = coOwner.getProperty().getResort().getResortMaintainces().stream().filter(e -> e.getType() == ResortStatus.MAINTENANCE);
+        var propMaintain = coOwner.getProperty().getPropertyMaintenance().stream().filter(e -> e.getType() == PropertyStatus.MAINTENANCE);
+        var apartmentMaintain = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentId(coOwner.getPropertyId(), coOwner.getRoomId()).stream().filter(e -> e.getType() == CoOwnerMaintenanceStatus.MAINTENANCE);
+        resMaintain.forEach(e -> {
+            if ((startD.isAfter(e.getStartDate()) || startD.isEqual(e.getStartDate())) && (startD.isBefore(e.getEndDate()) || startD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+            }
+            if ((endD.isAfter(e.getStartDate()) || endD.isEqual(e.getStartDate())) && (endD.isBefore(e.getEndDate()) || endD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Resort in maintain this time. Try to another time!.");
+            }
+        });
+        propMaintain.forEach(e -> {
+            if ((startD.isAfter(e.getStartDate()) || startD.isEqual(e.getStartDate())) && (startD.isBefore(e.getEndDate()) || startD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Property in maintain this time. Try to another time!.");
+            }
+            if ((endD.isAfter(e.getStartDate()) || endD.isEqual(e.getStartDate())) && (endD.isBefore(e.getEndDate()) || endD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Property in maintain this time. Try to another time!.");
+            }
+        });
+        apartmentMaintain.forEach(e -> {
+            if ((startD.isAfter(e.getStartDate()) || startD.isEqual(e.getStartDate())) && (startD.isBefore(e.getEndDate()) || startD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Apartment in maintain this time. Try to another time!.");
+            }
+            if ((endD.isAfter(e.getStartDate()) || endD.isEqual(e.getStartDate())) && (endD.isBefore(e.getEndDate()) || endD.isEqual(e.getEndDate()))) {
+                throw new DataIntegrityViolationException("Apartment in maintain this time. Try to another time!.");
+            }
+        });
+    }
+
+    private void checkIsInDeactivate(LocalDate start, LocalDate end, CoOwner coOwner) {
+        LocalDateTime startD = start.atStartOfDay();
+        LocalDateTime endD = end.atStartOfDay();
+        var resDeactivate = coOwner.getProperty().getResort().getResortMaintainces().stream().filter(e -> e.getType() == ResortStatus.DEACTIVATE).toList();
+        var propDeactivate = coOwner.getProperty().getPropertyMaintenance().stream().filter(e -> e.getType() == PropertyStatus.DEACTIVATE).toList();
+        var apartmentMaintain = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentId(coOwner.getPropertyId(), coOwner.getRoomId()).stream().filter(e -> e.getType() == CoOwnerMaintenanceStatus.DEACTIVATE).toList();
+        if (!resDeactivate.isEmpty()) {
+            if ((resDeactivate.get(0).getStartDate().isBefore(startD) || resDeactivate.get(0).getStartDate().isEqual(startD)) || (resDeactivate.get(0).getStartDate().isBefore(endD) || resDeactivate.get(0).getStartDate().isEqual(endD))) {
+                throw new DataIntegrityViolationException("Resort is deactivate this time. Try to another time!.");
+            }
+        }
+        if (!propDeactivate.isEmpty()) {
+            if ((propDeactivate.get(0).getStartDate().isBefore(startD) || propDeactivate.get(0).getStartDate().isEqual(startD)) || (propDeactivate.get(0).getStartDate().isBefore(endD) || propDeactivate.get(0).getStartDate().isEqual(endD))) {
+                throw new DataIntegrityViolationException("Property is deactivate this time. Try to another time!.");
+            }
+        }
+        if (!apartmentMaintain.isEmpty()) {
+            if ((apartmentMaintain.get(0).getStartDate().isBefore(startD) || apartmentMaintain.get(0).getStartDate().isEqual(startD)) || (apartmentMaintain.get(0).getStartDate().isBefore(endD) || apartmentMaintain.get(0).getStartDate().isEqual(endD))) {
+                throw new DataIntegrityViolationException("Apartment is deactivate this time. Try to another time!.");
+            }
+        }
     }
 
     @Override
@@ -701,11 +755,10 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     public void cancelBookingExchange(Long bookingId) throws InterruptedException {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
-        if(booking.getStatus().equals(EnumBookingStatus.BookingStatus.SUCCESS)){
+        if (booking.getStatus().equals(EnumBookingStatus.BookingStatus.SUCCESS)) {
             bookingRepository.save(booking);
             returnPointBooking(bookingId);
-        }else
-            booking.setStatus(EnumBookingStatus.BookingStatus.CANCELLED);
+        } else booking.setStatus(EnumBookingStatus.BookingStatus.CANCELLED);
 
         bookingRepository.save(booking);
 
@@ -759,7 +812,7 @@ public class BookingServiceImpl implements IBookingService {
                 checkinDate, checkoutDate,co.getPropertyId(), co.getRoomId(), CoOwnerMaintenanceStatus.DEACTIVATE.name().toString());
         if(checkValidDeactiveApartment != null) throw new RuntimeException("This apartment is deactive at date : " + checkValidDeactiveApartment.getStartDate() );
 
-        }
+    }
 
 
 }
