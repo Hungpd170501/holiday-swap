@@ -22,7 +22,7 @@ public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMai
                             OR (date (?3) > date (r.start_date) AND date (?3) < date (r.end_date))
                             OR( date  (?2) <= date (r.start_date) AND date (?3) >= date (r.end_date) ))
                          """, nativeQuery = true)
-    Optional <PropertyMaintenance> findByPropertyIdAndStartDateAndEndDateAndType(Long propertyId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
+    List <PropertyMaintenance> findByPropertyIdAndStartDateAndEndDateAndType(Long propertyId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
 
     @Query(value = "select r.* from property_maintaince r where r.type = ?1 and date (r.start_date) = date (?2)", nativeQuery = true)
     List<PropertyMaintenance> findByTypeAndStartDate(String type, LocalDateTime startDate);

@@ -27,15 +27,15 @@ public class PropertyMaintenanceServiceImpl implements IPropertyMaintenanceServi
     public List<String> CreatePropertyMaintance(Long resortId, LocalDateTime startDate, LocalDateTime endDate, PropertyStatus resortStatus, List<MultipartFile> resortImage) {
         var checkResort = propertyRepository.findById(resortId).orElseThrow(() -> new RuntimeException("Property not found"));
         var checkIsDeactivate = propertyMaintenanceRepository.findAllByTypeAndProperty(PropertyStatus.DEACTIVATE,resortId);
-        PropertyMaintenance checkIsMaintance = null;
-        checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, PropertyStatus.MAINTENANCE.name()).orElse(null);
+        List <PropertyMaintenance> checkIsMaintance;
+        checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, startDate, PropertyStatus.MAINTENANCE.name());
         if(checkIsDeactivate.size()>0) {
             throw new RuntimeException("Property is deactivated");
         }
         if(resortStatus != PropertyStatus.DEACTIVATE) {
-            checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, PropertyStatus.MAINTENANCE.name()).orElse(null);
+            checkIsMaintance = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(resortId, startDate, endDate, PropertyStatus.MAINTENANCE.name());
         }
-        if(checkIsMaintance != null) {
+        if(checkIsMaintance.size()>0) {
             throw new RuntimeException("Property is already in maintenance");
         }
         List<PropertyMaintenanceImage> listimage = new ArrayList<>();
