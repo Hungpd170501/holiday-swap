@@ -221,7 +221,7 @@ public class ExchangeServiceImpl implements IExchangeService {
     private void handleBookingUpdate(Exchange exchange, User user, ExchangeStatus nextStatus, Long availableTimeId,
                                      LocalDate checkInDate, LocalDate checkOutDate,
                                      int numberOfGuest, ExchangeStatus currentStatus) throws MessagingException, IOException, InterruptedException, WriterException {
-        if (nextStatus.equals(ExchangeStatus.PRE_CONFIRMATION) && !currentStatus.equals(ExchangeStatus.PRE_CONFIRMATION)) {
+        if (nextStatus.equals(ExchangeStatus.PRE_CONFIRMATION)) {
             Long bookingId = bookingService.createBookingExchange(
                     BookingRequest.builder()
                             .userId(user.getUserId())
@@ -239,7 +239,7 @@ public class ExchangeServiceImpl implements IExchangeService {
             }
             exchangeRepository.save(exchange);
         }
-        if (nextStatus.equals(ExchangeStatus.SUCCESS) && !currentStatus.equals(ExchangeStatus.SUCCESS)) {
+        if (nextStatus.equals(ExchangeStatus.SUCCESS)) {
             bookingService.payBookingExchange(exchange.getBookingId());
         }
     }
