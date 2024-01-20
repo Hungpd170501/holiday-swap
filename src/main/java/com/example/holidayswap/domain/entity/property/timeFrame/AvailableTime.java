@@ -44,7 +44,7 @@ public class  AvailableTime {
     @NotNull
     @Column(name = "co_owner_id")
     private Long coOwnerId;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY á fashfsdgkjhbn)
     @JoinColumn(name = "co_owner_id",
             referencedColumnName = "co_owner_id",
             nullable = false,

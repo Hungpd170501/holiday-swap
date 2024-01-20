@@ -775,20 +775,20 @@ public class BookingServiceImpl implements IBookingService {
         var propertyCheck = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
                 co.getPropertyId(),
                         checkinDate, checkoutDate, PropertyStatus.MAINTENANCE.name());
-        propertyCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+        propertyCheck.forEach(x -> {throw new RuntimeException("This property of apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
 
         propertyCheck =propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
                         co.getPropertyId(),
                         checkinDate, checkinDate, PropertyStatus.MAINTENANCE.name());
-        propertyCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+        propertyCheck.forEach(x -> {throw new RuntimeException("This property of apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
 
 
         var resortCheck = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
                         co.getProperty().getResortId(), checkinDate, checkinDate, ResortStatus.MAINTENANCE.name());
-                resortCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+                resortCheck.forEach(x -> {throw new RuntimeException("This resort of apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
         resortCheck=resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
                         co.getProperty().getResortId(), checkinDate, checkoutDate, ResortStatus.MAINTENANCE.name());
-        resortCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+        resortCheck.forEach(x -> {throw new RuntimeException("This resort of apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
 
         var checkCoOwner = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentIdAndStartDateAndEndDateAndType(
                 co.getPropertyId(), checkinDate,
