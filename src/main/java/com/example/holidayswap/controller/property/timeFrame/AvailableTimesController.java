@@ -27,7 +27,7 @@ public class AvailableTimesController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "id") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
         var dtoResponses = availableTimeService.getAllByCoOwnerId(CoOwnerId, pageable);
         return ResponseEntity.ok(dtoResponses);
     }

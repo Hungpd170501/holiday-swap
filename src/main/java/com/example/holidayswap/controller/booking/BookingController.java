@@ -107,15 +107,4 @@ public class BookingController {
         bookingService.cancelBookingExchange(bookingId);
         return ResponseEntity.ok("Success");
     }
-
-    @GetMapping("/test")
-    public ResponseEntity<?> cte() throws InterruptedException {
-        LocalDate dateNow = LocalDate.now();
-        LocalDateTime dateNowTime = LocalDateTime.now();
-        bookingService.refundPointBookingToOwner(dateNow);
-        resortService.deactiveResort(dateNowTime);
-        propertyMaintenanceService.DeactivePropertyAtStartDate(dateNowTime);
-        return ResponseEntity.ok("Success");
-
-    }
 }

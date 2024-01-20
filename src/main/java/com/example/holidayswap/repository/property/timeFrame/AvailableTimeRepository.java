@@ -140,20 +140,20 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
               and (:userId is null or co.user.userId  != :userId)
               and u.status = 'ACTIVE'
               and (
-                case when bk.status = 5 and p.status = 'ACTIVE'
-                    and r.status = 'ACTIVE' then (
-                    (extract(day from cast(at.endTime as timestamp )) - extract(day from cast(at.startTime as timestamp )))
-                        >
-                    (select sum(extract(day from cast(bk.checkOutDate as timestamp )) - extract(day from cast(bk.checkInDate as timestamp ))) from Booking bk
-                     where bk.availableTimeId = at.id))
-                     else (
-                         bk.id is null or bk.status != 5
+                case
+                    when bk.status = 5 and p.status = 'ACTIVE' and r.status = 'ACTIVE'
+                        then (
+                             (date(at.endTime  ) - date(at.startTime  )) >
+                            (select sum( date(bk.checkOutDate  ) - date(bk.checkInDate  ))
+                            from Booking bk
+                            where bk.availableTimeId = at.id)
                          )
-                    end
+                        else (bk.id is null or bk.status != 5
+                        )
+                end
                 )
               and ((at.endTime) > current_date)
-              and ((:#{#listPropertyCanNotUse == null} = true) or (co.propertyId not in :listPropertyCanNotUse))
-              and ((:#{#listResortCanNotUse == null} = true) or (p.resortId not in :listResortCanNotUse))
+              and ((:#{#listOut == null} = true) or (at.id not in :listOut))
               """)
     Page<ApartmentForRentDTO> findApartmentForRent(@Param("locationName") String locationName,
                                                    @Param("resortId") Long resortId, @Param("checkIn") Date checkIn,
@@ -164,8 +164,7 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                                                    @Param("listOfInRoomAmenity") Set<Long> listOfInRoomAmenity,
                                                    @Param("listOfPropertyView") Set<Long> listOfPropertyView,
                                                    @Param("listOfPropertyType") Set<Long> listOfPropertyType,
-                                                   @Param("listResortCanNotUse") Set<Long> listResortCanNotUse,
-                                                   @Param("listPropertyCanNotUse") Set<Long> listPropertyCanNotUse,
+                                                   @Param("listOut") Set<Long> listOut,
                                                    @Param("userId") Long userId, Pageable pageable);
 
     @Query(value = """
@@ -193,6 +192,23 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
                 at 
             )
+                 from AvailableTime at
+                 left join at.coOwner co
+                 left join co.timeFrames tf
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
+                 where
+                 at.id = :availableId
+                 and co.status = 'ACCEPTED'
+            """)
+    Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerIdIgnoreStatus(@Param("availableId") Long availableId);
+
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+                at 
+            )
             from AvailableTime at
                  left join at.coOwner co
                  left join co.timeFrames tf
@@ -202,7 +218,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  left join p.inRoomAmenities ira
                  left join p.propertyType pt
                  left join p.propertyView pv
-                 left join  at.bookings bk
                  where
                co.user.userId  = :userId
             """)
@@ -236,7 +251,15 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
     @Query(value = "select a.* from available_time  a where a.co_owner_id  = :coOwnerId and EXTRACT (YEAR FROM A.start_time) = :year", nativeQuery = true)
     List<AvailableTime> findByCoOwnerIdAndYear(@Param("coOwnerId") Long coOwnerId, @Param("year") int year);
 
-    Page<AvailableTime> findAllByCoOwnerIdAndIsDeletedIsFalse(Long coOwnerId, Pageable pageable);
+    @Query(value = """
+            select a.*
+            from available_time a
+                     inner join public.co_owner co on a.co_owner_id = co.co_owner_id
+            where co.co_owner_id = :co_owner_id
+              and a.is_deleted = false
+            order by (a.end_time > current_date) DESC, a.start_time
+            """, nativeQuery = true)
+    Page<AvailableTime> findAllByCoOwnerIdAndIsDeletedIsFalse(@Param("co_owner_id") Long coOwnerId, Pageable pageable);
 
     @Query(value = """      
             select a.*

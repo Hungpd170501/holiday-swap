@@ -28,7 +28,22 @@ public interface PropertyMaintenanceRepository extends JpaRepository<PropertyMai
     List<PropertyMaintenance> findByTypeAndStartDate(String type, LocalDateTime startDate);
 
     @Query(value = """
-            select pm.property_id from property_maintaince pm where current_date between pm.start_date and pm.end_date
+            SELECT at2.available_time_id
+             FROM property_maintaince pm
+                      INNER JOIN property p ON p.property_id = pm.property_id
+                      INNER JOIN co_owner co ON co.property_id = p.property_id
+                      INNER JOIN available_time at2 ON at2.co_owner_id = co.co_owner_id
+             WHERE CASE
+                       WHEN pm."type" = 'MAINTENANCE'
+                           THEN
+                           (date(pm.start_date) <= date(at2.start_time)) AND
+                           (date(pm.end_date) >= date(at2.end_time))
+                       ELSE
+                           (
+                               date(pm.start_date) <= date(at2.start_time)
+                               )
+                       END
+             group by at2.available_time_id;
              """, nativeQuery = true)
     Set<Long> findCanNotUse();
 

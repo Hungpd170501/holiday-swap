@@ -8,6 +8,7 @@ import com.example.holidayswap.domain.entity.property.PropertyStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerMaintenanceStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.CoOwnerStatus;
 import com.example.holidayswap.domain.entity.property.coOwner.ContractType;
+import com.example.holidayswap.domain.entity.property.coOwner.OwnerShipMaintenance;
 import com.example.holidayswap.domain.entity.property.timeFrame.AvailableTimeStatus;
 import com.example.holidayswap.domain.entity.resort.ResortStatus;
 import com.example.holidayswap.domain.exception.DataIntegrityViolationException;
@@ -15,6 +16,7 @@ import com.example.holidayswap.domain.exception.EntityNotFoundException;
 import com.example.holidayswap.domain.mapper.property.coOwner.CoOwnerMapper;
 import com.example.holidayswap.repository.auth.UserRepository;
 import com.example.holidayswap.repository.property.PropertyRepository;
+import com.example.holidayswap.repository.property.coOwner.CoOwnerMaintenanceRepository;
 import com.example.holidayswap.repository.property.coOwner.CoOwnerRepository;
 import com.example.holidayswap.repository.resort.ResortRepository;
 import com.example.holidayswap.service.EmailService;
@@ -45,6 +47,7 @@ import static com.example.holidayswap.constants.ErrorMessage.*;
 @Slf4j
 @RequiredArgsConstructor
 public class CoOwnerServiceImpl implements CoOwnerService {
+    private final CoOwnerMaintenanceRepository coOwnerMaintenanceRepository;
 
     private final CoOwnerRepository coOwnerRepository;
 
@@ -239,5 +242,10 @@ public class CoOwnerServiceImpl implements CoOwnerService {
         if(entity.size() >0){
             bookingService.deactiveApartmentNotifyBookingUser(propertyId,apartmentId, startDate, endDate, resortStatus, listImage);
         }
+    }
+
+    @Override
+    public List<OwnerShipMaintenance> getListOwnerShipMaintenance(Long propertyId, String apartmentId) {
+        return coOwnerMaintenanceRepository.findByPropertyIdAndApartmentId(propertyId, apartmentId).stream().toList();
     }
 }
