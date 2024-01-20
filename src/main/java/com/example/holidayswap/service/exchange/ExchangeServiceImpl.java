@@ -181,12 +181,13 @@ public class ExchangeServiceImpl implements IExchangeService {
                 });
                 CompletableFuture.runAsync(() -> {
                     var recipient = userService.getUserById(exchange.getUserId());
+                    var exchanger = userService.getUserById(exchange.getRequestUserId());
                     bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
                         pushNotificationService.createNotification(
                                 NotificationRequest.builder()
                                         .subject("Exchange success.")
                                         .toUserId(recipient.getUserId())
-                                        .content("Your exchange with "+ recipient.getUsername() + " has been success.").build());
+                                        .content("Your exchange with "+ exchanger.getUsername() + " has been success.").build());
                         try {
                             emailService.sendConfirmBookedHtml(booking, recipient.getEmail());
                         } catch (MessagingException e) {
@@ -197,12 +198,13 @@ public class ExchangeServiceImpl implements IExchangeService {
                 });
                 CompletableFuture.runAsync(() -> {
                     var recipient = userService.getUserById(exchange.getRequestUserId());
+                    var exchanger = userService.getUserById(exchange.getUserId());
                     bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
                         pushNotificationService.createNotification(
                                 NotificationRequest.builder()
                                         .subject("Exchange success.")
                                         .toUserId(recipient.getUserId())
-                                        .content("Your exchange with "+ recipient.getUsername() + " has been success.").build());
+                                        .content("Your exchange with "+ exchanger.getUsername() + " has been success.").build());
                         try {
                             emailService.sendConfirmBookedHtml(booking, recipient.getEmail());
                         } catch (MessagingException e) {
