@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface CoOwnerMaintenanceRepository extends JpaRepository<OwnerShipMaintenance,Long> {
     @Query("select o from OwnerShipMaintenance o where o.propertyId = ?1 and o.apartmentId = ?2")
-    Optional <OwnerShipMaintenance> findByPropertyIdAndApartmentId(Long propertyId, String apartmentId);
+    Set<OwnerShipMaintenance> findByPropertyIdAndApartmentId(Long propertyId, String apartmentId);
     @Query("select o from OwnerShipMaintenance o where o.propertyId = ?1 and o.apartmentId = ?2 and o.type = ?3")
     OwnerShipMaintenance findByPropertyIdAndApartmentIdAndType(Long propertyId, String apartmentId, CoOwnerMaintenanceStatus type);
 
@@ -23,4 +23,23 @@ public interface CoOwnerMaintenanceRepository extends JpaRepository<OwnerShipMai
                             OR( date  (?2) <= date (r.start_date) AND date (?3) >= date (r.end_date) ))
                          """, nativeQuery = true)
      OwnerShipMaintenance findByPropertyIdAndApartmentIdAndStartDateAndEndDateAndType(Long propertyId, LocalDateTime startDate, LocalDateTime endDate, String apartmentId, String type);
+
+    @Query(value = """
+            select at2.available_time_id
+            from owner_ship_maintenance oM
+                     inner join co_owner co on oM.apartment_id = co.room_id and oM.property_id = co.property_id
+                     inner join public.available_time at2 on co.co_owner_id = at2.co_owner_id
+            WHERE CASE
+                      WHEN oM."type" = 'MAINTENANCE'
+                          THEN
+                          (date(oM.start_date) <= date(at2.start_time)) AND
+                          (date(oM.end_date) >= date(at2.end_time))
+                      ELSE
+                          (
+                              date(oM.start_date) <= date(at2.start_time)
+                              )
+                      END
+            group by at2.available_time_id;
+            """, nativeQuery = true)
+    Set<Long> findCanNotUse();
 }

@@ -83,4 +83,20 @@ public class BookingController {
         bookingService.refundPointBookingToOwner(java.time.LocalDate.now());
         return ResponseEntity.ok("Success");
     }
+    //---------------------Exchange---------------------
+    @PostMapping("/create-exchange")
+    public ResponseEntity<EnumBookingStatus.BookingStatus> createBookingExchange(@RequestBody BookingRequest bookingRequest) throws InterruptedException, IOException, WriterException, MessagingException {
+        bookingService.createBookingExchange(bookingRequest);
+        return ResponseEntity.ok(EnumBookingStatus.BookingStatus.PENDING);
+    }
+    @PutMapping("/pay-exchange/{bookingId}")
+    public ResponseEntity<?> payBookingExchange(@PathVariable Long bookingId) throws InterruptedException, IOException, WriterException, MessagingException {
+        bookingService.payBookingExchange(bookingId);
+        return ResponseEntity.ok("Success");
+    }
+    @PutMapping("/cancel-exchange/{bookingId}")
+    public ResponseEntity<?> cancelBookingExchange(@PathVariable Long bookingId) throws InterruptedException {
+        bookingService.cancelBookingExchange(bookingId);
+        return ResponseEntity.ok("Success");
+    }
 }

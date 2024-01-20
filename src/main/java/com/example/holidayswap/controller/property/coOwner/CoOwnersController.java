@@ -1,6 +1,5 @@
 package com.example.holidayswap.controller.property.coOwner;
 
-import com.example.holidayswap.domain.dto.request.property.PropertyRequestUpdate;
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerRequest;
 import com.example.holidayswap.domain.dto.request.property.coOwner.CoOwnerUpdateRequest;
 import com.example.holidayswap.domain.dto.response.property.coOwner.CoOwnerResponse;
@@ -67,18 +66,18 @@ public class CoOwnersController {
         coOwnerService.update(coOwnerId, coOwnerStatus);
         return ResponseEntity.ok().build();
     }
+
     @PutMapping("/update-status")
     public ResponseEntity<CoOwnerResponse> updateStatus(
             @RequestPart CoOwnerUpdateRequest resortUpdateRequest,
             @RequestPart(required = false) List<MultipartFile> resortImage) throws MessagingException, IOException {
-        coOwnerService.updateStatus(resortUpdateRequest.getPropertyId(), resortUpdateRequest.getRoomId(), resortUpdateRequest.getResortStatus(),resortUpdateRequest.getStartDate(),resortUpdateRequest.getEndDate(),  resortImage);
+        coOwnerService.updateStatus(resortUpdateRequest.getPropertyId(), resortUpdateRequest.getRoomId(), resortUpdateRequest.getResortStatus(), resortUpdateRequest.getStartDate(), resortUpdateRequest.getEndDate(), resortImage);
         return ResponseEntity.ok().build();
     }
-//
-//    @DeleteMapping
-//    public ResponseEntity<Void> delete(@RequestPart("coOwnerId") CoOwnerId coOwnerId) {
-//
-//        coOwnerService.delete(coOwnerId);
-//        return ResponseEntity.noContent().build();
-//    }
+
+    @GetMapping("/getListApartmentMaintain/{propertyId}/{apartmentId}")
+    public ResponseEntity<?> getListApartmentMaintain(@PathVariable("propertyId") Long propertyId,
+                                                      @PathVariable("apartmentId") String apartmentId) {
+        return ResponseEntity.ok(coOwnerService.getListOwnerShipMaintenance(propertyId, apartmentId));
+    }
 }

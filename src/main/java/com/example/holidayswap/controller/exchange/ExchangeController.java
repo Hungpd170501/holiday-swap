@@ -1,28 +1,67 @@
 package com.example.holidayswap.controller.exchange;
 
-import com.example.holidayswap.domain.entity.exchange.Exchange;
+import com.example.holidayswap.domain.dto.request.exchange.ExchangeCreatingRequest;
+import com.example.holidayswap.domain.dto.request.exchange.ExchangeUpdatingRequest;
+import com.example.holidayswap.domain.dto.response.auth.UserProfileResponse;
+import com.example.holidayswap.domain.dto.response.exchange.ExchangeResponse;
+import com.example.holidayswap.domain.dto.response.exchange.ExchangeWithDetailResponse;
 import com.example.holidayswap.service.exchange.IExchangeService;
 import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/exchange")
+@RequestMapping("api/v1/exchange")
 @AllArgsConstructor
 public class ExchangeController {
     private final IExchangeService exchangeService;
+
+    @GetMapping("/current-user")
+    public Page<ExchangeWithDetailResponse> getExchangesByUserId(
+            @RequestParam(name = "limit", defaultValue = "20") Integer limit,
+            @RequestParam(name = "offset", defaultValue = "0") Integer offset,
+            @RequestParam(defaultValue = "exchangeId") String sortProps,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ){
+        return exchangeService.getExchangesByUserId(limit, offset, sortProps, sortDirection);
+    }
+
+    @GetMapping("/{exchangeId}")
+    public ResponseEntity<ExchangeResponse> getExchangeById(@PathVariable("exchangeId") Long exchangeId) {
+        return ResponseEntity.ok(exchangeService.getExchangeById(exchangeId));
+    }
+
     @PostMapping("/create")
-    public void createExchange(@RequestBody Exchange exchange) {
-        exchangeService.CreateExchange(exchange.getAvailableTimeIdOfUser1(), exchange.getTotalMemberOfUser1(), exchange.getAvailableTimeIdOfUser2(), exchange.getTotalMemberOfUser2(), exchange.getUserIdOfUser1(), exchange.getUserIdOfUser2(), exchange.getPriceOfUser1(), exchange.getPriceOfUser2(), exchange.getCheckInDateOfUser1(), exchange.getCheckOutDateOfUser1(), exchange.getCheckInDateOfUser2(), exchange.getCheckOutDateOfUser2());
+    public ResponseEntity<ExchangeResponse> createExchange(@RequestBody ExchangeCreatingRequest exchangeCreatingRequest) {
+        return ResponseEntity.ok(exchangeService.create(exchangeCreatingRequest));
     }
-    @PutMapping("/update/{exchangeId}")
-    public void updateExchange(@PathVariable Long exchangeId, @RequestBody Exchange exchange) {
-        exchangeService.UpdateExchange(exchangeId, exchange.getAvailableTimeIdOfUser1(), exchange.getTotalMemberOfUser1(), exchange.getAvailableTimeIdOfUser2(), exchange.getTotalMemberOfUser2(), exchange.getPriceOfUser1(), exchange.getPriceOfUser2(), exchange.getCheckInDateOfUser1(), exchange.getCheckOutDateOfUser1(), exchange.getCheckInDateOfUser2(), exchange.getCheckOutDateOfUser2());
+
+    @PatchMapping("/{exchangeId}")
+    public ResponseEntity<Void> updateExchange(@PathVariable Long exchangeId, @RequestBody ExchangeUpdatingRequest exchangeUpdatingRequest) {
+        exchangeService.updateBaseData(exchangeId, exchangeUpdatingRequest);
+        return ResponseEntity.noContent().build();
     }
-    @PutMapping("/updateStatus/{exchangeId}")
-    public void updateStatus(@PathVariable Long exchangeId, @RequestBody String status) throws IOException, InterruptedException, WriterException {
-        exchangeService.UpdateStatus(exchangeId, status);
+
+    @PutMapping("/{exchangeId}/next-step")
+    public ResponseEntity<Void> approveExchange(@PathVariable Long exchangeId) throws InterruptedException, MessagingException, IOException, WriterException {
+        exchangeService.updateNextStatus(exchangeId);
+        return ResponseEntity.noContent().build();
     }
+    @PutMapping("/{exchangeId}/previous-step")
+    public ResponseEntity<Void> updateToPreviousStatus(@PathVariable Long exchangeId) throws InterruptedException {
+        exchangeService.updatePreviousStatus(exchangeId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{exchangeId}/cancel")
+    public ResponseEntity<Void> cancelExchange(@PathVariable Long exchangeId) throws InterruptedException {
+        exchangeService.cancel(exchangeId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
