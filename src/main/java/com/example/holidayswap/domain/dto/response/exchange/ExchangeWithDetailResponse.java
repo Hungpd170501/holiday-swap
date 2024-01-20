@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -35,4 +36,8 @@ public class ExchangeWithDetailResponse {
     private Long requestBookingId;
     private Long bookingId;
     private ExchangeStatus overallStatus;
+    private LocalDateTime createdOn;
+    private String createdBy;
+    private LocalDateTime lastModifiedOn;
+    private String lastModifiedBy;
 }

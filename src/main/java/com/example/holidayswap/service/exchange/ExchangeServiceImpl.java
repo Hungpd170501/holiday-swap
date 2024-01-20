@@ -102,6 +102,12 @@ public class ExchangeServiceImpl implements IExchangeService {
                 messagingTemplate.convertAndSend("/topic/exchange-" + exchangeId + "-" + exchange.getUserId(),
                         exchangeUpdatingResponse);
             }
+            bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
+                bookingRepository.deleteById(booking.getId());
+            });
+            bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
+                bookingRepository.deleteById(booking.getId());
+            });
             exchange.setRequestStatus(ExchangeStatus.CONVERSATION);
             exchange.setStatus(ExchangeStatus.CONVERSATION);
             exchange.setOverallStatus(ExchangeStatus.CONVERSATION);
@@ -153,9 +159,22 @@ public class ExchangeServiceImpl implements IExchangeService {
             exchange.setOverallStatus(nextStatus);
             messagingTemplate.convertAndSend("/topic/exchangeStep-" + exchange.getExchangeId(), step);
             if (exchange.getOverallStatus().equals(ExchangeStatus.SUCCESS)) {
+                bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
+                    booking.setStatus(EnumBookingStatus.BookingStatus.SUCCESS);
+                    bookingRepository.save(booking);
+                });
+                bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
+                    booking.setStatus(EnumBookingStatus.BookingStatus.SUCCESS);
+                    bookingRepository.save(booking);
+                });
                 CompletableFuture.runAsync(() -> {
                     var recipient = userService.getUserById(exchange.getUserId());
                     bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
+                        pushNotificationService.createNotification(
+                                NotificationRequest.builder()
+                                        .subject("Exchange success.")
+                                        .toUserId(exchange.getUserId())
+                                        .content("Your exchange with "+ recipient.getUsername() + "has been success.").build());
                         try {
                             emailService.sendConfirmBookedHtml(booking, recipient.getEmail());
                         } catch (MessagingException e) {
@@ -167,6 +186,11 @@ public class ExchangeServiceImpl implements IExchangeService {
                 CompletableFuture.runAsync(() -> {
                     var recipient = userService.getUserById(exchange.getRequestUserId());
                     bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
+                        pushNotificationService.createNotification(
+                                NotificationRequest.builder()
+                                        .subject("Exchange success.")
+                                        .toUserId(exchange.getUserId())
+                                        .content("Your exchange with "+ recipient.getUsername() + "has been success.").build());
                         try {
                             emailService.sendConfirmBookedHtml(booking, recipient.getEmail());
                         } catch (MessagingException e) {
@@ -223,12 +247,10 @@ public class ExchangeServiceImpl implements IExchangeService {
                     exchange.setOverallStatus(ExchangeStatus.CONVERSATION);
                     exchangeRepository.save(exchange);
                     bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
-                        booking.setStatus(EnumBookingStatus.BookingStatus.FAILED);
-                        bookingRepository.save(booking);
+                        bookingRepository.deleteById(booking.getId());
                     });
                     bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
-                        booking.setStatus(EnumBookingStatus.BookingStatus.FAILED);
-                        bookingRepository.save(booking);
+                        bookingRepository.deleteById(booking.getId());
                     });
                     messagingTemplate.convertAndSend("/topic/exchangeStep-" + exchangeId,
                             "0");
@@ -287,18 +309,6 @@ public class ExchangeServiceImpl implements IExchangeService {
                         PageRequest.of(offset, limit, Sort.by(Sort.Direction.fromString(sortDirection), sortProps)))
                 .map(ExchangeMapper.INSTANCE::toExchangeWithDetailResponse)
                 .map(exchangeWithDetailResponse -> {
-//                    CompletableFuture<Void> future1 = CompletableFuture.runAsync(()
-//                            -> exchangeWithDetailResponse.setAvailableTime(
-//                                    ApartmentForRentMapper.INSTANCE.toDtoResponse(
-//                                            availableTimeRepository.findApartmentForRentByCoOwnerId(
-//                                                    exchangeWithDetailResponse.getAvailableTimeId())
-//                                            .orElse(null))));
-//                    CompletableFuture<Void> future2 = CompletableFuture.runAsync(()
-//                            -> exchangeWithDetailResponse.setAvailableTime(
-//                                    ApartmentForRentMapper.INSTANCE.toDtoResponse(
-//                                            availableTimeRepository.findApartmentForRentByCoOwnerId(
-//                                                    exchangeWithDetailResponse.getRequestAvailableTimeId())
-//                                            .orElse(null))));
                     CompletableFuture<Void> future3 = CompletableFuture.runAsync(()
                             -> exchangeWithDetailResponse.setRequestUser(
                             userService.getUserById(exchangeWithDetailResponse.getRequestUserId())));
@@ -312,12 +322,12 @@ public class ExchangeServiceImpl implements IExchangeService {
                     }
                     exchangeWithDetailResponse.setAvailableTime(
                             ApartmentForRentMapper.INSTANCE.toDtoResponse(
-                                    availableTimeRepository.findApartmentForRentByCoOwnerId(
+                                    availableTimeRepository.findApartmentForRentByCoOwnerIdIgnoreStatus(
                                                     exchangeWithDetailResponse.getAvailableTimeId())
                                             .orElse(null)));
-                    exchangeWithDetailResponse.setAvailableTime(
+                    exchangeWithDetailResponse.setRequestAvailableTime(
                             ApartmentForRentMapper.INSTANCE.toDtoResponse(
-                                    availableTimeRepository.findApartmentForRentByCoOwnerId(
+                                    availableTimeRepository.findApartmentForRentByCoOwnerIdIgnoreStatus(
                                                     exchangeWithDetailResponse.getRequestAvailableTimeId())
                                             .orElse(null)));
                     return exchangeWithDetailResponse;

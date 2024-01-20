@@ -192,6 +192,23 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
             select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
                 at 
             )
+                 from AvailableTime at
+                 left join at.coOwner co
+                 left join co.timeFrames tf
+                 left join co.property p
+                 left join p.resort r
+                 left join co.user u
+                 where
+                 at.id = :availableId
+                 and co.status = 'ACCEPTED'
+            """)
+    Optional<ApartmentForRentDTO> findApartmentForRentByCoOwnerIdIgnoreStatus(@Param("availableId") Long availableId);
+
+
+    @Query(value = """
+            select distinct new com.example.holidayswap.domain.dto.response.property.ApartmentForRentDTO (
+                at 
+            )
             from AvailableTime at
                  left join at.coOwner co
                  left join co.timeFrames tf
@@ -201,7 +218,6 @@ public interface AvailableTimeRepository extends JpaRepository<AvailableTime, Lo
                  left join p.inRoomAmenities ira
                  left join p.propertyType pt
                  left join p.propertyView pv
-                 left join  at.bookings bk
                  where
                co.user.userId  = :userId
             """)
