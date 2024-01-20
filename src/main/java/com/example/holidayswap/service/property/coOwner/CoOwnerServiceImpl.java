@@ -205,6 +205,7 @@ public class CoOwnerServiceImpl implements CoOwnerService {
                 });
                 //update role user to Membership
                 var user = userRepository.findById(co.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found to accept co-Owner in apartment!."));
+                userService.upgradeUserToMember(co.getUserId());
                 //send mail
                 try {
                     notification.setSubject("Apartment register co-owner accepted");
@@ -216,7 +217,6 @@ public class CoOwnerServiceImpl implements CoOwnerService {
                     log.error("Error sending verification email", e);
                 }
             } else if (coOwnerStatus.equals(CoOwnerStatus.REJECTED)) {
-                userService.upgradeUserToMember(co.getUserId());
                 var user = userRepository.findById(co.getUserId()).orElseThrow(() -> new EntityNotFoundException("User not found to accept co-Owner in apartment!."));
                 //send mail
                 try {
