@@ -46,31 +46,47 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, Long> {
             """, nativeQuery = true)
     Page<CoOwner> findAllByResortIdAndPropertyIdAndUserIdAndRoomIdAndStatus(@Param("resortId") Long resortId, @Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("coOwnerStatus") String coOwnerStatus, @Param("property_status") String property_status, @Param("resort_status") String resort_status, Pageable pageable);
 
-    @Query(value =
-            """
-                    select
-                    	co.*
-                    from
-                    	co_owner co
-                    inner join property p on
-                    	co.property_id = p.property_id
-                    inner join resort r on
-                    	r.resort_id = p.resort_id
-                    where
-                    	(:resortId is null
-                    		or p.property_id = :resortId)
-                    	and (:propertyId is null
-                    		or co.property_id = :propertyId)
-                    	and (:userId is null
-                    		or co.user_id = :userId)
-                    	and (:roomId is null
-                    		or co.room_id = :roomId)
-                    	and (:coOwnerStatus is null
-                    		or co.status = :coOwnerStatus)
-                    		and p.is_deleted = false
-                    		and r.is_deleted = false
-                     """, nativeQuery = true)
+    @Query(value = """
+            select
+            	co.*
+            from
+            	co_owner co
+            inner join property p on
+            	co.property_id = p.property_id
+            inner join resort r on
+            	r.resort_id = p.resort_id
+            where
+            	(:resortId is null
+            		or p.property_id = :resortId)
+            	and (:propertyId is null
+            		or co.property_id = :propertyId)
+            	and (:userId is null
+            		or co.user_id = :userId)
+            	and (:roomId is null
+            		or co.room_id = :roomId)
+            	and (:coOwnerStatus is null
+            		or co.status = :coOwnerStatus)
+            		and p.is_deleted = false
+            		and r.is_deleted = false
+             """, nativeQuery = true)
     Page<CoOwner> findAllByResortIdAndPropertyIdAndUserIdAndRoomIdAndStatus(@Param("resortId") Long resortId, @Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("coOwnerStatus") String coOwnerStatus, Pageable pageable);
+
+    @Query(value = """
+            select new com.example.holidayswap.domain.entity.property.coOwner.CoOwner
+            (co.propertyId, co.property, co.roomId)
+            from CoOwner co
+            inner join co.property p
+            inner join p.resort r
+            where co.status = 'ACCEPTED'
+            and p.isDeleted = false
+            and p.status = 'ACTIVE'
+            and r.isDeleted = false
+            and r.status = 'ACTIVE'
+            and (:propertyId is null or co.propertyId = :propertyId)
+            and (:roomId is null or co.roomId = :roomId)
+            group by co.propertyId, co.property, co.roomId
+             """)
+    Page<CoOwner> findAllByPropertyAndRoomId(@Param("propertyId") Long propertyId, @Param("roomId") String roomId, Pageable pageable);
 
 //    @Query("""
 //            select o from CoOwner o
@@ -102,7 +118,8 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, Long> {
     List<CoOwner> checkOverlapsTimeOwnership(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
     @Query(value = "select c.* from co_owner c where c.property_id = ?1 and c.room_id = ?2", nativeQuery = true)
-   List<CoOwner> findByPropertyIdAndRoomId(Long propertyId, String apartmentId);
+    List<CoOwner> findByPropertyIdAndRoomId(Long propertyId, String apartmentId);
+
     @Query(value = "SELECT Distinct o.property_id, o.room_id from co_owner o", nativeQuery = true)
     List<OwnerShipResponseDTO> getAllDistinctOwnerShipWithoutUserId();
 
@@ -147,10 +164,8 @@ public interface CoOwnerRepository extends JpaRepository<CoOwner, Long> {
                           co.type = :type
                 end
             """, nativeQuery = true)
-    Optional<CoOwner> findByPropertyIdAndUserIdAndRoomIdAndType(@Param("propertyId") Long propertyId,
-                                                                @Param("userId") Long userId,
-                                                                @Param("roomId") String roomId,
-                                                                @Param("type") String type,
-                                                                @Param("startTime") LocalDate startTime,
-                                                                @Param("endTime") LocalDate endTime);
+    Optional<CoOwner> findByPropertyIdAndUserIdAndRoomIdAndType(@Param("propertyId") Long propertyId, @Param("userId") Long userId, @Param("roomId") String roomId, @Param("type") String type, @Param("startTime") LocalDate startTime, @Param("endTime") LocalDate endTime);
+
+    @Query(value = "select c.* from co_owner c where c.co_owner_id = ?1 and c.is_deleted = false", nativeQuery = true)
+    Optional<CoOwner> findByIdAndDeleted(Long id);
 }

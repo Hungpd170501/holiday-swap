@@ -27,7 +27,7 @@ public interface CoOwnerMaintenanceRepository extends JpaRepository<OwnerShipMai
 
     @Query(value = """
             select r.* from owner_ship_maintenance r
-            where r.property_id = ?3 and r.type = ?5 and r.apartment_id = ?4 and ((r.start_date BETWEEN date (?2) AND date (?3)) OR r.start_date = date (?2) OR r.start_date = date (?3))
+            where r.property_id = ?3 and r.type = ?5 and r.apartment_id = ?4 and ((r.start_date BETWEEN date (?1) AND date (?2)) OR r.start_date = date (?1) OR r.start_date = date (?2))
                          """, nativeQuery = true)
     OwnerShipMaintenance findCoOwnerMaintenanceByStartDateAndEndDateAndPropertyIdAndApartmentIdAndType(LocalDateTime startDate, LocalDateTime endDate, Long propertyId, String apartmentId, String type);
 
