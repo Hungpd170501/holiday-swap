@@ -102,12 +102,16 @@ public class ExchangeServiceImpl implements IExchangeService {
                 messagingTemplate.convertAndSend("/topic/exchange-" + exchangeId + "-" + exchange.getUserId(),
                         exchangeUpdatingResponse);
             }
-            bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
-                bookingRepository.deleteById(booking.getId());
-            });
-            bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
-                bookingRepository.deleteById(booking.getId());
-            });
+            if(exchange.getBookingId() !=null){
+                bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
+                    bookingRepository.deleteById(booking.getId());
+                });
+            }
+            if(exchange.getRequestBookingId() !=null){
+                bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
+                    bookingRepository.deleteById(booking.getId());
+                });
+            }
             exchange.setRequestStatus(ExchangeStatus.CONVERSATION);
             exchange.setStatus(ExchangeStatus.CONVERSATION);
             exchange.setOverallStatus(ExchangeStatus.CONVERSATION);
@@ -246,12 +250,14 @@ public class ExchangeServiceImpl implements IExchangeService {
                     exchange.setRequestStatus(ExchangeStatus.CONVERSATION);
                     exchange.setOverallStatus(ExchangeStatus.CONVERSATION);
                     exchangeRepository.save(exchange);
-                    bookingRepository.findById(exchange.getBookingId()).ifPresent(booking -> {
-                        bookingRepository.deleteById(booking.getId());
-                    });
-                    bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking -> {
-                        bookingRepository.deleteById(booking.getId());
-                    });
+                    if(exchange.getBookingId() !=null){
+                        bookingRepository.findById(exchange.getBookingId()).ifPresent(booking ->
+                                bookingRepository.deleteById(booking.getId()));
+                    }
+                    if(exchange.getRequestBookingId() !=null){
+                        bookingRepository.findById(exchange.getRequestBookingId()).ifPresent(booking ->
+                                bookingRepository.deleteById(booking.getId()));
+                    }
                     messagingTemplate.convertAndSend("/topic/exchangeStep-" + exchangeId,
                             "0");
                 } finally {
