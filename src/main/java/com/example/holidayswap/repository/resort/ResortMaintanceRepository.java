@@ -23,7 +23,7 @@ public interface ResortMaintanceRepository extends JpaRepository<ResortMaintance
                             OR (date (?3) > date (r.start_date) AND date (?3) < date (r.end_date))
                             OR( date  (?2) <= date (r.start_date) AND date (?3) >= date (r.end_date) ))
                          """, nativeQuery = true)
-    Optional <ResortMaintance> findByResortIdAndStartDateAndEndDateAndType(Long resortId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
+    List <ResortMaintance> findByResortIdAndStartDateAndEndDateAndType(Long resortId, LocalDateTime startDate, LocalDateTime endDate, String resortStatus);
 
     @Query(value = """
             select r.* from resort_maintaince r

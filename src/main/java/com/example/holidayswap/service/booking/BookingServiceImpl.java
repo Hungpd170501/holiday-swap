@@ -772,22 +772,23 @@ public class BookingServiceImpl implements IBookingService {
         LocalDateTime checkoutDate = checkOutDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         var co = coOwnerRepository.findByIdAndDeleted(availableTime.getCoOwnerId()).get();
 
-        propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
+        var propertyCheck = propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
                 co.getPropertyId(),
-                        checkinDate, checkoutDate, PropertyStatus.MAINTENANCE.name())
-                .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
-        propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
+                        checkinDate, checkoutDate, PropertyStatus.MAINTENANCE.name());
+        propertyCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+
+        propertyCheck =propertyMaintenanceRepository.findByPropertyIdAndStartDateAndEndDateAndType(
                         co.getPropertyId(),
-                        checkinDate, checkinDate, PropertyStatus.MAINTENANCE.name())
-                .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+                        checkinDate, checkinDate, PropertyStatus.MAINTENANCE.name());
+        propertyCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
 
 
-        resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
-                        co.getProperty().getResortId(), checkinDate, checkinDate, ResortStatus.MAINTENANCE.name())
-                .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
-        resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
-                        co.getProperty().getResortId(), checkinDate, checkoutDate, ResortStatus.MAINTENANCE.name())
-                .ifPresent(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+        var resortCheck = resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
+                        co.getProperty().getResortId(), checkinDate, checkinDate, ResortStatus.MAINTENANCE.name());
+                resortCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
+        resortCheck=resortMaintanceRepository.findByResortIdAndStartDateAndEndDateAndType(
+                        co.getProperty().getResortId(), checkinDate, checkoutDate, ResortStatus.MAINTENANCE.name());
+        resortCheck.forEach(x -> {throw new RuntimeException("This apartment is maintenance at date: " + x.getStartDate() + " to " + x.getEndDate());});
 
         var checkCoOwner = coOwnerMaintenanceRepository.findByPropertyIdAndApartmentIdAndStartDateAndEndDateAndType(
                 co.getPropertyId(), checkinDate,
