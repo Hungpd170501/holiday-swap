@@ -68,6 +68,12 @@ public class TimeFrameServiceImpl implements TimeFrameService {
             if (!listTimeFrameDEEDEDDuplicate2.isEmpty())
                 throw new DataIntegrityViolationException("Duplicate!.");
         } else {
+            var listTimeFrameDEEDEDDuplicate2 = timeFrameRepository.findByPropertyIdAndRoomIdAndWeekNumberDEEDEDDuplicate(co.getPropertyId(),
+//                    co.getUserId(),
+                    co.getRoomId(),
+                    weekNumber);
+            if (!listTimeFrameDEEDEDDuplicate2.isEmpty())
+                throw new DataIntegrityViolationException("Duplicate!.");
             var listTimeFrameRIGHTTOUSEDuplicate = timeFrameRepository.findByPropertyIdAndRoomIdAndWeekNumberRIGHTTOUSEDuplicate(co.getPropertyId(),
 //                    co.getUserId(),
                     co.getRoomId(), co.getStartTime(), co.getEndTime(), weekNumber);
