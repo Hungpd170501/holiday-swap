@@ -69,6 +69,7 @@ public class ExchangeServiceImpl implements IExchangeService {
         availableTimeRepository.findById(exchange.getAvailableTimeId())
                 .orElseThrow(()->new EntityNotFoundException("Available Time not found"));
         exchange.setRequestUserId(user.getUserId());
+        exchange.setTotalMember(1);
         exchange.setRequestStatus(ExchangeStatus.CONVERSATION);
         exchange.setStatus(ExchangeStatus.CONVERSATION);
         exchange.setOverallStatus(ExchangeStatus.CONVERSATION);
@@ -94,6 +95,7 @@ public class ExchangeServiceImpl implements IExchangeService {
                 exchange.setTotalMember(exchangeUpdatingRequest.getTotalMember());
                 exchangeUpdatingResponse.setAvailableTimeId(exchange.getAvailableTimeId());
                 exchangeUpdatingResponse.setUserId(exchange.getUserId());
+
                 messagingTemplate.convertAndSend("/topic/exchange-" + exchangeId + "-" + exchange.getRequestUserId(),
                         exchangeUpdatingResponse);
             }
@@ -159,12 +161,16 @@ public class ExchangeServiceImpl implements IExchangeService {
             exchange.setStatus(nextStatus);
             handleBookingUpdate(exchange, user, nextStatus, exchange.getAvailableTimeId(),
                     exchange.getCheckInDate(), exchange.getCheckOutDate(),
-                    exchange.getTotalMember(), exchange.getStatus());
+                    exchange.getTotalMember(), exchange.getStatus(),
+                    exchange.getBookingId()
+            );
         } else {
             exchange.setRequestStatus(nextStatus);
             handleBookingUpdate(exchange, user, nextStatus, exchange.getRequestAvailableTimeId(),
                     exchange.getRequestCheckInDate(), exchange.getRequestCheckOutDate(),
-                    exchange.getRequestTotalMember(), exchange.getRequestStatus());
+                    exchange.getRequestTotalMember(), exchange.getRequestStatus(),
+                    exchange.getRequestBookingId()
+            );
         }
 
         if (exchange.getStatus().equals(exchange.getRequestStatus())) {
@@ -222,7 +228,8 @@ public class ExchangeServiceImpl implements IExchangeService {
 
     private void handleBookingUpdate(Exchange exchange, User user, ExchangeStatus nextStatus, Long availableTimeId,
                                      LocalDate checkInDate, LocalDate checkOutDate,
-                                     int numberOfGuest, ExchangeStatus currentStatus) throws MessagingException, IOException, InterruptedException, WriterException {
+                                     int numberOfGuest, ExchangeStatus currentStatus,
+                                     Long currentBookingId) throws MessagingException, IOException, InterruptedException, WriterException {
         if (nextStatus.equals(ExchangeStatus.PRE_CONFIRMATION)) {
             Long bookingId = bookingService.createBookingExchange(
                     BookingRequest.builder()
@@ -242,7 +249,7 @@ public class ExchangeServiceImpl implements IExchangeService {
             exchangeRepository.save(exchange);
         }
         if (nextStatus.equals(ExchangeStatus.SUCCESS)) {
-            bookingService.payBookingExchange(exchange.getBookingId());
+            bookingService.payBookingExchange(currentBookingId);
         }
     }
 
